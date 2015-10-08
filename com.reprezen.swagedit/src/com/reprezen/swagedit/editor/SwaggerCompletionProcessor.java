@@ -11,42 +11,57 @@ import org.eclipse.jface.text.contentassist.ICompletionProposal;
 import org.eclipse.jface.text.contentassist.IContentAssistProcessor;
 import org.eclipse.jface.text.contentassist.IContextInformation;
 import org.eclipse.jface.text.contentassist.IContextInformationValidator;
-
-import com.reprezen.swagedit.editor.SwaggerDocumentProvider.SwaggerDocument;
+import org.yaml.snakeyaml.events.Event;
+import org.yaml.snakeyaml.events.ScalarEvent;
 
 public class SwaggerCompletionProcessor implements IContentAssistProcessor {
 
-	private String[] proposals = new String[] { "swagger:", "info:", "description:", "host:", "schemes:", "consumes:",
-			"produces:", "paths:", "definitions:" };
+	private SwaggerCompletionProposal proposals = SwaggerCompletionProposal.create();
 
 	@Override
 	public ICompletionProposal[] computeCompletionProposals(ITextViewer viewer, int offset) {
 		IDocument document = viewer.getDocument();
 		int lineOfOffset = 0;
-		int lineOffset = 0;
+//		int lineOffset = 0;
 		try {
 			lineOfOffset = document.getLineOfOffset(offset);
-			lineOffset = document.getLineOffset(lineOfOffset);
+//			lineOffset = document.getLineOffset(lineOfOffset);
 
 			// do not show any content assist in case the offset is not at the
 			// beginning of a line
-			if (offset != lineOffset) {
-				return new ICompletionProposal[0];
-			}
+//			if (offset != lineOffset) {
+//				return new ICompletionProposal[0];
+//			}
 		} catch (BadLocationException e) {
 			// ignore here and just continue
 		}
 
+		List<Event> events = null;
 		if (document instanceof SwaggerDocument) {
-			((SwaggerDocument) document).getEvent(lineOfOffset);
+			events = ((SwaggerDocument) document).getEvent(lineOfOffset);
 		}
 
 		List<ICompletionProposal> completionProposals = new ArrayList<ICompletionProposal>();
 
-		for (String c : proposals) {
-			// Only add proposal if it is not already present
-			if (!(viewer.getDocument().get().contains(c))) {
-				completionProposals.add(new CompletionProposal(c, offset, 0, c.length()));
+		if (!events.isEmpty()) {
+			Event event = events.get(0);
+			if (event instanceof ScalarEvent) {
+				String value = ((ScalarEvent) event).getValue();
+				List<SwaggerProposal> list = proposals.getProposals().get(value);
+				
+				if (list != null) {
+					for (SwaggerProposal proposal: list) {
+						completionProposals.add(new CompletionProposal(proposal.name, 
+								offset + 1, 0, proposal.name.length()));
+					}
+				}
+			}
+		} else {
+			for (String c: proposals.getProposals().keySet()) {
+				// Only add proposal if it is not already present
+				if (!(viewer.getDocument().get().contains(c))) {
+					completionProposals.add(new CompletionProposal(c, offset, 0, c.length()));
+				}
 			}
 		}
 

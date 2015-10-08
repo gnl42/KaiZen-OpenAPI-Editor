@@ -13,6 +13,7 @@ import io.swagger.util.Json;
 public class Schema {
 
 	private final JsonSchemaFactory factory = JsonSchemaFactory.byDefault();
+	private final ObjectMapper jsonMapper = Json.mapper();
 	private JsonSchema schema;
 
 	/**
@@ -22,7 +23,6 @@ public class Schema {
 	 */
 	public JsonSchema getSchema() {
 		if (schema == null) {
-			final ObjectMapper jsonMapper = Json.mapper();
 			JsonNode schemaObject = null;
 
 			try {
@@ -42,4 +42,13 @@ public class Schema {
 
 		return schema;
 	}
+
+	public JsonNode getTree() {
+		try {
+			return jsonMapper.readTree(Schema.class.getResourceAsStream("schema.json"));
+		} catch (IOException e) {
+			return null;
+		}
+	}
+
 }
