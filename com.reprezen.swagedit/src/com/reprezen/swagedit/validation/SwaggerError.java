@@ -13,7 +13,7 @@ import com.fasterxml.jackson.databind.JsonMappingException;
 import com.github.fge.jsonschema.core.report.LogLevel;
 import com.github.fge.jsonschema.core.report.ProcessingMessage;
 import com.github.fge.jsonschema.core.report.ProcessingReport;
-import com.reprezen.swagedit.editor.SwaggerDocumentProvider.SwaggerDocument;
+import com.reprezen.swagedit.editor.SwaggerDocument;
 
 public class SwaggerError {
 

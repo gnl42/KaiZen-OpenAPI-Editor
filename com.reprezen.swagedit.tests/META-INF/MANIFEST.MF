@@ -5,5 +5,7 @@ Bundle-SymbolicName: com.reprezen.swagedit.tests;singleton:=true
 Bundle-Version: 0.1.0.qualifier
 Bundle-RequiredExecutionEnvironment: JavaSE-1.7
 Require-Bundle: org.junit;bundle-version="4.0.0",
- com.reprezen.swagedit;bundle-version="0.1.0"
+ com.reprezen.swagedit;bundle-version="0.1.0",
+ com.github.fge.json-schema-validator,
+ com.fasterxml.jackson.core.jackson-databind
 Export-Package: com.reprezen.swagedit.tests
