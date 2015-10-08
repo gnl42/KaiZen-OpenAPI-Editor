@@ -56,6 +56,12 @@
             id="com.reprezen.swagedit.preferences"
             name="Swagger">
       </page>
+      <page
+            category="com.reprezen.swagedit.preferences"
+            class="com.reprezen.swagedit.preferences.SwaggerColorPreferences"
+            id="com.reprezen.swagedit.preferences.SwaggerColorPreferences"
+            name="Color Preferences">
+      </page>
    </extension>
 
 </plugin>

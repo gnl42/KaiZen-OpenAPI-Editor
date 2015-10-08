@@ -1,39 +1,31 @@
 package com.reprezen.swagedit.preferences;
 
-import org.eclipse.jface.preference.PreferencePage;
-import org.eclipse.jface.resource.ImageDescriptor;
-import org.eclipse.swt.widgets.Composite;
-import org.eclipse.swt.widgets.Control;
+import org.eclipse.jface.preference.FieldEditorPreferencePage;
 import org.eclipse.ui.IWorkbench;
 import org.eclipse.ui.IWorkbenchPreferencePage;
 
-public class SwaggerPreferencePage extends PreferencePage implements IWorkbenchPreferencePage {
+import com.reprezen.swagedit.Activator;
+
+public class SwaggerPreferencePage extends FieldEditorPreferencePage implements IWorkbenchPreferencePage {
 
 	public SwaggerPreferencePage() {
-		super();
+		super(GRID);
 		setDescription("Swagger Preferences");
-	}
-
-	public SwaggerPreferencePage(String title) {
-		super(title);
-		// TODO Auto-generated constructor stub
-	}
-
-	public SwaggerPreferencePage(String title, ImageDescriptor image) {
-		super(title, image);
-		// TODO Auto-generated constructor stub
+		setPreferenceStore(Activator.getDefault().getPreferenceStore());
 	}
 
 	@Override
 	public void init(IWorkbench workbench) {
 		// TODO Auto-generated method stub
-
+		
 	}
 
 	@Override
-	protected Control createContents(Composite parent) {
+	protected void createFieldEditors() {
 		// TODO Auto-generated method stub
-		return null;
+		
 	}
+
+	
 
 }
