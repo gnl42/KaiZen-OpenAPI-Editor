@@ -20,6 +20,8 @@ import org.eclipse.swt.widgets.Label;
 import org.eclipse.swt.widgets.Text;
 import org.eclipse.ui.dialogs.ContainerSelectionDialog;
 
+import com.reprezen.swagedit.Activator;
+
 public class SwagEditNewWizardPage extends WizardPage {
 	private Text containerText;
 	private Text fileText;
@@ -35,6 +37,7 @@ public class SwagEditNewWizardPage extends WizardPage {
 		super("wizardPage");
 		setTitle("Swagger");
 		setDescription("This wizard creates a new file with *.yaml extension that can be opened by the swagger editor.");
+		setImageDescriptor(Activator.imageDescriptorFromPlugin("com.reprezen.swagedit", "icons/swagger_64.jpg"));
 		this.selection = selection;
 	}
 
