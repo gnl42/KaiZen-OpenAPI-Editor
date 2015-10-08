@@ -27,14 +27,14 @@ public class SwagEditNewWizardPage extends WizardPage {
 	private final String extension = "yaml";
 
 	/**
-	 * Constructor for SampleNewWizardPage.
+	 * Constructor for SwagEditNewWizardPage.
 	 * 
-	 * @param pageName
+	 * @param selection
 	 */
 	public SwagEditNewWizardPage(ISelection selection) {
 		super("wizardPage");
 		setTitle("Swagger");
-		setDescription("This wizard creates a new file with *.yml extension that can be opened by the swagger editor.");
+		setDescription("This wizard creates a new file with *.yaml extension that can be opened by the swagger editor.");
 		this.selection = selection;
 	}
 
@@ -108,7 +108,6 @@ public class SwagEditNewWizardPage extends WizardPage {
 	 * Uses the standard container selection dialog to choose the new value for
 	 * the container field.
 	 */
-
 	private void handleBrowse() {
 		ContainerSelectionDialog dialog = new ContainerSelectionDialog(
 				getShell(), ResourcesPlugin.getWorkspace().getRoot(), false,
@@ -124,7 +123,6 @@ public class SwagEditNewWizardPage extends WizardPage {
 	/**
 	 * Ensures that both text fields are set.
 	 */
-
 	private void dialogChanged() {
 		IResource container = ResourcesPlugin.getWorkspace().getRoot()
 				.findMember(new Path(getContainerName()));
