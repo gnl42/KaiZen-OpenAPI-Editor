@@ -20,6 +20,7 @@
          point="org.eclipse.ui.editors">
       <editor
             class="com.reprezen.swagedit.editor.SwaggerEditor"
+            contributorClass="org.eclipse.ui.texteditor.BasicTextEditorActionContributor"
             default="true"
             filenames="yaml"
             icon="icons/swagger_16.jpg"
