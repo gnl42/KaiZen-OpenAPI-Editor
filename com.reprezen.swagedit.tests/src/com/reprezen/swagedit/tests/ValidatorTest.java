@@ -48,6 +48,42 @@ public class ValidatorTest {
 		assertEquals(8, error.getLine());
 	}
 
+	@Test
+	public void shouldReturnSingleErrorIfTypeOfDeepPropertyIsIncorrect() throws IOException {
+		String content = read("fixt4.yaml");
+
+		List<SwaggerError> errors = validator.validate(content);
+		assertEquals(1, errors.size());
+
+		SwaggerError error = errors.get(0);
+		assertEquals(IMarker.SEVERITY_ERROR, error.getLevel());
+		assertEquals(11, error.getLine());
+	}
+
+	@Test
+	public void shouldReturnSingleErrorIfInvalidResponseCode() throws IOException {
+		String content = read("fixt5.yaml");
+
+		List<SwaggerError> errors = validator.validate(content);
+		assertEquals(1, errors.size());
+
+		SwaggerError error = errors.get(0);
+		assertEquals(IMarker.SEVERITY_ERROR, error.getLevel());
+		assertEquals(12, error.getLine());
+	}
+
+	@Test
+	public void shouldReturnErrorForInvalidScheme() throws IOException {
+		String content = read("fixt6.yaml");
+
+		List<SwaggerError> errors = validator.validate(content);
+		assertEquals(1, errors.size());
+
+		SwaggerError error = errors.get(0);
+		assertEquals(IMarker.SEVERITY_ERROR, error.getLevel());
+		assertEquals(8, error.getLine());
+	}
+
 	private String read(String fileName) throws IOException {
 		return new String(Files.readAllBytes(Paths.get("fixtures", fileName)));
 	}
