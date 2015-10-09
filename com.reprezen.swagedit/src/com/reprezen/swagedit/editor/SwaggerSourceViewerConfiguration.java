@@ -5,9 +5,13 @@ import org.eclipse.jface.text.IDocument;
 import org.eclipse.jface.text.contentassist.ContentAssistant;
 import org.eclipse.jface.text.contentassist.IContentAssistProcessor;
 import org.eclipse.jface.text.contentassist.IContentAssistant;
+import org.eclipse.jface.text.reconciler.IReconciler;
+import org.eclipse.jface.text.reconciler.MonoReconciler;
 import org.eclipse.jface.text.source.ISourceViewer;
 
 public class SwaggerSourceViewerConfiguration extends YEditSourceViewerConfiguration {
+
+	private SwaggerEditor editor;
 
 	public SwaggerSourceViewerConfiguration() {
 		super();
@@ -36,6 +40,18 @@ public class SwaggerSourceViewerConfiguration extends YEditSourceViewerConfigura
 		ca.enableAutoInsert(true);
 
 		return ca;
+	}
+
+	@Override
+	public IReconciler getReconciler(ISourceViewer sourceViewer) {
+		SwaggerReconcilingStrategy strategy = new SwaggerReconcilingStrategy();
+		strategy.setEditor(editor);
+		MonoReconciler reconciler = new MonoReconciler(strategy,false);
+		return reconciler;
+	}
+
+	public void setEditor(SwaggerEditor editor) {
+		this.editor = editor;
 	}
 
 }
