@@ -1,0 +1,11 @@
+# fixture 4
+# invalid responses type 
+
+swagger: '2.0'
+info:
+  version: 0.0.0
+  title: Simple API
+paths:
+  /:
+    get:
+      responses: 'Hello'

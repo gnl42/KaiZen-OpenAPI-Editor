@@ -1,0 +1,68 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<?eclipse version="3.2"?>
+<plugin>
+   <extension
+         point="org.eclipse.ui.newWizards">
+      <category
+            id="com.reprezen.swagedit"
+            name="Swagger">
+      </category>
+      <wizard
+            category="com.reprezen.swagedit"
+            class="com.reprezen.swagedit.wizards.SwagEditNewWizard"
+            icon="icons/swagger_32.jpg"
+            id="com.reprezen.swagedit.wizards.SwagEditNewWizard"
+            name="Swagger File">
+      </wizard>
+   </extension>
+
+   <extension
+         point="org.eclipse.ui.editors">
+      <editor
+            class="com.reprezen.swagedit.editor.SwaggerEditor"
+            contributorClass="org.eclipse.ui.texteditor.BasicTextEditorActionContributor"
+            default="true"
+            filenames="yaml"
+            icon="icons/swagger_16.jpg"
+            id="com.reprezen.swagedit.editor"
+            name="Swagger Editor">
+         <contentTypeBinding
+               contentTypeId="com.reprezen.swagedit.contentTypeBinding">
+         </contentTypeBinding>
+      </editor>
+   </extension>
+
+   <extension
+         point="org.dadacoalition.yedit.sourceViewerConfigurationContribution">
+         <sourceViewerConfiguration
+         	class="com.reprezen.swagedit.editor.SwaggerSourceViewerConfiguration">
+         </sourceViewerConfiguration>
+   </extension>
+
+   <extension
+         point="org.eclipse.core.contenttype.contentTypes">
+      <content-type
+            base-type="org.eclipse.core.runtime.text"
+            file-extensions="yaml"
+            id="com.reprezen.swagedit.contentTypeBinding"
+            name="Swagger Content Type"
+            priority="high">
+      </content-type>
+   </extension>
+
+   <extension
+         point="org.eclipse.ui.preferencePages">
+      <page
+            class="com.reprezen.swagedit.preferences.SwaggerPreferencePage"
+            id="com.reprezen.swagedit.preferences"
+            name="Swagger">
+      </page>
+      <page
+            category="com.reprezen.swagedit.preferences"
+            class="com.reprezen.swagedit.preferences.SwaggerColorPreferences"
+            id="com.reprezen.swagedit.preferences.SwaggerColorPreferences"
+            name="Color Preferences">
+      </page>
+   </extension>
+
+</plugin>
