@@ -1,5 +1,6 @@
 package com.reprezen.swagedit.validation;
 
+import java.io.IOException;
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.Collections;
@@ -13,6 +14,7 @@ import org.yaml.snakeyaml.nodes.NodeTuple;
 import org.yaml.snakeyaml.nodes.ScalarNode;
 
 import com.fasterxml.jackson.databind.JsonNode;
+import com.fasterxml.jackson.dataformat.yaml.snakeyaml.parser.ParserException;
 import com.github.fge.jsonschema.core.exceptions.ProcessingException;
 import com.github.fge.jsonschema.core.report.ProcessingMessage;
 import com.github.fge.jsonschema.core.report.ProcessingReport;
@@ -37,20 +39,36 @@ public class Validator {
 	 * 
 	 * @param content
 	 * @return list or errors
+	 * @throws IOException 
+	 * @throws ParserException 
 	 */
 	public List<SwaggerError> validate(SwaggerDocument document) {
-		final JsonNode spec = document.getTree();
+		JsonNode spec = null;
+		try {
+			spec = document.getTree();
+		} catch (Exception e) {
+//			if (e instanceof ParserException) {
+//				return Collections.singletonList(SwaggerError.create((ParserException) e));
+//			} else if (e instanceof ScannerException) {
+//				return Collections.singletonList(SwaggerError.create((ScannerException) e));
+//			}
+		}
 
 		if (spec == null) {
 			return Collections.singletonList(new SwaggerError(
 					IMarker.SEVERITY_ERROR, 
 					"Unable to read content.  It may be invalid YAML"));
 		} else {
+			final Node yaml = document.getYaml();
 			ProcessingReport report = null;
+
 			try {
 				report = schema.getSchema().validate(spec);
 			} catch (ProcessingException e) {
-				e.printStackTrace();
+				final ProcessingMessage pm = e.getProcessingMessage();
+				final int line = getLine(pm, yaml);
+
+				return Collections.singletonList(SwaggerError.create(pm, line));
 			}
 
 			return create(report, document.getYaml());

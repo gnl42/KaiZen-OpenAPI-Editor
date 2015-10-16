@@ -60,7 +60,11 @@ public class SwaggerReconcilingStrategy implements IReconcilingStrategy, IReconc
 		fPositions.clear();
 		cNextPos = fOffset;
 
-		final Node node = ((SwaggerDocument) document).getYaml();
+		Node node = null;
+		try {
+			node = ((SwaggerDocument) document).getYaml();
+		} catch (Exception e) {}
+		
 		if (node instanceof MappingNode) {
 			final MappingNode mappingNode = (MappingNode) node;
 

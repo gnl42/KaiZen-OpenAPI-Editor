@@ -1,7 +1,6 @@
 package com.reprezen.swagedit.editor;
 
 import java.io.IOException;
-import java.io.Reader;
 import java.io.StringReader;
 import java.util.ArrayList;
 import java.util.LinkedList;
@@ -16,69 +15,29 @@ import org.yaml.snakeyaml.events.Event.ID;
 import org.yaml.snakeyaml.nodes.Node;
 
 import com.fasterxml.jackson.databind.JsonNode;
+import org.yaml.snakeyaml.parser.ParserException;
 
 public class SwaggerDocument extends Document {
 
 	private final Yaml yaml = new Yaml();
-	private JsonNode tree;
-	private Node yamlNode;
 	private Iterable<Event> events = new ArrayList<>();
 
 	public SwaggerDocument() {
 		addDocumentListener(new IDocumentListener() {
 			@Override
-			public void documentChanged(DocumentEvent event) {
-//				System.out.println("document changed");
-//				setTree(event.getText());
-//				setYaml(event.getText());
-//				setEvents(event.getText());
-			}
+			public void documentChanged(DocumentEvent event) {}
 
 			@Override
 			public void documentAboutToBeChanged(DocumentEvent event) {}
 		});
 	}
 
-	protected void setEvents(String text) {
-		final Reader reader = new StringReader(get());
-		try {
-			events = yaml.parse(reader);
-		} catch (Exception e) {
-			e.printStackTrace();
-		}
-	}
-
-	private Iterable<Event> getEvents() {
-		if (!events.iterator().hasNext()) {
-			setEvents(get());
-		}
-		return events;
-	}
-
-	protected void setYaml(String text) {
-		yamlNode = yaml.compose(new StringReader(text));
-	}
-
 	public Node getYaml() {
-//		if (yamlNode == null) {
-		setYaml(get());
-//		}
-		return yamlNode;
+		return yaml.compose(new StringReader(get()));
 	}
 
-	protected void setTree(String content) {
-		try {
-			tree = io.swagger.util.Yaml.mapper().readTree(content);
-		} catch (IOException e) {
-			tree = null;
-		}
-	}
-
-	public JsonNode getTree() {
-//		if (tree == null) {
-			setTree(get());
-//		}
-		return tree;
+	public JsonNode getTree() throws ParserException, IOException {
+		return io.swagger.util.Yaml.mapper().readTree(get());
 	}
 
 	/*

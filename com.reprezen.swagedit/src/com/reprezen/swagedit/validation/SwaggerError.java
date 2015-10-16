@@ -4,9 +4,10 @@ import org.eclipse.core.resources.IFile;
 import org.eclipse.core.resources.IMarker;
 import org.eclipse.core.runtime.CoreException;
 import org.eclipse.jface.text.IDocument;
+import org.yaml.snakeyaml.parser.ParserException;
 
 import com.fasterxml.jackson.databind.JsonMappingException;
-import com.fasterxml.jackson.databind.JsonNode;
+import com.fasterxml.jackson.dataformat.yaml.snakeyaml.scanner.ScannerException;
 import com.github.fge.jsonschema.core.report.LogLevel;
 import com.github.fge.jsonschema.core.report.ProcessingMessage;
 
@@ -35,9 +36,20 @@ public class SwaggerError {
 		return new SwaggerError(IMarker.SEVERITY_ERROR, exception.getMessage(), line);
 	}
 
-	public static SwaggerError create(ProcessingMessage message, int line) {
-		
+	public static SwaggerError create(ProcessingMessage message, int line) {		
 		return new SwaggerError(getLevel(message), message.getMessage(), line);
+	}
+
+	public static SwaggerError create(ParserException e) {
+		return new SwaggerError(IMarker.SEVERITY_ERROR, e.getMessage(), e.getProblemMark().getLine() + 1);
+	}
+
+	public static SwaggerError create(com.fasterxml.jackson.dataformat.yaml.snakeyaml.parser.ParserException e) {
+		return new SwaggerError(IMarker.SEVERITY_ERROR, e.getMessage(), e.getProblemMark().getLine() + 1);
+	}
+
+	public static SwaggerError create(ScannerException e) {
+		return new SwaggerError(IMarker.SEVERITY_ERROR, e.getMessage(), e.getProblemMark().getLine() + 1);
 	}
 
 //	private static String newMessage(ProcessingMessage message) {
