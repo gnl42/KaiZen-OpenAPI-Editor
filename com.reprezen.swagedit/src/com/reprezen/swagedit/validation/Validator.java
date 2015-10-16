@@ -130,28 +130,21 @@ public class Validator {
 		}
 
 		final List<String> next = paths.subList(1, paths.size());
+		// ~1 seems to be used to escape /
+		if (path.startsWith("~1")) {		
+			path = "/" + path.substring(2, path.length());
+		}
 
-		if (path.startsWith("~")) {
-			path = path.substring(1, path.length());
-			// path positions start at 1
-			int pos = Integer.valueOf(path) - 1;
-			if (pos >= 0 && pos < root.getValue().size()) {
-				NodeTuple nodeTuple = root.getValue().get(pos);
-				if (nodeTuple != null) {
-					return findNode(nodeTuple, next);
-				}
-			}
-		} else {
-			for (NodeTuple child: root.getValue()) {
-				if (child.getKeyNode() instanceof ScalarNode) {
-					ScalarNode scalar = (ScalarNode) child.getKeyNode();
+		for (NodeTuple child: root.getValue()) {
+			if (child.getKeyNode() instanceof ScalarNode) {
+				ScalarNode scalar = (ScalarNode) child.getKeyNode();
 
-					if (scalar.getValue().equals(path)) {
-						return findNode(child, next);
-					}
+				if (scalar.getValue().equals(path)) {
+					return findNode(child, next);
 				}
 			}
 		}
+
 		return root;
 	}
 
