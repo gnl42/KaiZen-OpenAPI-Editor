@@ -11,6 +11,54 @@ class ValidationMessageTest {
 	val validator = new Validator
 	val document = new SwaggerDocument
 
+	def runTest(String expected, String content) {
+		document.set(content)
+		val errors = validator.validate(document)				
+		assertEquals(1, errors.size)
+
+		val error = errors.get(0)
+		assertEquals(expected, error.message)
+	}
+	
+	@Test
+	def testMessage_additionalItems_notAllowed() {
+		var expected = "instance type (integer) does not match any allowed primitive type (allowed: [\"array\"])"
+		// parameters should contain an array of object
+		val content = '''
+		swagger: '2.0'
+		info:
+		  version: 0.0.0
+		  title: MyModel
+		paths:
+		  /p:
+		    get:
+		      parameters: 2        
+		      responses:
+		        '200':
+		          description: OK
+		'''
+
+		runTest(expected, content)
+	}
+
+	@Test
+	def testMessage_typeNoMatch() {
+		var expected = "instance type (integer) does not match any allowed primitive type (allowed: [\"object\"])"
+		// responses should contain an object
+		val content = '''
+		swagger: '2.0'
+		info:
+		  version: 0.0.0
+		  title: MyModel
+		paths:
+		  /p:
+		    get:        
+		      responses: 2
+		'''
+
+		runTest(expected, content)
+	}
+
 	@Test
 	def	testMessage_notInEnum() {
 		val expected = "instance value (\"foo\") not found in enum (possible values: [\"http\",\"https\",\"ws\",\"wss\"])"
@@ -30,12 +78,7 @@ class ValidationMessageTest {
 		          description: OK
 		'''
 
-		document.set(content)
-		val errors = validator.validate(document)				
-		assertEquals(1, errors.size)
-
-		val error = errors.get(0)
-		assertEquals(expected, error.message)
+		runTest(expected, content)
 	}
 
 	@Test
@@ -54,13 +97,7 @@ class ValidationMessageTest {
 		          description: 200
 		'''
 		
-		document.set(content)
-		val errors = validator.validate(document)				
-		assertEquals(1, errors.size)
-
-		val error = errors.get(0)
-		println(error.message)
-		assertEquals(expected, error.message)
+		runTest(expected, content)
 	}
 
 	@Test
@@ -80,13 +117,7 @@ class ValidationMessageTest {
 		        description: OK
 		'''
 		
-		document.set(content)
-		val errors = validator.validate(document)				
-		assertEquals(1, errors.size)
-
-		val error = errors.get(0)
-		println(error.message)
-		assertEquals(expected, error.message)
+		runTest(expected, content)
 	}
 
 }
