@@ -6,18 +6,23 @@ import org.junit.Test
 
 import static org.junit.Assert.assertEquals
 
+/**
+ * Tests as documentation for #9 - User-friendly validation messages
+ * The " #validation error marker" are placed right above the place where we expect to see a validation error. 
+ * It's for human convenience only and will be ignored by the test.
+ */
 class ValidationMessageTest {
 
 	val validator = new Validator
 	val document = new SwaggerDocument
 
-	def runTest(String expected, String content) {
-		document.set(content)
+	def assertModelHasValidationError(String expectedMessage, String modelText) {
+		document.set(modelText)
 		val errors = validator.validate(document)				
 		assertEquals(1, errors.size)
 
 		val error = errors.get(0)
-		assertEquals(expected, error.message)
+		assertEquals(expectedMessage, error.message)
 	}
 	
 	@Test
@@ -32,13 +37,14 @@ class ValidationMessageTest {
 		paths:
 		  /p:
 		    get:
+		      #validation error marker
 		      parameters: 2        
 		      responses:
 		        '200':
 		          description: OK
 		'''
 
-		runTest(expected, content)
+		assertModelHasValidationError(expected, content)
 	}
 
 	@Test
@@ -52,11 +58,12 @@ class ValidationMessageTest {
 		  title: MyModel
 		paths:
 		  /p:
-		    get:        
+		    get:     
+		      #validation error marker
 		      responses: 2
 		'''
 
-		runTest(expected, content)
+		assertModelHasValidationError(expected, content)
 	}
 
 	@Test
@@ -67,6 +74,7 @@ class ValidationMessageTest {
 		info:
 		  version: 0.0.0
 		  title: Simple API
+		#validation error marker
 		schemes:
 		  - http
 		  - foo
@@ -78,7 +86,7 @@ class ValidationMessageTest {
 		          description: OK
 		'''
 
-		runTest(expected, content)
+		assertModelHasValidationError(expected, content)
 	}
 
 	@Test
@@ -94,10 +102,11 @@ class ValidationMessageTest {
 		    get:
 		      responses:
 		        '200':
+		          #validation error marker
 		          description: 200
 		'''
 		
-		runTest(expected, content)
+		assertModelHasValidationError(expected, content)
 	}
 
 	@Test
@@ -113,11 +122,12 @@ class ValidationMessageTest {
 		  /p:
 		    get:
 		      responses:
+		        #validation error marker
 		        '200':
 		        description: OK
 		'''
 		
-		runTest(expected, content)
+		assertModelHasValidationError(expected, content)
 	}
 
 }
