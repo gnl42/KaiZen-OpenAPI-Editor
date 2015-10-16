@@ -1,5 +1,6 @@
 package com.reprezen.swagedit.tests
 
+import com.reprezen.swagedit.editor.SwaggerDocument
 import com.reprezen.swagedit.validation.Validator
 import java.io.IOException
 import org.eclipse.core.resources.IMarker
@@ -10,6 +11,7 @@ import static org.junit.Assert.assertEquals
 class ValidatorTest {
 
 	val validator = new Validator
+	val document = new SwaggerDocument
 
 	@Test
 	def shouldNotReturnErrorsIfDocumentIsValid() throws IOException {
@@ -27,7 +29,9 @@ class ValidatorTest {
 			          description: OK
 		'''
 
-		assertEquals(0, validator.validate(content).size())
+		document.set(content)
+		val errors = validator.validate(document)
+		assertEquals(0, errors.size())
 	}
 
 	@Test
@@ -40,7 +44,8 @@ class ValidatorTest {
 		    title: Simple API
 		'''
 
-		val errors = validator.validate(content)
+		document.set(content)
+		val errors = validator.validate(document)
 		assertEquals(1, errors.size())
 
 		val error = errors.get(0)
@@ -59,7 +64,8 @@ class ValidatorTest {
 		paths: 'Hello'
 		'''
 
-		val errors = validator.validate(content)
+		document.set(content)
+		val errors = validator.validate(document)
 		assertEquals(1, errors.size())
 
 		val error = errors.get(0)
@@ -81,7 +87,8 @@ class ValidatorTest {
 		      responses: 'Hello'
 		'''
 
-		val errors = validator.validate(content)
+		document.set(content)
+		val errors = validator.validate(document)
 		assertEquals(1, errors.size())
 
 		val error = errors.get(0)
@@ -105,7 +112,8 @@ class ValidatorTest {
 		          description: OK
 		'''
 
-		val errors = validator.validate(content)
+		document.set(content)
+		val errors = validator.validate(document)
 		assertEquals(1, errors.size())
 
 		val error = errors.get(0)
@@ -132,7 +140,8 @@ class ValidatorTest {
 		          description: OK
 		'''
 
-		val errors = validator.validate(content)
+		document.set(content)
+		val errors = validator.validate(document)
 		assertEquals(1, errors.size())
 
 		val error = errors.get(0)

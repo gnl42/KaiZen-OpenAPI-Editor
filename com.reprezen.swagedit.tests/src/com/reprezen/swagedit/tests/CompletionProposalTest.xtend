@@ -1,22 +1,20 @@
 package com.reprezen.swagedit.tests
 
-import org.junit.Test
-import static org.junit.Assert.assertFalse
-import static org.junit.Assert.assertNotNull
-import static org.mockito.Mockito.mock
-import static org.mockito.Mockito.when
-
-import java.util.Arrays
-import org.eclipse.jface.text.contentassist.IContentAssistProcessor
-import org.eclipse.jface.text.IDocument
+import com.reprezen.swagedit.completions.SwaggerCompletionProcessor
 import com.reprezen.swagedit.completions.SwaggerProposal
 import com.reprezen.swagedit.editor.SwaggerDocument
-import org.eclipse.jface.text.BadLocationException
-import org.eclipse.jface.text.contentassist.ICompletionProposal
 import com.reprezen.swagedit.validation.Schema
+import java.util.Arrays
+import org.eclipse.jface.text.BadLocationException
+import org.eclipse.jface.text.IDocument
 import org.eclipse.jface.text.ITextViewer
-import com.reprezen.swagedit.completions.SwaggerCompletionProcessor
+import org.eclipse.jface.text.contentassist.ICompletionProposal
+import org.eclipse.jface.text.contentassist.IContentAssistProcessor
 import org.junit.Before
+import org.junit.Test
+
+import static org.mockito.Mockito.mock
+import static org.mockito.Mockito.when
 
 class CompletionProposalTest {
 
@@ -26,20 +24,20 @@ class CompletionProposalTest {
 	var ITextViewer viewer
 
 	@Before
-	def setUp() {
+	def void setUp() {
 		document = new SwaggerDocument()
 		processor = new SwaggerCompletionProcessor()
 		viewer = mock(ITextViewer)
 	}
 
 	@Test
-	def test() {
+	def void test() {
 		val proposal = new SwaggerProposal.Builder(schema.getTree()).build()
 		System.out.println(proposal);		
 	}
 
 	@Test
-	def shouldProvideEnumCompletion() throws BadLocationException {
+	def void shouldProvideEnumCompletion() throws BadLocationException {
 		val currentText = "swagger: "
 		val offset = 2
 

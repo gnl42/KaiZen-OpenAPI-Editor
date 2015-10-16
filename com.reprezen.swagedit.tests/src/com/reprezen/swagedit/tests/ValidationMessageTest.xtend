@@ -1,5 +1,6 @@
 package com.reprezen.swagedit.tests
 
+import com.reprezen.swagedit.editor.SwaggerDocument
 import com.reprezen.swagedit.validation.Validator
 import org.junit.Test
 
@@ -8,6 +9,7 @@ import static org.junit.Assert.assertEquals
 class ValidationMessageTest {
 
 	val validator = new Validator
+	val document = new SwaggerDocument
 
 	@Test
 	def	testMessage_notInEnum() {
@@ -28,7 +30,8 @@ class ValidationMessageTest {
 		          description: OK
 		'''
 
-		val errors = validator.validate(content)		
+		document.set(content)
+		val errors = validator.validate(document)				
 		assertEquals(1, errors.size)
 
 		val error = errors.get(0)
