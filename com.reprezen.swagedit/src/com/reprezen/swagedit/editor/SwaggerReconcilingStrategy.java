@@ -1,6 +1,5 @@
 package com.reprezen.swagedit.editor;
 
-import java.io.StringReader;
 import java.util.ArrayList;
 import java.util.List;
 
@@ -13,7 +12,6 @@ import org.eclipse.jface.text.reconciler.DirtyRegion;
 import org.eclipse.jface.text.reconciler.IReconcilingStrategy;
 import org.eclipse.jface.text.reconciler.IReconcilingStrategyExtension;
 import org.eclipse.swt.widgets.Display;
-import org.yaml.snakeyaml.Yaml;
 import org.yaml.snakeyaml.error.Mark;
 import org.yaml.snakeyaml.nodes.MappingNode;
 import org.yaml.snakeyaml.nodes.Node;
@@ -62,25 +60,21 @@ public class SwaggerReconcilingStrategy implements IReconcilingStrategy, IReconc
 		fPositions.clear();
 		cNextPos = fOffset;
 
-		Yaml yaml = new Yaml();
-		Iterable<Node> nodes = yaml.composeAll(new StringReader(document.get()));
+		final Node node = ((SwaggerDocument) document).getYaml();
+		if (node instanceof MappingNode) {
+			final MappingNode mappingNode = (MappingNode) node;
 
-		for (Node node : nodes) {
-			if (node instanceof MappingNode) {
-				MappingNode mappingNode = (MappingNode) node;
+			for (NodeTuple tuple : mappingNode.getValue()) {
+				final Mark startMark = tuple.getKeyNode().getStartMark();
+				final Mark endMark = tuple.getKeyNode().getEndMark();
 
-				for (NodeTuple tuple : mappingNode.getValue()) {
-					final Mark startMark = tuple.getKeyNode().getStartMark();
-					final Mark endMark = tuple.getKeyNode().getEndMark();
+				try {
+					int startOffset = document.getLineOffset(startMark.getLine()) + startMark.getColumn();
+					int endOffset = document.getLineOffset(endMark.getLine()) + endMark.getColumn();
 
-					try {
-						int startOffset = document.getLineOffset(startMark.getLine()) + startMark.getColumn();
-						int endOffset = document.getLineOffset(endMark.getLine()) + endMark.getColumn();
-
-						Position position = new Position(startOffset, (endOffset - startOffset));
-						fPositions.add(position);
-					} catch (BadLocationException e) {
-					}
+					Position position = new Position(startOffset, (endOffset - startOffset));
+					fPositions.add(position);
+				} catch (BadLocationException e) {
 				}
 			}
 		}

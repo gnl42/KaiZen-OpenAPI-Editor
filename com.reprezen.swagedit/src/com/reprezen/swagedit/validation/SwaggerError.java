@@ -6,6 +6,7 @@ import org.eclipse.core.runtime.CoreException;
 import org.eclipse.jface.text.IDocument;
 
 import com.fasterxml.jackson.databind.JsonMappingException;
+import com.fasterxml.jackson.databind.JsonNode;
 import com.github.fge.jsonschema.core.report.LogLevel;
 import com.github.fge.jsonschema.core.report.ProcessingMessage;
 
@@ -35,9 +36,15 @@ public class SwaggerError {
 	}
 
 	public static SwaggerError create(ProcessingMessage message, int line) {
+		
 		return new SwaggerError(getLevel(message), message.getMessage(), line);
 	}
 
+//	private static String newMessage(ProcessingMessage message) {
+//		JsonNode json = message.asJson();
+//		
+//	}
+	
 	protected static int getLevel(ProcessingMessage message) {
 		if (message == null) {
 			return IMarker.SEVERITY_INFO;

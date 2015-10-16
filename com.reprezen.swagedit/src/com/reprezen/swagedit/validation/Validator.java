@@ -1,7 +1,5 @@
 package com.reprezen.swagedit.validation;
 
-import java.io.Reader;
-import java.io.StringReader;
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.Collections;
@@ -9,18 +7,16 @@ import java.util.Iterator;
 import java.util.List;
 
 import org.eclipse.core.resources.IMarker;
-import org.yaml.snakeyaml.Yaml;
 import org.yaml.snakeyaml.nodes.MappingNode;
 import org.yaml.snakeyaml.nodes.Node;
 import org.yaml.snakeyaml.nodes.NodeTuple;
 import org.yaml.snakeyaml.nodes.ScalarNode;
 
-import com.fasterxml.jackson.databind.JsonMappingException;
 import com.fasterxml.jackson.databind.JsonNode;
-import com.fasterxml.jackson.databind.ObjectMapper;
 import com.github.fge.jsonschema.core.exceptions.ProcessingException;
 import com.github.fge.jsonschema.core.report.ProcessingMessage;
 import com.github.fge.jsonschema.core.report.ProcessingReport;
+import com.reprezen.swagedit.editor.SwaggerDocument;
 
 /**
  * This class contains methods for validating a Swagger YAML document.
@@ -31,9 +27,7 @@ import com.github.fge.jsonschema.core.report.ProcessingReport;
  */
 public class Validator {
 
-	private static final ObjectMapper yamlMapper = io.swagger.util.Yaml.mapper();
 	private static final Schema schema = new Schema();
-	private final Yaml yaml = new Yaml();
 
 	/**
 	 * Returns a list or errors if validation fails. 
@@ -44,15 +38,8 @@ public class Validator {
 	 * @param content
 	 * @return list or errors
 	 */
-	public List<SwaggerError> validate(String content) {
-		JsonNode spec = null;
-		try {
-			spec = yamlMapper.readTree(content);
-		} catch (Exception e) {
-			if (e instanceof JsonMappingException) {
-				return Collections.singletonList(SwaggerError.create((JsonMappingException) e));
-			}
-		}
+	public List<SwaggerError> validate(SwaggerDocument document) {
+		final JsonNode spec = document.getTree();
 
 		if (spec == null) {
 			return Collections.singletonList(new SwaggerError(
@@ -66,10 +53,7 @@ public class Validator {
 				e.printStackTrace();
 			}
 
-			final Reader reader = new StringReader(content);
-			final Node yamlTree = yaml.compose(reader);
-
-			return create(report, yamlTree);
+			return create(report, document.getYaml());
 		}
 	}
 

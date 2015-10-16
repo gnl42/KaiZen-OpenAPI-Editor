@@ -109,8 +109,7 @@ public class SwaggerEditor extends YEdit {
 	protected void checkErrors() {
 		final IFile file = ((IFileEditorInput) getEditorInput()).getFile();
 		final IDocument document = getDocumentProvider().getDocument(getEditorInput());
-		final String content = document.get();
-		final List<SwaggerError> errors = validator.validate(content);
+		final List<SwaggerError> errors = validator.validate((SwaggerDocument) document);
 
 		for (SwaggerError error : errors) {
 			try {
