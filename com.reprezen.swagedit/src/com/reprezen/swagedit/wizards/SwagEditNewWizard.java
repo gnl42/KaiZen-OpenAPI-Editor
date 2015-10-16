@@ -5,7 +5,13 @@ import org.eclipse.jface.viewers.IStructuredSelection;
 import org.eclipse.jface.wizard.Wizard;
 import org.eclipse.ui.INewWizard;
 import org.eclipse.ui.IWorkbench;
+import org.eclipse.ui.IWorkbenchPage;
 import org.eclipse.ui.IWorkbenchWizard;
+import org.eclipse.ui.PartInitException;
+import org.eclipse.ui.PlatformUI;
+import org.eclipse.ui.ide.IDE;
+
+import com.reprezen.swagedit.editor.SwaggerEditor;
 
 public class SwagEditNewWizard extends Wizard implements INewWizard {
 
@@ -34,6 +40,15 @@ public class SwagEditNewWizard extends Wizard implements INewWizard {
 		if (file == null || !file.exists()) {
 			return false;
 		}
+
+		getShell().getDisplay().asyncExec(new Runnable() {
+			public void run() {
+				IWorkbenchPage page = PlatformUI.getWorkbench().getActiveWorkbenchWindow().getActivePage();
+				try {
+					IDE.openEditor(page, file, SwaggerEditor.ID);
+				} catch (PartInitException e) {}
+			}
+		});
 
 		return true;
 	}
