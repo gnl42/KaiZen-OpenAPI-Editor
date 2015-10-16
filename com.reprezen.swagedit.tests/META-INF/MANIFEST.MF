@@ -8,4 +8,8 @@ Bundle-RequiredExecutionEnvironment: JavaSE-1.7
 Require-Bundle: org.junit;bundle-version="4.0.0",
  org.mockito;bundle-version="1.9.5",
  org.objenesis;bundle-version="1.0.0"
+ com.google.guava,
+ org.eclipse.xtext.xbase.lib,
+ org.eclipse.xtend.lib,
+ org.eclipse.xtend.lib.macro
 Export-Package: com.reprezen.swagedit.tests
