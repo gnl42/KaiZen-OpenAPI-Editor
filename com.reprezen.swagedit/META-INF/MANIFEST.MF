@@ -1,7 +1,7 @@
 Manifest-Version: 1.0
 Bundle-ManifestVersion: 2
 Bundle-Name: %Bundle-Name
-Bundle-Localization: OSGI-INF/l10n/bundle.properties
+Bundle-Localization: OSGI-INF/l10n/bundle
 Bundle-SymbolicName: com.reprezen.swagedit;singleton:=true
 Bundle-Version: 0.1.0.qualifier
 Require-Bundle: org.eclipse.ui,
