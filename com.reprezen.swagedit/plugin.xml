@@ -5,14 +5,14 @@
          point="org.eclipse.ui.newWizards">
       <category
             id="com.reprezen.swagedit"
-            name="Swagger">
+            name="%category.name">
       </category>
       <wizard
             category="com.reprezen.swagedit"
             class="com.reprezen.swagedit.wizards.SwagEditNewWizard"
             icon="icons/swagger_32.jpg"
             id="com.reprezen.swagedit.wizards.SwagEditNewWizard"
-            name="Swagger File">
+            name="%wizard.name">
       </wizard>
    </extension>
 
@@ -25,7 +25,7 @@
             filenames="yaml"
             icon="icons/swagger_16.jpg"
             id="com.reprezen.swagedit.editor"
-            name="Swagger Editor">
+            name="%editor.name">
          <contentTypeBinding
                contentTypeId="com.reprezen.swagedit.contentTypeBinding">
          </contentTypeBinding>
@@ -45,7 +45,7 @@
             base-type="org.eclipse.core.runtime.text"
             file-extensions="yaml"
             id="com.reprezen.swagedit.contentTypeBinding"
-            name="Swagger Content Type"
+            name="%content-type.name"
             priority="high">
       </content-type>
    </extension>
@@ -55,13 +55,13 @@
       <page
             class="com.reprezen.swagedit.preferences.SwaggerPreferencePage"
             id="com.reprezen.swagedit.preferences"
-            name="Swagger">
+            name="%page.name">
       </page>
       <page
             category="com.reprezen.swagedit.preferences"
             class="com.reprezen.swagedit.preferences.SwaggerColorPreferences"
             id="com.reprezen.swagedit.preferences.SwaggerColorPreferences"
-            name="Color Preferences">
+            name="%page.name.0">
       </page>
    </extension>
 

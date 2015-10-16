@@ -1,6 +1,7 @@
 Manifest-Version: 1.0
 Bundle-ManifestVersion: 2
-Bundle-Name: SwagEdit
+Bundle-Name: %Bundle-Name
+Bundle-Localization: OSGI-INF/l10n/bundle.properties
 Bundle-SymbolicName: com.reprezen.swagedit;singleton:=true
 Bundle-Version: 0.1.0.qualifier
 Require-Bundle: org.eclipse.ui,
@@ -47,6 +48,7 @@ Bundle-ClassPath: lib/cal10n.api_0.7.4.jar,
  .
 Bundle-Activator: com.reprezen.swagedit.Activator
 Export-Package: com.reprezen.swagedit,
+ com.reprezen.swagedit.completions,
  com.reprezen.swagedit.editor,
  com.reprezen.swagedit.preferences,
  com.reprezen.swagedit.validation,
