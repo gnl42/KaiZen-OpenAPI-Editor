@@ -1,9 +1,13 @@
 package com.reprezen.swagedit.wizards;
 
+import java.io.IOException;
+import java.io.InputStream;
+
 import org.eclipse.jface.viewers.IStructuredSelection;
 import org.eclipse.ui.dialogs.WizardNewFileCreationPage;
 
 import com.reprezen.swagedit.Activator;
+import com.reprezen.swagedit.Messages;
 
 public class SwagEditNewWizardPage extends WizardNewFileCreationPage {
 
@@ -16,10 +20,19 @@ public class SwagEditNewWizardPage extends WizardNewFileCreationPage {
 	 */
 	public SwagEditNewWizardPage(IStructuredSelection selection) {
 		super("SwagEditNewWizardPage", selection);
-		setTitle("Swagger");
-		setDescription("This wizard creates a new file with *.yaml extension that can be opened by the swagger editor.");
-		setImageDescriptor(Activator.imageDescriptorFromPlugin("com.reprezen.swagedit", "icons/swagger_64.jpg"));
+		setTitle(Messages.swagger);
+		setDescription(Messages.wizard_description);
+		setImageDescriptor(Activator.imageDescriptorFromPlugin(Activator.PLUGIN_ID, "icons/swagger_64.jpg"));
 		setFileExtension(extension);
+	}
+
+	@Override
+	protected InputStream getInitialContents() {
+		try {
+			return Activator.getDefault().getBundle().getEntry("/resources/default.yaml").openStream();
+		} catch (IOException e) {
+			return null;
+		}
 	}
 
 }

@@ -1,8 +1,5 @@
 package com.reprezen.swagedit.wizards;
 
-import java.io.ByteArrayInputStream;
-import java.io.InputStream;
-
 import org.eclipse.core.resources.IFile;
 import org.eclipse.jface.viewers.IStructuredSelection;
 import org.eclipse.jface.wizard.Wizard;
@@ -31,31 +28,20 @@ public class SwagEditNewWizard extends Wizard implements INewWizard {
 		addPage(page);
 	}
 
+	@Override
 	public boolean performFinish() {
 		final IFile file = page.createNewFile();
-		if (file != null && file.exists()) {
-			return true;
+		if (file == null || !file.exists()) {
+			return false;
 		}
-		return false;
+
+		return true;
 	}
 
 	/**
-	 * We will initialize file contents with a sample text.
-	 */
-	private InputStream openContentStream() {
-		String contents =
-				"swagger: '2.0'\n" +
-				"info:\n" +
-				"  version: 1.0.0\n" +
-				"  title: Sample\n"+
-				"  description: |";
-
-		return new ByteArrayInputStream(contents.getBytes());
-	}
-
-	/**
-	 * We will accept the selection in the workbench to see if
-	 * we can initialize from it.
+	 * We will accept the selection in the workbench to see if we can initialize
+	 * from it.
+	 * 
 	 * @see IWorkbenchWizard#init(IWorkbench, IStructuredSelection)
 	 */
 	public void init(IWorkbench workbench, IStructuredSelection selection) {
