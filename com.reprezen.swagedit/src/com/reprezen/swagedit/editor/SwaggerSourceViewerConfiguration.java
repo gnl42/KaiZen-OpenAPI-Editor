@@ -3,13 +3,12 @@ package com.reprezen.swagedit.editor;
 import org.dadacoalition.yedit.editor.YEditSourceViewerConfiguration;
 import org.eclipse.jface.text.IDocument;
 import org.eclipse.jface.text.contentassist.ContentAssistant;
-import org.eclipse.jface.text.contentassist.IContentAssistProcessor;
 import org.eclipse.jface.text.contentassist.IContentAssistant;
 import org.eclipse.jface.text.reconciler.IReconciler;
 import org.eclipse.jface.text.reconciler.MonoReconciler;
 import org.eclipse.jface.text.source.ISourceViewer;
 
-import com.reprezen.swagedit.completions.SwaggerCompletionProcessor;
+import com.reprezen.swagedit.assist.SwaggerContentAssistProcessor;
 
 public class SwaggerSourceViewerConfiguration extends YEditSourceViewerConfiguration {
 
@@ -23,13 +22,19 @@ public class SwaggerSourceViewerConfiguration extends YEditSourceViewerConfigura
 	public IContentAssistant getContentAssistant(ISourceViewer sourceViewer) {
 		ContentAssistant ca = new ContentAssistant();
 
-		IContentAssistProcessor cap = new SwaggerCompletionProcessor();
-		ca.setContentAssistProcessor(cap, IDocument.DEFAULT_CONTENT_TYPE);
+		ca.setContentAssistProcessor(new SwaggerContentAssistProcessor(), IDocument.DEFAULT_CONTENT_TYPE);
 		ca.setInformationControlCreator(getInformationControlCreator(sourceViewer));
 
 		ca.enableAutoInsert(true);
+		ca.enableAutoActivation(true);
+		ca.setAutoActivationDelay(500);
 
 		return ca;
+	}
+
+	@Override
+	public String[] getConfiguredContentTypes(ISourceViewer sourceViewer) {
+		return new String[] { IDocument.DEFAULT_CONTENT_TYPE };
 	}
 
 	@Override

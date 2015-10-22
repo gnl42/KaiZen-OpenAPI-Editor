@@ -1,4 +1,4 @@
-package com.reprezen.swagedit.completions;
+package com.reprezen.swagedit.assist;
 
 import java.util.ArrayList;
 import java.util.Arrays;

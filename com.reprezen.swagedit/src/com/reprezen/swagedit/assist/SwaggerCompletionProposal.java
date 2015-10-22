@@ -1,7 +1,7 @@
-package com.reprezen.swagedit.completions;
+package com.reprezen.swagedit.assist;
 
 import com.fasterxml.jackson.databind.JsonNode;
-import com.reprezen.swagedit.validation.Schema;
+import com.reprezen.swagedit.validation.SwaggerSchema;
 
 public class SwaggerCompletionProposal {
 
@@ -9,7 +9,7 @@ public class SwaggerCompletionProposal {
 
 	public SwaggerProposal get() {
 		if (proposal == null) {
-			final Schema schema = new Schema();
+			final SwaggerSchema schema = new SwaggerSchema();
 			final JsonNode tree = schema.getTree();
 			
 			proposal = new SwaggerProposal.Builder(tree).build();

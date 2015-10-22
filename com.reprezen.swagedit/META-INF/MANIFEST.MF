@@ -48,7 +48,7 @@ Bundle-ClassPath: lib/cal10n.api_0.7.4.jar,
  .
 Bundle-Activator: com.reprezen.swagedit.Activator
 Export-Package: com.reprezen.swagedit,
- com.reprezen.swagedit.completions,
+ com.reprezen.swagedit.assist,
  com.reprezen.swagedit.editor,
  com.reprezen.swagedit.preferences,
  com.reprezen.swagedit.validation,
