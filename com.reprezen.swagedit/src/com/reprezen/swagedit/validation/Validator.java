@@ -29,7 +29,7 @@ import com.reprezen.swagedit.editor.SwaggerDocument;
  */
 public class Validator {
 
-	private static final Schema schema = new Schema();
+	private static final SwaggerSchema schema = new SwaggerSchema();
 
 	/**
 	 * Returns a list or errors if validation fails. 
