@@ -6,23 +6,28 @@ import org.junit.Test
 
 import static org.junit.Assert.assertEquals
 
+/**
+ * Tests as documentation for #9 - User-friendly validation messages
+ * The " #validation error marker" are placed right above the place where we expect to see a validation error. 
+ * It's for human convenience only and will be ignored by the test.
+ */
 class ValidationMessageTest {
 
 	val validator = new Validator
 	val document = new SwaggerDocument
 
-	def runTest(String expected, String content) {
-		document.set(content)
+	def assertModelHasValidationError(String expectedMessage, String modelText) {
+		document.set(modelText)
 		val errors = validator.validate(document)				
 		assertEquals(1, errors.size)
 
 		val error = errors.get(0)
-		assertEquals(expected, error.message)
+		assertEquals(expectedMessage, error.message)
 	}
 	
 	@Test
 	def testMessage_additionalItems_notAllowed() {
-		var expected = "instance type (integer) does not match any allowed primitive type (allowed: [\"array\"])"
+		var expected = 'instance type (integer) does not match any allowed primitive type (allowed: ["array"])'
 		// parameters should contain an array of object
 		val content = '''
 		swagger: '2.0'
@@ -32,18 +37,19 @@ class ValidationMessageTest {
 		paths:
 		  /p:
 		    get:
+		      #validation error marker
 		      parameters: 2        
 		      responses:
 		        '200':
 		          description: OK
 		'''
 
-		runTest(expected, content)
+		assertModelHasValidationError(expected, content)
 	}
 
 	@Test
 	def testMessage_typeNoMatch() {
-		var expected = "instance type (integer) does not match any allowed primitive type (allowed: [\"object\"])"
+		var expected = 'instance type (integer) does not match any allowed primitive type (allowed: ["object"])'
 		// responses should contain an object
 		val content = '''
 		swagger: '2.0'
@@ -52,21 +58,23 @@ class ValidationMessageTest {
 		  title: MyModel
 		paths:
 		  /p:
-		    get:        
+		    get:     
+		      #validation error marker
 		      responses: 2
 		'''
 
-		runTest(expected, content)
+		assertModelHasValidationError(expected, content)
 	}
 
 	@Test
 	def	testMessage_notInEnum() {
-		val expected = "instance value (\"foo\") not found in enum (possible values: [\"http\",\"https\",\"ws\",\"wss\"])"
+		val expected = 'instance value ("foo") not found in enum (possible values: ["http","https","ws","wss"])'
 		val content = '''
 		swagger: '2.0'
 		info:
 		  version: 0.0.0
 		  title: Simple API
+		#validation error marker
 		schemes:
 		  - http
 		  - foo
@@ -78,12 +86,12 @@ class ValidationMessageTest {
 		          description: OK
 		'''
 
-		runTest(expected, content)
+		assertModelHasValidationError(expected, content)
 	}
 
 	@Test
 	def testMessage_oneOf_fail() {
-		val expected = "instance failed to match exactly one schema (matched 0 out of 2)"		
+		val expected = 'instance failed to match exactly one schema (matched 0 out of 2)'		
 		val content = '''
 		swagger: '2.0'
 		info:
@@ -94,15 +102,16 @@ class ValidationMessageTest {
 		    get:
 		      responses:
 		        '200':
+		          #validation error marker
 		          description: 200
 		'''
 		
-		runTest(expected, content)
+		assertModelHasValidationError(expected, content)
 	}
 
 	@Test
 	def testMessage_additionalProperties_notAllowed() {
-		val expected = "object instance has properties which are not allowed by the schema: [\"description\"]"
+		val expected = 'object instance has properties which are not allowed by the schema: ["description"]'
 		// description should be 2 spaces forward		
 		val content = '''
 		swagger: '2.0'
@@ -113,11 +122,12 @@ class ValidationMessageTest {
 		  /p:
 		    get:
 		      responses:
+		        #validation error marker
 		        '200':
 		        description: OK
 		'''
 		
-		runTest(expected, content)
+		assertModelHasValidationError(expected, content)
 	}
 
 }
