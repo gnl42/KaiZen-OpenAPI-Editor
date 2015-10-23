@@ -39,8 +39,27 @@ class SwaggerContentAssistProcessorTest {
 		document.set(yaml)
 
 		val ICompletionProposal[] proposals = processor.computeCompletionProposals(viewer, offset)
-		
+
 		assertThat(proposals).hasSize(schema.keywords.length)
 	}
 
+	@Test
+	def void shouldProvideEndOfWord() {
+		val yaml = '''swa'''
+		val offset = 3
+		
+		when(viewer.getDocument()).thenReturn(document)
+		when(viewer.getSelectedRange()).thenReturn(new Point(0, 0))
+		document.set(yaml)
+
+		val ICompletionProposal[] proposals = processor.computeCompletionProposals(viewer, offset)
+
+		assertThat(proposals).hasSize(1)
+		
+		val proposal = proposals.get(0)
+		proposal.apply(document)
+
+		assertThat(document.get()).isEqualTo("swagger");
+	}
+	
 }

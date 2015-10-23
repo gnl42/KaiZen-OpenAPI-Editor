@@ -27,34 +27,55 @@ public class SwaggerContentAssistProcessor implements IContentAssistProcessor {
 
 	@Override
 	public ICompletionProposal[] computeCompletionProposals(ITextViewer viewer, int documentOffset) {
-		final String[] keywords = schema.getKeywords();		
+		final List<String> keywords = schema.getKeywords();
 		final IDocument document = viewer.getDocument();
 
 		boolean startOfLine = true;
+		int lineOfOffset = 0;
 		try {
-			int lineOfOffset = document.getLineOfOffset(documentOffset);
+			lineOfOffset = document.getLineOfOffset(documentOffset);
 			int lineOffset = document.getLineOffset(lineOfOffset);			
 
 			startOfLine = documentOffset == lineOffset;
 		} catch (BadLocationException e) {}
 
+		final List<CompletionProposal> proposals = new LinkedList<>();
+
 		if (startOfLine) {
-			final List<CompletionProposal> proposals = new LinkedList<>();
-			for (int i = 0; i < keywords.length; i++) {
-				final String current = keywords[i];
-	
+			for (String current: keywords) {
 				if (!(viewer.getDocument().get().contains(current))) {
-					proposals.add(new CompletionProposal(current, 
-							documentOffset, 
-							0, 
-							current.length()));
+					proposals.add(new CompletionProposal(current, documentOffset, 0, current.length()));
 				}
 			}
-
-			return proposals.toArray(new CompletionProposal[proposals.size()]);
 		} else {
-			return new ICompletionProposal[0];
-		}	
+			final String word = getWord(document, documentOffset);
+			if (!word.isEmpty()) {
+				for (String current: keywords) {
+					if (current.startsWith(word)) {
+						final String replacement = current.substring(word.length(), current.length());
+						proposals.add(new CompletionProposal(replacement, documentOffset, 0, replacement.length()));
+					}			
+				}
+			}
+		}
+
+		return proposals.toArray(new CompletionProposal[proposals.size()]);
+	}
+
+	private String getWord(IDocument document, int documentOffset) {
+		final StringBuffer buffer = new StringBuffer();
+		while (true) {
+			try {
+				char c = document.getChar(--documentOffset);
+				if (!Character.isLetterOrDigit(c) || Character.isWhitespace(c)) {
+					return buffer.reverse().toString().trim(); 
+				} else {
+					buffer.append(c);
+				}
+			} catch (BadLocationException e) {
+				return buffer.reverse().toString().trim();
+			}
+		}
 	}
 
 	@Override

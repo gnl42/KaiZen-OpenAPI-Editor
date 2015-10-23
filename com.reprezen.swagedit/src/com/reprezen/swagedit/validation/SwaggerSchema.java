@@ -1,6 +1,7 @@
 package com.reprezen.swagedit.validation;
 
 import java.io.IOException;
+import java.util.Iterator;
 import java.util.LinkedList;
 import java.util.List;
 
@@ -9,7 +10,6 @@ import com.fasterxml.jackson.databind.ObjectMapper;
 import com.github.fge.jsonschema.core.exceptions.ProcessingException;
 import com.github.fge.jsonschema.main.JsonSchema;
 import com.github.fge.jsonschema.main.JsonSchemaFactory;
-import com.google.common.collect.Iterators;
 
 import io.swagger.util.Json;
 
@@ -20,7 +20,7 @@ public class SwaggerSchema {
 	
 	private JsonNode tree;
 	private JsonSchema schema;
-	private String[] keywords;
+	private List<String> keywords;
 
 	/**
 	 * Returns swagger 2.0 schema
@@ -43,13 +43,12 @@ public class SwaggerSchema {
 		return schema;
 	}
 
-	public String[] getKeywords() {
+	public List<String> getKeywords() {
 		if (keywords == null) {
-			final List<String> listOfKeys = new LinkedList<>();
-			final JsonNode tree = getTree();
-
-			Iterators.addAll(listOfKeys, tree.get("properties").fieldNames());		
-			keywords = listOfKeys.toArray(new String[listOfKeys.size()]);
+			keywords = new LinkedList<>();
+			for (Iterator<String> it = getTree().get("properties").fieldNames(); it.hasNext();) {
+				keywords.add(it.next());
+			}
 		}
 
 		return keywords;
