@@ -1,5 +1,6 @@
 package com.reprezen.swagedit.tests
 
+import com.reprezen.swagedit.assist.SwaggerCompletionProposal
 import com.reprezen.swagedit.assist.SwaggerContentAssistProcessor
 import com.reprezen.swagedit.editor.SwaggerDocument
 import com.reprezen.swagedit.validation.SwaggerSchema
@@ -13,7 +14,9 @@ import org.junit.Before
 import org.junit.Test
 
 import static org.assertj.core.api.Assertions.*
+import static org.junit.Assert.*
 import static org.mockito.Mockito.*
+import com.reprezen.swagedit.assist.SwaggerProposal.ObjectProposal
 
 class SwaggerContentAssistProcessorTest {
 
@@ -61,5 +64,14 @@ class SwaggerContentAssistProcessorTest {
 
 		assertThat(document.get()).isEqualTo("swagger");
 	}
-	
+
+	@Test
+	def void test() {		
+		val proposal = new SwaggerCompletionProposal().get() as ObjectProposal
+		val value = proposal.properties.get("swagger")
+		
+		println(value)
+		assertNotNull(value)
+	}
+
 }

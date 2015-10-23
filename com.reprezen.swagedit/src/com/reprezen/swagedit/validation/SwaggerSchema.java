@@ -1,9 +1,12 @@
 package com.reprezen.swagedit.validation;
 
 import java.io.IOException;
+import java.util.ArrayList;
 import java.util.Iterator;
-import java.util.LinkedList;
+import java.util.LinkedHashSet;
 import java.util.List;
+import java.util.Map.Entry;
+import java.util.Set;
 
 import com.fasterxml.jackson.databind.JsonNode;
 import com.fasterxml.jackson.databind.ObjectMapper;
@@ -20,7 +23,7 @@ public class SwaggerSchema {
 	
 	private JsonNode tree;
 	private JsonSchema schema;
-	private List<String> keywords;
+	private Set<String> keywords;
 
 	/**
 	 * Returns swagger 2.0 schema
@@ -43,15 +46,31 @@ public class SwaggerSchema {
 		return schema;
 	}
 
-	public List<String> getKeywords() {
+	public List<String> getProperties(String key) {
+		return new ArrayList<>();
+	}
+
+	public Set<String> getKeywords() {
 		if (keywords == null) {
-			keywords = new LinkedList<>();
-			for (Iterator<String> it = getTree().get("properties").fieldNames(); it.hasNext();) {
-				keywords.add(it.next());
+			keywords = new LinkedHashSet<>();
+			collectKeywords(getTree());
+
+			final JsonNode definitions = getTree().get("definitions");
+			for (Iterator<Entry<String, JsonNode>> it = definitions.fields(); it.hasNext();) {
+				final Entry<String, JsonNode> entry = it.next();
+				collectKeywords(entry.getValue());
 			}
 		}
 
 		return keywords;
+	}
+
+	private void collectKeywords(JsonNode node) {
+		if (node != null && node.has("properties") && node.get("properties").isObject()) {
+			for (Iterator<String> it = node.get("properties").fieldNames(); it.hasNext();) {
+				keywords.add(it.next());
+			}
+		}
 	}
 
 	public JsonNode getTree() {

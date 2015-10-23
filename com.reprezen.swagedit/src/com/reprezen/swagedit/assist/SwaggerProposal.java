@@ -91,10 +91,10 @@ public interface SwaggerProposal {
 
 		@Override
 		public List<ICompletionProposal> asCompletionProposal(int offset) {
-			List<ICompletionProposal> result = new LinkedList<>();
+			final List<ICompletionProposal> result = new LinkedList<>();
 			for (String literal: literals) {
-				CompletionProposal cp = new CompletionProposal(literal, offset + 1, 0, literal.length());
-				result.add(cp);
+				final String replacement = "'" + literal + "'";
+				result.add(new CompletionProposal(replacement, offset, 0, replacement.length()));
 			}
 			return result;
 		}
@@ -120,8 +120,8 @@ public interface SwaggerProposal {
 
 		@Override
 		public List<ICompletionProposal> asCompletionProposal(int offset) {
-			// TODO Auto-generated method stub
-			return null;
+			List<ICompletionProposal> result = new LinkedList<>();
+			return result;
 		}
 	}
 
@@ -155,8 +155,8 @@ public interface SwaggerProposal {
 
 		@Override
 		public List<ICompletionProposal> asCompletionProposal(int offset) {
-			// TODO Auto-generated method stub
-			return null;
+			List<ICompletionProposal> result = new LinkedList<>();
+			return result;
 		}
 
 	}
@@ -204,8 +204,8 @@ public interface SwaggerProposal {
 
 		@Override
 		public List<ICompletionProposal> asCompletionProposal(int offset) {
-			// TODO Auto-generated method stub
-			return null;
+			List<ICompletionProposal> result = new LinkedList<>();
+			return result;
 		}
 	}
 

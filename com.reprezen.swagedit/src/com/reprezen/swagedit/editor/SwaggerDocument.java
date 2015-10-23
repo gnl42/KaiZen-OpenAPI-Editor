@@ -12,10 +12,12 @@ import org.eclipse.jface.text.IDocumentListener;
 import org.yaml.snakeyaml.Yaml;
 import org.yaml.snakeyaml.events.Event;
 import org.yaml.snakeyaml.events.Event.ID;
+import org.yaml.snakeyaml.nodes.MappingNode;
 import org.yaml.snakeyaml.nodes.Node;
+import org.yaml.snakeyaml.nodes.NodeTuple;
+import org.yaml.snakeyaml.parser.ParserException;
 
 import com.fasterxml.jackson.databind.JsonNode;
-import org.yaml.snakeyaml.parser.ParserException;
 
 public class SwaggerDocument extends Document {
 
@@ -33,7 +35,11 @@ public class SwaggerDocument extends Document {
 	}
 
 	public Node getYaml() {
-		return yaml.compose(new StringReader(get()));
+		try {
+			return yaml.compose(new StringReader(get()));
+		} catch (Exception e) {
+			return null;
+		}
 	}
 
 	public JsonNode getTree() throws ParserException, IOException {
@@ -45,30 +51,11 @@ public class SwaggerDocument extends Document {
 	 * in the document.
 	 */
 	public List<Event> getEvent(int position) {
-//		Node node = getYaml();
 		final List<Event> result = new ArrayList<>();
-		final List<Node> resultTree = new LinkedList<>();
 
-//		System.out.println(node);
-//		Node current = node;
-//		Node found = null;
-//		while (found == null || current != null) {
-//			if (current instanceof MappingNode) {
-//				List<NodeTuple> values = ((MappingNode) node).getValue();
-//				
-//				
-//			} else if (current instanceof ScalarNode) {
-//				ScalarNode scalar = (ScalarNode) current;
-//				System.out.println("scalar " + scalar);
-//				if (current.getStartMark().getLine() == position) {
-//					found = current;
-//					System.out.println("found " + scalar);
-//				}
-//			}
-//		}
-		
 		try {
-			for (Event event: events) {
+			for (Event event: yaml.parse(new StringReader(get()))) {
+				System.out.println(event.getStartMark().getLine() + " > " + event.toString());
 				if (event.getStartMark().getLine() == position) {
 					if (event.is(ID.Scalar)) {
 						result.add(event);
@@ -80,6 +67,39 @@ public class SwaggerDocument extends Document {
 		}
 
 		return result;
+	}
+
+	public List<String> getPath(int i) {
+		final List<String> path = new LinkedList<>();
+		final List<Event> events = new LinkedList<>();
+
+		int starts = 0;
+		int found = 0;
+
+		MappingNode root = (MappingNode) yaml.compose(new StringReader(get()));
+		NodeTuple previous = null;
+		for (NodeTuple tuple: root.getValue()) {
+			System.out.println(tuple);
+			Node key = tuple.getKeyNode();
+
+			if (key.getStartMark().getLine() == i) {
+				System.out.println("start here");
+			} else if (key.getStartMark().getLine() > i) {
+				System.out.println("too far");				
+				traverse(previous, i);
+			}
+
+			previous = tuple;
+		}
+
+		return path;
+	}
+
+	private void traverse(NodeTuple tuple, int position) {
+		Node key = tuple.getKeyNode();
+		Node value = tuple.getValueNode();
+
+		System.out.println("here " + position + " " + key + " > " + value);
 	}
 
 }

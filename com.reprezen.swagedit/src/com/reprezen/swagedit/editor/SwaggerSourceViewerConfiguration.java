@@ -27,7 +27,7 @@ public class SwaggerSourceViewerConfiguration extends YEditSourceViewerConfigura
 
 		ca.enableAutoInsert(true);
 		ca.enableAutoActivation(true);
-		ca.setAutoActivationDelay(500);
+		ca.setAutoActivationDelay(100);
 
 		return ca;
 	}
