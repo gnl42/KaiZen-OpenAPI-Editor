@@ -3,8 +3,7 @@ package com.reprezen.swagedit.tests
 import com.reprezen.swagedit.editor.SwaggerDocument
 import org.junit.Test
 import org.yaml.snakeyaml.events.ScalarEvent
-
-import static org.assertj.core.api.Assertions.*
+import static junit.framework.Assert.*
 
 class SwaggerDocumentTest {
 
@@ -19,13 +18,13 @@ class SwaggerDocumentTest {
 		document.set(yaml)		
 		val events = document.getEvent(0)
 
-		assertThat(events).hasSize(2)
+		assertEquals(events.size, 2)
 			
 		val e1 = events.get(0) as ScalarEvent
 		val e2 = events.get(1) as ScalarEvent
 		
-		assertThat(e1.value).isEqualTo("key")
-		assertThat(e2.value).isEqualTo("value")
+		assertEquals(e1.value, "key")
+		assertEquals(e2.value, "value")
 	}
 
 	@Test
@@ -39,13 +38,13 @@ class SwaggerDocumentTest {
 		document.set(yaml)		
 		val events = document.getEvent(1)
 
-		assertThat(events).hasSize(2)
+		assertEquals(events.size, 2)
 
 		val e1 = events.get(0) as ScalarEvent
 		val e2 = events.get(1) as ScalarEvent
 
-		assertThat(e1.value).isEqualTo("description")
-		assertThat(e2.value).isEqualTo("Tax Blaster")
+		assertEquals(e1.value, "description")
+		assertEquals(e2.value, "Tax Blaster")
 	}
 
 }
