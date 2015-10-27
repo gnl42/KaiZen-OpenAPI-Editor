@@ -19,7 +19,7 @@ import static org.junit.Assert.*;
 import static org.mockito.Mockito.*;
 import com.reprezen.swagedit.assist.SwaggerProposal.ObjectProposal;
 
-class SwaggerContentAssistProcessorTest {
+public class SwaggerContentAssistProcessorTest {
 
 	private SwaggerSchema schema = new SwaggerSchema();
 	private IDocument document;
