@@ -1,7 +1,6 @@
 package com.reprezen.swagedit.tests
 
 import com.reprezen.swagedit.editor.SwaggerDocument
-import io.swagger.util.Yaml
 import org.junit.Test
 import org.yaml.snakeyaml.events.ScalarEvent
 
@@ -47,27 +46,6 @@ class SwaggerDocumentTest {
 
 		assertThat(e1.value).isEqualTo("description")
 		assertThat(e2.value).isEqualTo("Tax Blaster")
-	}
-
-	@Test
-	def void testGetRootMapping() {
-		val yaml = '''
-		info:
-		  description: ""
-		tags:
-		  - foo: ""
-		  - bar: ""
-		'''
-
-		document.set(yaml)
-		val path = document.getPath(1)
-		println(path)
-
-		println(document.getPath(3))
-		val node = Yaml.mapper.readTree(yaml)
-		println(node)
-		//val events = document.getEvent(1)		
-		//println(events)
 	}
 
 }
