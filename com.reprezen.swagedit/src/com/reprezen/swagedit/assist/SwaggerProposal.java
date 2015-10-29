@@ -36,18 +36,22 @@ public interface SwaggerProposal {
 				return SwaggerProposal.RegExProposal.create(node, this);
 			} else if (node.has("items")) {
 				return SwaggerProposal.ArrayProposal.create(node, this);
-			} else if (node.has("object")) {
-				return SwaggerProposal.ObjectProposal.create(node, this);
 			} else if (node.has("$ref")) {
 				return getType(find(node.get("$ref").asText()));
-			} else {
-				return null;
+			} else if (node.has("type")) {
+				String type = node.get("type").asText();
+				if ("object".equals(type)) {
+					return SwaggerProposal.ObjectProposal.create(node, this);
+				} else if ("string".equals(type)) {
+					return SwaggerProposal.StringProposal.create(node, this);
+				}
 			}
+				
+			return null;
 		}
 
 		private JsonNode find(String ref) {
-			String[] keys = ref.substring(2).split("/");
-			
+			final String[] keys = ref.substring(2).split("/");
 			JsonNode found = schema;
 			for (String key: keys) {
 				found = found.get(key);
@@ -61,6 +65,24 @@ public interface SwaggerProposal {
 		}
 	}
 
+	public class StringProposal implements SwaggerProposal {
+
+		StringProposal() {}
+
+		@Override
+		public List<ICompletionProposal> asCompletionProposal(int offset) {
+			final String replacement = "''";
+			final List<ICompletionProposal> result = new ArrayList<>();					
+			result.add(new CompletionProposal(replacement, offset, 0, 1));
+			return result;
+		}
+
+		public static SwaggerProposal create(JsonNode node, Builder builder) {
+			return new StringProposal();
+		}
+		
+	}
+	
 	public class EnumProposal implements SwaggerProposal {
 
 		public final String[] literals;
@@ -133,11 +155,17 @@ public interface SwaggerProposal {
 			final JsonNode items = definition.get("items");
 			final ArrayProposal proposal = new ArrayProposal();
 
-			for (JsonNode item: items) {
-				final SwaggerProposal type = builder.getType(item);
-
+			if (items.isObject()) {
+				final SwaggerProposal type = builder.getType(items);
 				if (type != null) {
 					proposal.items.add(type);
+				}
+			} else if (items.isArray()) {
+				for (JsonNode item: items) {
+					final SwaggerProposal type = builder.getType(item);
+					if (type != null) {
+						proposal.items.add(type);
+					}	
 				}
 			}
 
@@ -155,7 +183,10 @@ public interface SwaggerProposal {
 
 		@Override
 		public List<ICompletionProposal> asCompletionProposal(int offset) {
-			List<ICompletionProposal> result = new LinkedList<>();
+			final List<ICompletionProposal> result = new LinkedList<>();
+			for (SwaggerProposal proposal: getItems()) {				
+				result.addAll(proposal.asCompletionProposal(offset));
+			}
 			return result;
 		}
 
@@ -182,7 +213,6 @@ public interface SwaggerProposal {
 				for (Iterator<String> it = properties.fieldNames(); it.hasNext();) {
 					String key = it.next();
 					SwaggerProposal value = builder.getType(properties.get(key));
-					
 					if (value != null) {
 						proposal.addProperty(key, value);
 					}
@@ -205,6 +235,9 @@ public interface SwaggerProposal {
 		@Override
 		public List<ICompletionProposal> asCompletionProposal(int offset) {
 			List<ICompletionProposal> result = new LinkedList<>();
+			for (String property: properties.keySet()) {
+				result.add(new CompletionProposal(property, offset, 0, property.length()));
+			}
 			return result;
 		}
 	}

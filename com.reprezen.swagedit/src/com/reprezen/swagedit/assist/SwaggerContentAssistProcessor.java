@@ -2,26 +2,29 @@ package com.reprezen.swagedit.assist;
 
 import java.util.LinkedList;
 import java.util.List;
-import java.util.Set;
 
 import org.eclipse.jface.text.BadLocationException;
-import org.eclipse.jface.text.IDocument;
+import org.eclipse.jface.text.IRegion;
 import org.eclipse.jface.text.ITextViewer;
 import org.eclipse.jface.text.contentassist.CompletionProposal;
 import org.eclipse.jface.text.contentassist.ICompletionProposal;
 import org.eclipse.jface.text.contentassist.IContentAssistProcessor;
 import org.eclipse.jface.text.contentassist.IContextInformation;
 import org.eclipse.jface.text.contentassist.IContextInformationValidator;
+import org.eclipse.jface.text.templates.Template;
+import org.eclipse.jface.text.templates.TemplateCompletionProcessor;
+import org.eclipse.jface.text.templates.TemplateContextType;
+import org.eclipse.swt.graphics.Image;
 
 import com.reprezen.swagedit.assist.SwaggerProposal.ObjectProposal;
+import com.reprezen.swagedit.editor.SwaggerDocument;
 import com.reprezen.swagedit.validation.SwaggerSchema;
 
 /**
  * This class provides basic content assist based on keywords used by 
  * the swagger schema.
- * 
  */
-public class SwaggerContentAssistProcessor implements IContentAssistProcessor {
+public class SwaggerContentAssistProcessor extends TemplateCompletionProcessor implements IContentAssistProcessor {
 
 	private final SwaggerSchema schema = new SwaggerSchema();
 	private final ObjectProposal swaggerProposal = new SwaggerCompletionProposal().get();
@@ -30,8 +33,13 @@ public class SwaggerContentAssistProcessor implements IContentAssistProcessor {
 
 	@Override
 	public ICompletionProposal[] computeCompletionProposals(ITextViewer viewer, int documentOffset) {
-		final Set<String> keywords = schema.getKeywords();
-		final IDocument document = viewer.getDocument();
+		// should be done when we add templates
+		//ICompletionProposal[] completionProposals = super.computeCompletionProposals(viewer, documentOffset);
+		//if (completionProposals.length != 0) {
+		//	return completionProposals;
+		//}
+
+		final SwaggerDocument document = (SwaggerDocument) viewer.getDocument();
 
 		boolean startOfLine = true;
 		int lineOfOffset = 0;
@@ -43,13 +51,14 @@ public class SwaggerContentAssistProcessor implements IContentAssistProcessor {
 		} catch (BadLocationException e) {}
 
 		final List<ICompletionProposal> proposals = new LinkedList<>();
-	
+
 		// look that the cursor is after a :
-		int delemiterPos = isAfterDelimiter(document, documentOffset);
+		int delemiterPos = document.getDelimiterPosition(documentOffset);
+
 		if (delemiterPos > -1) {
 			// find the keyword before :
-			final String word = getWord(document, delemiterPos);
-			// get proposals for that keyword 
+			final String word = document.getWordBeforeOffset(delemiterPos);
+			// get proposals for that keyword
 			if (!word.isEmpty()) {
 				SwaggerProposal proposal = swaggerProposal.getProperties().get(word);
 				if (proposal != null) {
@@ -58,10 +67,10 @@ public class SwaggerContentAssistProcessor implements IContentAssistProcessor {
 			}
 		} else {
 			// user started a word, find that input
-			final String word = getWord(document, documentOffset);
+			final String word = document.getWordBeforeOffset(documentOffset);
 			if (!word.isEmpty()) {
 				// look for keywords that match the input
-				for (String keyword: keywords) {
+				for (String keyword: schema.getKeywords(false)) {
 					if (keyword.startsWith(word)) {
 						final String replacement = keyword.substring(word.length(), keyword.length());
 						proposals.add(new CompletionProposal(replacement, 
@@ -72,14 +81,14 @@ public class SwaggerContentAssistProcessor implements IContentAssistProcessor {
 								keyword,
 								null,
 								null));
-					}	
+					}
 				}
 			}
 		}
 
 		// if nothing has been found, add list of keywords
 		if (proposals.isEmpty()) {
-			for (String current: keywords) {
+			for (String current: schema.getKeywords(startOfLine)) {
 				if (!(viewer.getDocument().get().contains(current))) {
 					proposals.add(new CompletionProposal(current, documentOffset, 0, current.length()));
 				}
@@ -87,35 +96,6 @@ public class SwaggerContentAssistProcessor implements IContentAssistProcessor {
 		}
 
 		return proposals.toArray(new CompletionProposal[proposals.size()]);
-	}
-
-	private int isAfterDelimiter(IDocument document, int offset) {
-		while(true) {
-			try {
-				char c = document.getChar(--offset);
-				if (Character.isLetterOrDigit(c))
-					return -1;
-				if (c == ':')
-					return offset;			
-			} catch (BadLocationException e) {
-				return -1;
-			}
-		}
-	}
-	private String getWord(IDocument document, int documentOffset) {
-		final StringBuffer buffer = new StringBuffer();
-		while (true) {
-			try {
-				char c = document.getChar(--documentOffset);
-				if (!Character.isLetterOrDigit(c) || Character.isWhitespace(c)) {
-					return buffer.reverse().toString().trim(); 
-				} else {
-					buffer.append(c);
-				}
-			} catch (BadLocationException e) {
-				return buffer.reverse().toString().trim();
-			}
-		}
 	}
 
 	@Override
@@ -140,6 +120,21 @@ public class SwaggerContentAssistProcessor implements IContentAssistProcessor {
 
 	@Override
 	public IContextInformationValidator getContextInformationValidator() {
+		return null;
+	}
+
+	@Override
+	protected Template[] getTemplates(String contextTypeId) {
+		return null;
+	}
+
+	@Override
+	protected TemplateContextType getContextType(ITextViewer viewer, IRegion region) {
+		return null;
+	}
+
+	@Override
+	protected Image getImage(Template template) {
 		return null;
 	}
 

@@ -44,7 +44,7 @@ public class SwaggerContentAssistProcessorTest {
 
 		ICompletionProposal[] proposals = processor.computeCompletionProposals(viewer, offset);
 
-		assertThat(proposals).hasSize(schema.getKeywords().size());
+		assertThat(proposals).hasSize(schema.getKeywords(true).size());
 	}
 
 	@Test

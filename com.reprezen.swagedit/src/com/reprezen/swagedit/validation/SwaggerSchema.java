@@ -23,7 +23,8 @@ public class SwaggerSchema {
 	
 	private JsonNode tree;
 	private JsonSchema schema;
-	private Set<String> keywords;
+	private final Set<String> keywords = new LinkedHashSet<>();
+	private final Set<String> rootKeywords = new LinkedHashSet<>();
 
 	/**
 	 * Returns swagger 2.0 schema
@@ -50,27 +51,29 @@ public class SwaggerSchema {
 		return new ArrayList<>();
 	}
 
-	public Set<String> getKeywords() {
-		if (keywords == null) {
-			keywords = new LinkedHashSet<>();
-			collectKeywords(getTree());
+	public Set<String> getKeywords(boolean isRoot) {
+		if (keywords.isEmpty()) {
+			rootKeywords.addAll(collectKeywords(getTree()));
+			keywords.addAll(rootKeywords);
 
 			final JsonNode definitions = getTree().get("definitions");
 			for (Iterator<Entry<String, JsonNode>> it = definitions.fields(); it.hasNext();) {
-				final Entry<String, JsonNode> entry = it.next();
-				collectKeywords(entry.getValue());
+				keywords.addAll(collectKeywords(it.next().getValue()));
 			}
 		}
 
-		return keywords;
+		return isRoot ? rootKeywords : keywords;
 	}
 
-	private void collectKeywords(JsonNode node) {
+	private Set<String> collectKeywords(JsonNode node) {
+		Set<String> result = new LinkedHashSet<>();
 		if (node != null && node.has("properties") && node.get("properties").isObject()) {
 			for (Iterator<String> it = node.get("properties").fieldNames(); it.hasNext();) {
-				keywords.add(it.next());
+				result.add(it.next());
 			}
 		}
+		
+		return result;
 	}
 
 	public JsonNode getTree() {
