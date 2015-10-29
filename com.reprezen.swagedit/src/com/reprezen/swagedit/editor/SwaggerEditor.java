@@ -28,6 +28,10 @@ import org.eclipse.ui.IFileEditorInput;
 import com.reprezen.swagedit.validation.SwaggerError;
 import com.reprezen.swagedit.validation.Validator;
 
+/**
+ * SwagEdit editor.
+ * 
+ */
 public class SwaggerEditor extends YEdit {
 
 	public static final String ID = "com.reprezen.swagedit.editor";

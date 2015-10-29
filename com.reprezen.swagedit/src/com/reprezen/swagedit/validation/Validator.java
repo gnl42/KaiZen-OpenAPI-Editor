@@ -7,6 +7,7 @@ import java.util.Collections;
 import java.util.Iterator;
 import java.util.List;
 
+import org.dadacoalition.yedit.YEditLog;
 import org.eclipse.core.resources.IMarker;
 import org.yaml.snakeyaml.nodes.MappingNode;
 import org.yaml.snakeyaml.nodes.Node;
@@ -43,18 +44,14 @@ public class Validator {
 	 * @throws ParserException 
 	 */
 	public List<SwaggerError> validate(SwaggerDocument document) {
-		JsonNode spec = null;
+		JsonNode jsonContent = null;
 		try {
-			spec = document.getTree();
+			jsonContent = document.asJson();
 		} catch (Exception e) {
-//			if (e instanceof ParserException) {
-//				return Collections.singletonList(SwaggerError.create((ParserException) e));
-//			} else if (e instanceof ScannerException) {
-//				return Collections.singletonList(SwaggerError.create((ScannerException) e));
-//			}
+			YEditLog.logException(e);
 		}
 
-		if (spec == null) {
+		if (jsonContent == null) {
 			return Collections.singletonList(new SwaggerError(
 					IMarker.SEVERITY_ERROR, 
 					"Unable to read content.  It may be invalid YAML"));
@@ -63,7 +60,7 @@ public class Validator {
 			ProcessingReport report = null;
 
 			try {
-				report = schema.getSchema().validate(spec);
+				report = schema.getSchema().validate(jsonContent);
 			} catch (ProcessingException e) {
 				final ProcessingMessage pm = e.getProcessingMessage();
 				final int line = getLine(pm, yaml);

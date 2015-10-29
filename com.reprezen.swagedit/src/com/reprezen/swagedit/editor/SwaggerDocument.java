@@ -6,9 +6,8 @@ import java.util.ArrayList;
 import java.util.LinkedList;
 import java.util.List;
 
+import org.eclipse.jface.text.BadLocationException;
 import org.eclipse.jface.text.Document;
-import org.eclipse.jface.text.DocumentEvent;
-import org.eclipse.jface.text.IDocumentListener;
 import org.yaml.snakeyaml.Yaml;
 import org.yaml.snakeyaml.events.Event;
 import org.yaml.snakeyaml.events.Event.ID;
@@ -19,21 +18,21 @@ import org.yaml.snakeyaml.parser.ParserException;
 
 import com.fasterxml.jackson.databind.JsonNode;
 
+/**
+ * SwaggerDocument
+ * 
+ */
 public class SwaggerDocument extends Document {
 
 	private final Yaml yaml = new Yaml();
-	private Iterable<Event> events = new ArrayList<>();
 
-	public SwaggerDocument() {
-		addDocumentListener(new IDocumentListener() {
-			@Override
-			public void documentChanged(DocumentEvent event) {}
+	public SwaggerDocument() {}
 
-			@Override
-			public void documentAboutToBeChanged(DocumentEvent event) {}
-		});
-	}
-
+	/**
+	 * Returns YAML abstract representation of the document.
+	 * 
+	 * @return Node
+	 */
 	public Node getYaml() {
 		try {
 			return yaml.compose(new StringReader(get()));
@@ -42,20 +41,84 @@ public class SwaggerDocument extends Document {
 		}
 	}
 
-	public JsonNode getTree() throws ParserException, IOException {
+	/**
+	 * Returns the JSON representation of the document.
+	 * 
+	 * Will throw an exception if the content of the document is not 
+	 * valid YAML.
+	 * 
+	 * @return JsonNode
+	 * @throws ParserException
+	 * @throws IOException
+	 */
+	public JsonNode asJson() throws ParserException, IOException {
 		return io.swagger.util.Yaml.mapper().readTree(get());
 	}
 
-	/*
+	/**
+	 * Returns position of the symbol ':' in respect to 
+	 * the given offset.
+	 * 
+	 * Will return -1 if reaches beginning of line of other symbol 
+	 * before finding ':'.
+	 * 
+	 * @param offset
+	 * @return position
+	 */
+	public int getDelimiterPosition(int offset) {
+		while(true) {
+			try {
+				char c = getChar(--offset);				
+				if (Character.isLetterOrDigit(c)) {
+					return -1;
+				}
+				if (c == ':') {
+					return offset;
+				}
+				if (c != ':' && !Character.isLetterOrDigit(c)) {
+					return -1;
+				}
+			} catch (BadLocationException e) {
+				return -1;
+			}
+		}
+	}
+
+	/**
+	 * Returns the first word it encounters by reading backwards on the line 
+	 * starting from the offset.
+	 * 
+	 * @param offset
+	 * @return string
+	 */
+	public String getWordBeforeOffset(int offset) {
+		final StringBuffer buffer = new StringBuffer();
+		while (true) {
+			try {
+				char c = getChar(--offset);
+				if (!Character.isLetterOrDigit(c) || Character.isWhitespace(c)) {
+					return buffer.reverse().toString().trim(); 
+				} else {
+					buffer.append(c);
+				}
+			} catch (BadLocationException e) {
+				return buffer.reverse().toString().trim();
+			}
+		}
+	}
+
+	/**
 	 * Returns the yaml event that matches the given position (line)
 	 * in the document.
+	 * 
+	 * @param position
+	 * @return list of events
 	 */
 	public List<Event> getEvent(int position) {
 		final List<Event> result = new ArrayList<>();
 
 		try {
 			for (Event event: yaml.parse(new StringReader(get()))) {
-				System.out.println(event.getStartMark().getLine() + " > " + event.toString());
 				if (event.getStartMark().getLine() == position) {
 					if (event.is(ID.Scalar)) {
 						result.add(event);
