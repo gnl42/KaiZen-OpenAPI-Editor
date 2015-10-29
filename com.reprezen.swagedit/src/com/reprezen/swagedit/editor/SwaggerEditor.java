@@ -4,8 +4,10 @@ import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 
+import org.dadacoalition.yedit.YEditLog;
 import org.dadacoalition.yedit.editor.YEdit;
 import org.eclipse.core.resources.IFile;
+import org.eclipse.core.resources.IMarker;
 import org.eclipse.core.runtime.CoreException;
 import org.eclipse.core.runtime.IProgressMonitor;
 import org.eclipse.jface.text.IDocument;
@@ -113,11 +115,20 @@ public class SwaggerEditor extends YEdit {
 
 		for (SwaggerError error : errors) {
 			try {
-				error.addMarker(file, document);
+				addMarker(error, file, document);
 			} catch (CoreException e) {
-				e.printStackTrace();
+				YEditLog.logException(e);
 			}
 		}
+	}
+
+	private IMarker addMarker(SwaggerError error, IFile target, IDocument document) throws CoreException {
+		final IMarker marker = target.createMarker(IMarker.PROBLEM);
+		marker.setAttribute(IMarker.SEVERITY, error.getLevel());
+		marker.setAttribute(IMarker.MESSAGE, error.getMessage());
+		marker.setAttribute(IMarker.LINE_NUMBER, error.getLine());
+
+		return marker;
 	}
 
 	@Override

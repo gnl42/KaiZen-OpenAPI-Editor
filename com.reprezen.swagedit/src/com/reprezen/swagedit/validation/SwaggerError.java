@@ -2,10 +2,7 @@ package com.reprezen.swagedit.validation;
 
 import java.util.Iterator;
 
-import org.eclipse.core.resources.IFile;
 import org.eclipse.core.resources.IMarker;
-import org.eclipse.core.runtime.CoreException;
-import org.eclipse.jface.text.IDocument;
 import org.yaml.snakeyaml.parser.ParserException;
 
 import com.fasterxml.jackson.databind.JsonMappingException;
@@ -148,15 +145,6 @@ public class SwaggerError {
 		default:
 			return IMarker.SEVERITY_INFO;
 		}
-	}
-
-	public IMarker addMarker(IFile target, IDocument document) throws CoreException {
-		final IMarker marker = target.createMarker(IMarker.PROBLEM);
-		marker.setAttribute(IMarker.SEVERITY, getLevel());
-		marker.setAttribute(IMarker.MESSAGE, getMessage());
-		marker.setAttribute(IMarker.LINE_NUMBER, getLine());
-
-		return marker;
 	}
 
 	public int getLevel() {
