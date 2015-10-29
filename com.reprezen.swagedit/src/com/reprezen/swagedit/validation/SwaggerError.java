@@ -1,5 +1,7 @@
 package com.reprezen.swagedit.validation;
 
+import java.util.Iterator;
+
 import org.eclipse.core.resources.IFile;
 import org.eclipse.core.resources.IMarker;
 import org.eclipse.core.runtime.CoreException;
@@ -7,9 +9,12 @@ import org.eclipse.jface.text.IDocument;
 import org.yaml.snakeyaml.parser.ParserException;
 
 import com.fasterxml.jackson.databind.JsonMappingException;
+import com.fasterxml.jackson.databind.JsonNode;
 import com.fasterxml.jackson.dataformat.yaml.snakeyaml.scanner.ScannerException;
 import com.github.fge.jsonschema.core.report.LogLevel;
 import com.github.fge.jsonschema.core.report.ProcessingMessage;
+import com.google.common.base.Joiner;
+import com.reprezen.swagedit.Messages;
 
 public class SwaggerError {
 
@@ -36,8 +41,8 @@ public class SwaggerError {
 		return new SwaggerError(IMarker.SEVERITY_ERROR, exception.getMessage(), line);
 	}
 
-	public static SwaggerError create(ProcessingMessage message, int line) {		
-		return new SwaggerError(getLevel(message), message.getMessage(), line);
+	public static SwaggerError create(ProcessingMessage error, int line) {
+		return new SwaggerError(getLevel(error), rewriteError(error.asJson()), line);
 	}
 
 	public static SwaggerError create(ParserException e) {
@@ -52,11 +57,81 @@ public class SwaggerError {
 		return new SwaggerError(IMarker.SEVERITY_ERROR, e.getMessage(), e.getProblemMark().getLine() + 1);
 	}
 
-//	private static String newMessage(ProcessingMessage message) {
-//		JsonNode json = message.asJson();
-//		
-//	}
-	
+	private static String rewriteError(JsonNode error) {
+		if (error == null || !error.has("keyword")) {
+			return "";
+		}
+
+		switch (error.get("keyword").asText()) {
+		case "type":
+			return rewriteTypeError(error);
+		case "enum":
+			return rewriteEnumError(error);
+		case "oneOf":
+			return rewriteOneOfError(error);
+		case "additionalProperties":
+			return rewriteAdditionalProperties(error);
+		case "required":
+			return rewriteRequiredProperties(error);
+		default:
+			return error.get("message").asText();
+		}
+	}
+
+	private static String rewriteRequiredProperties(JsonNode error) {
+		JsonNode missing = error.get("missing");
+
+		return String.format(Messages.error_required_properties, Joiner.on(", ").join(missing));
+	}
+
+	private static String rewriteAdditionalProperties(JsonNode error) {
+		final JsonNode unwanted = error.get("unwanted");
+
+		return String.format(Messages.error_additional_properties_not_allowed, Joiner.on(", ").join(unwanted));
+	}
+
+	private static String rewriteOneOfError(JsonNode node) {
+		final JsonNode reports = node.get("reports");
+		String result = ""; 
+
+		for (Iterator<String> it = reports.fieldNames(); it.hasNext();) {
+			final String key = it.next();
+			final JsonNode value = reports.get(key);
+
+			if (value.isObject()) {
+				result += rewriteError(value) + "\n";
+			} else if (value.isArray()) {
+				for (JsonNode one: value) {
+					result += rewriteError(one) + "\n";
+				}
+			}
+		}
+
+		return result;
+	}
+
+	private static String rewriteTypeError(JsonNode error) {
+		final JsonNode found = error.get("found");
+		final JsonNode expected = error.get("expected");
+
+		String expect;
+		if (expected.isArray()) {
+			expect = expected.get(0).asText();
+		} else {
+			expect = expected.asText();
+		}
+
+		return String.format(Messages.error_typeNoMatch, found.asText(), expect);
+	}
+
+	private static String rewriteEnumError(JsonNode error) {
+		final JsonNode value = error.get("value");
+		final JsonNode enums = error.get("enum");
+		final String enumString = Joiner.on(", ").join(enums);
+
+		return String.format(Messages.error_notInEnum, value.asText(), enumString);
+	}
+
 	protected static int getLevel(ProcessingMessage message) {
 		if (message == null) {
 			return IMarker.SEVERITY_INFO;
