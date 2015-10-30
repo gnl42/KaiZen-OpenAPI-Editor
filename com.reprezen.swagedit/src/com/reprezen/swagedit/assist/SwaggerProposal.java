@@ -2,8 +2,8 @@ package com.reprezen.swagedit.assist;
 
 import java.util.ArrayList;
 import java.util.Arrays;
-import java.util.HashMap;
 import java.util.Iterator;
+import java.util.LinkedHashMap;
 import java.util.LinkedList;
 import java.util.List;
 import java.util.Map;
@@ -25,7 +25,7 @@ public interface SwaggerProposal {
 			this.schema = schema;
 		}
 
-		private SwaggerProposal getType(JsonNode node) {
+		public SwaggerProposal getType(JsonNode node) {
 			if (node == null) {
 				return null;
 			}
@@ -194,7 +194,7 @@ public interface SwaggerProposal {
 
 	public class ObjectProposal implements SwaggerProposal {
 
-		private final Map<String, SwaggerProposal> properties = new HashMap<>();
+		private final Map<String, SwaggerProposal> properties = new LinkedHashMap<>();
 
 		void addProperty(String key, SwaggerProposal value) {
 			properties.put(key, value);
@@ -220,16 +220,6 @@ public interface SwaggerProposal {
 			}
 
 			return proposal;
-		}
-
-		@Override
-		public String toString() {
-			String res = "{ ";
-			for (String key: properties.keySet()) {
-				res += key + ":" + properties.get(key); 
-			}
-			res += " }";
-			return res;
 		}
 
 		@Override

@@ -139,16 +139,21 @@ public class SwaggerSchema {
 		return proposals;
 	}
 
-	public void getProposals(String path, JsonNode document) {
+	public SwaggerProposal getProposals(String path, JsonNode document) {
 	  if (path.startsWith("/"))
 		  path = path.substring(1);
 	  
 	  String[] paths = path.split("/");
 	  JsonNode current = document.path(paths[0]);
 	  JsonNode definition = getDefinition(paths[0]);
-	  
-	  System.out.println(current);
-	  System.out.println(definition);
+
+	  return getProposals(current, definition);
+	}
+
+	private SwaggerProposal getProposals(JsonNode current, JsonNode definition) {
+		SwaggerProposal type = new SwaggerProposal.Builder(asJson()).getType(definition);
+
+		return type;
 	}
 
 	private JsonNode getDefinition(String path) {

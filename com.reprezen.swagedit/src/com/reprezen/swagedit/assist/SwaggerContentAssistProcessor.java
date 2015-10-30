@@ -1,6 +1,5 @@
 package com.reprezen.swagedit.assist;
 
-import java.util.LinkedList;
 import java.util.List;
 
 import org.eclipse.jface.text.BadLocationException;
@@ -48,14 +47,26 @@ public class SwaggerContentAssistProcessor extends TemplateCompletionProcessor i
 			startOfLine = documentOffset == lineOffset;
 		} catch (BadLocationException e) {}
 
-		 new LinkedList<>();
-
 		final int delemiterPos = document.getDelimiterPosition(documentOffset);
 		final String prefix = document.getWordBeforeOffset(documentOffset);
 		final String indent = document.lastIndent(documentOffset);
-		final List<ICompletionProposal> proposals = schema.getContentProposals(startOfLine, 
-				prefix, indent, 
-				delemiterPos, documentOffset);
+
+		SwaggerProposal sp;
+		try {
+			sp = schema.getProposals(document.getPath(lineOfOffset), document.asJson());
+		} catch (Exception e) {
+			e.printStackTrace();
+			sp = null;
+		}
+
+		List<ICompletionProposal> proposals = null;
+		if (sp != null) {
+			proposals = sp.asCompletionProposal(documentOffset);
+		}
+
+		if (proposals == null || proposals.isEmpty()) {
+			proposals = schema.getContentProposals(startOfLine, prefix, indent, delemiterPos, documentOffset);
+		}
 
 		return proposals.toArray(new CompletionProposal[proposals.size()]);
 	}
