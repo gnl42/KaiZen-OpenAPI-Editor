@@ -31,4 +31,19 @@ class SwaggerDocumentTest {
 		assertEquals("/tags/1/bar", document.getPath(5))
 	}
 
+	@Test
+	def void testGetPathOnEmptyLine() {
+		val yaml = '''
+		info:
+		  description: ""
+		  
+		  version: "1.0.0"
+		'''
+
+		document.set(yaml)
+		assertEquals("/info", document.getPath(2))
+		assertEquals("/info/description", document.getPath(1))
+		assertEquals("/info/version", document.getPath(3))
+	}
+
 }
