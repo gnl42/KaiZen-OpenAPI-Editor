@@ -2,18 +2,16 @@ package com.reprezen.swagedit.editor;
 
 import java.io.IOException;
 import java.io.StringReader;
-import java.util.ArrayList;
-import java.util.LinkedList;
-import java.util.List;
+import java.util.Iterator;
 
 import org.eclipse.jface.text.BadLocationException;
 import org.eclipse.jface.text.Document;
 import org.yaml.snakeyaml.Yaml;
-import org.yaml.snakeyaml.events.Event;
-import org.yaml.snakeyaml.events.Event.ID;
 import org.yaml.snakeyaml.nodes.MappingNode;
 import org.yaml.snakeyaml.nodes.Node;
 import org.yaml.snakeyaml.nodes.NodeTuple;
+import org.yaml.snakeyaml.nodes.ScalarNode;
+import org.yaml.snakeyaml.nodes.SequenceNode;
 import org.yaml.snakeyaml.parser.ParserException;
 
 import com.fasterxml.jackson.databind.JsonNode;
@@ -26,7 +24,8 @@ public class SwaggerDocument extends Document {
 
 	private final Yaml yaml = new Yaml();
 
-	public SwaggerDocument() {}
+	public SwaggerDocument() {
+	}
 
 	/**
 	 * Returns YAML abstract representation of the document.
@@ -44,8 +43,7 @@ public class SwaggerDocument extends Document {
 	/**
 	 * Returns the JSON representation of the document.
 	 * 
-	 * Will throw an exception if the content of the document is not 
-	 * valid YAML.
+	 * Will throw an exception if the content of the document is not valid YAML.
 	 * 
 	 * @return JsonNode
 	 * @throws ParserException
@@ -56,19 +54,18 @@ public class SwaggerDocument extends Document {
 	}
 
 	/**
-	 * Returns position of the symbol ':' in respect to 
-	 * the given offset.
+	 * Returns position of the symbol ':' in respect to the given offset.
 	 * 
-	 * Will return -1 if reaches beginning of line of other symbol 
-	 * before finding ':'.
+	 * Will return -1 if reaches beginning of line of other symbol before
+	 * finding ':'.
 	 * 
 	 * @param offset
 	 * @return position
 	 */
 	public int getDelimiterPosition(int offset) {
-		while(true) {
+		while (true) {
 			try {
-				char c = getChar(--offset);				
+				char c = getChar(--offset);
 				if (Character.isLetterOrDigit(c)) {
 					return -1;
 				}
@@ -85,7 +82,7 @@ public class SwaggerDocument extends Document {
 	}
 
 	/**
-	 * Returns the first word it encounters by reading backwards on the line 
+	 * Returns the first word it encounters by reading backwards on the line
 	 * starting from the offset.
 	 * 
 	 * @param offset
@@ -97,7 +94,7 @@ public class SwaggerDocument extends Document {
 			try {
 				char c = getChar(--offset);
 				if (!Character.isLetterOrDigit(c) || Character.isWhitespace(c)) {
-					return buffer.reverse().toString().trim(); 
+					return buffer.reverse().toString().trim();
 				} else {
 					buffer.append(c);
 				}
@@ -107,62 +104,95 @@ public class SwaggerDocument extends Document {
 		}
 	}
 
-	/**
-	 * Returns the yaml event that matches the given position (line)
-	 * in the document.
-	 * 
-	 * @param position
-	 * @return list of events
-	 */
-	public List<Event> getEvent(int position) {
-		final List<Event> result = new ArrayList<>();
-
+	public String lastIndent(int offset) {
 		try {
-			for (Event event: yaml.parse(new StringReader(get()))) {
-				if (event.getStartMark().getLine() == position) {
-					if (event.is(ID.Scalar)) {
-						result.add(event);
-					}
+			int start = offset - 1;
+			while (start >= 0 && getChar(start) != '\n') {
+				start--;
+			}
+
+			int end = start;
+			while (end < offset && Character.isSpaceChar(getChar(end))) {
+				end++;
+			}
+			return get(start + 1, end - start - 1);
+		} catch (BadLocationException e) {
+			return "";
+		}
+	}
+
+	public String getPath(int line) {
+		final MappingNode root = (MappingNode) yaml.compose(new StringReader(get()));
+		NodeTuple found = null, previous = null;
+
+		// find root tuple that is after the line
+		final Iterator<NodeTuple> it = root.getValue().iterator();
+		while (found == null && it.hasNext()) {
+			final NodeTuple current = it.next();
+			final Node key = current.getKeyNode();
+
+			if (key.getStartMark().getLine() > line) {				
+				found = previous;
+			}
+
+			previous = current;
+		}
+
+		// should be at end of document
+		if (found == null) {
+			found = previous;
+		}
+
+		return getPath(found, line);
+	}
+
+	private String getPath(NodeTuple tuple, int line) {
+		String path = "/";
+		path += getId(tuple.getKeyNode());
+
+		return path += getPath(tuple.getValueNode(), line);
+	}
+
+	private String getPath(Node node, int line) {
+		if (node instanceof MappingNode) {
+			MappingNode map = (MappingNode) node;
+			for (NodeTuple tuple: map.getValue()) {
+				if (tuple.getKeyNode().getStartMark().getLine() == line) {
+					return getPath(tuple.getKeyNode(), line);
 				}
 			}
-		} catch (Exception e) {
-			return result;
 		}
-
-		return result;
-	}
-
-	public List<String> getPath(int i) {
-		final List<String> path = new LinkedList<>();
-		final List<Event> events = new LinkedList<>();
-
-		int starts = 0;
-		int found = 0;
-
-		MappingNode root = (MappingNode) yaml.compose(new StringReader(get()));
-		NodeTuple previous = null;
-		for (NodeTuple tuple: root.getValue()) {
-			System.out.println(tuple);
-			Node key = tuple.getKeyNode();
-
-			if (key.getStartMark().getLine() == i) {
-				System.out.println("start here");
-			} else if (key.getStartMark().getLine() > i) {
-				System.out.println("too far");				
-				traverse(previous, i);
+		
+		if (node instanceof SequenceNode) {
+			SequenceNode seq = (SequenceNode) node;
+			for (Node current: seq.getValue()) {
+				if (current.getStartMark().getLine() == line) {
+					return "/" + seq.getValue().indexOf(current) + getPath(current, line);
+				}
 			}
-
-			previous = tuple;
 		}
 
-		return path;
+		if (node.getStartMark().getLine() == line) {
+			return "/" + getId(node);
+		}
+
+		switch (node.getNodeId()) {
+		case scalar:
+			return ((ScalarNode) node).getValue();
+		default:
+			return "";
+		}
 	}
 
-	private void traverse(NodeTuple tuple, int position) {
-		Node key = tuple.getKeyNode();
-		Node value = tuple.getValueNode();
-
-		System.out.println("here " + position + " " + key + " > " + value);
+	public String getId(Node node) {
+		switch (node.getNodeId()) {
+		case scalar:
+			return ((ScalarNode) node).getValue();
+		case mapping:
+			return "";
+		default:
+			return "";
+		}
 	}
 
 }

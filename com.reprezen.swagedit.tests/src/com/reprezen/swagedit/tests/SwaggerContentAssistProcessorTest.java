@@ -1,10 +1,10 @@
 package com.reprezen.swagedit.tests;
 
-import com.reprezen.swagedit.assist.SwaggerCompletionProposal;
-import com.reprezen.swagedit.assist.SwaggerContentAssistProcessor;
-import com.reprezen.swagedit.assist.SwaggerProposal;
-import com.reprezen.swagedit.editor.SwaggerDocument;
-import com.reprezen.swagedit.validation.SwaggerSchema;
+import static org.junit.Assert.assertEquals;
+import static org.junit.Assert.assertNotNull;
+import static org.mockito.Mockito.mock;
+import static org.mockito.Mockito.when;
+
 import org.eclipse.jface.text.BadLocationException;
 import org.eclipse.jface.text.IDocument;
 import org.eclipse.jface.text.ITextViewer;
@@ -14,10 +14,11 @@ import org.eclipse.swt.graphics.Point;
 import org.junit.Before;
 import org.junit.Test;
 
-import static org.assertj.core.api.Assertions.*;
-import static org.junit.Assert.*;
-import static org.mockito.Mockito.*;
+import com.reprezen.swagedit.assist.SwaggerContentAssistProcessor;
+import com.reprezen.swagedit.assist.SwaggerProposal;
 import com.reprezen.swagedit.assist.SwaggerProposal.ObjectProposal;
+import com.reprezen.swagedit.editor.SwaggerDocument;
+import com.reprezen.swagedit.validation.SwaggerSchema;
 
 public class SwaggerContentAssistProcessorTest {
 
@@ -44,7 +45,7 @@ public class SwaggerContentAssistProcessorTest {
 
 		ICompletionProposal[] proposals = processor.computeCompletionProposals(viewer, offset);
 
-		assertThat(proposals).hasSize(schema.getKeywords(true).size());
+		assertEquals(schema.getKeywords(true).size(), proposals.length);
 	}
 
 	@Test
@@ -58,17 +59,17 @@ public class SwaggerContentAssistProcessorTest {
 
 		ICompletionProposal[] proposals = processor.computeCompletionProposals(viewer, offset);
 
-		assertThat(proposals).hasSize(1);
+		assertEquals(1, proposals.length);
 		
 		ICompletionProposal proposal = proposals[0];
 		proposal.apply(document);
 
-		assertThat(document.get()).isEqualTo("swagger");
+		assertEquals("swagger", document.get());
 	}
 
 	@Test
 	public void test() {		
-		ObjectProposal proposal = (ObjectProposal) new SwaggerCompletionProposal().get();
+		ObjectProposal proposal = new SwaggerSchema().get();
 		SwaggerProposal value = proposal.getProperties().get("swagger");
 		
 		System.out.println(value);

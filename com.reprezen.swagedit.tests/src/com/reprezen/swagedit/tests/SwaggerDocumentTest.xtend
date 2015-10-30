@@ -2,71 +2,33 @@ package com.reprezen.swagedit.tests
 
 import com.reprezen.swagedit.editor.SwaggerDocument
 import org.junit.Test
-import org.yaml.snakeyaml.events.ScalarEvent
-import static junit.framework.Assert.*
-import io.swagger.util.Yaml
+
+import static org.junit.Assert.*
 
 class SwaggerDocumentTest {
 
 	private val document = new SwaggerDocument
-
-	@Test
-	def void testGetCorrectListOfEvents() {
-		val yaml = '''
-		key: 'value'
-		'''
-
-		document.set(yaml)		
-		val events = document.getEvent(0)
-
-		assertEquals(events.size, 2)
-			
-		val e1 = events.get(0) as ScalarEvent
-		val e2 = events.get(1) as ScalarEvent
-		
-		assertEquals(e1.value, "key")
-		assertEquals(e2.value, "value")
-	}
-
-	@Test
-	def void test() {
-		val yaml = '''
-		info:
-		  description: "Tax Blaster"
-		  version: "1.0.0"
-		'''
-
-		document.set(yaml)		
-		val events = document.getEvent(1)
-
-		assertEquals(events.size, 2)
-
-		val e1 = events.get(0) as ScalarEvent
-		val e2 = events.get(1) as ScalarEvent
-
-		assertEquals(e1.value, "description")
-		assertEquals(e2.value, "Tax Blaster")
-	}
+	
 	
 	@Test
-	def void testGetRootMapping() {
+	def void testGetPaths() {
 		val yaml = '''
 		info:
 		  description: ""
+		  version: "1.0.0"
 		tags:
 		  - foo: ""
 		  - bar: ""
 		'''
 
 		document.set(yaml)
-		val path = document.getPath(1)
-		println(path)
+		assertEquals("/info", document.getPath(0))
+		assertEquals("/info/description", document.getPath(1))
+		assertEquals("/info/version", document.getPath(2))
+		assertEquals("/tags", document.getPath(3))
 
-		println(document.getPath(3))
-		val node = Yaml.mapper.readTree(yaml)
-		println(node)
-		//val events = document.getEvent(1)		
-		//println(events)
+		assertEquals("/tags/0/foo", document.getPath(4))
+		assertEquals("/tags/1/bar", document.getPath(5))
 	}
 
 }

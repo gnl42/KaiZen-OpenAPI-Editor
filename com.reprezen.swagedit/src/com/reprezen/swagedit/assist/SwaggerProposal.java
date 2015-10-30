@@ -171,11 +171,11 @@ public interface SwaggerProposal {
 
 			return proposal;
 		}
-		
+
 		public List<SwaggerProposal> getItems() {
 			return items;
 		}
-		
+
 		@Override
 		public String toString() {
 			return "[]";
