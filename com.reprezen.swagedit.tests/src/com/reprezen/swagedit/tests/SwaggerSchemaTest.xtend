@@ -16,22 +16,61 @@ class SwaggerSchemaTest {
 		info:
 		  description: ""
 		  version: "1.0.0"
+		'''
+
+		val node = Yaml.mapper.readTree(yaml)
+		val result = schema.getProposals(":info", node)
+
+		assertNotNull(result)
+
+//		assertArrayEquals(#[ 
+//			"title",
+//			"version", 
+//			"description",		
+//			"termsOfService",
+//			"contact",
+//			"license"
+//		], result.asCompletionProposal(1).map[ it.displayString ])
+	}
+
+	@Test
+	def void testTagsProposals() {
+		val yaml = '''
 		tags:
 		  - foo: ""
 		  - bar: ""
 		'''
 
 		val node = Yaml.mapper.readTree(yaml)
-		val result = schema.getProposals("/info", node)
+		val result = schema.getProposals(":tags", node)
+		
+		assertNotNull(result)
+	}
 
-		assertArrayEquals(#[ 
-			"title",
-			"version", 
-			"description",		
-			"termsOfService",
-			"contact",
-			"license"
-		], result.asCompletionProposal(1).map[ it.displayString ])
+	@Test
+	def void testPathsProposals() {
+		val yaml = '''
+		paths:
+		'''
+		
+		val node = Yaml.mapper.readTree(yaml)
+		val result = schema.getProposals(":paths", node)
+
+		assertNotNull(result)
+	}
+	
+	@Test
+	def void testPaths() {
+		val yaml = '''
+		paths:
+		  /:
+		    get:
+		'''
+
+		val node = Yaml.mapper.readTree(yaml)
+		val result = schema.getProposals(":paths:/:get", node)
+		
+		assertNotNull(result)
 	}
 
 }

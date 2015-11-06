@@ -3,11 +3,14 @@ package com.reprezen.swagedit;
 import org.eclipse.ui.plugin.AbstractUIPlugin;
 import org.osgi.framework.BundleContext;
 
+import com.reprezen.swagedit.validation.SwaggerSchema;
+
 public class Activator extends AbstractUIPlugin {
 
 	public static final String PLUGIN_ID = "com.reprezen.swagedit";
 	
 	private static Activator plugin;
+	private final SwaggerSchema schema = new SwaggerSchema();
 
 	/*
 	 * (non-Javadoc)
@@ -18,6 +21,8 @@ public class Activator extends AbstractUIPlugin {
 	public void start(BundleContext context) throws Exception {
 		super.start(context);
 		plugin = this;
+		// preload schema
+		getSchema().getSchema();		
 	}
 
 	/*
@@ -40,4 +45,12 @@ public class Activator extends AbstractUIPlugin {
 		return plugin;
 	}
 
+	/**
+	 * Returns the swagger schema
+	 * 
+	 * @return schema
+	 */
+	public SwaggerSchema getSchema() {
+		return schema;
+	}
 }

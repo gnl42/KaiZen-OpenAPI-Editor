@@ -76,6 +76,7 @@ public class SwaggerReconcilingStrategy implements IReconcilingStrategy, IReconc
 			previous = tuple;
 		}
 
+		// handle the last element
 		if (previous != null) {
 			start = previous.getKeyNode().getStartMark().getLine();
 			end = document.getNumberOfLines();

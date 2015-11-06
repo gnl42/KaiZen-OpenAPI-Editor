@@ -1,9 +1,11 @@
 package com.reprezen.swagedit.assist;
 
+import java.util.ArrayList;
 import java.util.List;
 
 import org.eclipse.jface.text.BadLocationException;
 import org.eclipse.jface.text.IRegion;
+import org.eclipse.jface.text.ITextSelection;
 import org.eclipse.jface.text.ITextViewer;
 import org.eclipse.jface.text.contentassist.CompletionProposal;
 import org.eclipse.jface.text.contentassist.ICompletionProposal;
@@ -15,6 +17,8 @@ import org.eclipse.jface.text.templates.TemplateCompletionProcessor;
 import org.eclipse.jface.text.templates.TemplateContextType;
 import org.eclipse.swt.graphics.Image;
 
+import com.fasterxml.jackson.databind.JsonNode;
+import com.reprezen.swagedit.Activator;
 import com.reprezen.swagedit.editor.SwaggerDocument;
 import com.reprezen.swagedit.validation.SwaggerSchema;
 
@@ -24,7 +28,7 @@ import com.reprezen.swagedit.validation.SwaggerSchema;
  */
 public class SwaggerContentAssistProcessor extends TemplateCompletionProcessor implements IContentAssistProcessor {
 
-	private final SwaggerSchema schema = new SwaggerSchema();
+	private final SwaggerProposalProvider proposalProvider = new SwaggerProposalProvider();
 
 	public SwaggerContentAssistProcessor() {}
 
@@ -37,35 +41,42 @@ public class SwaggerContentAssistProcessor extends TemplateCompletionProcessor i
 		//}
 
 		final SwaggerDocument document = (SwaggerDocument) viewer.getDocument();
+		final SwaggerSchema schema = Activator.getDefault().getSchema();
+		final ITextSelection selection = (ITextSelection) viewer.getSelectionProvider().getSelection();
 
 		boolean startOfLine = true;
-		int lineOfOffset = 0;
+		int line = 0, lineOffset = 0, column = 0;
 		try {
-			lineOfOffset = document.getLineOfOffset(documentOffset);
-			int lineOffset = document.getLineOffset(lineOfOffset);			
+			line = document.getLineOfOffset(documentOffset);
+			lineOffset = document.getLineOffset(line);
+			column = selection.getOffset() - lineOffset;
 
 			startOfLine = documentOffset == lineOffset;
 		} catch (BadLocationException e) {}
 
-		final int delemiterPos = document.getDelimiterPosition(documentOffset);
 		final String prefix = document.getWordBeforeOffset(documentOffset);
-		final String indent = document.lastIndent(documentOffset);
+		final List<ICompletionProposal> proposals = new ArrayList<>();
 
-		SwaggerProposal sp;
-		try {
-			sp = schema.getProposals(document.getPath(lineOfOffset), document.asJson());
-		} catch (Exception e) {
-			e.printStackTrace();
-			sp = null;
-		}
-
-		List<ICompletionProposal> proposals = null;
-		if (sp != null) {
-			proposals = sp.asCompletionProposal(documentOffset);
-		}
-
-		if (proposals == null || proposals.isEmpty()) {
-			proposals = schema.getContentProposals(startOfLine, prefix, indent, delemiterPos, documentOffset);
+		if (!prefix.isEmpty()) {
+			for (String keyword : schema.getKeywords(startOfLine)) {				
+				if (keyword.startsWith(prefix)) {
+					final String replacement = keyword.substring(prefix.length(), keyword.length());
+					proposals.add(new CompletionProposal(replacement, documentOffset, 0, replacement.length(), null,keyword, null, null));
+				}
+			}
+		} else {
+			JsonNode sp = null;
+			try {
+				String path = document.getPath(line, column);
+				sp = schema.getProposals(path, document.asJson());
+			} catch (Exception e) {
+				e.printStackTrace();
+				sp = null;
+			}
+			
+			if (sp != null) {
+				proposals.addAll(proposalProvider.getProposals(sp, documentOffset));
+			}
 		}
 
 		return proposals.toArray(new CompletionProposal[proposals.size()]);

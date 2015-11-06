@@ -9,6 +9,7 @@ import org.eclipse.jface.text.Document;
 import org.yaml.snakeyaml.Yaml;
 import org.yaml.snakeyaml.nodes.MappingNode;
 import org.yaml.snakeyaml.nodes.Node;
+import org.yaml.snakeyaml.nodes.NodeId;
 import org.yaml.snakeyaml.nodes.NodeTuple;
 import org.yaml.snakeyaml.nodes.ScalarNode;
 import org.yaml.snakeyaml.nodes.SequenceNode;
@@ -72,6 +73,9 @@ public class SwaggerDocument extends Document {
 				if (c == ':') {
 					return offset;
 				}
+				if (Character.isWhitespace(c)) {
+					continue;
+				}
 				if (c != ':' && !Character.isLetterOrDigit(c)) {
 					return -1;
 				}
@@ -121,7 +125,10 @@ public class SwaggerDocument extends Document {
 		}
 	}
 
-	public String getPath(int line) {
+	public String getPath(int line, int column) {
+		if (column == 0)
+			return ":";
+
 		final MappingNode root = (MappingNode) yaml.compose(new StringReader(get()));
 		NodeTuple found = null, previous = null;
 
@@ -143,53 +150,87 @@ public class SwaggerDocument extends Document {
 			found = previous;
 		}
 
-		return getPath(found, line);
+		return getPath(found, line, column);
 	}
 
-	private String getPath(NodeTuple tuple, int line) {
-		String path = "/";
-		path += getId(tuple.getKeyNode());
+	private String getPath(NodeTuple tuple, int line, int column) {
+		String path = "";
+		
+		if (tuple == null)
+			return path;
 
-		return path += getPath(tuple.getValueNode(), line);
+		final String id = getId(tuple.getKeyNode());
+		if (!id.isEmpty())
+			path += ":" + id;
+
+		if (tuple.getValueNode().getNodeId() != NodeId.scalar) {
+			return path += getPath(tuple.getValueNode(), line, column);
+		} else {
+			return path;
+		}
 	}
 
-	private String getPath(Node node, int line) {
+	private String getPath(Node node, int line, int column) {
 		if (node instanceof MappingNode) {
 			MappingNode map = (MappingNode) node;
-			for (NodeTuple tuple: map.getValue()) {
-				if (tuple.getKeyNode().getStartMark().getLine() == line) {
-					return getPath(tuple.getKeyNode(), line);
+
+			NodeTuple found = null;
+			Iterator<NodeTuple> it = map.getValue().iterator();
+			int currentLine = 0;
+			while (currentLine <= line && it.hasNext()) {			
+				final NodeTuple tuple = it.next();
+				currentLine = tuple.getKeyNode().getStartMark().getLine();
+				if (currentLine <= line) {
+					found = tuple;
+				}
+			}
+
+			String content;
+			try {
+				content = get(getLineOffset(line), getLineLength(line));
+			} catch (BadLocationException e) {
+				content = null;
+			}
+
+			if (found != null) {
+				int c = found.getKeyNode().getStartMark().getColumn();
+				if (column > c || !content.trim().isEmpty()) {			
+					return getPath(found, line, column);					
 				}
 			}
 		}
-		
+
 		if (node instanceof SequenceNode) {
 			SequenceNode seq = (SequenceNode) node;
 			for (Node current: seq.getValue()) {
 				if (current.getStartMark().getLine() == line) {
-					return "/" + seq.getValue().indexOf(current) + getPath(current, line);
+					return ":@" + seq.getValue().indexOf(current) + getPath(current, line, column);
 				}
 			}
 		}
 
 		if (node.getStartMark().getLine() == line) {
-			return "/" + getId(node);
+			if (node.getNodeId() == NodeId.scalar) {
+				String value = ((ScalarNode) node).getValue();
+				if (value == null || value.isEmpty()) {
+					return "";
+				}
+			}
+			return ":" + getId(node);
 		}
 
-		switch (node.getNodeId()) {
-		case scalar:
+		if (node.getNodeId() == NodeId.scalar) {
 			return ((ScalarNode) node).getValue();
-		default:
-			return "";
 		}
+
+		// found nothing
+		return "";
 	}
 
 	public String getId(Node node) {
 		switch (node.getNodeId()) {
 		case scalar:
 			return ((ScalarNode) node).getValue();
-		case mapping:
-			return "";
 		default:
 			return "";
 		}
