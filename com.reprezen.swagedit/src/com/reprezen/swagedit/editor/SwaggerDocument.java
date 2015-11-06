@@ -50,8 +50,12 @@ public class SwaggerDocument extends Document {
 	 * @throws ParserException
 	 * @throws IOException
 	 */
-	public JsonNode asJson() throws ParserException, IOException {
-		return io.swagger.util.Yaml.mapper().readTree(get());
+	public JsonNode asJson() {
+		try {
+			return io.swagger.util.Yaml.mapper().readTree(get());
+		} catch (Exception e) {
+			return io.swagger.util.Yaml.mapper().createObjectNode();
+		}
 	}
 
 	/**
