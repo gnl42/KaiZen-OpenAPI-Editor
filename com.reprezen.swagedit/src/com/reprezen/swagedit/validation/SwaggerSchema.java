@@ -1,12 +1,10 @@
 package com.reprezen.swagedit.validation;
 
 import java.io.IOException;
-import java.util.ArrayList;
 import java.util.Iterator;
-import java.util.LinkedHashSet;
-import java.util.List;
-import java.util.Map.Entry;
-import java.util.Set;
+
+import org.apache.commons.lang3.tuple.ImmutablePair;
+import org.apache.commons.lang3.tuple.Pair;
 
 import com.fasterxml.jackson.databind.JsonNode;
 import com.fasterxml.jackson.databind.ObjectMapper;
@@ -26,8 +24,6 @@ public class SwaggerSchema {
 
 	private JsonNode tree;
 	private JsonSchema schema;
-	private final Set<String> keywords = new LinkedHashSet<>();
-	private final Set<String> rootKeywords = new LinkedHashSet<>();
 
 	/**
 	 * Returns swagger 2.0 schema
@@ -50,6 +46,12 @@ public class SwaggerSchema {
 		return schema;
 	}
 
+	/**
+	 * Returns the json tree representation of 
+	 * the schema.
+	 * 
+	 * @return json
+	 */
 	public JsonNode asJson() {
 		if (tree == null) {
 			try {
@@ -62,57 +64,46 @@ public class SwaggerSchema {
 		return tree;
 	}
 
-	public List<String> getProperties(String key) {
-		return new ArrayList<>();
-	}
-
-	public Set<String> getKeywords(boolean isRoot) {
-		if (keywords.isEmpty()) {
-			rootKeywords.addAll(collectKeywords(asJson()));
-			keywords.addAll(rootKeywords);
-
-			final JsonNode definitions = asJson().get("definitions");
-			for (Iterator<Entry<String, JsonNode>> it = definitions.fields(); it.hasNext();) {
-				keywords.addAll(collectKeywords(it.next().getValue()));
-			}
-		}
-
-		return isRoot ? rootKeywords : keywords;
-	}
-
-	private Set<String> collectKeywords(JsonNode node) {
-		Set<String> result = new LinkedHashSet<>();
-		if (node != null && node.has("properties") && node.get("properties").isObject()) {
-			for (Iterator<String> it = node.get("properties").fieldNames(); it.hasNext();) {
-				result.add(it.next());
-			}
-		}
-
-		return result;
-	}
-
+	/**
+	 * Returns the proposal that matches the given path in the document.
+	 * 
+	 * @param path
+	 * @param document
+	 * @return proposal
+	 */
 	public JsonNode getProposals(String path, JsonNode document) {
-		if (path.startsWith(":"))
-			  path = path.substring(1);
+		final Pair<JsonNode, JsonNode> dataAndDefinition = findDataAndDefintion(path, document); 
+		JsonNode node = proposalProvider.get(asJson(), dataAndDefinition.getKey(), dataAndDefinition.getValue());
+		return node;
+	}
 
-		  String[] paths = path.split(":");
-		  JsonNode node = document;
-		  JsonNode definition = asJson();
+	private Pair<JsonNode, JsonNode> findDataAndDefintion(String path, JsonNode document) {
+		if (path.startsWith(":")) {
+			path = path.substring(1);
+		}
 
-		  for (String current: paths) {
-			  if (node.isArray() && current.startsWith("@")) {
-				  node = node.get(Integer.valueOf(current.substring(1)));
-			  } else {
-				  node = node.path(current);
-			  }
+		String[] paths = path.split(":");
+		JsonNode node = document;
+		JsonNode definition = asJson();
 
-			  JsonNode next = getDefinition(definition, current); 
-			  if (next != null) {
-				  definition = next;
-			  }
-		  }
+		for (String current : paths) {
+			if (node.isArray() && current.startsWith("@")) {
+				try {
+					node = node.get(Integer.valueOf(current.substring(1)));
+				} catch (NumberFormatException e) {
+					node = null;
+				}
+			} else {
+				node = node.path(current);
+			}
 
-		  return proposalProvider.get(asJson(), node, definition);
+			JsonNode next = getDefinition(definition, current);
+			if (next != null) {
+				definition = next;
+			}
+		}
+
+		return new ImmutablePair<>(node, definition);
 	}
 
 	private JsonNode getDefinition(JsonNode parent, String path) {
@@ -122,7 +113,7 @@ public class SwaggerSchema {
 
 		JsonNode definition = null;
 
-		if (path.startsWith("@") && "array".equals( JsonUtil.getType(asJson(), parent) )) {
+		if (path.startsWith("@") && "array".equals(JsonUtil.getType(asJson(), parent))) {
 			return JsonUtil.getRef(asJson(), parent.get("items"));
 		}
 
@@ -136,6 +127,12 @@ public class SwaggerSchema {
 				Iterator<String> it = properties.fieldNames();
 				while (definition == null && it.hasNext()) {
 					String key = it.next();
+					if (key.startsWith("^")) {
+						if (path.startsWith(key.substring(1))) {
+							definition = properties.get(key);
+						}
+					}
+
 					if (path.matches(key)) {
 						definition = properties.get(key);
 					}
@@ -145,6 +142,13 @@ public class SwaggerSchema {
 				if (properties.isObject()) {
 					definition = JsonUtil.getRef(asJson(), properties);
 				}
+			}
+		}
+		
+		if (definition == null && parent.has("oneOf")) {
+			Iterator<JsonNode> it = parent.get("oneOf").elements();
+			while (definition == null && it.hasNext()) {
+				definition = getDefinition(JsonUtil.getRef(asJson(), it.next()), path);
 			}
 		}
 

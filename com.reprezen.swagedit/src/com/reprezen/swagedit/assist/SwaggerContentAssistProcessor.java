@@ -42,41 +42,35 @@ public class SwaggerContentAssistProcessor extends TemplateCompletionProcessor i
 
 		final SwaggerDocument document = (SwaggerDocument) viewer.getDocument();
 		final SwaggerSchema schema = Activator.getDefault().getSchema();
+
+		final List<ICompletionProposal> proposals = new ArrayList<>();
 		final ITextSelection selection = (ITextSelection) viewer.getSelectionProvider().getSelection();
 
-		boolean startOfLine = true;
 		int line = 0, lineOffset = 0, column = 0;
 		try {
 			line = document.getLineOfOffset(documentOffset);
 			lineOffset = document.getLineOffset(line);
 			column = selection.getOffset() - lineOffset;
-
-			startOfLine = documentOffset == lineOffset;
 		} catch (BadLocationException e) {}
 
 		final String prefix = document.getWordBeforeOffset(documentOffset);
-		final List<ICompletionProposal> proposals = new ArrayList<>();
-
+		// we have to remove the length of 
+		// the prefix to obtain the correct 
+		// column to resolve the path
 		if (!prefix.isEmpty()) {
-			for (String keyword : schema.getKeywords(startOfLine)) {				
-				if (keyword.startsWith(prefix)) {
-					final String replacement = keyword.substring(prefix.length(), keyword.length());
-					proposals.add(new CompletionProposal(replacement, documentOffset, 0, replacement.length(), null,keyword, null, null));
-				}
-			}
-		} else {
-			JsonNode sp = null;
-			try {
-				String path = document.getPath(line, column);
-				sp = schema.getProposals(path, document.asJson());
-			} catch (Exception e) {
-				e.printStackTrace();
-				sp = null;
-			}
-			
-			if (sp != null) {
-				proposals.addAll(proposalProvider.getProposals(sp, documentOffset));
-			}
+			column -= prefix.length();
+		}
+
+		JsonNode sp;
+		try {
+			sp = schema.getProposals(document.getPath(line, column), document.asJson());
+		} catch (Exception e) {
+			e.printStackTrace();
+			sp = null;
+		}
+
+		if (sp != null) {
+			proposals.addAll(proposalProvider.getProposals(sp, prefix, documentOffset));
 		}
 
 		return proposals.toArray(new CompletionProposal[proposals.size()]);

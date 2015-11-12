@@ -22,12 +22,12 @@ class SwaggerDocumentTest {
 
 		document.set(yaml)
 		assertEquals(":info", document.getPath(0, 1))
-		assertEquals(":info:description", document.getPath(1, 2))
-		assertEquals(":info:version", document.getPath(2, 2))
+		assertEquals(":info:description", document.getPath(1, 13))
+		assertEquals(":info:version", document.getPath(2, 9))
 		assertEquals(":tags", document.getPath(3, 2))
 
-		assertEquals(":tags:@0:foo", document.getPath(4, 4))
-		assertEquals(":tags:@1:bar", document.getPath(5, 4))
+		assertEquals(":tags:@0:foo", document.getPath(4, 7))
+		assertEquals(":tags:@1:bar", document.getPath(5, 7))
 	}
 
 	@Test
@@ -40,9 +40,24 @@ class SwaggerDocumentTest {
 		'''
 
 		document.set(yaml)
-		assertEquals(":info:description", document.getPath(1, 10))
+		assertEquals(":info:description", document.getPath(1, 13))
 		assertEquals(":info", document.getPath(2, 2))
-		assertEquals(":info:version", document.getPath(3, 2))
+		assertEquals(":info:version", document.getPath(3, 9))
+	}
+
+	@Test
+	def void testGetPathOnEmptyLineAfter() {
+		val yaml = '''
+		info:
+		  description: ""
+		  version: "1.0.0"
+		  
+		'''
+
+		document.set(yaml)
+		assertEquals(":info:description", document.getPath(1, 14))
+		assertEquals(":info:version", document.getPath(2, 9))
+		assertEquals(":info", document.getPath(3, 2))
 	}
 
 	@Test
@@ -58,10 +73,10 @@ class SwaggerDocumentTest {
 		document.set(yaml)
 
 		assertEquals(":paths", document.getPath(0, 1));
-		assertEquals(":paths:/", document.getPath(1, 2));
-		assertEquals(":paths:/:get", document.getPath(2, 4));
-		assertEquals(":paths:/:get:responses", document.getPath(3, 6));
-		assertEquals(":paths:/:get:responses:200", document.getPath(4, 8));
+		assertEquals(":paths:/", document.getPath(1, 3));
+		assertEquals(":paths:/:get", document.getPath(2, 7));
+		assertEquals(":paths:/:get:responses", document.getPath(3, 14));
+		assertEquals(":paths:/:get:responses:200", document.getPath(4, 10));
 	}
 
 	@Test
@@ -75,7 +90,8 @@ class SwaggerDocumentTest {
 		document.set(yaml)
 
 		assertEquals(":paths", document.getPath(0, 1));
-		assertEquals(":paths:/", document.getPath(1, 1));
+		assertEquals(":paths:", document.getPath(1, 1));
+		assertEquals(":paths:/", document.getPath(1, 3));
 		assertEquals(":paths:/", document.getPath(2, 3));
 	}
 	

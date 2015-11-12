@@ -41,6 +41,8 @@ public class JsonUtil {
 		} 
 		else if (isRef(node)) {
 			return getType(document, getRef(document, node));
+		} else if (node.has("properties")) {
+			return "object";
 		}
 
 		return null;

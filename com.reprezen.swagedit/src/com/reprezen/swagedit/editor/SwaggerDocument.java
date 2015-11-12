@@ -6,6 +6,8 @@ import java.util.Iterator;
 
 import org.eclipse.jface.text.BadLocationException;
 import org.eclipse.jface.text.Document;
+import org.eclipse.jface.text.DocumentEvent;
+import org.eclipse.jface.text.IDocumentListener;
 import org.yaml.snakeyaml.Yaml;
 import org.yaml.snakeyaml.nodes.MappingNode;
 import org.yaml.snakeyaml.nodes.Node;
@@ -16,6 +18,7 @@ import org.yaml.snakeyaml.nodes.SequenceNode;
 import org.yaml.snakeyaml.parser.ParserException;
 
 import com.fasterxml.jackson.databind.JsonNode;
+import com.fasterxml.jackson.databind.ObjectMapper;
 
 /**
  * SwaggerDocument
@@ -24,8 +27,30 @@ import com.fasterxml.jackson.databind.JsonNode;
 public class SwaggerDocument extends Document {
 
 	private final Yaml yaml = new Yaml();
+	private final ObjectMapper mapper = io.swagger.util.Yaml.mapper();
+
+	private JsonNode jsonContent;
+	private Node yamlContent;
 
 	public SwaggerDocument() {
+		addDocumentListener(new IDocumentListener() {
+			@Override
+			public void documentChanged(DocumentEvent event) {
+				final String content = SwaggerDocument.this.get();
+
+				try {
+					yamlContent = yaml.compose(new StringReader(content));
+				} catch (Exception e) {}
+
+				try {
+					jsonContent = mapper.readTree(content);
+				} catch (Exception e) {}
+
+			}
+
+			@Override
+			public void documentAboutToBeChanged(DocumentEvent event) {}
+		});
 	}
 
 	/**
@@ -34,11 +59,15 @@ public class SwaggerDocument extends Document {
 	 * @return Node
 	 */
 	public Node getYaml() {
-		try {
-			return yaml.compose(new StringReader(get()));
-		} catch (Exception e) {
-			return null;
+		if (yamlContent == null) {
+			try {
+				 yamlContent = yaml.compose(new StringReader(get()));
+			} catch (Exception e) {
+				yamlContent = null;
+			}
 		}
+
+		return yamlContent;
 	}
 
 	/**
@@ -51,11 +80,15 @@ public class SwaggerDocument extends Document {
 	 * @throws IOException
 	 */
 	public JsonNode asJson() {
-		try {
-			return io.swagger.util.Yaml.mapper().readTree(get());
-		} catch (Exception e) {
-			return io.swagger.util.Yaml.mapper().createObjectNode();
+		if (jsonContent == null) {
+			try {
+				jsonContent = mapper.readTree(get());
+			} catch (Exception e) {
+				jsonContent = mapper.createObjectNode();
+			}
 		}
+
+		return jsonContent;
 	}
 
 	/**
@@ -130,10 +163,16 @@ public class SwaggerDocument extends Document {
 	}
 
 	public String getPath(int line, int column) {
-		if (column == 0)
+		if (column == 0) {
 			return ":";
+		}
 
-		final MappingNode root = (MappingNode) yaml.compose(new StringReader(get()));
+		final Node yaml = getYaml();
+		if (!(yaml instanceof MappingNode)) {
+			return ":";
+		}
+
+		final MappingNode root = (MappingNode) yaml;
 		NodeTuple found = null, previous = null;
 
 		// find root tuple that is after the line
@@ -177,10 +216,10 @@ public class SwaggerDocument extends Document {
 	private String getPath(Node node, int line, int column) {
 		if (node instanceof MappingNode) {
 			MappingNode map = (MappingNode) node;
-
 			NodeTuple found = null;
-			Iterator<NodeTuple> it = map.getValue().iterator();
 			int currentLine = 0;
+
+			final Iterator<NodeTuple> it = map.getValue().iterator();
 			while (currentLine <= line && it.hasNext()) {			
 				final NodeTuple tuple = it.next();
 				currentLine = tuple.getKeyNode().getStartMark().getLine();
@@ -189,16 +228,9 @@ public class SwaggerDocument extends Document {
 				}
 			}
 
-			String content;
-			try {
-				content = get(getLineOffset(line), getLineLength(line));
-			} catch (BadLocationException e) {
-				content = null;
-			}
-
 			if (found != null) {
 				int c = found.getKeyNode().getStartMark().getColumn();
-				if (column > c || !content.trim().isEmpty()) {			
+				if (column > c) {			
 					return getPath(found, line, column);					
 				}
 			}
@@ -206,9 +238,17 @@ public class SwaggerDocument extends Document {
 
 		if (node instanceof SequenceNode) {
 			SequenceNode seq = (SequenceNode) node;
-			for (Node current: seq.getValue()) {
-				if (current.getStartMark().getLine() == line) {
-					return ":@" + seq.getValue().indexOf(current) + getPath(current, line, column);
+			if (column > seq.getStartMark().getColumn()) {
+				Node inside = null;
+
+				for (Node current : seq.getValue()) {
+					if (current.getStartMark().getLine() <= line) {
+						inside = current;
+					}
+				}
+
+				if (inside != null) {
+					return ":@" + seq.getValue().indexOf(inside) + getPath(inside, line, column);
 				}
 			}
 		}
