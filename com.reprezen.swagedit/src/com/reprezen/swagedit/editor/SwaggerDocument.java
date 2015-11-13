@@ -145,23 +145,45 @@ public class SwaggerDocument extends Document {
 		}
 	}
 
-	public String lastIndent(int offset) {
-		try {
-			int start = offset - 1;
-			while (start >= 0 && getChar(start) != '\n') {
-				start--;
-			}
-
-			int end = start;
-			while (end < offset && Character.isSpaceChar(getChar(end))) {
-				end++;
-			}
-			return get(start + 1, end - start - 1);
-		} catch (BadLocationException e) {
-			return "";
+	/**
+	 * Returns the json node present at the given yaml path. 
+	 * 
+	 * @param path
+	 * @return json node
+	 */
+	public JsonNode getNodeForPath(String path) {
+		if (path.startsWith(":")) {
+			path = path.substring(1);
 		}
+
+		String[] paths = path.split(":");
+		JsonNode node = asJson();
+
+		for (String current : paths) {
+			if (!current.isEmpty()) {
+				if (node.isArray() && current.startsWith("@")) {
+					try {
+						node = node.get(Integer.valueOf(current.substring(1)));
+					} catch (NumberFormatException e) {
+						node = null;
+					}
+				} else {
+					node = node.path(current);
+				}
+			}
+		}
+
+		return node;
 	}
 
+	/**
+	 * Returns the yaml path of the element at the given line and column 
+	 * in the document.
+	 * 
+	 * @param line
+	 * @param column
+	 * @return path
+	 */
 	public String getPath(int line, int column) {
 		if (column == 0) {
 			return ":";
@@ -271,7 +293,7 @@ public class SwaggerDocument extends Document {
 		return "";
 	}
 
-	public String getId(Node node) {
+	private String getId(Node node) {
 		switch (node.getNodeId()) {
 		case scalar:
 			return ((ScalarNode) node).getValue();

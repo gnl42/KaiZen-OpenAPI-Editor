@@ -2,9 +2,8 @@ package com.reprezen.swagedit.assist;
 
 import java.util.ArrayList;
 import java.util.Collections;
-import java.util.HashSet;
 import java.util.Iterator;
-import java.util.LinkedList;
+import java.util.LinkedHashSet;
 import java.util.List;
 import java.util.Set;
 
@@ -13,268 +12,181 @@ import org.eclipse.jface.text.contentassist.ICompletionProposal;
 
 import com.fasterxml.jackson.databind.JsonNode;
 import com.fasterxml.jackson.databind.ObjectMapper;
-import com.fasterxml.jackson.databind.node.ArrayNode;
-import com.fasterxml.jackson.databind.node.ObjectNode;
-import com.google.common.base.Predicate;
-import com.google.common.collect.Iterables;
+import com.google.common.base.Strings;
 import com.google.common.collect.Sets;
+import com.reprezen.swagedit.validation.SwaggerSchema;
 
 /**
- * 
- * 
- *
+ * Provider of completion proposals.
  */
 public class SwaggerProposalProvider {
 
-	public final static String TYPE = "_type";
-
 	private final ObjectMapper mapper = new ObjectMapper();
+	private final SwaggerSchema schema = new SwaggerSchema();
 
 	/**
-	 * Returns proposal for the given data and schema definition.
+	 * Returns a list of completion proposals that are created from a single
+	 * proposal object.
+	 * 
+	 * @param path
+	 * @param document
+	 * @param prefix
+	 * @param documentOffset
+	 * @return list of completion proposals
+	 */
+	public List<? extends ICompletionProposal> getCompletionProposals(String path, JsonNode data, String prefix,int documentOffset) {
+		final JsonNode definition = schema.getDefintionForPath(path);
+		final Set<JsonNode> proposals = createProposals(data, definition);
+		final List<ICompletionProposal> result = new ArrayList<>();
+
+		prefix = Strings.emptyToNull(prefix);
+
+		for (JsonNode proposal: proposals) {
+			String value = proposal.get("value").asText();
+			String label = proposal.get("label").asText();
+
+			if (prefix != null) {
+				if (value.startsWith(prefix)) {
+					value = value.substring(prefix.length(), value.length());
+					result.add(
+							new CompletionProposal(value, documentOffset, 0, value.length(), null, label, null, null));
+				}
+			} else {
+				result.add(new CompletionProposal(value, documentOffset, 0, value.length(), null, label, null, null));
+			}
+		}
+
+		return result;
+	}
+
+	/**
+	 * Returns a list of proposals for the given data and schema definition.
+	 * 
+	 * A proposal is a JSON object of the following format: <code>
+	 * {
+	 *   value: string,
+	 *   label: string
+	 * }
+	 * </code>
 	 * 
 	 * @param schema
 	 * @param data
 	 * @param definition
 	 * @return proposal
 	 */
-	public JsonNode get(JsonNode schema, JsonNode data, JsonNode definition) {
-		final String type = JsonUtil.getType(schema, definition);
-
-		if (type != null) {
-			switch (type) {
-			case "object":
-				return createObjectProposal(schema, data, definition);
-			case "string":
-				return createStringProposal(schema, data, definition);
-			case "enum":
-				return createEnumProposal(schema, data, definition);
-			case "oneOf":
-				return createOneOfProposal(schema, data, definition);
-			case "array":
-				return createArrayProposal(schema, data, definition);
-			default:
-				return null;
-			}
+	public Set<JsonNode> createProposals(JsonNode data, JsonNode definition) {
+		if (definition == null) {
+			return Collections.emptySet();
 		}
 
-		return null;
-	}
-
-	private JsonNode createArrayProposal(JsonNode schema, JsonNode data, JsonNode definition) {
-		JsonNode proposal = mapper.createObjectNode()
-				.put(TYPE, "array");
-
-		return proposal;
-	}
-
-	private JsonNode createOneOfProposal(JsonNode schema, JsonNode data, JsonNode definition) {
-		final ArrayNode values = mapper.createArrayNode();
-		
-		List<JsonNode> collect = collect(schema, data, definition, new LinkedList<JsonNode>());
-		Iterable<JsonNode> withOutObjects = Iterables.filter(collect, new Predicate<JsonNode>() {
-			@Override
-			public boolean apply(JsonNode node) {
-				return !"object".equals( node.get(TYPE).asText() );
-			}
-			
-		});
-		Iterable<JsonNode> filter = Iterables.filter(collect, new Predicate<JsonNode>() {
-			@Override
-			public boolean apply(JsonNode node) {
-				return "object".equals( node.get(TYPE).asText() );
-			}
-		});
-
-		ObjectNode merged = mapper.createObjectNode()
-				.put(TYPE, "object");
-
-		ArrayNode keys = merged.putArray("keys");
-		Set<JsonNode> allKeys = new HashSet<>();
-		for (JsonNode n: filter) {
-			ArrayNode otherKeys = (ArrayNode) n.get("keys");
-			for (JsonNode k: otherKeys) {
-				allKeys.add( k );
-			}
+		switch (schema.getType(definition)) {
+		case OBJECT:
+			return createObjectProposal(data, definition);
+		case STRING:
+			return createStringProposal(data, definition);
+		case ENUM:
+			return createEnumProposal(data, definition);
+		case ONE_OF:
+			return createOneOfProposal(data, definition);
+		case ARRAY:
+			return createArrayProposal(data, definition);
+		default:
+			return Sets.newHashSet();
 		}
-
-		keys.addAll(allKeys);
-
-		Set<JsonNode> set = Sets.newHashSet(withOutObjects);
-		set.add(merged);
-		values.addAll(set);
-
-		return mapper.createObjectNode()
-				.put(TYPE, "oneOf")
-				.set("oneOf", values);
 	}
 
-	private List<JsonNode> collect(JsonNode schema, JsonNode data, JsonNode oneOf, List<JsonNode> acc) {
-		String type = JsonUtil.getType(schema, JsonUtil.getRef(schema, oneOf));
+	private Set<JsonNode> createArrayProposal(JsonNode data, JsonNode definition) {
+		final Set<JsonNode> proposals = new LinkedHashSet<>();
+		proposals.add(mapper.createObjectNode()
+				.put("value", "-")
+				.put("label", "-"));
 		
-		if ("oneOf".equals(type)) {
-			for (JsonNode one: oneOf.get("oneOf")) {
-				acc.addAll(collect(schema, data, JsonUtil.getRef(schema, one), acc));
+		return proposals;
+	}
+
+	private Set<JsonNode> createOneOfProposal(JsonNode data, JsonNode definition) {
+		return collectOneOf(data, definition, new LinkedHashSet<JsonNode>());
+	}
+
+	private Set<JsonNode> collectOneOf(JsonNode data, JsonNode oneOf, Set<JsonNode> acc) {
+		JsonType type = schema.getType(oneOf);
+
+		if (JsonType.ONE_OF == type) {
+			for (JsonNode one : oneOf.get(JsonType.ONE_OF.getValue())) {
+				acc.addAll(collectOneOf(data, JsonUtil.getRef(schema.asJson(), one), acc));
 			}
 		} else {
-			acc.add(get(schema, data, JsonUtil.getRef(schema, oneOf)));
+			acc.addAll(createProposals(data, JsonUtil.getRef(schema.asJson(), oneOf)));
 		}
 
 		return acc;
 	}
 
-	private JsonNode createEnumProposal(JsonNode schema, JsonNode data, JsonNode definition) {
-		JsonNode proposal = mapper.createObjectNode()
-				.put(TYPE, "enum")
-				.set("literals", definition.get("enum"));
+	private Set<JsonNode> createEnumProposal(JsonNode data, JsonNode definition) {
+		final Set<JsonNode> proposals = new LinkedHashSet<>();
 
-		return proposal;
+		for (JsonNode literal : definition.get("enum")) {
+			proposals.add(mapper.createObjectNode()
+					.put("value", "'" + literal.asText() + "'")
+					.put("label", literal.asText()));
+		}
+
+		return proposals;
 	}
 
-	private JsonNode createStringProposal(JsonNode schema, JsonNode data, JsonNode definition) {
-		return mapper.createObjectNode()
-				.put(TYPE, "string");
+	private Set<JsonNode> createStringProposal(JsonNode data, JsonNode definition) {
+		Set<JsonNode> proposals = new LinkedHashSet<>();
+		proposals.add(mapper.createObjectNode()
+				.put("value", "''")
+				.put("label", "''"));
+
+		return proposals;
 	}
 
-	private JsonNode createObjectProposal(JsonNode schema, JsonNode data, JsonNode definition) {
-		ObjectNode properties = mapper.createObjectNode()
-				.put(TYPE, "object");
-
-		ArrayNode keys = properties
-				.putArray("keys");
+	private Set<JsonNode> createObjectProposal(JsonNode data, JsonNode definition) {
+		Set<JsonNode> proposals = new LinkedHashSet<>();
 
 		if (definition.has("properties")) {
 			for (Iterator<String> it = definition.get("properties").fieldNames(); it.hasNext();) {
 				String key = it.next();
-				JsonNode value = definition.get("properties").get(key);
-				String type = JsonUtil.getType(schema, value);
-				String label = key + " - " + type;
 
-				JsonNode keyNode = mapper.createObjectNode()
-						.put("key", key)
-						.put("type", type)
-						.put("label", label);
+				if (!data.has(key)) {			
+					JsonNode value = definition.get("properties").get(key);
+					String label = key + " - " + schema.getType(value).getValue();
 
-				keys.add(keyNode);
+					JsonNode keyNode = mapper.createObjectNode()
+							.put("value", key + ":")
+							.put("label", label);
+
+					proposals.add(keyNode);
+				}
 			}
 		}
-		
+
 		if (definition.has("patternProperties")) {
 			for (Iterator<String> it = definition.get("patternProperties").fieldNames(); it.hasNext();) {
 				String key = it.next();
-
-				JsonNode value = definition.get("patternProperties").get(key);		
-				String type = JsonUtil.getType(schema, value);
-
+				JsonNode value = definition.get("patternProperties").get(key);
 				if (key.startsWith("^")) {
 					key = key.substring(1);
 				}
 
-				String label = key + " - " + type;
+				String label = key + " - " + schema.getType(value).getValue();
 				JsonNode keyNode = mapper.createObjectNode()
-						.put("key", key)
-						.put("type", type)
+						.put("value", key + ":")
 						.put("label", label);
 
-				keys.add(keyNode);
-			}
-		}
-		
-		return properties;
-	}
-
-	/**
-	 * Returns a list of completion proposals that are created from a single proposal object.
-	 * 
-	 * @param proposal
-	 * @param prefix
-	 * @param offset
-	 * @return list of completion proposals
-	 */
-	public List<ICompletionProposal> getProposals(JsonNode proposal, String prefix, int offset) {
-		if (proposal == null || !proposal.has(TYPE))
-			return Collections.emptyList();
-
-		if (prefix != null && prefix.trim().isEmpty()) {
-			prefix = null;
-		}
-
-		switch (proposal.get(TYPE).asText()) {
-		case "string":
-			return getStringProposals(proposal, prefix, offset);
-		case "object":
-			return getObjectProposals(proposal, prefix, offset);
-		case "array":
-			return getArrayProposals(proposal, prefix, offset);
-		case "enum":
-			return getEnumProposals(proposal, prefix, offset);
-		case "oneOf":
-			return getOneOfProposals(proposal, prefix, offset);
-		default:
-			return Collections.emptyList();
-		}
-	}
-
-	private List<ICompletionProposal> getOneOfProposals(JsonNode proposal, String prefix, int offset) {
-		final List<ICompletionProposal> result = new ArrayList<>();
-		for (JsonNode p: proposal.get("oneOf")) {
-			result.addAll(getProposals(p, prefix, offset));
-		}
-		return result;
-	}
-
-	private List<ICompletionProposal> getStringProposals(JsonNode proposal, String prefix, int offset) {
-		final List<ICompletionProposal> result = new ArrayList<>();
-		result.add(new CompletionProposal("''", offset, 0, "''".length(), null,"''", null, null));
-		return result;
-	}
-
-	private List<ICompletionProposal> getArrayProposals(JsonNode proposal, String prefix, int offset) {
-		final List<ICompletionProposal> result = new ArrayList<>();
-		result.add(new CompletionProposal("-", offset, 0, "-".length(), null,"-", null, null));
-		return result;
-	}
-
-	private List<ICompletionProposal> getEnumProposals(JsonNode proposal, String prefix, int offset) {
-		final List<ICompletionProposal> result = new ArrayList<>();
-		for (JsonNode literal: proposal.get("literals")) {
-			final String value = literal.asText();
-			
-			if (prefix != null) {
-				if (value.startsWith(prefix)) {
-					final String replacement = value.substring(prefix.length(), value.length());
-					result.add(new CompletionProposal(replacement, offset, 0, replacement.length(), null, value, null, null));
-				}
-			} else {
-				result.add(new CompletionProposal(value, offset, 0, value.length(), null, value, null, null));
+				proposals.add(keyNode);
 			}
 		}
 
-		return result;
-	}
-
-	private List<ICompletionProposal> getObjectProposals(JsonNode proposal, String prefix, int offset) {
-		final List<ICompletionProposal> result = new ArrayList<>();
-
-		for (final JsonNode key: proposal.get("keys")) {
-			final String value = key.get("key").asText();
-			final String label = key.get("label").asText();
-			
-			if (prefix != null) {
-				if (value.startsWith(prefix)) {
-					final String replacement = value.substring(prefix.length(), value.length());
-					result.add(new CompletionProposal(replacement, offset, 0, replacement.length(), null, label, null, null));
-				}
-			} else {
-				result.add(new CompletionProposal(value, offset, 0, value.length(), null, label, null, null));
-			}
+		if (proposals.isEmpty()) {
+			proposals.add(mapper.createObjectNode()
+					.put("value", "_key_" + ":")
+					.put("label", "_key_"));
 		}
 
-		if (result.isEmpty()) {
-			result.add(new CompletionProposal("_key_", offset, 0, "_key_".length(), null, "key", null, null));
-		}
-
-		return result;
+		return proposals;
 	}
 
 }

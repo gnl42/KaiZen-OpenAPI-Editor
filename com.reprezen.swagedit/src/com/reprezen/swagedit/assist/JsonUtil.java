@@ -4,10 +4,23 @@ import com.fasterxml.jackson.databind.JsonNode;
 
 public class JsonUtil {
 
+	/**
+	 * Returns true if the node is a reference to another node.
+	 * 
+	 * @param node
+	 * @return true if is reference
+	 */
 	public static boolean isRef(JsonNode node) {
 		return node.isObject() && node.has("$ref");
 	}
 
+	/**
+	 * Returns the node that is referenced by the refNode.
+	 * 
+	 * @param document
+	 * @param refNode
+	 * @return referenced node
+	 */
 	public static JsonNode getRef(JsonNode document, JsonNode refNode) {
 		if (!isRef(refNode) || document == null)
 			return refNode;
@@ -24,28 +37,6 @@ public class JsonUtil {
 		}
 
 		return found != null ? found : refNode;
-	}
-
-	public static String getType(JsonNode document, JsonNode node) {		
-		if (document == null || node == null)
-			return null;
-
-		if (node.has("oneOf")) {
-			return "oneOf";
-		}
-		else if (node.has("enum")) {
-			return "enum";
-		}
-		else if (node.has("type")) {
-			return node.get("type").asText();
-		} 
-		else if (isRef(node)) {
-			return getType(document, getRef(document, node));
-		} else if (node.has("properties")) {
-			return "object";
-		}
-
-		return null;
 	}
 
 }

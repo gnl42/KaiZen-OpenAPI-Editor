@@ -3,16 +3,13 @@ package com.reprezen.swagedit.validation;
 import java.io.IOException;
 import java.util.Iterator;
 
-import org.apache.commons.lang3.tuple.ImmutablePair;
-import org.apache.commons.lang3.tuple.Pair;
-
 import com.fasterxml.jackson.databind.JsonNode;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import com.github.fge.jsonschema.core.exceptions.ProcessingException;
 import com.github.fge.jsonschema.main.JsonSchema;
 import com.github.fge.jsonschema.main.JsonSchemaFactory;
+import com.reprezen.swagedit.assist.JsonType;
 import com.reprezen.swagedit.assist.JsonUtil;
-import com.reprezen.swagedit.assist.SwaggerProposalProvider;
 
 import io.swagger.util.Json;
 
@@ -20,17 +17,16 @@ public class SwaggerSchema {
 
 	private final JsonSchemaFactory factory = JsonSchemaFactory.byDefault();
 	private final ObjectMapper jsonMapper = Json.mapper();
-	private final SwaggerProposalProvider proposalProvider = new SwaggerProposalProvider();
 
-	private JsonNode tree;
-	private JsonSchema schema;
+	private static JsonNode tree;
+	private static JsonSchema schema;
 
 	/**
 	 * Returns swagger 2.0 schema
 	 * 
 	 * @return swagger schema.
 	 */
-	public JsonSchema getSchema() {
+	public synchronized JsonSchema getSchema() {
 		if (schema == null) {
 			final JsonNode schemaObject = asJson();
 
@@ -52,7 +48,7 @@ public class SwaggerSchema {
 	 * 
 	 * @return json
 	 */
-	public JsonNode asJson() {
+	public synchronized JsonNode asJson() {
 		if (tree == null) {
 			try {
 				tree = jsonMapper.readTree(SwaggerSchema.class.getResourceAsStream("schema.json"));
@@ -65,45 +61,60 @@ public class SwaggerSchema {
 	}
 
 	/**
-	 * Returns the proposal that matches the given path in the document.
+	 * Returns the type of the node.
 	 * 
-	 * @param path
-	 * @param document
-	 * @return proposal
+	 * The node should be a schema definition that is part of 
+	 * this schema.
+	 * 
+	 * @param node
+	 * @return type
 	 */
-	public JsonNode getProposals(String path, JsonNode document) {
-		final Pair<JsonNode, JsonNode> dataAndDefinition = findDataAndDefintion(path, document); 
-		JsonNode node = proposalProvider.get(asJson(), dataAndDefinition.getKey(), dataAndDefinition.getValue());
-		return node;
+	public JsonType getType(JsonNode node) {		
+		if (node == null)
+			return null;
+
+		if (JsonUtil.isRef(node)) {
+			node = JsonUtil.getRef(asJson(), node);
+		}
+
+		if (node.has("oneOf")) {
+			return JsonType.ONE_OF;
+		}
+		else if (node.has("enum")) {
+			return JsonType.ENUM;
+		}
+		else if (node.has("type")) {
+			return JsonType.valueOf(node);
+		}
+		else if (node.has("properties")) {
+			return JsonType.OBJECT;
+		}
+
+		return JsonType.UNDEFINED;
 	}
 
-	private Pair<JsonNode, JsonNode> findDataAndDefintion(String path, JsonNode document) {
+	/**
+	 * Returns the schema definition that corresponds to the given path.
+	 * 
+	 * @param path
+	 * @return schema definition
+	 */
+	public JsonNode getDefintionForPath(String path) {
 		if (path.startsWith(":")) {
 			path = path.substring(1);
 		}
 
 		String[] paths = path.split(":");
-		JsonNode node = document;
 		JsonNode definition = asJson();
 
 		for (String current : paths) {
-			if (node.isArray() && current.startsWith("@")) {
-				try {
-					node = node.get(Integer.valueOf(current.substring(1)));
-				} catch (NumberFormatException e) {
-					node = null;
-				}
-			} else {
-				node = node.path(current);
-			}
-
 			JsonNode next = getDefinition(definition, current);
 			if (next != null) {
 				definition = next;
 			}
 		}
 
-		return new ImmutablePair<>(node, definition);
+		return definition;
 	}
 
 	private JsonNode getDefinition(JsonNode parent, String path) {
@@ -113,7 +124,7 @@ public class SwaggerSchema {
 
 		JsonNode definition = null;
 
-		if (path.startsWith("@") && "array".equals(JsonUtil.getType(asJson(), parent))) {
+		if (path.startsWith("@") && JsonType.ARRAY == getType(parent)) {
 			return JsonUtil.getRef(asJson(), parent.get("items"));
 		}
 

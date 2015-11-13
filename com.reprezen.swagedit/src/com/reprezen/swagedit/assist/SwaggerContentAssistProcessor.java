@@ -17,10 +17,7 @@ import org.eclipse.jface.text.templates.TemplateCompletionProcessor;
 import org.eclipse.jface.text.templates.TemplateContextType;
 import org.eclipse.swt.graphics.Image;
 
-import com.fasterxml.jackson.databind.JsonNode;
-import com.reprezen.swagedit.Activator;
 import com.reprezen.swagedit.editor.SwaggerDocument;
-import com.reprezen.swagedit.validation.SwaggerSchema;
 
 /**
  * This class provides basic content assist based on keywords used by 
@@ -41,8 +38,6 @@ public class SwaggerContentAssistProcessor extends TemplateCompletionProcessor i
 		//}
 
 		final SwaggerDocument document = (SwaggerDocument) viewer.getDocument();
-		final SwaggerSchema schema = Activator.getDefault().getSchema();
-
 		final List<ICompletionProposal> proposals = new ArrayList<>();
 		final ITextSelection selection = (ITextSelection) viewer.getSelectionProvider().getSelection();
 
@@ -61,17 +56,12 @@ public class SwaggerContentAssistProcessor extends TemplateCompletionProcessor i
 			column -= prefix.length();
 		}
 
-		JsonNode sp;
-		try {
-			sp = schema.getProposals(document.getPath(line, column), document.asJson());
-		} catch (Exception e) {
-			e.printStackTrace();
-			sp = null;
-		}
-
-		if (sp != null) {
-			proposals.addAll(proposalProvider.getProposals(sp, prefix, documentOffset));
-		}
+		final String path = document.getPath(line, column);
+		proposals.addAll(proposalProvider.getCompletionProposals(
+				path, 
+				document.getNodeForPath(path), 
+				prefix, 
+				documentOffset));
 
 		return proposals.toArray(new CompletionProposal[proposals.size()]);
 	}

@@ -3,6 +3,7 @@ package com.reprezen.swagedit.tests
 import com.fasterxml.jackson.databind.ObjectMapper
 import com.reprezen.swagedit.assist.SwaggerProposalProvider
 import com.reprezen.swagedit.validation.SwaggerSchema
+import io.swagger.util.Yaml
 import org.junit.Test
 
 import static org.junit.Assert.*
@@ -19,30 +20,148 @@ class SwaggerProposalProviderTest {
 		val data = mapper.createObjectNode
 				.set("swagger", null)
 
-		val proposal = provider.get(definition, data, definition)
-
-		assertEquals("object", proposal.get(SwaggerProposalProvider.TYPE).asText)
+		val proposals = provider.createProposals(data, definition)
 		// should contain all required and non properties
-		// should exclude already properties that are already present 
+		// should exclude already properties that are already present
+		assertEquals(15, proposals.size)
+		assertArrayEquals(#[ 
+			"info:",
+			"host:", 
+			"basePath:",		
+			"schemes:",
+			"consumes:",
+			"produces:",
+			"paths:",
+			"definitions:",
+			"parameters:",
+			"responses:",
+			"security:",
+			"securityDefinitions:",
+			"tags:",
+			"externalDocs:",
+			"x-:"
+		], proposals.map[ it.get("value").asText ])
 	}
 
 	@Test
 	def void testGetProposalForArrayDefinition() {
 		val definition = schema.asJson.get("properties").get("tags")		
-		val proposal = provider.get(schema.asJson, mapper.createObjectNode, definition)
+		val proposals = provider.createProposals(mapper.createObjectNode, definition)
 
-		assertNotNull(proposal)
-		assertEquals("array", proposal.get(SwaggerProposalProvider.TYPE).asText)
+		assertNotNull(proposals)
+		assertEquals(1, proposals.size)
 	}
 
 	@Test
 	def void testGetProposalForEnumDefinition() {
 		val definition = schema.asJson.get("properties").get("swagger")		
-		val proposal = provider.get(schema.asJson, mapper.createObjectNode, definition)
+		val proposals = provider.createProposals(mapper.createObjectNode, definition)
 
-		assertNotNull(proposal)
-		assertEquals("enum", proposal.get(SwaggerProposalProvider.TYPE).asText)
-		assertArrayEquals(#["2.0"], proposal.get("literals").map(it | it.asText))
+		assertArrayEquals(#["'2.0'"], 
+			proposals.map(it | it.get("value").asText))
 	}
 
+	@Test
+	def void testInfoProposals() {
+		val yaml = '''
+		info:
+		  description: ""
+		  version: "1.0.0"
+		'''
+
+		val node = Yaml.mapper.readTree(yaml)
+		val proposals = provider.createProposals(node, schema.asJson.get("definitions").get("info"))
+
+		assertArrayEquals(#[ 
+			"title:",
+			"version:", 
+			"description:",		
+			"termsOfService:",
+			"contact:",
+			"license:",
+			"x-:"
+		], proposals.map[ it.get("value").asText ])
+	}
+
+	@Test
+	def void testTagsProposals() {
+		val yaml = '''
+		tags:
+		  - foo: ""
+		  - bar: ""
+		'''
+
+		val node = Yaml.mapper.readTree(yaml)
+		val proposals = provider.createProposals(node, 
+			schema.getDefintionForPath(":tags")
+		)
+
+		assertArrayEquals(#[ 
+			"-"
+		], proposals.map[ it.get("value").asText ])
+	}
+
+	@Test
+	def void testPathsProposals() {
+		val yaml = '''
+		paths:
+		'''
+		
+		val node = Yaml.mapper.readTree(yaml)
+		val proposals = provider.createProposals(node, 
+			schema.getDefintionForPath(":paths")
+		)
+
+		assertArrayEquals(#[ 
+			"x-:",
+			"/:"
+		], proposals.map[ it.get("value").asText ])
+	}
+	
+	@Test
+	def void testPathGetProposals() {
+		val yaml = '''
+		paths:
+		  /:
+		    get:
+		'''
+
+		val node = Yaml.mapper.readTree(yaml)
+		val proposals = provider.createProposals(node, 
+			schema.getDefintionForPath(":paths:/:get")
+		)
+
+		assertArrayEquals(#[ 
+			"tags:",		
+			"summary:",
+			"description:",
+			"externalDocs:",
+			"operationId:",
+			"produces:",
+			"consumes:",
+			"parameters:",
+			"responses:",
+			"schemes:",
+			"deprecated:",
+			"security:",
+			"x-:"
+		], proposals.map[ it.get("value").asText ])
+	}
+
+	@Test
+	def void testGetOneOfProposals() {
+		val proposals = provider.createProposals(mapper.createObjectNode, 
+				schema.asJson.get("definitions").get("responseValue")
+		)
+
+		assertArrayEquals(#[ 
+			"description:",		
+			"schema:",
+			"headers:",
+			"examples:",
+			"x-:",
+			"$ref:"
+		], proposals.map[ it.get("value").asText ])
+	}
+	
 }
