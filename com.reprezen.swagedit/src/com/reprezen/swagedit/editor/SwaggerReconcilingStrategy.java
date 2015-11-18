@@ -12,38 +12,27 @@ import org.eclipse.jface.text.reconciler.DirtyRegion;
 import org.eclipse.jface.text.reconciler.IReconcilingStrategy;
 import org.eclipse.jface.text.reconciler.IReconcilingStrategyExtension;
 import org.eclipse.swt.widgets.Display;
-import org.yaml.snakeyaml.error.Mark;
 import org.yaml.snakeyaml.nodes.MappingNode;
 import org.yaml.snakeyaml.nodes.Node;
 import org.yaml.snakeyaml.nodes.NodeTuple;
 
 public class SwaggerReconcilingStrategy implements IReconcilingStrategy, IReconcilingStrategyExtension {
 
-	private IDocument document;
-	private int fOffset;
-	private int fRangeEnd;
-	private List<Position> fPositions = new ArrayList<>();
-	private int cNextPos;
+	private SwaggerDocument document;
 	private SwaggerEditor editor;
 
 	@Override
-	public void setProgressMonitor(IProgressMonitor monitor) {
-		// TODO Auto-generated method stub
-	}
+	public void setProgressMonitor(IProgressMonitor monitor) {}
 
 	@Override
 	public void initialReconcile() {
-		fOffset = 0;
-		fRangeEnd = document.getLength();
 		calculatePositions();
-
 		editor.redrawViewer();
-
 	}
 
 	@Override
 	public void setDocument(IDocument document) {
-		this.document = document;
+		this.document = (SwaggerDocument) document;
 	}
 
 	@Override
@@ -57,28 +46,65 @@ public class SwaggerReconcilingStrategy implements IReconcilingStrategy, IReconc
 	}
 
 	protected void calculatePositions() {
-		fPositions.clear();
-		cNextPos = fOffset;
+		final Node yaml = document.getYaml();
+		if (!(yaml instanceof MappingNode)) { 
+			return;
+		}
 
-		Node node = null;
-		try {
-			node = ((SwaggerDocument) document).getYaml();
-		} catch (Exception e) {}
-		
-		if (node instanceof MappingNode) {
-			final MappingNode mappingNode = (MappingNode) node;
+		final List<Position> fPositions = new ArrayList<>();
+		final MappingNode mapping = (MappingNode) yaml;
 
-			for (NodeTuple tuple : mappingNode.getValue()) {
-				final Mark startMark = tuple.getKeyNode().getStartMark();
-				final Mark endMark = tuple.getKeyNode().getEndMark();
+		int start;
+		int end = -1;
+		NodeTuple previous = null;
+		for (NodeTuple tuple: mapping.getValue()) {
+
+			if (previous != null) {
+				start = previous.getKeyNode().getStartMark().getLine();
+				end = tuple.getKeyNode().getStartMark().getLine();
+
+				if ((end - start) > 1) {
+					try {
+						int startOffset = document.getLineOffset(start);
+						int endOffset = document.getLineOffset(end);
+
+						fPositions.add(new Position(startOffset, (endOffset - startOffset)));
+					} catch (BadLocationException e) {}
+				}
+			}
+
+			previous = tuple;
+		}
+
+		// handle the last element
+		if (previous != null) {
+			start = previous.getKeyNode().getStartMark().getLine();
+			end = document.getNumberOfLines();
+
+			if ((end - start) > 1) {
+				int startOffset = -1, endOffset = -1;
 
 				try {
-					int startOffset = document.getLineOffset(startMark.getLine()) + startMark.getColumn();
-					int endOffset = document.getLineOffset(endMark.getLine()) + endMark.getColumn();
-
-					Position position = new Position(startOffset, (endOffset - startOffset));
-					fPositions.add(position);
+					startOffset = document.getLineOffset(start);
+					endOffset = document.getLineOffset(end);
 				} catch (BadLocationException e) {
+					// does not have no line at end of document
+					try {
+						startOffset = document.getLineOffset(start);
+						endOffset = document.getLineOffset(end - 1);
+					} catch (BadLocationException e1) {
+						// forget it
+						startOffset = -1;
+						endOffset = -1;
+					}
+				}
+
+				if (startOffset > -1 && endOffset > -1) {
+					try {
+						fPositions.add(new Position(startOffset, (endOffset - startOffset)));
+					} catch (Exception e) {
+						e.printStackTrace();
+					}
 				}
 			}
 		}
@@ -87,7 +113,6 @@ public class SwaggerReconcilingStrategy implements IReconcilingStrategy, IReconc
 			public void run() {
 				editor.updateFoldingStructure(fPositions);
 			}
-
 		});
 	}
 

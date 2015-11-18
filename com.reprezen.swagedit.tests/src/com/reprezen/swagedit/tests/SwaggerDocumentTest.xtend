@@ -2,71 +2,117 @@ package com.reprezen.swagedit.tests
 
 import com.reprezen.swagedit.editor.SwaggerDocument
 import org.junit.Test
-import org.yaml.snakeyaml.events.ScalarEvent
-import static junit.framework.Assert.*
-import io.swagger.util.Yaml
+
+import static org.junit.Assert.*
 
 class SwaggerDocumentTest {
 
 	private val document = new SwaggerDocument
 
 	@Test
-	def void testGetCorrectListOfEvents() {
-		val yaml = '''
-		key: 'value'
-		'''
-
-		document.set(yaml)		
-		val events = document.getEvent(0)
-
-		assertEquals(events.size, 2)
-			
-		val e1 = events.get(0) as ScalarEvent
-		val e2 = events.get(1) as ScalarEvent
-		
-		assertEquals(e1.value, "key")
-		assertEquals(e2.value, "value")
-	}
-
-	@Test
-	def void test() {
-		val yaml = '''
-		info:
-		  description: "Tax Blaster"
-		  version: "1.0.0"
-		'''
-
-		document.set(yaml)		
-		val events = document.getEvent(1)
-
-		assertEquals(events.size, 2)
-
-		val e1 = events.get(0) as ScalarEvent
-		val e2 = events.get(1) as ScalarEvent
-
-		assertEquals(e1.value, "description")
-		assertEquals(e2.value, "Tax Blaster")
-	}
-	
-	@Test
-	def void testGetRootMapping() {
+	def void testGetPaths() {
 		val yaml = '''
 		info:
 		  description: ""
+		  version: "1.0.0"
 		tags:
 		  - foo: ""
 		  - bar: ""
 		'''
 
 		document.set(yaml)
-		val path = document.getPath(1)
-		println(path)
+		assertEquals(":info", document.getPath(0, 1))
+		assertEquals(":info:description", document.getPath(1, 13))
+		assertEquals(":info:version", document.getPath(2, 9))
+		assertEquals(":tags", document.getPath(3, 2))
 
-		println(document.getPath(3))
-		val node = Yaml.mapper.readTree(yaml)
-		println(node)
-		//val events = document.getEvent(1)		
-		//println(events)
+		assertEquals(":tags:@0:foo", document.getPath(4, 7))
+		assertEquals(":tags:@1:bar", document.getPath(5, 7))
+	}
+
+	@Test
+	def void testGetPathOnEmptyLine() {
+		val yaml = '''
+		info:
+		  description: ""
+		  
+		  version: "1.0.0"
+		'''
+
+		document.set(yaml)
+		assertEquals(":info:description", document.getPath(1, 13))
+		assertEquals(":info", document.getPath(2, 2))
+		assertEquals(":info:version", document.getPath(3, 9))
+	}
+
+	@Test
+	def void testGetPathOnEmptyLineAfter() {
+		val yaml = '''
+		info:
+		  description: ""
+		  version: "1.0.0"
+		  
+		'''
+
+		document.set(yaml)
+		assertEquals(":info:description", document.getPath(1, 14))
+		assertEquals(":info:version", document.getPath(2, 9))
+		assertEquals(":info", document.getPath(3, 2))
+	}
+
+	@Test
+	def void testGetPathOnPaths() {
+		val yaml = '''
+		paths:
+		  /:
+		    get:
+		      responses:
+		        '200':
+		'''
+
+		document.set(yaml)
+
+		assertEquals(":paths", document.getPath(0, 1));
+		assertEquals(":paths:/", document.getPath(1, 3));
+		assertEquals(":paths:/:get", document.getPath(2, 7));
+		assertEquals(":paths:/:get:responses", document.getPath(3, 14));
+		assertEquals(":paths:/:get:responses:200", document.getPath(4, 10));
+	}
+
+	@Test
+	def void testGetPathOnPathsAfter() {
+		val yaml = '''
+		paths:
+		  /:
+		    
+		'''
+
+		document.set(yaml)
+
+		assertEquals(":paths", document.getPath(0, 1));
+		assertEquals(":paths:", document.getPath(1, 1));
+		assertEquals(":paths:/", document.getPath(1, 3));
+		assertEquals(":paths:/", document.getPath(2, 3));
+	}
+	
+	@Test
+	def void testGetPath() {
+		val yaml = '''
+		paths:
+		  /:
+		    get:
+		      responses:
+		        '200':
+		          description: OK
+		    
+		parameters:
+		  foo:
+		    name: foo
+		'''
+		
+		document.set(yaml)
+		
+		assertEquals(":paths:/", document.getPath(6, 3))
 	}
 
 }

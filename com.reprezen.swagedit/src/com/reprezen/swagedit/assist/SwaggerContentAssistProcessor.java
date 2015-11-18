@@ -1,10 +1,11 @@
 package com.reprezen.swagedit.assist;
 
-import java.util.LinkedList;
+import java.util.ArrayList;
 import java.util.List;
 
 import org.eclipse.jface.text.BadLocationException;
 import org.eclipse.jface.text.IRegion;
+import org.eclipse.jface.text.ITextSelection;
 import org.eclipse.jface.text.ITextViewer;
 import org.eclipse.jface.text.contentassist.CompletionProposal;
 import org.eclipse.jface.text.contentassist.ICompletionProposal;
@@ -16,9 +17,7 @@ import org.eclipse.jface.text.templates.TemplateCompletionProcessor;
 import org.eclipse.jface.text.templates.TemplateContextType;
 import org.eclipse.swt.graphics.Image;
 
-import com.reprezen.swagedit.assist.SwaggerProposal.ObjectProposal;
 import com.reprezen.swagedit.editor.SwaggerDocument;
-import com.reprezen.swagedit.validation.SwaggerSchema;
 
 /**
  * This class provides basic content assist based on keywords used by 
@@ -26,8 +25,7 @@ import com.reprezen.swagedit.validation.SwaggerSchema;
  */
 public class SwaggerContentAssistProcessor extends TemplateCompletionProcessor implements IContentAssistProcessor {
 
-	private final SwaggerSchema schema = new SwaggerSchema();
-	private final ObjectProposal swaggerProposal = new SwaggerCompletionProposal().get();
+	private final SwaggerProposalProvider proposalProvider = new SwaggerProposalProvider();
 
 	public SwaggerContentAssistProcessor() {}
 
@@ -40,60 +38,30 @@ public class SwaggerContentAssistProcessor extends TemplateCompletionProcessor i
 		//}
 
 		final SwaggerDocument document = (SwaggerDocument) viewer.getDocument();
+		final List<ICompletionProposal> proposals = new ArrayList<>();
+		final ITextSelection selection = (ITextSelection) viewer.getSelectionProvider().getSelection();
 
-		boolean startOfLine = true;
-		int lineOfOffset = 0;
+		int line = 0, lineOffset = 0, column = 0;
 		try {
-			lineOfOffset = document.getLineOfOffset(documentOffset);
-			int lineOffset = document.getLineOffset(lineOfOffset);			
-
-			startOfLine = documentOffset == lineOffset;
+			line = document.getLineOfOffset(documentOffset);
+			lineOffset = document.getLineOffset(line);
+			column = selection.getOffset() - lineOffset;
 		} catch (BadLocationException e) {}
 
-		final List<ICompletionProposal> proposals = new LinkedList<>();
-
-		// look that the cursor is after a :
-		int delemiterPos = document.getDelimiterPosition(documentOffset);
-
-		if (delemiterPos > -1) {
-			// find the keyword before :
-			final String word = document.getWordBeforeOffset(delemiterPos);
-			// get proposals for that keyword
-			if (!word.isEmpty()) {
-				SwaggerProposal proposal = swaggerProposal.getProperties().get(word);
-				if (proposal != null) {
-					proposals.addAll(proposal.asCompletionProposal(documentOffset));						
-				}
-			}
-		} else {
-			// user started a word, find that input
-			final String word = document.getWordBeforeOffset(documentOffset);
-			if (!word.isEmpty()) {
-				// look for keywords that match the input
-				for (String keyword: schema.getKeywords(false)) {
-					if (keyword.startsWith(word)) {
-						final String replacement = keyword.substring(word.length(), keyword.length());
-						proposals.add(new CompletionProposal(replacement, 
-								documentOffset, 
-								0, 
-								replacement.length(), 
-								null,
-								keyword,
-								null,
-								null));
-					}
-				}
-			}
+		final String prefix = document.getWordBeforeOffset(documentOffset);
+		// we have to remove the length of 
+		// the prefix to obtain the correct 
+		// column to resolve the path
+		if (!prefix.isEmpty()) {
+			column -= prefix.length();
 		}
 
-		// if nothing has been found, add list of keywords
-		if (proposals.isEmpty()) {
-			for (String current: schema.getKeywords(startOfLine)) {
-				if (!(viewer.getDocument().get().contains(current))) {
-					proposals.add(new CompletionProposal(current, documentOffset, 0, current.length()));
-				}
-			}
-		}
+		final String path = document.getPath(line, column);
+		proposals.addAll(proposalProvider.getCompletionProposals(
+				path, 
+				document.getNodeForPath(path), 
+				prefix, 
+				documentOffset));
 
 		return proposals.toArray(new CompletionProposal[proposals.size()]);
 	}

@@ -86,18 +86,13 @@ public class SwaggerEditor extends YEdit {
 	}
 
 	public void updateFoldingStructure(List<Position> positions) {
-		Annotation[] annotations = new Annotation[positions.size()];
-		// this will hold the new annotations along
-		// with their corresponding positions
-		Map<Annotation, Position> newAnnotations = new HashMap<>();
-		for (int i = 0; i < positions.size(); i++) {
-			ProjectionAnnotation annotation = new ProjectionAnnotation();
-			newAnnotations.put(annotation, positions.get(i));
-			annotations[i] = annotation;
+		final Map<Annotation, Position> newAnnotations = new HashMap<Annotation, Position>();
+		for (Position position: positions) {
+			newAnnotations.put(new ProjectionAnnotation(), position);
 		}
 
 		annotationModel.modifyAnnotations(oldAnnotations, newAnnotations, null);
-		oldAnnotations = annotations;
+		oldAnnotations = newAnnotations.keySet().toArray(new Annotation[0]);
 	}
 
 	@Override
