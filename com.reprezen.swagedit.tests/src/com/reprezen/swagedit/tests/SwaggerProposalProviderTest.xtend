@@ -57,7 +57,7 @@ class SwaggerProposalProviderTest {
 		val definition = schema.asJson.get("properties").get("swagger")		
 		val proposals = provider.createProposals(mapper.createObjectNode, definition)
 
-		assertArrayEquals(#["'2.0'"], 
+		assertArrayEquals(#["\"2.0\""], 
 			proposals.map(it | it.get("value").asText))
 	}
 
