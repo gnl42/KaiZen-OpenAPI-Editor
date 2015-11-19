@@ -12,14 +12,13 @@ import org.eclipse.jface.text.contentassist.IContentAssistProcessor;
 import org.eclipse.jface.viewers.ISelectionProvider;
 import org.eclipse.swt.graphics.Point;
 import org.junit.Before;
+import org.junit.Test;
 
 import com.reprezen.swagedit.assist.SwaggerContentAssistProcessor;
 import com.reprezen.swagedit.editor.SwaggerDocument;
-import com.reprezen.swagedit.validation.SwaggerSchema;
 
 public class SwaggerContentAssistProcessorTest {
 
-	private SwaggerSchema schema = new SwaggerSchema();
 	private IDocument document;
 	private IContentAssistProcessor processor;
 	private ITextViewer viewer;
@@ -35,11 +34,11 @@ public class SwaggerContentAssistProcessorTest {
 		selection = mock(ITextSelection.class);
 	}
 
-//	@Test
+	@Test
 	public void shouldProvideEndOfWord() {
 		String yaml = "swa";
 		int offset = 3;
-		
+
 		when(viewer.getDocument()).thenReturn(document);
 		when(viewer.getSelectedRange()).thenReturn(new Point(0, 0));
 		when(viewer.getSelectionProvider()).thenReturn(selectionProvider);
@@ -54,7 +53,7 @@ public class SwaggerContentAssistProcessorTest {
 		ICompletionProposal proposal = proposals[0];
 		proposal.apply(document);
 
-		assertEquals("swagger", document.get());
+		assertEquals("swagger:", document.get());
 	}
 
 }
