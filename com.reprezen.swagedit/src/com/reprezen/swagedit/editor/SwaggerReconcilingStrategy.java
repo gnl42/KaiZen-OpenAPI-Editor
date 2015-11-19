@@ -18,7 +18,7 @@ import org.yaml.snakeyaml.nodes.NodeTuple;
 
 public class SwaggerReconcilingStrategy implements IReconcilingStrategy, IReconcilingStrategyExtension {
 
-	private SwaggerDocument document;
+	private IDocument document;
 	private SwaggerEditor editor;
 
 	@Override
@@ -27,12 +27,14 @@ public class SwaggerReconcilingStrategy implements IReconcilingStrategy, IReconc
 	@Override
 	public void initialReconcile() {
 		calculatePositions();
-		editor.redrawViewer();
+		if (editor != null) {
+			editor.redrawViewer();
+		}
 	}
 
 	@Override
 	public void setDocument(IDocument document) {
-		this.document = (SwaggerDocument) document;
+		this.document = document;
 	}
 
 	@Override
@@ -46,7 +48,10 @@ public class SwaggerReconcilingStrategy implements IReconcilingStrategy, IReconc
 	}
 
 	protected void calculatePositions() {
-		final Node yaml = document.getYaml();
+		if (!(document instanceof SwaggerDocument))
+			return;
+
+		final Node yaml = ((SwaggerDocument) document).getYaml();
 		if (!(yaml instanceof MappingNode)) { 
 			return;
 		}

@@ -63,6 +63,20 @@
             id="com.reprezen.swagedit.preferences.SwaggerColorPreferences"
             name="%page.name.0">
       </page>
+      <page
+            category="com.reprezen.swagedit.preferences"
+            class="com.reprezen.swagedit.preferences.SwaggerTemplatePreferences"
+            id="com.reprezen.swagedit.preferences.SwaggerTemplatePreferences"
+            name="Templates">
+      </page>
+   </extension>
+   <extension
+         point="org.eclipse.ui.editors.templates">
+      <contextType
+            class="com.reprezen.swagedit.templates.SwaggerContentType"
+            id="com.reprezen.swagedit.templates.swagger"
+            name="Swagger Context">
+      </contextType>
    </extension>
 
 </plugin>
