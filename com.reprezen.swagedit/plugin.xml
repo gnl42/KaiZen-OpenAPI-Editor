@@ -70,6 +70,7 @@
             name="Templates">
       </page>
    </extension>
+
    <extension
          point="org.eclipse.ui.editors.templates">
       <contextType
@@ -77,6 +78,70 @@
             id="com.reprezen.swagedit.templates.swagger"
             name="Swagger Context">
       </contextType>
+
+      <template
+            autoinsert="true"
+            contextTypeId="com.reprezen.swagedit.templates.swagger"
+            id="com.reprezen.swagedit.templates.swagger_template"
+            name="swagger"
+            description="default template">
+         <pattern>
+swagger: "2.0"
+         </pattern>
+      </template>
+
+      <template
+            autoinsert="true"
+            contextTypeId="com.reprezen.swagedit.templates.swagger"
+            id="com.reprezen.swagedit.templates.info_template"
+            name="info"
+            description="default template">
+         <pattern>
+info:
+  version: ${version}
+  title: ${title}
+  description: ${description}
+  termsOfService: ${terms}
+  contact:
+    name: ${name}
+    url: ${url}
+    email: ${email}
+  license:
+    name: MIT
+    url: http://opensource.org/licenses/MIT
+         </pattern>
+      </template>
+
+     <template
+            autoinsert="true"
+            contextTypeId="com.reprezen.swagedit.templates.swagger"
+            id="com.reprezen.swagedit.templates.paths_template"
+            name="paths"
+            description="default template">
+         <pattern>
+paths:
+  /:
+    get:
+      responses:
+        '200':
+          description: Ok
+         </pattern>
+      </template>
+
+     <template
+            autoinsert="true"
+            contextTypeId="com.reprezen.swagedit.templates.swagger"
+            id="com.reprezen.swagedit.templates.definitions_template"
+            name="definitions"
+            description="default template">
+         <pattern>
+definitions:
+  ${model}:
+    title: "${model}"
+    type: string
+         </pattern>
+      </template>
+
    </extension>
 
 </plugin>
