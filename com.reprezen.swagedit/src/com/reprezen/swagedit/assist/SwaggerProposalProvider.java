@@ -84,6 +84,8 @@ public class SwaggerProposalProvider {
 			return createObjectProposal(data, definition);
 		case STRING:
 			return createStringProposal(data, definition);
+		case BOOLEAN:
+			return createBooleanProposal(data, definition);
 		case ENUM:
 			return createEnumProposal(data, definition);
 		case ONE_OF:
@@ -127,7 +129,7 @@ public class SwaggerProposalProvider {
 
 		for (JsonNode literal : definition.get("enum")) {
 			proposals.add(mapper.createObjectNode()
-					.put("value", "'" + literal.asText() + "'")
+					.put("value", "\"" + literal.asText() + "\"")
 					.put("label", literal.asText()));
 		}
 
@@ -137,8 +139,20 @@ public class SwaggerProposalProvider {
 	private Set<JsonNode> createStringProposal(JsonNode data, JsonNode definition) {
 		Set<JsonNode> proposals = new LinkedHashSet<>();
 		proposals.add(mapper.createObjectNode()
-				.put("value", "''")
-				.put("label", "''"));
+				.put("value", "\"\"")
+				.put("label", "\"\""));
+
+		return proposals;
+	}
+
+	private Set<JsonNode> createBooleanProposal(JsonNode data, JsonNode definition) {
+		Set<JsonNode> proposals = new LinkedHashSet<>();
+		proposals.add(mapper.createObjectNode()
+				.put("value", "true")
+				.put("label", "true"));
+		proposals.add(mapper.createObjectNode()
+				.put("value", "false")
+				.put("label", "false"));
 
 		return proposals;
 	}
