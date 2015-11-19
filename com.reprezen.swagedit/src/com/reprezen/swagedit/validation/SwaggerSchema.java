@@ -99,7 +99,7 @@ public class SwaggerSchema {
 	 * @param path
 	 * @return schema definition
 	 */
-	public JsonNode getDefintionForPath(String path) {
+	public JsonNode getDefinitionForPath(String path) {
 		if (path.startsWith(":")) {
 			path = path.substring(1);
 		}

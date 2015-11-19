@@ -93,7 +93,7 @@ class SwaggerProposalProviderTest {
 
 		val node = Yaml.mapper.readTree(yaml)
 		val proposals = provider.createProposals(node, 
-			schema.getDefintionForPath(":tags")
+			schema.getDefinitionForPath(":tags")
 		)
 
 		assertArrayEquals(#[ 
@@ -109,7 +109,7 @@ class SwaggerProposalProviderTest {
 		
 		val node = Yaml.mapper.readTree(yaml)
 		val proposals = provider.createProposals(node, 
-			schema.getDefintionForPath(":paths")
+			schema.getDefinitionForPath(":paths")
 		)
 
 		assertArrayEquals(#[ 
@@ -128,7 +128,7 @@ class SwaggerProposalProviderTest {
 
 		val node = Yaml.mapper.readTree(yaml)
 		val proposals = provider.createProposals(node, 
-			schema.getDefintionForPath(":paths:/:get")
+			schema.getDefinitionForPath(":paths:/:get")
 		)
 
 		assertArrayEquals(#[ 

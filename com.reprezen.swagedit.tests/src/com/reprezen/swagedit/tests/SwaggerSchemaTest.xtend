@@ -11,7 +11,7 @@ class SwaggerSchemaTest {
 
 	@Test
 	def void testGetDefinitionForRoot() {
-		val definition = schema.getDefintionForPath(":")
+		val definition = schema.getDefinitionForPath(":")
 		
 		assertNotNull(definition)
 		assertEquals(schema.asJson, definition)

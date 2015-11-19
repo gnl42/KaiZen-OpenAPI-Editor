@@ -35,7 +35,7 @@ public class SwaggerProposalProvider {
 	 * @return list of completion proposals
 	 */
 	public List<? extends ICompletionProposal> getCompletionProposals(String path, JsonNode data, String prefix,int documentOffset) {
-		final JsonNode definition = schema.getDefintionForPath(path);
+		final JsonNode definition = schema.getDefinitionForPath(path);
 		final Set<JsonNode> proposals = createProposals(data, definition);
 		final List<ICompletionProposal> result = new ArrayList<>();
 
