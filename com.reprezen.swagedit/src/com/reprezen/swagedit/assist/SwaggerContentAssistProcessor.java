@@ -19,7 +19,7 @@ import org.eclipse.swt.graphics.Image;
 import com.google.common.collect.Lists;
 import com.reprezen.swagedit.Activator;
 import com.reprezen.swagedit.editor.SwaggerDocument;
-import com.reprezen.swagedit.templates.SwaggerContentType;
+import com.reprezen.swagedit.templates.SwaggerContextType;
 
 /**
  * This class provides basic content assist based on keywords used by the
@@ -28,26 +28,22 @@ import com.reprezen.swagedit.templates.SwaggerContentType;
 public class SwaggerContentAssistProcessor extends TemplateCompletionProcessor implements IContentAssistProcessor {
 
 	private final SwaggerProposalProvider proposalProvider = new SwaggerProposalProvider();
+	private String currentPath = null;
 
-	public SwaggerContentAssistProcessor() {
-	}
+	public SwaggerContentAssistProcessor() {}
 
 	@Override
 	public ICompletionProposal[] computeCompletionProposals(ITextViewer viewer, int documentOffset) {
-		final ICompletionProposal[] templateProposals = super.computeCompletionProposals(viewer, documentOffset);
 		final SwaggerDocument document = (SwaggerDocument) viewer.getDocument();
-		final List<ICompletionProposal> proposals = new ArrayList<>();
 		final ITextSelection selection = (ITextSelection) viewer.getSelectionProvider().getSelection();
-
 		int line = 0, lineOffset = 0, column = 0;
 		try {
 			line = document.getLineOfOffset(documentOffset);
 			lineOffset = document.getLineOffset(line);
 			column = selection.getOffset() - lineOffset;
-		} catch (BadLocationException e) {
-		}
+		} catch (BadLocationException e) {}
 
-		final String prefix = document.getWordBeforeOffset(documentOffset);
+		final String prefix = extractPrefix(viewer, documentOffset);
 		// we have to remove the length of
 		// the prefix to obtain the correct
 		// column to resolve the path
@@ -55,10 +51,15 @@ public class SwaggerContentAssistProcessor extends TemplateCompletionProcessor i
 			column -= prefix.length();
 		}
 
-		final String path = document.getPath(line, column);
+		currentPath = document.getPath(line, column);
+
+		// compute template proposals
+		final ICompletionProposal[] templateProposals = super.computeCompletionProposals(viewer, documentOffset);
+		final List<ICompletionProposal> proposals = new ArrayList<>();
+
 		proposals.addAll(proposalProvider.getCompletionProposals(
-				path, 
-				document.getNodeForPath(path), 
+				currentPath, 
+				document.getNodeForPath(currentPath), 
 				prefix, 
 				documentOffset));
 
@@ -106,7 +107,9 @@ public class SwaggerContentAssistProcessor extends TemplateCompletionProcessor i
 
 	@Override
 	protected TemplateContextType getContextType(ITextViewer viewer, IRegion region) {
-		return Activator.getDefault().getContextTypeRegistry().getContextType(SwaggerContentType.SWAGGER_CONTENT_TYPE);
+		return Activator.getDefault()
+				.getContextTypeRegistry()
+				.getContextType(SwaggerContextType.getContentType(currentPath));
 	}
 
 	@Override

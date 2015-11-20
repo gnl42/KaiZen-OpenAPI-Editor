@@ -123,29 +123,6 @@ public class SwaggerDocument extends Document {
 	}
 
 	/**
-	 * Returns the first word it encounters by reading backwards on the line
-	 * starting from the offset.
-	 * 
-	 * @param offset
-	 * @return string
-	 */
-	public String getWordBeforeOffset(int offset) {
-		final StringBuffer buffer = new StringBuffer();
-		while (true) {
-			try {
-				char c = getChar(--offset);
-				if (!Character.isLetterOrDigit(c) || Character.isWhitespace(c)) {
-					return buffer.reverse().toString().trim();
-				} else {
-					buffer.append(c);
-				}
-			} catch (BadLocationException e) {
-				return buffer.reverse().toString().trim();
-			}
-		}
-	}
-
-	/**
 	 * Returns the json node present at the given yaml path. 
 	 * 
 	 * @param path

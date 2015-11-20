@@ -74,14 +74,19 @@
    <extension
          point="org.eclipse.ui.editors.templates">
       <contextType
-            class="com.reprezen.swagedit.templates.SwaggerContentType"
-            id="com.reprezen.swagedit.templates.swagger"
+            class="com.reprezen.swagedit.templates.RootContextType"
+            id="com.reprezen.swagedit.templates.swagger.root"
             name="Swagger Context">
+      </contextType>
+      <contextType
+            class="com.reprezen.swagedit.templates.PathContextType"
+            id="com.reprezen.swagedit.templates.swagger.path"
+            name="Path Context">
       </contextType>
 
       <template
             autoinsert="true"
-            contextTypeId="com.reprezen.swagedit.templates.swagger"
+            contextTypeId="com.reprezen.swagedit.templates.swagger.root"
             id="com.reprezen.swagedit.templates.swagger_template"
             name="swagger"
             description="default template">
@@ -92,7 +97,7 @@ swagger: "2.0"
 
       <template
             autoinsert="true"
-            contextTypeId="com.reprezen.swagedit.templates.swagger"
+            contextTypeId="com.reprezen.swagedit.templates.swagger.root"
             id="com.reprezen.swagedit.templates.info_template"
             name="info"
             description="default template">
@@ -114,7 +119,7 @@ info:
 
      <template
             autoinsert="true"
-            contextTypeId="com.reprezen.swagedit.templates.swagger"
+            contextTypeId="com.reprezen.swagedit.templates.swagger.root"
             id="com.reprezen.swagedit.templates.paths_template"
             name="paths"
             description="default template">
@@ -130,7 +135,7 @@ paths:
 
      <template
             autoinsert="true"
-            contextTypeId="com.reprezen.swagedit.templates.swagger"
+            contextTypeId="com.reprezen.swagedit.templates.swagger.root"
             id="com.reprezen.swagedit.templates.definitions_template"
             name="definitions"
             description="default template">
@@ -139,6 +144,118 @@ definitions:
   ${model}:
     title: "${model}"
     type: string
+         </pattern>
+      </template>
+
+     <template
+            autoinsert="true"
+            contextTypeId="com.reprezen.swagedit.templates.swagger.path"
+            id="com.reprezen.swagedit.templates.path_get_template"
+            name="get"
+            description="default template">
+         <pattern>
+get:
+      summary:
+      description: 
+      responses:
+        '200':
+          description: OK
+         </pattern>
+      </template>
+
+     <template
+            autoinsert="true"
+            contextTypeId="com.reprezen.swagedit.templates.swagger.path"
+            id="com.reprezen.swagedit.templates.path_post_template"
+            name="post"
+            description="default template">
+         <pattern>
+post:
+      summary:
+      description: 
+      responses:
+        '200':
+          description: OK
+         </pattern>
+      </template>
+
+     <template
+            autoinsert="true"
+            contextTypeId="com.reprezen.swagedit.templates.swagger.path"
+            id="com.reprezen.swagedit.templates.path_put_template"
+            name="put"
+            description="default template">
+         <pattern>
+put:
+      summary:
+      description: 
+      responses:
+        '200':
+          description: OK
+         </pattern>
+      </template>
+
+     <template
+            autoinsert="true"
+            contextTypeId="com.reprezen.swagedit.templates.swagger.path"
+            id="com.reprezen.swagedit.templates.path_delete_template"
+            name="delete"
+            description="default template">
+         <pattern>
+delete:
+      summary:
+      description: 
+      responses:
+        '200':
+          description: OK
+         </pattern>
+      </template>
+
+     <template
+            autoinsert="true"
+            contextTypeId="com.reprezen.swagedit.templates.swagger.path"
+            id="com.reprezen.swagedit.templates.path_delete_template"
+            name="delete"
+            description="default template">
+         <pattern>
+delete:
+      summary:
+      description: 
+      responses:
+        '200':
+          description: OK
+         </pattern>
+      </template>
+
+     <template
+            autoinsert="true"
+            contextTypeId="com.reprezen.swagedit.templates.swagger.path"
+            id="com.reprezen.swagedit.templates.path_patch_template"
+            name="patch"
+            description="default template">
+         <pattern>
+patch:
+      summary:
+      description: 
+      responses:
+        '200':
+          description: OK
+         </pattern>
+      </template>
+
+     <template
+            autoinsert="true"
+            contextTypeId="com.reprezen.swagedit.templates.swagger.path"
+            id="com.reprezen.swagedit.templates.path_options_template"
+            name="options"
+            description="default template">
+         <pattern>
+options:
+      summary:
+      description: 
+      responses:
+        '200':
+          description: OK
          </pattern>
       </template>
 
