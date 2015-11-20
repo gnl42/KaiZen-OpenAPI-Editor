@@ -53,7 +53,7 @@ public class SwaggerReconcilingStrategy implements IReconcilingStrategy, IReconc
 			return;
 
 		final Node yaml = ((SwaggerDocument) document).getYaml();
-		if (!(yaml instanceof MappingNode)) {
+		if (!(yaml instanceof MappingNode)) { 
 			return;
 		}
 
