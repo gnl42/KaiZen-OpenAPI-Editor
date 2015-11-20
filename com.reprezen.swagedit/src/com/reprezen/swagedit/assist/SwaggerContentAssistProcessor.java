@@ -11,9 +11,11 @@ import org.eclipse.jface.text.contentassist.ICompletionProposal;
 import org.eclipse.jface.text.contentassist.IContentAssistProcessor;
 import org.eclipse.jface.text.contentassist.IContextInformation;
 import org.eclipse.jface.text.contentassist.IContextInformationValidator;
+import org.eclipse.jface.text.templates.ContextTypeRegistry;
 import org.eclipse.jface.text.templates.Template;
 import org.eclipse.jface.text.templates.TemplateCompletionProcessor;
 import org.eclipse.jface.text.templates.TemplateContextType;
+import org.eclipse.jface.text.templates.persistence.TemplateStore;
 import org.eclipse.swt.graphics.Image;
 
 import com.google.common.collect.Lists;
@@ -102,14 +104,12 @@ public class SwaggerContentAssistProcessor extends TemplateCompletionProcessor i
 
 	@Override
 	protected Template[] getTemplates(String contextTypeId) {
-		return Activator.getDefault().getTemplateStore().getTemplates();
+		return geTemplateStore().getTemplates();
 	}
 
 	@Override
 	protected TemplateContextType getContextType(ITextViewer viewer, IRegion region) {
-		return Activator.getDefault()
-				.getContextTypeRegistry()
-				.getContextType(SwaggerContextType.getContentType(currentPath));
+		return getContextTypeRegistry().getContextType(SwaggerContextType.getContentType(currentPath));
 	}
 
 	@Override
@@ -117,4 +117,11 @@ public class SwaggerContentAssistProcessor extends TemplateCompletionProcessor i
 		return null;
 	}
 
+	protected TemplateStore geTemplateStore() {
+		return Activator.getDefault().getTemplateStore();
+	}
+
+	protected ContextTypeRegistry getContextTypeRegistry() {
+		return Activator.getDefault().getContextTypeRegistry();
+	}
 }
