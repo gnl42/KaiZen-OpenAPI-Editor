@@ -18,21 +18,24 @@ import org.yaml.snakeyaml.nodes.NodeTuple;
 
 public class SwaggerReconcilingStrategy implements IReconcilingStrategy, IReconcilingStrategyExtension {
 
-	private SwaggerDocument document;
+	private IDocument document;
 	private SwaggerEditor editor;
 
 	@Override
-	public void setProgressMonitor(IProgressMonitor monitor) {}
+	public void setProgressMonitor(IProgressMonitor monitor) {
+	}
 
 	@Override
 	public void initialReconcile() {
 		calculatePositions();
-		editor.redrawViewer();
+		if (editor != null) {
+			editor.redrawViewer();
+		}
 	}
 
 	@Override
 	public void setDocument(IDocument document) {
-		this.document = (SwaggerDocument) document;
+		this.document = document;
 	}
 
 	@Override
@@ -46,74 +49,46 @@ public class SwaggerReconcilingStrategy implements IReconcilingStrategy, IReconc
 	}
 
 	protected void calculatePositions() {
-		final Node yaml = document.getYaml();
-		if (!(yaml instanceof MappingNode)) { 
+		if (!(document instanceof SwaggerDocument))
 			return;
-		}
 
-		final List<Position> fPositions = new ArrayList<>();
-		final MappingNode mapping = (MappingNode) yaml;
-
-		int start;
-		int end = -1;
-		NodeTuple previous = null;
-		for (NodeTuple tuple: mapping.getValue()) {
-
-			if (previous != null) {
-				start = previous.getKeyNode().getStartMark().getLine();
-				end = tuple.getKeyNode().getStartMark().getLine();
-
-				if ((end - start) > 1) {
-					try {
-						int startOffset = document.getLineOffset(start);
-						int endOffset = document.getLineOffset(end);
-
-						fPositions.add(new Position(startOffset, (endOffset - startOffset)));
-					} catch (BadLocationException e) {}
-				}
-			}
-
-			previous = tuple;
-		}
-
-		// handle the last element
-		if (previous != null) {
-			start = previous.getKeyNode().getStartMark().getLine();
-			end = document.getNumberOfLines();
-
-			if ((end - start) > 1) {
-				int startOffset = -1, endOffset = -1;
-
-				try {
-					startOffset = document.getLineOffset(start);
-					endOffset = document.getLineOffset(end);
-				} catch (BadLocationException e) {
-					// does not have no line at end of document
-					try {
-						startOffset = document.getLineOffset(start);
-						endOffset = document.getLineOffset(end - 1);
-					} catch (BadLocationException e1) {
-						// forget it
-						startOffset = -1;
-						endOffset = -1;
-					}
-				}
-
-				if (startOffset > -1 && endOffset > -1) {
-					try {
-						fPositions.add(new Position(startOffset, (endOffset - startOffset)));
-					} catch (Exception e) {
-						e.printStackTrace();
-					}
-				}
-			}
+		final Node yaml = ((SwaggerDocument) document).getYaml();
+		if (!(yaml instanceof MappingNode)) {
+			return;
 		}
 
 		Display.getDefault().asyncExec(new Runnable() {
 			public void run() {
-				editor.updateFoldingStructure(fPositions);
+				editor.updateFoldingStructure(calculatePositions((MappingNode) yaml));
 			}
 		});
+	}
+
+	protected List<Position> calculatePositions(MappingNode mapping) {
+		List<Position> positions = new ArrayList<>();
+		int start;
+		int end = -1;
+
+		for (NodeTuple tuple : mapping.getValue()) {
+			start = tuple.getKeyNode().getStartMark().getLine();
+			end = tuple.getValueNode().getEndMark().getLine();
+
+			if ((end - start) > 0) {
+				try {
+					int startOffset = document.getLineOffset(start);
+					int endOffset = document.getLineOffset(end);
+
+					positions.add(new Position(startOffset, (endOffset - startOffset)));
+				} catch (BadLocationException e) {
+				}
+			}
+
+			if (tuple.getValueNode() instanceof MappingNode) {
+				positions.addAll(calculatePositions((MappingNode) tuple.getValueNode()));
+			}
+		}
+
+		return positions;
 	}
 
 	public void setEditor(SwaggerEditor editor) {
