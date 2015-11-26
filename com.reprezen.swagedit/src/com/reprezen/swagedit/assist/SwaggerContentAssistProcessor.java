@@ -36,6 +36,10 @@ public class SwaggerContentAssistProcessor extends TemplateCompletionProcessor i
 
 	@Override
 	public ICompletionProposal[] computeCompletionProposals(ITextViewer viewer, int documentOffset) {
+		if (!(viewer.getDocument() instanceof SwaggerDocument)) {
+			return super.computeCompletionProposals(viewer, documentOffset);
+		}
+
 		final SwaggerDocument document = (SwaggerDocument) viewer.getDocument();
 		final ITextSelection selection = (ITextSelection) viewer.getSelectionProvider().getSelection();
 		int line = 0, lineOffset = 0, column = 0;
