@@ -18,8 +18,8 @@ public class SwaggerTemplatePreferences extends TemplatePreferencePage implement
 
 	protected static class SwaggerEditTemplateDialog extends TemplatePreferencePage.EditTemplateDialog {
 
-		public SwaggerEditTemplateDialog(Shell arg0, Template arg1, boolean arg2, boolean arg3, ContextTypeRegistry arg4) {
-			super(arg0, arg1, arg2, arg3, arg4);
+		public SwaggerEditTemplateDialog(Shell parent, Template template, boolean edit, boolean isNameModifiable, ContextTypeRegistry registry) {
+			super(parent, template, edit, isNameModifiable, registry);
 		}
 
 		protected SourceViewer createViewer(Composite parent) {
