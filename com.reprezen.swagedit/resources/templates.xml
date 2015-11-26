@@ -1,0 +1,132 @@
+<templates>
+
+     <template name="swagger" 
+       id="com.reprezen.swagedit.templates.swagger_template" 
+       description="swagger template" 
+       context="com.reprezen.swagedit.templates.swagger.root" 
+       enabled="true">
+swagger: "2.0"
+     </template>
+
+     <template name="info" 
+       id="com.reprezen.swagedit.templates.info_template" 
+       description="swagger template" 
+       context="com.reprezen.swagedit.templates.swagger.root" 
+       enabled="true">
+info:
+  version: ${version}
+  title: ${title}
+  description: ${description}
+  termsOfService: ${terms}
+  contact:
+    name: ${name}
+    url: ${url}
+    email: ${email}
+  license:
+    name: MIT
+    url: http://opensource.org/licenses/MIT
+     </template>
+
+     <template name="paths" 
+       id="com.reprezen.swagedit.templates.paths_template" 
+       description="swagger template" 
+       context="com.reprezen.swagedit.templates.swagger.root" 
+       enabled="true">
+paths:
+  /:
+    get:
+      responses:
+        '200':
+          description: Ok
+     </template>
+
+     <template name="definitions" 
+       id="com.reprezen.swagedit.templates.definitions_template" 
+       description="swagger template" 
+       context="com.reprezen.swagedit.templates.swagger.root" 
+       enabled="true">
+definitions:
+  ${model}:
+    title: "${model}"
+    type: string
+     </template>
+
+     <template name="get" 
+       id="com.reprezen.swagedit.templates.path_get_template" 
+       description="swagger template" 
+       context="com.reprezen.swagedit.templates.swagger.path" 
+       enabled="true">
+get:
+      summary:
+      description: 
+      responses:
+        '200':
+          description: OK
+     </template>
+
+     <template name="post" 
+       id="com.reprezen.swagedit.templates.path_post_template" 
+       description="swagger template" 
+       context="com.reprezen.swagedit.templates.swagger.path" 
+       enabled="true">
+post:
+      summary:
+      description: 
+      responses:
+        '200':
+          description: OK
+     </template>
+
+     <template name="put" 
+       id="com.reprezen.swagedit.templates.path_put_template" 
+       description="swagger template" 
+       context="com.reprezen.swagedit.templates.swagger.path" 
+       enabled="true">
+put:
+      summary:
+      description: 
+      responses:
+        '200':
+          description: OK
+     </template>
+
+     <template name="delete" 
+       id="com.reprezen.swagedit.templates.path_delete_template" 
+       description="swagger template" 
+       context="com.reprezen.swagedit.templates.swagger.path" 
+       enabled="true">
+delete:
+      summary:
+      description: 
+      responses:
+        '200':
+          description: OK
+     </template>
+    
+    <template name="patch" 
+       id="com.reprezen.swagedit.templates.path_patch_template" 
+       description="swagger template" 
+       context="com.reprezen.swagedit.templates.swagger.path" 
+       enabled="true">
+patch:
+      summary:
+      description: 
+      responses:
+        '200':
+          description: OK
+     </template>
+
+    <template name="options" 
+       id="com.reprezen.swagedit.templates.path_options_template" 
+       description="swagger template" 
+       context="com.reprezen.swagedit.templates.swagger.path" 
+       enabled="true">
+options:
+      summary:
+      description: 
+      responses:
+        '200':
+          description: OK
+     </template>
+
+ </templates>
