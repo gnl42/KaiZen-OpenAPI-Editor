@@ -114,7 +114,7 @@ public class SwaggerContentAssistProcessor extends TemplateCompletionProcessor i
 
 	@Override
 	protected Image getImage(Template template) {
-		return null;
+		return Activator.getDefault().getImageRegistry().get("swagger_16");
 	}
 
 	protected TemplateStore geTemplateStore() {

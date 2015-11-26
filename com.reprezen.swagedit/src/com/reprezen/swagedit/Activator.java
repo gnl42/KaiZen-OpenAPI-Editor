@@ -1,13 +1,20 @@
 package com.reprezen.swagedit;
 
 import java.io.IOException;
+import java.net.URL;
 
 import org.dadacoalition.yedit.YEditLog;
+import org.eclipse.core.runtime.FileLocator;
+import org.eclipse.core.runtime.IPath;
+import org.eclipse.core.runtime.Path;
+import org.eclipse.core.runtime.Platform;
+import org.eclipse.jface.resource.ImageDescriptor;
 import org.eclipse.jface.text.templates.ContextTypeRegistry;
 import org.eclipse.jface.text.templates.persistence.TemplateStore;
 import org.eclipse.ui.editors.text.templates.ContributionContextTypeRegistry;
 import org.eclipse.ui.editors.text.templates.ContributionTemplateStore;
 import org.eclipse.ui.plugin.AbstractUIPlugin;
+import org.osgi.framework.Bundle;
 import org.osgi.framework.BundleContext;
 
 import com.reprezen.swagedit.templates.PathContextType;
@@ -33,6 +40,11 @@ public class Activator extends AbstractUIPlugin {
 	public void start(BundleContext context) throws Exception {
 		super.start(context);
 		plugin = this;
+
+		Bundle bundle = Platform.getBundle(PLUGIN_ID);
+		IPath path = new Path("icons/swagger_16.jpg");
+		URL url = FileLocator.find(bundle, path, null);
+		getImageRegistry().put("swagger_16", ImageDescriptor.createFromURL(url));
 	}
 
 	/*
@@ -57,9 +69,7 @@ public class Activator extends AbstractUIPlugin {
 
 	public TemplateStore getTemplateStore() {
 		if (templateStore == null) {
-			templateStore = new ContributionTemplateStore(
-					getContextTypeRegistry(), 
-					getDefault().getPreferenceStore(),
+			templateStore = new ContributionTemplateStore(getContextTypeRegistry(), getDefault().getPreferenceStore(),
 					TEMPLATE_STORE_ID);
 
 			try {
