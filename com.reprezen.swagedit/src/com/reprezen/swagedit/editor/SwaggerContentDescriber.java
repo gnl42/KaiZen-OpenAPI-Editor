@@ -19,7 +19,7 @@ public class SwaggerContentDescriber implements IContentDescriber {
 			return INDETERMINATE;
 		}
 
-		return content.contains("swagger") ? VALID : INVALID;
+		return content.contains("swagger: \"2.0\"") || content.contains("swagger: '2.0'") ? VALID : INVALID;
 	}
 
 	@Override
