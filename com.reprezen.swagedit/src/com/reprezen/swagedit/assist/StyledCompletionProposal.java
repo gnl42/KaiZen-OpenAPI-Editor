@@ -10,32 +10,33 @@ import org.eclipse.swt.graphics.Image;
 import org.eclipse.swt.graphics.Point;
 
 import com.reprezen.swagedit.Activator;
+import com.reprezen.swagedit.Activator.Icons;
 
 public class StyledCompletionProposal implements ICompletionProposal, ICompletionProposalExtension6 {
 
-	private final int fReplacementOffset;
-	private final int fReplacementLength;
-	private final String fReplacementString;
-	private final StyledString fLabel;
-	private final int fCursorPosition;
+	private final int replacementOffset;
+	private final int replacementLength;
+	private final String replacementString;
+	private final StyledString label;
+	private final int cursorPosition;
 
 	public StyledCompletionProposal(String replacement, StyledString label, int offset, int lenght, int position) {
-		this.fReplacementString = replacement;
-		this.fLabel = label;
-		this.fReplacementOffset = offset;
-		this.fReplacementLength = lenght;
-		this.fCursorPosition = position;
+		this.replacementString = replacement;
+		this.label = label;
+		this.replacementOffset = offset;
+		this.replacementLength = lenght;
+		this.cursorPosition = position;
 	}
 
 	@Override
 	public StyledString getStyledDisplayString() {
-		return fLabel;
+		return label;
 	}
 
 	@Override
 	public void apply(IDocument document) {
 		try {
-			document.replace(fReplacementOffset, fReplacementLength, fReplacementString);
+			document.replace(replacementOffset, replacementLength, replacementString);
 		} catch (BadLocationException x) {
 			// ignore
 		}
@@ -43,29 +44,26 @@ public class StyledCompletionProposal implements ICompletionProposal, ICompletio
 
 	@Override
 	public Point getSelection(IDocument document) {
-		return new Point(fReplacementOffset + fCursorPosition, 0);
+		return new Point(replacementOffset + cursorPosition, 0);
 	}
 
 	@Override
 	public String getAdditionalProposalInfo() {
-		// TODO Auto-generated method stub
 		return null;
 	}
 
 	@Override
 	public String getDisplayString() {
-		// TODO Auto-generated method stub
 		return null;
 	}
 
 	@Override
 	public Image getImage() {
-		return Activator.getDefault().getImageRegistry().get("swagger_16");
+		return Activator.getDefault().getImage(Icons.assist_item);
 	}
 
 	@Override
 	public IContextInformation getContextInformation() {
-		// TODO Auto-generated method stub
 		return null;
 	}
 	

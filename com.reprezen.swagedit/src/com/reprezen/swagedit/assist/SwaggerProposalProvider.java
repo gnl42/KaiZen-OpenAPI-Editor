@@ -29,6 +29,13 @@ public class SwaggerProposalProvider {
 	private final ObjectMapper mapper = new ObjectMapper();
 	private final SwaggerSchema schema = new SwaggerSchema();
 
+	private final Styler typeStyler = new StyledString.Styler() {
+		@Override
+		public void applyStyles(TextStyle textStyle) {
+			textStyle.foreground = new Color(Display.getCurrent(), new RGB(120, 120, 120));
+		}
+	};
+
 	/**
 	 * Returns a list of completion proposals that are created from a single
 	 * proposal object.
@@ -46,13 +53,6 @@ public class SwaggerProposalProvider {
 
 		prefix = Strings.emptyToNull(prefix);
 
-		Styler typeStyler = new StyledString.Styler() {
-			@Override
-			public void applyStyles(TextStyle textStyle) {
-				textStyle.foreground = new Color(Display.getCurrent(), new RGB(120, 120, 120));
-			}
-		};
-		
 		for (JsonNode proposal: proposals) {
 			String value = proposal.get("value").asText();
 			String label = proposal.get("label").asText();
