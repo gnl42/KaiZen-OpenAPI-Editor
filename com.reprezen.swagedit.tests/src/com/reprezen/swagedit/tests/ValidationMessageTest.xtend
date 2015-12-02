@@ -2,9 +2,8 @@ package com.reprezen.swagedit.tests
 
 import com.reprezen.swagedit.editor.SwaggerDocument
 import com.reprezen.swagedit.validation.Validator
+import org.junit.Assert
 import org.junit.Test
-
-import static org.junit.Assert.assertEquals
 
 /**
  * Tests as documentation for #9 - User-friendly validation messages
@@ -19,10 +18,10 @@ class ValidationMessageTest {
 	def assertModelHasValidationError(String expectedMessage, String modelText) {
 		document.set(modelText)
 		val errors = validator.validate(document)				
-		assertEquals(1, errors.size)
+		Assert.assertEquals(1, errors.size)
 
 		val error = errors.get(0)
-		assertEquals(expectedMessage, error.message)
+		Assert.assertEquals(expectedMessage, error.message)
 	}
 
 	@Test
