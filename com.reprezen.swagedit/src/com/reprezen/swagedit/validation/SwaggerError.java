@@ -1,6 +1,6 @@
 package com.reprezen.swagedit.validation;
 
-import java.util.Iterator;
+import java.util.Objects;
 
 import org.eclipse.core.resources.IMarker;
 import org.yaml.snakeyaml.parser.ParserException;
@@ -8,8 +8,6 @@ import org.yaml.snakeyaml.parser.ParserException;
 import com.fasterxml.jackson.databind.JsonMappingException;
 import com.fasterxml.jackson.databind.JsonNode;
 import com.fasterxml.jackson.dataformat.yaml.snakeyaml.scanner.ScannerException;
-import com.github.fge.jsonschema.core.report.LogLevel;
-import com.github.fge.jsonschema.core.report.ProcessingMessage;
 import com.google.common.base.Joiner;
 import com.reprezen.swagedit.Messages;
 
@@ -38,8 +36,8 @@ public class SwaggerError {
 		return new SwaggerError(IMarker.SEVERITY_ERROR, exception.getMessage(), line);
 	}
 
-	public static SwaggerError create(ProcessingMessage error, int line) {
-		return new SwaggerError(getLevel(error), rewriteError(error.asJson()), line);
+	public static SwaggerError create(JsonNode error, int line) {
+		return new SwaggerError(getLevel(error), rewriteError(error), line);
 	}
 
 	public static SwaggerError create(ParserException e) {
@@ -64,8 +62,6 @@ public class SwaggerError {
 			return rewriteTypeError(error);
 		case "enum":
 			return rewriteEnumError(error);
-		case "oneOf":
-			return rewriteOneOfError(error);
 		case "additionalProperties":
 			return rewriteAdditionalProperties(error);
 		case "required":
@@ -85,26 +81,6 @@ public class SwaggerError {
 		final JsonNode unwanted = error.get("unwanted");
 
 		return String.format(Messages.error_additional_properties_not_allowed, Joiner.on(", ").join(unwanted));
-	}
-
-	private static String rewriteOneOfError(JsonNode node) {
-		final JsonNode reports = node.get("reports");
-		String result = ""; 
-
-		for (Iterator<String> it = reports.fieldNames(); it.hasNext();) {
-			final String key = it.next();
-			final JsonNode value = reports.get(key);
-
-			if (value.isObject()) {
-				result += rewriteError(value) + "\n";
-			} else if (value.isArray()) {
-				for (JsonNode one: value) {
-					result += rewriteError(one) + "\n";
-				}
-			}
-		}
-
-		return result;
 	}
 
 	private static String rewriteTypeError(JsonNode error) {
@@ -129,18 +105,18 @@ public class SwaggerError {
 		return String.format(Messages.error_notInEnum, value.asText(), enumString);
 	}
 
-	protected static int getLevel(ProcessingMessage message) {
-		if (message == null) {
+	protected static int getLevel(JsonNode message) {
+		if (message == null || !message.has("level")) {
 			return IMarker.SEVERITY_INFO;
 		}
 
-		final LogLevel level = message.getLogLevel();
+		final String level = message.get("level").asText();
 
 		switch (level) {
-		case ERROR:
-		case FATAL:
+		case "error":
+		case "fatal":
 			return IMarker.SEVERITY_ERROR;
-		case WARNING:
+		case "warning":
 			return IMarker.SEVERITY_WARNING;
 		default:
 			return IMarker.SEVERITY_INFO;
@@ -164,4 +140,19 @@ public class SwaggerError {
 		return "{ (level=" + getLevel() + ") " + getMessage() + " at line " + getLine() + " }";
 	}
 
+	@Override
+	public boolean equals(Object obj) {
+		if (obj instanceof SwaggerError) {
+			return Objects.equals(level, ((SwaggerError) obj).level) &&
+					Objects.equals(line, ((SwaggerError) obj).line) &&
+					Objects.equals(message, ((SwaggerError) obj).message);
+		}
+
+		return super.equals(obj);
+	}
+
+	@Override
+	public int hashCode() {
+		return message.hashCode();
+	}
 }
