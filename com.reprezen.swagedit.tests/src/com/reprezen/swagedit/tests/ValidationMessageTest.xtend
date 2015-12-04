@@ -4,7 +4,8 @@ import com.reprezen.swagedit.editor.SwaggerDocument
 import com.reprezen.swagedit.validation.Validator
 import org.junit.Test
 
-import static org.junit.Assert.assertEquals
+import static org.junit.Assert.*
+import static org.hamcrest.core.IsCollectionContaining.*
 
 /**
  * Tests as documentation for #9 - User-friendly validation messages
@@ -15,15 +16,6 @@ class ValidationMessageTest {
 
 	val validator = new Validator
 	val document = new SwaggerDocument
-
-	def assertModelHasValidationError(String expectedMessage, String modelText) {
-		document.set(modelText)
-		val errors = validator.validate(document)				
-		assertEquals(1, errors.size)
-
-		val error = errors.get(0)
-		assertEquals(expectedMessage, error.message)
-	}
 
 	@Test
 	def testMessage_additionalItems_notAllowed() {
@@ -45,7 +37,11 @@ class ValidationMessageTest {
 		          description: OK
 		'''
 
-		assertModelHasValidationError(expected, content)
+		document.set(content)
+		val errors = validator.validate(document)
+		
+		assertEquals(1, errors.size)
+		assertEquals(expected, errors.get(0).message)
 	}
 
 	@Test
@@ -65,7 +61,11 @@ class ValidationMessageTest {
 		      responses: 2
 		'''
 
-		assertModelHasValidationError(expected, content)
+		document.set(content)
+		val errors = validator.validate(document)
+		
+		assertEquals(1, errors.size)
+		assertEquals(expected, errors.get(0).message)
 	}
 
 	@Test
@@ -89,18 +89,16 @@ class ValidationMessageTest {
 		          description: OK
 		'''
 
-		assertModelHasValidationError(expected, content)
+		document.set(content)
+		val errors = validator.validate(document)
+		
+		assertEquals(1, errors.size)
+		assertEquals(expected, errors.get(0).message)
 	}
 
 	@Test
 	def testMessage_oneOf_fail() {
 		// previous message 'instance failed to match exactly one schema (matched 0 out of 2)'
-		val expected = 
-		'''
-		value of type integer is not allowed, value should be of type string
-		object has properties "description" which are not allowed
-		object has missing required properties "$ref"
-		'''
 
 		val content = '''
 		swagger: '2.0'
@@ -116,7 +114,14 @@ class ValidationMessageTest {
 		          description: 200
 		'''
 		
-		assertModelHasValidationError(expected, content)
+		document.set(content)
+		val errors = validator.validate(document)
+
+		assertThat(errors.map[message], hasItems(
+			"value of type integer is not allowed, value should be of type string",
+			"object has properties \"description\" which are not allowed",
+			"object has missing required properties \"$ref\""
+		))
 	}
 
 	@Test
@@ -139,7 +144,10 @@ class ValidationMessageTest {
 		        description: OK
 		'''
 		
-		assertModelHasValidationError(expected, content)
+		document.set(content)
+		val errors = validator.validate(document)
+
+		assertThat(errors.map[message], hasItems(expected))
 	}
 
 	@Test
@@ -157,7 +165,11 @@ class ValidationMessageTest {
 		          description: OK
 		'''
 
-		assertModelHasValidationError(expected, content)
+		document.set(content)
+		val errors = validator.validate(document)
+		
+		assertEquals(1, errors.size)
+		assertEquals(expected, errors.get(0).message)
 	}
 
 }

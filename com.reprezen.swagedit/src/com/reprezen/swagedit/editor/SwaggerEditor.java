@@ -3,6 +3,7 @@ package com.reprezen.swagedit.editor;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
+import java.util.Set;
 
 import org.dadacoalition.yedit.YEditLog;
 import org.dadacoalition.yedit.editor.YEdit;
@@ -100,7 +101,7 @@ public class SwaggerEditor extends YEdit {
 	protected void checkErrors() {
 		final IFile file = ((IFileEditorInput) getEditorInput()).getFile();
 		final IDocument document = getDocumentProvider().getDocument(getEditorInput());
-		final List<SwaggerError> errors = validator.validate((SwaggerDocument) document);
+		final Set<SwaggerError> errors = validator.validate((SwaggerDocument) document);
 
 		for (SwaggerError error : errors) {
 			try {
