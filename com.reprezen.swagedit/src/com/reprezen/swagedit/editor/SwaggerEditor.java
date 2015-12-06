@@ -5,6 +5,7 @@ import java.util.List;
 import java.util.Map;
 
 import org.dadacoalition.yedit.YEditLog;
+import org.dadacoalition.yedit.editor.IDocumentIdleListener;
 import org.dadacoalition.yedit.editor.YEdit;
 import org.dadacoalition.yedit.editor.YEditSourceViewerConfiguration;
 import org.eclipse.core.resources.IFile;
@@ -51,12 +52,16 @@ public class SwaggerEditor extends YEdit {
 		configuration.setEditor(this);
 		return configuration;
 	}
+	
+	public ProjectionViewer getProjectionViewer() {
+	    return (ProjectionViewer) getSourceViewer();
+	}
 
 	@Override
 	public void createPartControl(Composite parent) {
 		super.createPartControl(parent);
 
-		ProjectionViewer viewer = (ProjectionViewer) getSourceViewer();
+		ProjectionViewer viewer = getProjectionViewer();
 
 		projectionSupport = new ProjectionSupport(viewer, getAnnotationAccess(), getSharedColors());
 		projectionSupport.install();
@@ -128,6 +133,11 @@ public class SwaggerEditor extends YEdit {
 				}
 			}
 		});
+	}
+	
+	@Override
+	public void addDocumentIdleListener(IDocumentIdleListener listener) {
+	    super.addDocumentIdleListener(listener);
 	}
 
 }
