@@ -7,6 +7,9 @@ import org.eclipse.core.resources.IMarker
 import org.junit.Assert
 import org.junit.Test
 
+import static org.junit.Assert.assertEquals
+import static org.junit.Assert.assertTrue
+
 class ValidatorTest {
 
 	val validator = new Validator
@@ -154,4 +157,32 @@ class ValidatorTest {
 		Assert.assertEquals(5, error.getLine())
 	}
 
+	@Test
+	def void shouldReturnCorrectErrorPositionOnPathWithHierarchy() throws IOException {
+		// invalid property schema
+		val content = '''
+			swagger: '2.0'
+			info:
+			  version: 0.0.0
+			  title: Simple API
+			paths:
+			  /foo/{bar}:
+			    get:
+			      responses:
+			        '200':
+			          description: OK
+			          schema:
+		'''
+
+		document.set(content)
+		val errors = validator.validate(document)
+
+		assertEquals(5, errors.size())
+
+		errors.forEach [
+			assertTrue(it.line == 10 || it.line == 11)
+			assertEquals(IMarker.SEVERITY_ERROR, it.level)
+		]
+	}
 }
+
