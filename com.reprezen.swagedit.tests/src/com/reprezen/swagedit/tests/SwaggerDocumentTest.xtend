@@ -94,7 +94,7 @@ class SwaggerDocumentTest {
 		assertEquals(":paths:/", document.getPath(1, 3));
 		assertEquals(":paths:/", document.getPath(2, 3));
 	}
-	
+
 	@Test
 	def void testGetPath() {
 		val yaml = '''
