@@ -7,8 +7,13 @@ import java.util.LinkedHashSet;
 import java.util.List;
 import java.util.Set;
 
-import org.eclipse.jface.text.contentassist.CompletionProposal;
 import org.eclipse.jface.text.contentassist.ICompletionProposal;
+import org.eclipse.jface.viewers.StyledString;
+import org.eclipse.jface.viewers.StyledString.Styler;
+import org.eclipse.swt.graphics.Color;
+import org.eclipse.swt.graphics.RGB;
+import org.eclipse.swt.graphics.TextStyle;
+import org.eclipse.swt.widgets.Display;
 
 import com.fasterxml.jackson.databind.JsonNode;
 import com.fasterxml.jackson.databind.ObjectMapper;
@@ -23,6 +28,13 @@ public class SwaggerProposalProvider {
 
 	private final ObjectMapper mapper = new ObjectMapper();
 	private final SwaggerSchema schema = new SwaggerSchema();
+
+	private final Styler typeStyler = new StyledString.Styler() {
+		@Override
+		public void applyStyles(TextStyle textStyle) {
+			textStyle.foreground = new Color(Display.getCurrent(), new RGB(120, 120, 120));
+		}
+	};
 
 	/**
 	 * Returns a list of completion proposals that are created from a single
@@ -44,15 +56,22 @@ public class SwaggerProposalProvider {
 		for (JsonNode proposal: proposals) {
 			String value = proposal.get("value").asText();
 			String label = proposal.get("label").asText();
+			String type = proposal.has("type") ? proposal.get("type").asText() : null;
+
+			StyledString styledString = new StyledString(label);
+			if (type != null) {
+				styledString
+				.append(": ", typeStyler)
+				.append(type, typeStyler);
+			}
 
 			if (prefix != null) {
 				if (value.startsWith(prefix)) {
 					value = value.substring(prefix.length(), value.length());
-					result.add(
-							new CompletionProposal(value, documentOffset, 0, value.length(), null, label, null, null));
+					result.add(new StyledCompletionProposal(value, styledString, documentOffset, 0, value.length()));
 				}
 			} else {
-				result.add(new CompletionProposal(value, documentOffset, 0, value.length(), null, label, null, null));
+				result.add(new StyledCompletionProposal(value, styledString, documentOffset, 0, value.length()));
 			}
 		}
 
@@ -166,11 +185,11 @@ public class SwaggerProposalProvider {
 
 				if (!data.has(key)) {			
 					JsonNode value = definition.get("properties").get(key);
-					String label = key + " - " + schema.getType(value).getValue();
 
 					JsonNode keyNode = mapper.createObjectNode()
 							.put("value", key + ":")
-							.put("label", label);
+							.put("label", key)
+							.put("type", schema.getType(value).getValue());
 
 					proposals.add(keyNode);
 				}
@@ -185,10 +204,10 @@ public class SwaggerProposalProvider {
 					key = key.substring(1);
 				}
 
-				String label = key + " - " + schema.getType(value).getValue();
 				JsonNode keyNode = mapper.createObjectNode()
 						.put("value", key + ":")
-						.put("label", label);
+						.put("label", key)
+						.put("type", schema.getType(value).getValue());
 
 				proposals.add(keyNode);
 			}
@@ -202,5 +221,4 @@ public class SwaggerProposalProvider {
 
 		return proposals;
 	}
-
 }

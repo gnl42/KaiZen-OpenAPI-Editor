@@ -3,9 +3,12 @@ package com.reprezen.swagedit.editor;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
+import java.util.Set;
 
 import org.dadacoalition.yedit.YEditLog;
+import org.dadacoalition.yedit.editor.IDocumentIdleListener;
 import org.dadacoalition.yedit.editor.YEdit;
+import org.dadacoalition.yedit.editor.YEditSourceViewerConfiguration;
 import org.eclipse.core.resources.IFile;
 import org.eclipse.core.resources.IMarker;
 import org.eclipse.core.resources.IResource;
@@ -18,7 +21,6 @@ import org.eclipse.jface.text.Position;
 import org.eclipse.jface.text.source.Annotation;
 import org.eclipse.jface.text.source.ISourceViewer;
 import org.eclipse.jface.text.source.IVerticalRuler;
-import org.eclipse.jface.text.source.SourceViewerConfiguration;
 import org.eclipse.jface.text.source.projection.ProjectionAnnotation;
 import org.eclipse.jface.text.source.projection.ProjectionAnnotationModel;
 import org.eclipse.jface.text.source.projection.ProjectionSupport;
@@ -70,14 +72,10 @@ public class SwaggerEditor extends YEdit {
 	}
 
 	@Override
-	protected void initializeEditor() {
-		super.initializeEditor();
-
-		SourceViewerConfiguration configuration = getSourceViewerConfiguration();
-
-		if (configuration instanceof SwaggerSourceViewerConfiguration) {
-			((SwaggerSourceViewerConfiguration) configuration).setEditor(this);
-		}
+	protected YEditSourceViewerConfiguration createSourceViewerConfiguration() {
+		final SwaggerSourceViewerConfiguration configuration = new SwaggerSourceViewerConfiguration();
+		configuration.setEditor(this);
+		return configuration;
 	}
 
 	@Override
@@ -86,12 +84,16 @@ public class SwaggerEditor extends YEdit {
 		
 		getDocumentProvider().getDocument(getEditorInput()).addDocumentListener(changeListener);
 	}
+	
+	public ProjectionViewer getProjectionViewer() {
+	    return (ProjectionViewer) getSourceViewer();
+	}
 
 	@Override
 	public void createPartControl(Composite parent) {
 		super.createPartControl(parent);
 
-		ProjectionViewer viewer = (ProjectionViewer) getSourceViewer();
+		ProjectionViewer viewer = getProjectionViewer();
 
 		projectionSupport = new ProjectionSupport(viewer, getAnnotationAccess(), getSharedColors());
 		projectionSupport.install();
@@ -170,7 +172,7 @@ public class SwaggerEditor extends YEdit {
 	}
 
 	protected void validateSwagger(IFile file, SwaggerDocument document) {
-		final List<SwaggerError> errors = validator.validate(document);
+		final Set<SwaggerError> errors = validator.validate(document);
 
 		for (SwaggerError error : errors) {
 			addMarker(error, file, document);
@@ -192,12 +194,6 @@ public class SwaggerEditor extends YEdit {
 		return marker;
 	}
 
-
-	@Override
-	protected void handleEditorInputChanged() {
-		super.handleEditorInputChanged();
-	}
-
 	public void redrawViewer() {
 		Display.getDefault().asyncExec(new Runnable() {
 			public void run() {
@@ -206,6 +202,11 @@ public class SwaggerEditor extends YEdit {
 				}
 			}
 		});
+	}
+	
+	@Override
+	public void addDocumentIdleListener(IDocumentIdleListener listener) {
+	    super.addDocumentIdleListener(listener);
 	}
 
 }

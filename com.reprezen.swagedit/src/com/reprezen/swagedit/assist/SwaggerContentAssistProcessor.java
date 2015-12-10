@@ -14,12 +14,20 @@ import org.eclipse.jface.text.contentassist.IContextInformationValidator;
 import org.eclipse.jface.text.templates.ContextTypeRegistry;
 import org.eclipse.jface.text.templates.Template;
 import org.eclipse.jface.text.templates.TemplateCompletionProcessor;
+import org.eclipse.jface.text.templates.TemplateContext;
 import org.eclipse.jface.text.templates.TemplateContextType;
 import org.eclipse.jface.text.templates.persistence.TemplateStore;
+import org.eclipse.jface.viewers.StyledString;
+import org.eclipse.jface.viewers.StyledString.Styler;
+import org.eclipse.swt.graphics.Color;
 import org.eclipse.swt.graphics.Image;
+import org.eclipse.swt.graphics.RGB;
+import org.eclipse.swt.graphics.TextStyle;
+import org.eclipse.swt.widgets.Display;
 
 import com.google.common.collect.Lists;
 import com.reprezen.swagedit.Activator;
+import com.reprezen.swagedit.Activator.Icons;
 import com.reprezen.swagedit.editor.SwaggerDocument;
 import com.reprezen.swagedit.templates.SwaggerContextType;
 
@@ -36,6 +44,10 @@ public class SwaggerContentAssistProcessor extends TemplateCompletionProcessor i
 
 	@Override
 	public ICompletionProposal[] computeCompletionProposals(ITextViewer viewer, int documentOffset) {
+		if (!(viewer.getDocument() instanceof SwaggerDocument)) {
+			return super.computeCompletionProposals(viewer, documentOffset);
+		}
+
 		final SwaggerDocument document = (SwaggerDocument) viewer.getDocument();
 		final ITextSelection selection = (ITextSelection) viewer.getSelectionProvider().getSelection();
 		int line = 0, lineOffset = 0, column = 0;
@@ -103,6 +115,11 @@ public class SwaggerContentAssistProcessor extends TemplateCompletionProcessor i
 	}
 
 	@Override
+	protected ICompletionProposal createProposal(Template template, TemplateContext context, IRegion region, int relevance) {
+		return new StyledTemplateProposal(template, context, region, getImage(template), getTemplateLabel(template), relevance);
+	}
+
+	@Override
 	protected Template[] getTemplates(String contextTypeId) {
 		return geTemplateStore().getTemplates();
 	}
@@ -114,7 +131,7 @@ public class SwaggerContentAssistProcessor extends TemplateCompletionProcessor i
 
 	@Override
 	protected Image getImage(Template template) {
-		return null;
+		return Activator.getDefault().getImage(Icons.template_item);
 	}
 
 	protected TemplateStore geTemplateStore() {
@@ -124,4 +141,24 @@ public class SwaggerContentAssistProcessor extends TemplateCompletionProcessor i
 	protected ContextTypeRegistry getContextTypeRegistry() {
 		return Activator.getDefault().getContextTypeRegistry();
 	}
+
+	protected StyledString getTemplateLabel(Template template) {
+		Styler nameStyle = new StyledString.Styler() {
+			@Override
+			public void applyStyles(TextStyle textStyle) {
+				textStyle.foreground = new Color(Display.getCurrent(), new RGB(80, 80, 255));
+			}
+		};
+		Styler descriptionStyle = new StyledString.Styler() {
+			@Override
+			public void applyStyles(TextStyle textStyle) {
+				textStyle.foreground = new Color(Display.getCurrent(), new RGB(120, 120, 120));
+			}
+		};
+
+		return new StyledString(template.getName(), nameStyle)
+				.append(": ", descriptionStyle)
+				.append(template.getDescription(), descriptionStyle);
+	}
+
 }
