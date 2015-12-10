@@ -3,7 +3,8 @@ package com.reprezen.swagedit.validation;
 import java.util.Objects;
 
 import org.eclipse.core.resources.IMarker;
-import org.yaml.snakeyaml.parser.ParserException;
+import org.yaml.snakeyaml.error.MarkedYAMLException;
+import org.yaml.snakeyaml.error.YAMLException;
 
 import com.fasterxml.jackson.databind.JsonMappingException;
 import com.fasterxml.jackson.databind.JsonNode;
@@ -40,8 +41,14 @@ public class SwaggerError {
 		return new SwaggerError(getLevel(error), rewriteError(error), line);
 	}
 
-	public static SwaggerError create(ParserException e) {
-		return new SwaggerError(IMarker.SEVERITY_ERROR, e.getMessage(), e.getProblemMark().getLine() + 1);
+	public static SwaggerError create(YAMLException error) {
+		if (error instanceof MarkedYAMLException) {
+			return new SwaggerError(IMarker.SEVERITY_ERROR, 
+					error.getMessage(),
+					((MarkedYAMLException) error).getProblemMark().getLine() + 1);
+		} else {
+			return new SwaggerError(IMarker.SEVERITY_ERROR, error.getMessage(), 1);
+		}
 	}
 
 	public static SwaggerError create(com.fasterxml.jackson.dataformat.yaml.snakeyaml.parser.ParserException e) {

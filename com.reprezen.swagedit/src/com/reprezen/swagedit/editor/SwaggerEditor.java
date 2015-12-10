@@ -11,9 +11,12 @@ import org.dadacoalition.yedit.editor.YEdit;
 import org.dadacoalition.yedit.editor.YEditSourceViewerConfiguration;
 import org.eclipse.core.resources.IFile;
 import org.eclipse.core.resources.IMarker;
+import org.eclipse.core.resources.IResource;
 import org.eclipse.core.runtime.CoreException;
 import org.eclipse.core.runtime.IProgressMonitor;
+import org.eclipse.jface.text.DocumentEvent;
 import org.eclipse.jface.text.IDocument;
+import org.eclipse.jface.text.IDocumentListener;
 import org.eclipse.jface.text.Position;
 import org.eclipse.jface.text.source.Annotation;
 import org.eclipse.jface.text.source.ISourceViewer;
@@ -24,7 +27,9 @@ import org.eclipse.jface.text.source.projection.ProjectionSupport;
 import org.eclipse.jface.text.source.projection.ProjectionViewer;
 import org.eclipse.swt.widgets.Composite;
 import org.eclipse.swt.widgets.Display;
+import org.eclipse.ui.IEditorInput;
 import org.eclipse.ui.IFileEditorInput;
+import org.yaml.snakeyaml.error.YAMLException;
 
 import com.reprezen.swagedit.validation.SwaggerError;
 import com.reprezen.swagedit.validation.Validator;
@@ -42,6 +47,25 @@ public class SwaggerEditor extends YEdit {
 	private Annotation[] oldAnnotations;
 	private ProjectionAnnotationModel annotationModel;
 
+	private final IDocumentListener changeListener = new IDocumentListener() {
+		@Override
+		public void documentAboutToBeChanged(DocumentEvent event) {}
+		@Override
+		public void documentChanged(DocumentEvent event) {
+			if (event.getDocument() instanceof SwaggerDocument) {
+				final SwaggerDocument document = (SwaggerDocument) event.getDocument();
+
+				Display.getCurrent().asyncExec(new Runnable() {
+					@Override
+					public void run() {
+						document.onChange();
+						validate();
+					}
+				});
+			}
+		}
+	};
+
 	public SwaggerEditor() {
 		super();
 		setDocumentProvider(new SwaggerDocumentProvider());
@@ -52,6 +76,13 @@ public class SwaggerEditor extends YEdit {
 		final SwaggerSourceViewerConfiguration configuration = new SwaggerSourceViewerConfiguration();
 		configuration.setEditor(this);
 		return configuration;
+	}
+
+	@Override
+	protected void doSetInput(IEditorInput input) throws CoreException {
+		super.doSetInput(input);
+		
+		getDocumentProvider().getDocument(getEditorInput()).addDocumentListener(changeListener);
 	}
 	
 	public ProjectionViewer getProjectionViewer() {
@@ -94,34 +125,71 @@ public class SwaggerEditor extends YEdit {
 	@Override
 	public void doSave(IProgressMonitor monitor) {
 		super.doSave(monitor);
-		checkErrors();
+		validate();
 	}
 
 	@Override
 	public void doSaveAs() {
 		super.doSaveAs();
-		checkErrors();
+		validate();
 	}
 
-	protected void checkErrors() {
-		final IFile file = ((IFileEditorInput) getEditorInput()).getFile();
-		final IDocument document = getDocumentProvider().getDocument(getEditorInput());
-		final Set<SwaggerError> errors = validator.validate((SwaggerDocument) document);
+	protected void validate() {
+		IEditorInput editorInput = getEditorInput();
+		IDocument document = getDocumentProvider().getDocument(getEditorInput());
 
-		for (SwaggerError error : errors) {
-			try {
-				addMarker(error, file, document);
-			} catch (CoreException e) {
-				YEditLog.logException(e);
-			}
+		// if the file is not part of a workspace it does not seems that it is a
+		// IFileEditorInput
+		// but instead a FileStoreEditorInput. Unclear if markers are valid for
+		// such files.
+		if (!(editorInput instanceof IFileEditorInput)) {
+			YEditLog.logError("Marking errors not supported for files outside of a project.");
+			YEditLog.logger.info("editorInput is not a part of a project.");
+			return;
+		}
+		if (document instanceof SwaggerDocument) {
+			IFile file = ((IFileEditorInput) editorInput).getFile();
+			clearMarkers(file);
+			validateYaml(file, (SwaggerDocument) document);
+			validateSwagger(file, (SwaggerDocument) document);
 		}
 	}
 
-	private IMarker addMarker(SwaggerError error, IFile target, IDocument document) throws CoreException {
-		final IMarker marker = target.createMarker(IMarker.PROBLEM);
-		marker.setAttribute(IMarker.SEVERITY, error.getLevel());
-		marker.setAttribute(IMarker.MESSAGE, error.getMessage());
-		marker.setAttribute(IMarker.LINE_NUMBER, error.getLine());
+	protected void clearMarkers(IFile file) {
+		int depth = IResource.DEPTH_INFINITE;
+		try {
+			file.deleteMarkers(IMarker.PROBLEM, true, depth);
+		} catch (CoreException e) {
+			YEditLog.logException(e);
+			YEditLog.logger.warning("Failed to delete markers:\n" + e.toString());
+		}
+	}
+
+	protected void validateYaml(IFile file, SwaggerDocument document) {
+		if (document.getYamlError() instanceof YAMLException) {
+			addMarker(SwaggerError.create((YAMLException) document.getYamlError()), file, document);
+		}
+	}
+
+	protected void validateSwagger(IFile file, SwaggerDocument document) {
+		final Set<SwaggerError> errors = validator.validate(document);
+
+		for (SwaggerError error : errors) {
+			addMarker(error, file, document);
+		}
+	}
+
+	private IMarker addMarker(SwaggerError error, IFile target, IDocument document) {
+		IMarker marker = null;
+		try {
+			marker = target.createMarker(IMarker.PROBLEM);
+			marker.setAttribute(IMarker.SEVERITY, error.getLevel());
+			marker.setAttribute(IMarker.MESSAGE, error.getMessage());
+			marker.setAttribute(IMarker.LINE_NUMBER, error.getLine());
+		} catch (CoreException e) {
+			YEditLog.logException(e);
+			YEditLog.logger.warning("Failed to create marker for syntax error: \n" + e.toString());
+		}
 
 		return marker;
 	}
