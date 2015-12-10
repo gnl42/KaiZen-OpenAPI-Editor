@@ -7,6 +7,7 @@ import io.swagger.util.Yaml
 import org.junit.Test
 
 import static org.junit.Assert.*
+import static org.hamcrest.core.IsCollectionContaining.*;
 
 class SwaggerProposalProviderTest {
 
@@ -23,8 +24,9 @@ class SwaggerProposalProviderTest {
 		val proposals = provider.createProposals(data, definition)
 		// should contain all required and non properties
 		// should exclude already properties that are already present
-		assertEquals(15, proposals.size)
-		assertArrayEquals(#[ 
+
+		assertEquals(15, proposals.map[ it.get("value").asText ].size) 
+		assertThat(proposals.map[ it.get("value").asText ], hasItems(
 			"info:",
 			"host:", 
 			"basePath:",		
@@ -40,7 +42,7 @@ class SwaggerProposalProviderTest {
 			"tags:",
 			"externalDocs:",
 			"x-:"
-		], proposals.map[ it.get("value").asText ])
+		))
 	}
 
 	@Test
@@ -57,8 +59,7 @@ class SwaggerProposalProviderTest {
 		val definition = schema.asJson.get("properties").get("swagger")		
 		val proposals = provider.createProposals(mapper.createObjectNode, definition)
 
-		assertArrayEquals(#["\"2.0\""], 
-			proposals.map(it | it.get("value").asText))
+		assertThat(proposals.map[ it.get("value").asText ], hasItems("\"2.0\"")) 
 	}
 
 	@Test
@@ -72,15 +73,14 @@ class SwaggerProposalProviderTest {
 		val node = Yaml.mapper.readTree(yaml)
 		val proposals = provider.createProposals(node, schema.asJson.get("definitions").get("info"))
 
-		assertArrayEquals(#[ 
+		assertThat(proposals.map[ it.get("value").asText ], hasItems(
 			"title:",
 			"version:", 
 			"description:",		
 			"termsOfService:",
 			"contact:",
 			"license:",
-			"x-:"
-		], proposals.map[ it.get("value").asText ])
+			"x-:"))
 	}
 
 	@Test
@@ -93,12 +93,10 @@ class SwaggerProposalProviderTest {
 
 		val node = Yaml.mapper.readTree(yaml)
 		val proposals = provider.createProposals(node, 
-			schema.getDefinitionForPath(":tags")
+			schema.getDefinitions(":tags")
 		)
 
-		assertArrayEquals(#[ 
-			"-"
-		], proposals.map[ it.get("value").asText ])
+		assertThat(proposals.map[ it.get("value").asText ], hasItems("-"))
 	}
 
 	@Test
@@ -109,13 +107,10 @@ class SwaggerProposalProviderTest {
 		
 		val node = Yaml.mapper.readTree(yaml)
 		val proposals = provider.createProposals(node, 
-			schema.getDefinitionForPath(":paths")
+			schema.getDefinitions(":paths")
 		)
 
-		assertArrayEquals(#[ 
-			"x-:",
-			"/:"
-		], proposals.map[ it.get("value").asText ])
+		assertThat(proposals.map[ it.get("value").asText ], hasItems("x-:", "/:"))
 	}
 	
 	@Test
@@ -128,11 +123,11 @@ class SwaggerProposalProviderTest {
 
 		val node = Yaml.mapper.readTree(yaml)
 		val proposals = provider.createProposals(node, 
-			schema.getDefinitionForPath(":paths:/:get")
+			schema.getDefinitions(":paths:/:get")
 		)
 
-		assertArrayEquals(#[ 
-			"tags:",		
+		assertThat(proposals.map[ it.get("value").asText ], hasItems(
+			"tags:",
 			"summary:",
 			"description:",
 			"externalDocs:",
@@ -144,8 +139,7 @@ class SwaggerProposalProviderTest {
 			"schemes:",
 			"deprecated:",
 			"security:",
-			"x-:"
-		], proposals.map[ it.get("value").asText ])
+			"x-:"))
 	}
 
 	@Test
@@ -154,14 +148,13 @@ class SwaggerProposalProviderTest {
 				schema.asJson.get("definitions").get("responseValue")
 		)
 
-		assertArrayEquals(#[ 
-			"description:",		
+		assertThat(proposals.map[ it.get("value").asText ], hasItems(		
+			"description:",
 			"schema:",
 			"headers:",
 			"examples:",
 			"x-:",
-			"$ref:"
-		], proposals.map[ it.get("value").asText ])
+			"$ref:"))
 	}
 	
 }

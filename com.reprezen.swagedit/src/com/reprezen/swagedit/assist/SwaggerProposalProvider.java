@@ -2,6 +2,7 @@ package com.reprezen.swagedit.assist;
 
 import java.util.ArrayList;
 import java.util.Collections;
+import java.util.HashSet;
 import java.util.Iterator;
 import java.util.LinkedHashSet;
 import java.util.List;
@@ -47,8 +48,8 @@ public class SwaggerProposalProvider {
 	 * @return list of completion proposals
 	 */
 	public List<? extends ICompletionProposal> getCompletionProposals(String path, JsonNode data, String prefix,int documentOffset) {
-		final JsonNode definition = schema.getDefinitionForPath(path);
-		final Set<JsonNode> proposals = createProposals(data, definition);
+		final Set<JsonNode> definitions = schema.getDefinitions(path);
+		final Set<JsonNode> proposals = createProposals(data, definitions);
 		final List<ICompletionProposal> result = new ArrayList<>();
 
 		prefix = Strings.emptyToNull(prefix);
@@ -116,6 +117,25 @@ public class SwaggerProposalProvider {
 		}
 	}
 
+	/**
+	 * Returns a list of proposals for the given data and set of schema definition.
+	 * 
+	 * @param data
+	 * @param definitions
+	 * @return proposals
+	 */
+	public Set<JsonNode> createProposals(JsonNode data, Set<JsonNode> definitions) {
+		Set<JsonNode> proposals = new HashSet<>();
+		for (JsonNode definition: definitions) {
+			Set<JsonNode> pp = createProposals(data, definition);
+			if (!pp.isEmpty()) {
+				proposals.addAll(pp);
+			}
+		}
+
+		return proposals;
+	}
+
 	private Set<JsonNode> createArrayProposal(JsonNode data, JsonNode definition) {
 		final Set<JsonNode> proposals = new LinkedHashSet<>();
 		proposals.add(mapper.createObjectNode()
@@ -147,8 +167,15 @@ public class SwaggerProposalProvider {
 		final Set<JsonNode> proposals = new LinkedHashSet<>();
 
 		for (JsonNode literal : definition.get("enum")) {
+			String value;
+			if (literal.isBoolean()) {
+				value = literal.asText();
+			} else {
+				value = "\"" + literal.asText() + "\"";
+			}
+
 			proposals.add(mapper.createObjectNode()
-					.put("value", "\"" + literal.asText() + "\"")
+					.put("value", value)
 					.put("label", literal.asText()));
 		}
 
