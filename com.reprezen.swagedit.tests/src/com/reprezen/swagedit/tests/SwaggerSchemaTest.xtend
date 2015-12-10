@@ -12,14 +12,14 @@ class SwaggerSchemaTest {
 
 	@Test
 	def void testTraverse_WithPath_root() {
-		val result = schema.getDefinitionForPath("")
+		val result = schema.getDefinitions("")
 
 		assertThat(result, hasItems(schema.asJson))
 	}
 
 	@Test
 	def void testTraverse_With_Path_swagger() {
-		val result = schema.getDefinitionForPath("swagger")
+		val result = schema.getDefinitions("swagger")
 
 		assertThat(result, hasItems(
 			schema.asJson.get("properties").get("swagger")))
@@ -27,7 +27,7 @@ class SwaggerSchemaTest {
 
 	@Test
 	def void testTraverse_WithPath_info() {
-		val result = schema.getDefinitionForPath("info")
+		val result = schema.getDefinitions("info")
 
 		assertThat(result, hasItems(
 			schema.asJson.get("definitions").get("info")))
@@ -35,7 +35,7 @@ class SwaggerSchemaTest {
 
 	@Test
 	def void testTraverse_WithPath_paths() {
-		val result = schema.getDefinitionForPath("paths")
+		val result = schema.getDefinitions("paths")
 
 		assertThat(result, hasItems(
 			schema.asJson.get("definitions").get("paths"))
@@ -44,7 +44,7 @@ class SwaggerSchemaTest {
 
 	@Test
 	def void testTraverse_WithPath_paths_slash() {
-		val result = schema.getDefinitionForPath("paths:/")
+		val result = schema.getDefinitions("paths:/")
 
 		assertThat(result, hasItems(
 			schema.asJson.get("definitions").get("pathItem")
@@ -53,7 +53,7 @@ class SwaggerSchemaTest {
 
 	@Test
 	def void testTraverse_With_responseValue() {
-		val result = schema.getDefinitionForPath("paths:/:get:responses:200")
+		val result = schema.getDefinitions("paths:/:get:responses:200")
 
 		assertThat(result, hasItems(
 				schema.asJson.get("definitions").get("responseValue")))
@@ -61,7 +61,7 @@ class SwaggerSchemaTest {
 
 	@Test
 	def void testTraverse_With_parameter_in() {
-		val result = schema.getDefinitionForPath("paths:/:get:parameters:@1:in")
+		val result = schema.getDefinitions("paths:/:get:parameters:@1:in")
 
 		assertThat(result, hasItems(
 				schema.asJson.get("definitions").get("bodyParameter").get("properties").get("in"),
@@ -69,6 +69,15 @@ class SwaggerSchemaTest {
 				schema.asJson.get("definitions").get("formDataParameterSubSchema").get("properties").get("in"),
 				schema.asJson.get("definitions").get("queryParameterSubSchema").get("properties").get("in"),
 				schema.asJson.get("definitions").get("pathParameterSubSchema").get("properties").get("in")))
+	}
+
+	@Test
+	def void testTraverse_With_parameter_required() {
+		val result = schema.getDefinitions("paths:/:get:parameters:@1:required")
+
+		assertThat(result, hasItems(
+				schema.asJson.get("definitions").get("bodyParameter").get("properties").get("required"),
+				schema.asJson.get("definitions").get("pathParameterSubSchema").get("properties").get("required")))
 	}
 
 }

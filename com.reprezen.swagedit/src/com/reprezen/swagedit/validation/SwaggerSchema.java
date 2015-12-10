@@ -102,63 +102,90 @@ public class SwaggerSchema {
 	 * @param path
 	 * @return set of definitions for the path
 	 */
-	public Set<JsonNode> getDefinitionForPath(String path) {
+	public Set<JsonNode> getDefinitions(String path) {
 		if (path.startsWith(":")) {
 			path = path.substring(1);
 		}
 
-		final String[] paths = path.split(":");
+		final String[] segments = path.split(":");
 		Set<JsonNode> definitions = Collections.emptySet();
 		Set<JsonNode> toTraverse = Collections.singleton(asJson());
 
-		for (String currentPath: paths) {
+		// we iterate over all segments that form the path, 
+		// each segment is use to traverse the schema, until
+		// we find the definitions that correspond to the latest segment
+		for (String segment: segments) {
+			// we reset the definitions we found until now
+			// only the latest are of interest.
 			definitions = new HashSet<>();
 			for (JsonNode traverse: toTraverse) {
-				definitions.addAll( traverse(traverse, currentPath) );
+				definitions.addAll( traverse(traverse, segment) );
 			}
-
+			// we keep the definitions we will 
+			// need to process in the next iteration
 			toTraverse = definitions;
 		}
 
 		return definitions;
 	}
 
-	private Set<JsonNode> traverse(JsonNode current, String path) {
+	/*
+	 * This method takes for parameter the current JSON object, and the segment of 
+	 * a path that should be use to traverse the current JSON object.
+	 * 
+	 * Returns the set of nodes that matches the current segment, after applying 
+	 * the segment to the current node.
+	 */
+	private Set<JsonNode> traverse(JsonNode current, String segment) {
 		final Set<JsonNode> definitions = new HashSet<>();
 
+		// make sure the current node is not a ref.
 		current = JsonUtil.getRef(asJson(), current);
 
-		if (path.isEmpty()) {
+		if (segment.isEmpty()) {
 			return Collections.singleton(current);
 		}
 
-		if (isArray(path, current)) {
+		// if it's an array, collect definitions 
+		// from the property items.
+		if (isArray(current, segment)) {
 			definitions.add( JsonUtil.getRef(asJson(), current.get("items")) );
 		}
 
-		if (current.has("properties") && current.get("properties").has(path)) {
-			definitions.add( JsonUtil.getRef(asJson(), current.get("properties").get(path)) );
+		// if the node has properties, lookup for properties that
+		// matches the segment
+		if (current.has("properties") && current.get("properties").has(segment)) {
+			definitions.add( JsonUtil.getRef(asJson(), current.get("properties").get(segment)) );
 		}
 
+		// if nothing found yet, collect pattern properties 
+		// that match with the segment
 		if (definitions.isEmpty() && current.has("patternProperties")) {
-			definitions.addAll( traversePatternProperties(current, path) );
+			definitions.addAll( traversePatternProperties(current, segment) );
 		}
 
+		// same with additional properties
 		if (definitions.isEmpty() && current.has("additionalProperties")) {
-			definitions.addAll( traverseAdditionalProperties(current, path) );
+			definitions.addAll( traverseAdditionalProperties(current, segment) );
 		}
 
+		// finally if the node is of type oneOf, traverse and collect
+		// all definitions from the oneOf
 		if (definitions.isEmpty() && current.has("oneOf")) {
-			definitions.addAll( traverseOneOf(current, path) );
+			definitions.addAll( traverseOneOf(current, segment) );
 		}
-		
+
 		return definitions;
 	}
 
-	private boolean isArray(String path, JsonNode current) {
-		return path.startsWith("@") && JsonType.ARRAY == getType(current);
+	/*
+	 * Returns true if the segment matches a position in an array and 
+	 * the current node is itself an array.
+	 */
+	private boolean isArray(JsonNode current, String segment) {
+		return segment.startsWith("@") && JsonType.ARRAY == getType(current);
 	}
-	
+
 	private Set<JsonNode> traversePatternProperties(JsonNode current, String path) {
 		final Set<JsonNode> definitions = new HashSet<>();
 		final JsonNode properties = current.get("patternProperties");

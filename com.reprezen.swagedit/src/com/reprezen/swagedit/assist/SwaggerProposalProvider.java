@@ -48,7 +48,7 @@ public class SwaggerProposalProvider {
 	 * @return list of completion proposals
 	 */
 	public List<? extends ICompletionProposal> getCompletionProposals(String path, JsonNode data, String prefix,int documentOffset) {
-		final Set<JsonNode> definitions = schema.getDefinitionForPath(path);
+		final Set<JsonNode> definitions = schema.getDefinitions(path);
 		final Set<JsonNode> proposals = createProposals(data, definitions);
 		final List<ICompletionProposal> result = new ArrayList<>();
 
@@ -167,8 +167,15 @@ public class SwaggerProposalProvider {
 		final Set<JsonNode> proposals = new LinkedHashSet<>();
 
 		for (JsonNode literal : definition.get("enum")) {
+			String value;
+			if (literal.isBoolean()) {
+				value = literal.asText();
+			} else {
+				value = "\"" + literal.asText() + "\"";
+			}
+
 			proposals.add(mapper.createObjectNode()
-					.put("value", "\"" + literal.asText() + "\"")
+					.put("value", value)
 					.put("label", literal.asText()));
 		}
 

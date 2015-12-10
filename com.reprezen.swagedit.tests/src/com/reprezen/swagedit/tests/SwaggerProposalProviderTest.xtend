@@ -93,7 +93,7 @@ class SwaggerProposalProviderTest {
 
 		val node = Yaml.mapper.readTree(yaml)
 		val proposals = provider.createProposals(node, 
-			schema.getDefinitionForPath(":tags")
+			schema.getDefinitions(":tags")
 		)
 
 		assertThat(proposals.map[ it.get("value").asText ], hasItems("-"))
@@ -107,7 +107,7 @@ class SwaggerProposalProviderTest {
 		
 		val node = Yaml.mapper.readTree(yaml)
 		val proposals = provider.createProposals(node, 
-			schema.getDefinitionForPath(":paths")
+			schema.getDefinitions(":paths")
 		)
 
 		assertThat(proposals.map[ it.get("value").asText ], hasItems("x-:", "/:"))
@@ -123,7 +123,7 @@ class SwaggerProposalProviderTest {
 
 		val node = Yaml.mapper.readTree(yaml)
 		val proposals = provider.createProposals(node, 
-			schema.getDefinitionForPath(":paths:/:get")
+			schema.getDefinitions(":paths:/:get")
 		)
 
 		assertThat(proposals.map[ it.get("value").asText ], hasItems(
