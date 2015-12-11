@@ -6,8 +6,6 @@ import java.util.Iterator;
 
 import org.eclipse.jface.text.BadLocationException;
 import org.eclipse.jface.text.Document;
-import org.eclipse.jface.text.DocumentEvent;
-import org.eclipse.jface.text.IDocumentListener;
 import org.yaml.snakeyaml.Yaml;
 import org.yaml.snakeyaml.nodes.MappingNode;
 import org.yaml.snakeyaml.nodes.Node;
@@ -31,26 +29,12 @@ public class SwaggerDocument extends Document {
 
 	private JsonNode jsonContent;
 	private Node yamlContent;
+	private Exception yamlError;
 
-	public SwaggerDocument() {
-		addDocumentListener(new IDocumentListener() {
-			@Override
-			public void documentChanged(DocumentEvent event) {
-				final String content = SwaggerDocument.this.get();
+	public SwaggerDocument() {}
 
-				try {
-					yamlContent = yaml.compose(new StringReader(content));
-				} catch (Exception e) {}
-
-				try {
-					jsonContent = mapper.readTree(content);
-				} catch (Exception e) {}
-
-			}
-
-			@Override
-			public void documentAboutToBeChanged(DocumentEvent event) {}
-		});
+	public Exception getYamlError() {
+		return yamlError;
 	}
 
 	/**
@@ -276,6 +260,23 @@ public class SwaggerDocument extends Document {
 			return ((ScalarNode) node).getValue();
 		default:
 			return "";
+		}
+	}
+
+	public void onChange() {
+		final String content = get();
+
+		try {
+			yamlContent = yaml.compose(new StringReader(content));
+
+			try {
+				jsonContent = mapper.readTree(content);
+			} catch (Exception e) {}
+
+			yamlError = null;
+
+		} catch (Exception e) {
+			yamlError = e;
 		}
 	}
 
