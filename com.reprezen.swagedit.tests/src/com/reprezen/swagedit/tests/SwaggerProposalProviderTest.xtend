@@ -2,22 +2,25 @@ package com.reprezen.swagedit.tests
 
 import com.fasterxml.jackson.databind.ObjectMapper
 import com.reprezen.swagedit.assist.SwaggerProposalProvider
-import com.reprezen.swagedit.validation.SwaggerSchema
+import com.reprezen.swagedit.json.JsonSchemaManager
+import com.reprezen.swagedit.json.SchemaDefinition
 import io.swagger.util.Yaml
 import org.junit.Test
 
+import static org.hamcrest.core.IsCollectionContaining.*
 import static org.junit.Assert.*
-import static org.hamcrest.core.IsCollectionContaining.*;
+import com.reprezen.swagedit.json.SchemaDefinitionProvider
 
 class SwaggerProposalProviderTest {
 
 	val mapper = new ObjectMapper
-	val schema = new SwaggerSchema
+	val schema = new JsonSchemaManager().getSchema("swagger").asJson
+	val definitionProvider = new SchemaDefinitionProvider
 	val provider = new SwaggerProposalProvider
 
 	@Test
 	def void testProviderProposalForRootDefinition() {
-		val definition = schema.asJson
+		val definition = new SchemaDefinition(schema, schema)
 		val data = mapper.createObjectNode
 				.set("swagger", null)
 
@@ -47,7 +50,9 @@ class SwaggerProposalProviderTest {
 
 	@Test
 	def void testGetProposalForArrayDefinition() {
-		val definition = schema.asJson.get("properties").get("tags")		
+		val definition = new SchemaDefinition(
+			schema,
+			schema.get("properties").get("tags"))
 		val proposals = provider.createProposals(mapper.createObjectNode, definition)
 
 		assertNotNull(proposals)
@@ -56,7 +61,10 @@ class SwaggerProposalProviderTest {
 
 	@Test
 	def void testGetProposalForEnumDefinition() {
-		val definition = schema.asJson.get("properties").get("swagger")		
+		val definition = new SchemaDefinition(
+			schema,
+			schema.get("properties").get("swagger")
+		)
 		val proposals = provider.createProposals(mapper.createObjectNode, definition)
 
 		assertThat(proposals.map[ it.get("value").asText ], hasItems("\"2.0\"")) 
@@ -71,7 +79,11 @@ class SwaggerProposalProviderTest {
 		'''
 
 		val node = Yaml.mapper.readTree(yaml)
-		val proposals = provider.createProposals(node, schema.asJson.get("definitions").get("info"))
+		val definition = new SchemaDefinition(
+			schema,
+			schema.get("definitions").get("info")
+		)
+		val proposals = provider.createProposals(node, definition)
 
 		assertThat(proposals.map[ it.get("value").asText ], hasItems(
 			"title:",
@@ -92,9 +104,7 @@ class SwaggerProposalProviderTest {
 		'''
 
 		val node = Yaml.mapper.readTree(yaml)
-		val proposals = provider.createProposals(node, 
-			schema.getDefinitions(":tags")
-		)
+		val proposals = provider.createProposals(node, definitionProvider.getDefinitions(":tags"))
 
 		assertThat(proposals.map[ it.get("value").asText ], hasItems("-"))
 	}
@@ -107,7 +117,7 @@ class SwaggerProposalProviderTest {
 		
 		val node = Yaml.mapper.readTree(yaml)
 		val proposals = provider.createProposals(node, 
-			schema.getDefinitions(":paths")
+			definitionProvider.getDefinitions(":paths")
 		)
 
 		assertThat(proposals.map[ it.get("value").asText ], hasItems("x-:", "/:"))
@@ -123,7 +133,7 @@ class SwaggerProposalProviderTest {
 
 		val node = Yaml.mapper.readTree(yaml)
 		val proposals = provider.createProposals(node, 
-			schema.getDefinitions(":paths:/:get")
+			definitionProvider.getDefinitions(":paths:/:get")
 		)
 
 		assertThat(proposals.map[ it.get("value").asText ], hasItems(
@@ -144,8 +154,11 @@ class SwaggerProposalProviderTest {
 
 	@Test
 	def void testGetOneOfProposals() {
-		val proposals = provider.createProposals(mapper.createObjectNode, 
-				schema.asJson.get("definitions").get("responseValue")
+		val proposals = provider.createProposals(mapper.createObjectNode,
+			new SchemaDefinition(
+				schema,
+				schema.get("definitions").get("responseValue")
+			)
 		)
 
 		assertThat(proposals.map[ it.get("value").asText ], hasItems(		
@@ -156,5 +169,16 @@ class SwaggerProposalProviderTest {
 			"x-:",
 			"$ref:"))
 	}
-	
+
+	@Test
+	def void testGetAnyOfProposals() {
+		val proposals = provider.createProposals(
+			mapper.createObjectNode, 
+			definitionProvider.getDefinitions(":definitions:foo:type")
+		)
+
+		println(proposals)
+		println(proposals.map[it.get("value")])	
+	}
+
 }

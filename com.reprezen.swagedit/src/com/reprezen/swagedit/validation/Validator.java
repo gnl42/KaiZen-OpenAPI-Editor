@@ -22,6 +22,7 @@ import com.github.fge.jsonschema.core.exceptions.ProcessingException;
 import com.github.fge.jsonschema.core.report.ProcessingMessage;
 import com.github.fge.jsonschema.core.report.ProcessingReport;
 import com.reprezen.swagedit.editor.SwaggerDocument;
+import com.reprezen.swagedit.json.JsonSchemaManager;
 
 /**
  * This class contains methods for validating a Swagger YAML document.
@@ -32,7 +33,7 @@ import com.reprezen.swagedit.editor.SwaggerDocument;
  */
 public class Validator {
 
-	private static final SwaggerSchema schema = new SwaggerSchema();
+	private static final JsonSchemaManager schemaManager = new JsonSchemaManager();
 
 	/**
 	 * Returns a list or errors if validation fails.
@@ -61,7 +62,7 @@ public class Validator {
 			ProcessingReport report = null;
 
 			try {
-				report = schema.getSchema().validate(jsonContent, true);
+				report = schemaManager.getSwaggerSchema().getSchema().validate(jsonContent, true);
 			} catch (ProcessingException e) {
 				final ProcessingMessage pm = e.getProcessingMessage();
 				final int line = getLine(pm.asJson(), yaml);
