@@ -1,83 +1,93 @@
 package com.reprezen.swagedit.tests
 
-import com.reprezen.swagedit.validation.SwaggerSchema
+import com.reprezen.swagedit.json.JsonSchemaManager
 import org.junit.Test
 
+import static org.hamcrest.core.IsCollectionContaining.*
 import static org.junit.Assert.*
-import static org.hamcrest.core.IsCollectionContaining.*;
+import com.reprezen.swagedit.json.SchemaDefinitionProvider
 
 class SwaggerSchemaTest {
 
-	val schema = new SwaggerSchema()
+	val schema = new JsonSchemaManager().getSchema("swagger").asJson
+	val provider = new SchemaDefinitionProvider
 
 	@Test
 	def void testTraverse_WithPath_root() {
-		val result = schema.getDefinitions("")
+		val result = provider.getDefinitions("")
 
-		assertThat(result, hasItems(schema.asJson))
+		assertThat(result.map[definition], hasItems(schema))
 	}
 
 	@Test
 	def void testTraverse_With_Path_swagger() {
-		val result = schema.getDefinitions("swagger")
+		val result = provider.getDefinitions("swagger")
 
-		assertThat(result, hasItems(
-			schema.asJson.get("properties").get("swagger")))
+		assertThat(result.map[definition], hasItems(
+			schema.get("properties").get("swagger")))
 	}
 
 	@Test
 	def void testTraverse_WithPath_info() {
-		val result = schema.getDefinitions("info")
+		val result = provider.getDefinitions("info")
 
-		assertThat(result, hasItems(
-			schema.asJson.get("definitions").get("info")))
+		assertThat(result.map[definition], hasItems(
+			schema.get("definitions").get("info")))
 	}
 
 	@Test
 	def void testTraverse_WithPath_paths() {
-		val result = schema.getDefinitions("paths")
+		val result = provider.getDefinitions("paths")
 
-		assertThat(result, hasItems(
-			schema.asJson.get("definitions").get("paths"))
+		assertThat(result.map[definition], hasItems(
+			schema.get("definitions").get("paths"))
 		)
 	}
 
 	@Test
 	def void testTraverse_WithPath_paths_slash() {
-		val result = schema.getDefinitions("paths:/")
+		val result = provider.getDefinitions("paths:/")
 
-		assertThat(result, hasItems(
-			schema.asJson.get("definitions").get("pathItem")
+		assertThat(result.map[definition], hasItems(
+			schema.get("definitions").get("pathItem")
 		))
 	}
 
 	@Test
 	def void testTraverse_With_responseValue() {
-		val result = schema.getDefinitions("paths:/:get:responses:200")
+		val result = provider.getDefinitions("paths:/:get:responses:200")
 
-		assertThat(result, hasItems(
-				schema.asJson.get("definitions").get("responseValue")))
+		assertThat(result.map[definition], hasItems(
+				schema.get("definitions").get("responseValue")))
 	}
 
 	@Test
 	def void testTraverse_With_parameter_in() {
-		val result = schema.getDefinitions("paths:/:get:parameters:@1:in")
+		val result = provider.getDefinitions("paths:/:get:parameters:@1:in")
 
-		assertThat(result, hasItems(
-				schema.asJson.get("definitions").get("bodyParameter").get("properties").get("in"),
-				schema.asJson.get("definitions").get("headerParameterSubSchema").get("properties").get("in"),
-				schema.asJson.get("definitions").get("formDataParameterSubSchema").get("properties").get("in"),
-				schema.asJson.get("definitions").get("queryParameterSubSchema").get("properties").get("in"),
-				schema.asJson.get("definitions").get("pathParameterSubSchema").get("properties").get("in")))
+		assertThat(result.map[definition], hasItems(
+				schema.get("definitions").get("bodyParameter").get("properties").get("in"),
+				schema.get("definitions").get("headerParameterSubSchema").get("properties").get("in"),
+				schema.get("definitions").get("formDataParameterSubSchema").get("properties").get("in"),
+				schema.get("definitions").get("queryParameterSubSchema").get("properties").get("in"),
+				schema.get("definitions").get("pathParameterSubSchema").get("properties").get("in")))
 	}
 
 	@Test
 	def void testTraverse_With_parameter_required() {
-		val result = schema.getDefinitions("paths:/:get:parameters:@1:required")
+		val result = provider.getDefinitions("paths:/:get:parameters:@1:required")
 
-		assertThat(result, hasItems(
-				schema.asJson.get("definitions").get("bodyParameter").get("properties").get("required"),
-				schema.asJson.get("definitions").get("pathParameterSubSchema").get("properties").get("required")))
+		assertThat(result.map[definition], hasItems(
+				schema.get("definitions").get("bodyParameter").get("properties").get("required"),
+				schema.get("definitions").get("pathParameterSubSchema").get("properties").get("required")))
+	}
+
+	@Test
+	def void testTraverse_external_refs() {
+		val walker = new SchemaDefinitionProvider
+		val result = walker.getDefinitions("definitions:foo:type")		
+		
+		println(result.map[definition])		
 	}
 
 }

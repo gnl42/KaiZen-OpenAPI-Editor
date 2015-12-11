@@ -71,11 +71,7 @@ public class SwaggerContentAssistProcessor extends TemplateCompletionProcessor i
 		final ICompletionProposal[] templateProposals = super.computeCompletionProposals(viewer, documentOffset);
 		final List<ICompletionProposal> proposals = new ArrayList<>();
 
-		proposals.addAll(proposalProvider.getCompletionProposals(
-				currentPath, 
-				document.getNodeForPath(currentPath), 
-				prefix, 
-				documentOffset));
+		proposals.addAll(proposalProvider.getCompletionProposals(currentPath, document, prefix, documentOffset));
 
 		if (templateProposals != null && templateProposals.length > 0) {
 			proposals.addAll(Lists.newArrayList(templateProposals));

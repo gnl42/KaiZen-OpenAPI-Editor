@@ -1,6 +1,7 @@
 package com.reprezen.swagedit.assist;
 
 import java.util.ArrayList;
+import java.util.Collection;
 import java.util.Collections;
 import java.util.HashSet;
 import java.util.Iterator;
@@ -20,7 +21,11 @@ import com.fasterxml.jackson.databind.JsonNode;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import com.google.common.base.Strings;
 import com.google.common.collect.Sets;
-import com.reprezen.swagedit.validation.SwaggerSchema;
+import com.reprezen.swagedit.editor.SwaggerDocument;
+import com.reprezen.swagedit.json.SchemaDefinitionProvider;
+import com.reprezen.swagedit.json.JsonType;
+import com.reprezen.swagedit.json.JsonUtil;
+import com.reprezen.swagedit.json.SchemaDefinition;
 
 /**
  * Provider of completion proposals.
@@ -28,7 +33,6 @@ import com.reprezen.swagedit.validation.SwaggerSchema;
 public class SwaggerProposalProvider {
 
 	private final ObjectMapper mapper = new ObjectMapper();
-	private final SwaggerSchema schema = new SwaggerSchema();
 
 	private final Styler typeStyler = new StyledString.Styler() {
 		@Override
@@ -47,8 +51,47 @@ public class SwaggerProposalProvider {
 	 * @param documentOffset
 	 * @return list of completion proposals
 	 */
+	public Collection<? extends ICompletionProposal> getCompletionProposals(String path, SwaggerDocument document, String prefix, int documentOffset) {
+		final List<ICompletionProposal> result = new ArrayList<>();
+		final Set<JsonNode> proposals;
+		final SchemaDefinitionProvider walker = new SchemaDefinitionProvider();
+
+		if (path.endsWith("$ref")) {
+			proposals = createReferenceProposals(document.asJson());
+		} else {
+			proposals = createProposals(document.getNodeForPath(path), walker.getDefinitions(path));
+		}
+
+		prefix = Strings.emptyToNull(prefix);
+
+		for (JsonNode proposal: proposals) {
+			String value = proposal.get("value").asText();
+			String label = proposal.get("label").asText();
+			String type = proposal.has("type") ? proposal.get("type").asText() : null;
+
+			StyledString styledString = new StyledString(label);
+			if (type != null) {
+				styledString
+				.append(": ", typeStyler)
+				.append(type, typeStyler);
+			}
+
+			if (prefix != null) {
+				if (value.startsWith(prefix)) {
+					value = value.substring(prefix.length(), value.length());
+					result.add(new StyledCompletionProposal(value, styledString, documentOffset, 0, value.length()));
+				}
+			} else {
+				result.add(new StyledCompletionProposal(value, styledString, documentOffset, 0, value.length()));
+			}
+		}
+
+		return result;
+	}
+
 	public List<? extends ICompletionProposal> getCompletionProposals(String path, JsonNode data, String prefix,int documentOffset) {
-		final Set<JsonNode> definitions = schema.getDefinitions(path);
+		final SchemaDefinitionProvider walker = new SchemaDefinitionProvider();
+		final Set<SchemaDefinition> definitions = walker.getDefinitions(path);
 		final Set<JsonNode> proposals = createProposals(data, definitions);
 		final List<ICompletionProposal> result = new ArrayList<>();
 
@@ -79,6 +122,26 @@ public class SwaggerProposalProvider {
 		return result;
 	}
 
+	public Set<JsonNode> createReferenceProposals(JsonNode document) {
+		final Set<JsonNode> proposals = new LinkedHashSet<>();
+
+		if (document.has("definitions")) {
+			JsonNode definitions = document.get("definitions");
+			
+			for (Iterator<String> it = definitions.fieldNames(); it.hasNext();) {
+				String key = it.next();
+				
+				proposals.add( mapper.createObjectNode()
+						.put("value", "\"#/definitions/" + key + "\"")
+						.put("label", key)
+						.put("type", "ref") );
+			}
+			
+		}
+
+		return proposals;
+	}
+
 	/**
 	 * Returns a list of proposals for the given data and schema definition.
 	 * 
@@ -94,12 +157,12 @@ public class SwaggerProposalProvider {
 	 * @param definition
 	 * @return proposal
 	 */
-	public Set<JsonNode> createProposals(JsonNode data, JsonNode definition) {
+	public Set<JsonNode> createProposals(JsonNode data, SchemaDefinition definition) {
 		if (definition == null) {
 			return Collections.emptySet();
 		}
 
-		switch (schema.getType(definition)) {
+		switch (definition.type) {
 		case OBJECT:
 			return createObjectProposal(data, definition);
 		case STRING:
@@ -112,6 +175,10 @@ public class SwaggerProposalProvider {
 			return createOneOfProposal(data, definition);
 		case ARRAY:
 			return createArrayProposal(data, definition);
+		case ANY_OF:
+			return createAnyOfProposal(data, definition);
+		case ALL_OF:
+			return createAllOfProposal(data, definition);
 		default:
 			return Sets.newHashSet();
 		}
@@ -124,9 +191,9 @@ public class SwaggerProposalProvider {
 	 * @param definitions
 	 * @return proposals
 	 */
-	public Set<JsonNode> createProposals(JsonNode data, Set<JsonNode> definitions) {
+	public Set<JsonNode> createProposals(JsonNode data, Set<SchemaDefinition> definitions) {
 		Set<JsonNode> proposals = new HashSet<>();
-		for (JsonNode definition: definitions) {
+		for (SchemaDefinition definition: definitions) {
 			Set<JsonNode> pp = createProposals(data, definition);
 			if (!pp.isEmpty()) {
 				proposals.addAll(pp);
@@ -136,7 +203,7 @@ public class SwaggerProposalProvider {
 		return proposals;
 	}
 
-	private Set<JsonNode> createArrayProposal(JsonNode data, JsonNode definition) {
+	private Set<JsonNode> createArrayProposal(JsonNode data, SchemaDefinition definition) {
 		final Set<JsonNode> proposals = new LinkedHashSet<>();
 		proposals.add(mapper.createObjectNode()
 				.put("value", "-")
@@ -145,28 +212,44 @@ public class SwaggerProposalProvider {
 		return proposals;
 	}
 
-	private Set<JsonNode> createOneOfProposal(JsonNode data, JsonNode definition) {
-		return collectOneOf(data, definition, new LinkedHashSet<JsonNode>());
+	private Set<JsonNode> createOneOfProposal(JsonNode data, SchemaDefinition definition) {
+		return collect(data, definition, new LinkedHashSet<JsonNode>());
+	}
+	
+	private Set<JsonNode> createAnyOfProposal(JsonNode data, SchemaDefinition definition) {
+		return collect(data, definition, new LinkedHashSet<JsonNode>());
+	}
+	
+	private Set<JsonNode> createAllOfProposal(JsonNode data, SchemaDefinition definition) {
+		return collect(data, definition, new LinkedHashSet<JsonNode>());
 	}
 
-	private Set<JsonNode> collectOneOf(JsonNode data, JsonNode oneOf, Set<JsonNode> acc) {
-		JsonType type = schema.getType(oneOf);
+	private Set<JsonNode> collect(JsonNode data, SchemaDefinition definition, Set<JsonNode> acc) {
+		final JsonType type = definition.type;
 
-		if (JsonType.ONE_OF == type) {
-			for (JsonNode one : oneOf.get(JsonType.ONE_OF.getValue())) {
-				acc.addAll(collectOneOf(data, JsonUtil.getRef(schema.asJson(), one), acc));
+		if (JsonType.ONE_OF == type || JsonType.ANY_OF == type) {
+			if (definition.definition.has(type.getValue())) {
+				final JsonNode all = definition.definition.get(type.getValue());
+
+				if (all.isObject()) {
+					acc.addAll(collect(data, JsonUtil.getReference(definition.schema, all), acc));
+				} else if (all.isArray()) {
+					for (JsonNode one: all) {
+						acc.addAll(collect(data, JsonUtil.getReference(definition.schema, one), acc));
+					}
+				}
 			}
 		} else {
-			acc.addAll(createProposals(data, JsonUtil.getRef(schema.asJson(), oneOf)));
+			acc.addAll(createProposals(data, JsonUtil.getReference(definition.schema, definition.definition)));
 		}
 
 		return acc;
 	}
 
-	private Set<JsonNode> createEnumProposal(JsonNode data, JsonNode definition) {
+	private Set<JsonNode> createEnumProposal(JsonNode data, SchemaDefinition definition) {
 		final Set<JsonNode> proposals = new LinkedHashSet<>();
 
-		for (JsonNode literal : definition.get("enum")) {
+		for (JsonNode literal : definition.definition.get("enum")) {
 			String value;
 			if (literal.isBoolean()) {
 				value = literal.asText();
@@ -182,7 +265,7 @@ public class SwaggerProposalProvider {
 		return proposals;
 	}
 
-	private Set<JsonNode> createStringProposal(JsonNode data, JsonNode definition) {
+	private Set<JsonNode> createStringProposal(JsonNode data, SchemaDefinition definition) {
 		Set<JsonNode> proposals = new LinkedHashSet<>();
 		proposals.add(mapper.createObjectNode()
 				.put("value", "\"\"")
@@ -191,7 +274,7 @@ public class SwaggerProposalProvider {
 		return proposals;
 	}
 
-	private Set<JsonNode> createBooleanProposal(JsonNode data, JsonNode definition) {
+	private Set<JsonNode> createBooleanProposal(JsonNode data, SchemaDefinition definition) {
 		Set<JsonNode> proposals = new LinkedHashSet<>();
 		proposals.add(mapper.createObjectNode()
 				.put("value", "true")
@@ -203,30 +286,30 @@ public class SwaggerProposalProvider {
 		return proposals;
 	}
 
-	private Set<JsonNode> createObjectProposal(JsonNode data, JsonNode definition) {
+	private Set<JsonNode> createObjectProposal(JsonNode data, SchemaDefinition definition) {
 		Set<JsonNode> proposals = new LinkedHashSet<>();
 
-		if (definition.has("properties")) {
-			for (Iterator<String> it = definition.get("properties").fieldNames(); it.hasNext();) {
+		if (definition.definition.has("properties")) {
+			for (Iterator<String> it = definition.definition.get("properties").fieldNames(); it.hasNext();) {
 				String key = it.next();
 
 				if (!data.has(key)) {			
-					JsonNode value = definition.get("properties").get(key);
+					JsonNode value = definition.definition.get("properties").get(key);
 
 					JsonNode keyNode = mapper.createObjectNode()
 							.put("value", key + ":")
 							.put("label", key)
-							.put("type", schema.getType(value).getValue());
+							.put("type", JsonType.valueOf(value).getValue());
 
 					proposals.add(keyNode);
 				}
 			}
 		}
 
-		if (definition.has("patternProperties")) {
-			for (Iterator<String> it = definition.get("patternProperties").fieldNames(); it.hasNext();) {
+		if (definition.definition.has("patternProperties")) {
+			for (Iterator<String> it = definition.definition.get("patternProperties").fieldNames(); it.hasNext();) {
 				String key = it.next();
-				JsonNode value = definition.get("patternProperties").get(key);
+				JsonNode value = definition.definition.get("patternProperties").get(key);
 				if (key.startsWith("^")) {
 					key = key.substring(1);
 				}
@@ -234,7 +317,7 @@ public class SwaggerProposalProvider {
 				JsonNode keyNode = mapper.createObjectNode()
 						.put("value", key + ":")
 						.put("label", key)
-						.put("type", schema.getType(value).getValue());
+						.put("type", JsonType.valueOf(value).getValue());
 
 				proposals.add(keyNode);
 			}
@@ -248,4 +331,5 @@ public class SwaggerProposalProvider {
 
 		return proposals;
 	}
+
 }
