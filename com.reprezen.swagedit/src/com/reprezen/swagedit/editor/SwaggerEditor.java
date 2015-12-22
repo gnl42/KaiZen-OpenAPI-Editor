@@ -25,6 +25,11 @@ import org.eclipse.jface.text.source.projection.ProjectionAnnotation;
 import org.eclipse.jface.text.source.projection.ProjectionAnnotationModel;
 import org.eclipse.jface.text.source.projection.ProjectionSupport;
 import org.eclipse.jface.text.source.projection.ProjectionViewer;
+import org.eclipse.swt.SWT;
+import org.eclipse.swt.custom.StackLayout;
+import org.eclipse.swt.layout.FillLayout;
+import org.eclipse.swt.layout.GridData;
+import org.eclipse.swt.layout.GridLayout;
 import org.eclipse.swt.widgets.Composite;
 import org.eclipse.swt.widgets.Display;
 import org.eclipse.ui.IEditorInput;
@@ -46,6 +51,7 @@ public class SwaggerEditor extends YEdit {
 	private ProjectionSupport projectionSupport;
 	private Annotation[] oldAnnotations;
 	private ProjectionAnnotationModel annotationModel;
+	private Composite topPanel;
 
 	private final IDocumentListener changeListener = new IDocumentListener() {
 		@Override
@@ -104,8 +110,50 @@ public class SwaggerEditor extends YEdit {
 		annotationModel = viewer.getProjectionAnnotationModel();
 	}
 
-	@Override
-	protected ISourceViewer createSourceViewer(Composite parent, IVerticalRuler ruler, int styles) {
+    @Override
+    protected ISourceViewer createSourceViewer(Composite parent, IVerticalRuler ruler, int styles) {
+        Composite composite = new Composite(parent, SWT.NONE);
+        GridLayout compositeLayout = new GridLayout(1, false);
+        compositeLayout.marginHeight = 0;
+        compositeLayout.marginWidth = 0;
+        compositeLayout.horizontalSpacing = 0;
+        compositeLayout.verticalSpacing = 0;
+        composite.setLayout(compositeLayout);
+
+        topPanel = new Composite(composite, SWT.NONE);
+        topPanel.setLayout(new StackLayout());
+        topPanel.setLayoutData(new GridData(SWT.FILL, SWT.TOP, true, false));
+
+        Composite editorComposite = new Composite(composite, SWT.NONE);
+        editorComposite.setLayoutData(new GridData(SWT.FILL, SWT.FILL, true, true));
+        FillLayout fillLayout = new FillLayout(SWT.VERTICAL);
+        fillLayout.marginHeight = 0;
+        fillLayout.marginWidth = 0;
+        fillLayout.spacing = 0;
+        editorComposite.setLayout(fillLayout);
+
+        ISourceViewer result = doCreateSourceViewer(editorComposite, ruler, styles);
+
+        return result;
+        
+    }
+    
+    /**
+     * SwaggerEditor provides additional hidden panel on top of the source viewer, where external integrations can put
+     * their UI.
+     * <p/>
+     * The panel is only a placeholder, that is:
+     * <ul>
+     * <li>it is not visible by default</li>
+     * <li>it has a {@link StackLayout} and expect single composite to be created per contribution</li>
+     * <li>if there are more than one contributors, it is their responsibility to manage {@link StackLayout#topControl}</li>
+     * </ul>
+     */
+    public Composite getTopPanel() {
+        return topPanel;
+    }
+
+	protected ISourceViewer doCreateSourceViewer(Composite parent, IVerticalRuler ruler, int styles) {
 		ISourceViewer viewer = new ProjectionViewer(parent, ruler, getOverviewRuler(), isOverviewRulerVisible(),
 				styles);
 		getSourceViewerDecorationSupport(viewer);
