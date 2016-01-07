@@ -20,8 +20,8 @@ public class SwagEditNewWizardPage extends WizardNewFileCreationPage {
 	 */
 	public SwagEditNewWizardPage(IStructuredSelection selection) {
 		super("SwagEditNewWizardPage", selection);
-		setTitle(Messages.swagger);
-		setDescription(Messages.wizard_description);
+		setTitle(Messages.swagedit_wizard_title);
+		setDescription(Messages.swagedit_wizard_description);
 		setImageDescriptor(Activator.imageDescriptorFromPlugin(Activator.PLUGIN_ID, "icons/swagger_64.jpg"));
 		setFileExtension(extension);
 	}
