@@ -52,19 +52,19 @@
       <page
             class="com.reprezen.swagedit.preferences.SwaggerPreferencePage"
             id="com.reprezen.swagedit.preferences"
-            name="%page.name">
+            name="%preferences.page.name">
       </page>
       <page
             category="com.reprezen.swagedit.preferences"
             class="com.reprezen.swagedit.preferences.SwaggerColorPreferences"
             id="com.reprezen.swagedit.preferences.SwaggerColorPreferences"
-            name="%page.name.0">
+            name="%preferences.page.colors.name">
       </page>
       <page
             category="com.reprezen.swagedit.preferences"
             class="com.reprezen.swagedit.preferences.SwaggerTemplatePreferences"
             id="com.reprezen.swagedit.preferences.SwaggerTemplatePreferences"
-            name="Templates">
+            name="%preferences.page.templates.name">
       </page>
    </extension>
 
