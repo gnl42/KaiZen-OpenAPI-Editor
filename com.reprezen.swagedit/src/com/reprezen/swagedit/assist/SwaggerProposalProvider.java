@@ -208,7 +208,8 @@ public class SwaggerProposalProvider {
 		final Set<JsonNode> proposals = new LinkedHashSet<>();
 		proposals.add(mapper.createObjectNode()
 				.put("value", "-")
-				.put("label", "-"));
+				.put("label", "-")
+				.put("type", "array item"));
 		
 		return proposals;
 	}
@@ -275,8 +276,9 @@ public class SwaggerProposalProvider {
 	private Set<JsonNode> createStringProposal(JsonNode data, SchemaDefinition definition) {
 		Set<JsonNode> proposals = new LinkedHashSet<>();
 		proposals.add(mapper.createObjectNode()
-				.put("value", "\"\"")
-				.put("label", "\"\""));
+				.put("value", "")
+				.put("label", "")
+				.put("type", "string"));
 
 		return proposals;
 	}
