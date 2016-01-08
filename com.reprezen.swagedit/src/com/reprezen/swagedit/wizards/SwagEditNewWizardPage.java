@@ -22,7 +22,7 @@ public class SwagEditNewWizardPage extends WizardNewFileCreationPage {
 		super("SwagEditNewWizardPage", selection);
 		setTitle(Messages.swagedit_wizard_title);
 		setDescription(Messages.swagedit_wizard_description);
-		setImageDescriptor(Activator.imageDescriptorFromPlugin(Activator.PLUGIN_ID, "icons/swagger_64.jpg"));
+		setImageDescriptor(Activator.imageDescriptorFromPlugin(Activator.PLUGIN_ID, "icons/swagger_64.png"));
 		setFileExtension(extension);
 	}
 
