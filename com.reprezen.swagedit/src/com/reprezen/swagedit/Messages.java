@@ -7,8 +7,8 @@ public class Messages extends NLS {
 	private static final String BUNDLE_NAME = "com.reprezen.swagedit.messages";
 
 	// UI
-	public static String swagger;
-	public static String wizard_description;
+	public static String swagedit_wizard_title;
+	public static String swagedit_wizard_description;
 
 	// errors
 	public static String error_typeNoMatch;
