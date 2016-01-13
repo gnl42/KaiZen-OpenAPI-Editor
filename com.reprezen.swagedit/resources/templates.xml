@@ -55,8 +55,7 @@ definitions:
        id="com.reprezen.swagedit.templates.path_get_template" 
        description="swagger template" 
        context="com.reprezen.swagedit.templates.swagger.path" 
-       enabled="true">
-get:
+       enabled="true">get:
       summary:
       description: 
       responses:
@@ -68,8 +67,7 @@ get:
        id="com.reprezen.swagedit.templates.path_post_template" 
        description="swagger template" 
        context="com.reprezen.swagedit.templates.swagger.path" 
-       enabled="true">
-post:
+       enabled="true">post:
       summary:
       description: 
       responses:
@@ -81,8 +79,7 @@ post:
        id="com.reprezen.swagedit.templates.path_put_template" 
        description="swagger template" 
        context="com.reprezen.swagedit.templates.swagger.path" 
-       enabled="true">
-put:
+       enabled="true">put:
       summary:
       description: 
       responses:
@@ -94,8 +91,7 @@ put:
        id="com.reprezen.swagedit.templates.path_delete_template" 
        description="swagger template" 
        context="com.reprezen.swagedit.templates.swagger.path" 
-       enabled="true">
-delete:
+       enabled="true">delete:
       summary:
       description: 
       responses:
@@ -107,8 +103,7 @@ delete:
        id="com.reprezen.swagedit.templates.path_patch_template" 
        description="swagger template" 
        context="com.reprezen.swagedit.templates.swagger.path" 
-       enabled="true">
-patch:
+       enabled="true">patch:
       summary:
       description: 
       responses:
@@ -120,8 +115,7 @@ patch:
        id="com.reprezen.swagedit.templates.path_options_template" 
        description="swagger template" 
        context="com.reprezen.swagedit.templates.swagger.path" 
-       enabled="true">
-options:
+       enabled="true">options:
       summary:
       description: 
       responses:
