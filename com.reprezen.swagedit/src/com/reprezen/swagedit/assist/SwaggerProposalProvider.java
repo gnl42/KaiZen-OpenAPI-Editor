@@ -23,10 +23,10 @@ import com.fasterxml.jackson.databind.ObjectMapper;
 import com.google.common.base.Strings;
 import com.google.common.collect.Sets;
 import com.reprezen.swagedit.editor.SwaggerDocument;
-import com.reprezen.swagedit.json.SchemaDefinitionProvider;
 import com.reprezen.swagedit.json.JsonType;
 import com.reprezen.swagedit.json.JsonUtil;
 import com.reprezen.swagedit.json.SchemaDefinition;
+import com.reprezen.swagedit.json.SchemaDefinitionProvider;
 
 /**
  * Provider of completion proposals.
@@ -299,36 +299,29 @@ public class SwaggerProposalProvider {
 		Set<JsonNode> proposals = new LinkedHashSet<>();
 
 		if (definition.definition.has("properties")) {
-			for (Iterator<String> it = definition.definition.get("properties").fieldNames(); it.hasNext();) {
-				String key = it.next();
+			final JsonNode properties = definition.definition.get("properties");
 
-				if (!data.has(key)) {			
-					JsonNode value = definition.definition.get("properties").get(key);
+			for (Iterator<String> it = properties.fieldNames(); it.hasNext();) {
+				final String key = it.next();
 
-					JsonNode keyNode = mapper.createObjectNode()
-							.put("value", key + ":")
-							.put("label", key)
-							.put("type", JsonType.valueOf(value).getValue());
-
-					proposals.add(keyNode);
+				if (!data.has(key)) {							
+					proposals.add(createPropertyProposal(definition, key, properties.get(key)));
 				}
 			}
 		}
 
 		if (definition.definition.has("patternProperties")) {
-			for (Iterator<String> it = definition.definition.get("patternProperties").fieldNames(); it.hasNext();) {
+			final JsonNode properties = definition.definition.get("patternProperties");
+
+			for (Iterator<String> it = properties.fieldNames(); it.hasNext();) {
 				String key = it.next();
-				JsonNode value = definition.definition.get("patternProperties").get(key);
+				final JsonNode value = properties.get(key);
+
 				if (key.startsWith("^")) {
 					key = key.substring(1);
 				}
 
-				JsonNode keyNode = mapper.createObjectNode()
-						.put("value", key + ":")
-						.put("label", key)
-						.put("type", JsonType.valueOf(value).getValue());
-
-				proposals.add(keyNode);
+				proposals.add(createPropertyProposal(definition, key, value));
 			}
 		}
 
@@ -339,6 +332,18 @@ public class SwaggerProposalProvider {
 		}
 
 		return proposals;
+	}
+
+	private JsonNode createPropertyProposal(SchemaDefinition definition, String key, JsonNode value) {
+		final SchemaDefinition resolvedDefinition = JsonUtil.getReference(definition.schema, value);
+		final JsonType type = resolvedDefinition.type;
+
+		return mapper.createObjectNode()
+				.put("value", key + ":")
+				.put("label", key)
+				.put("type", type == JsonType.UNDEFINED && resolvedDefinition.descriptor != null ? 
+						resolvedDefinition.descriptor : 
+							type.getValue());
 	}
 
 }

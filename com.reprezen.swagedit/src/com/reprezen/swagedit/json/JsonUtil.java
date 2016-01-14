@@ -42,13 +42,16 @@ public class JsonUtil {
 		final String[] keys = (ref.startsWith("#/") ? ref.substring(2) : ref).split("/");
 
 		found = document;
+		String lastKey = null;
 		for (String key : keys) {
 			JsonNode value = found.get(key);
-			if (value != null)
+			if (value != null) {
 				found = value;
+				lastKey = key;
+			}
 		}
 
-		return new SchemaDefinition(document, found != null ? found : refNode);
+		return new SchemaDefinition(document, found != null ? found : refNode, lastKey);
 	}
 
 	
