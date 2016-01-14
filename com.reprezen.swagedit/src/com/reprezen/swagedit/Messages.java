@@ -16,6 +16,9 @@ public class Messages extends NLS {
 	public static String error_additional_properties_not_allowed;
 	public static String error_required_properties;
 
+	// content assist
+	public static String no_default_proposals;
+
 	static {
 		NLS.initializeMessages(BUNDLE_NAME, Messages.class);
 	}
