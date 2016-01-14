@@ -9,6 +9,7 @@ import java.util.LinkedHashSet;
 import java.util.List;
 import java.util.Set;
 
+import org.apache.commons.lang3.math.NumberUtils;
 import org.eclipse.jface.text.contentassist.ICompletionProposal;
 import org.eclipse.jface.viewers.StyledString;
 import org.eclipse.jface.viewers.StyledString.Styler;
@@ -207,7 +208,8 @@ public class SwaggerProposalProvider {
 		final Set<JsonNode> proposals = new LinkedHashSet<>();
 		proposals.add(mapper.createObjectNode()
 				.put("value", "-")
-				.put("label", "-"));
+				.put("label", "-")
+				.put("type", "array item"));
 		
 		return proposals;
 	}
@@ -249,12 +251,18 @@ public class SwaggerProposalProvider {
 	private Set<JsonNode> createEnumProposal(JsonNode data, SchemaDefinition definition) {
 		final Set<JsonNode> proposals = new LinkedHashSet<>();
 
+		final String type = definition.definition.has("type") ? 
+				definition.definition.get("type").asText() :
+				null;
+
 		for (JsonNode literal : definition.definition.get("enum")) {
-			String value;
-			if (literal.isBoolean()) {
-				value = literal.asText();
-			} else {
-				value = "\"" + literal.asText() + "\"";
+			String value = literal.asText();
+
+			// if the type of array is string and 
+			// current value is a number, it should be put 
+			// into quotes to avoid validation issues
+			if (NumberUtils.isNumber(value) && "string".equals(type)) {
+				value = "\"" + value + "\"";
 			}
 
 			proposals.add(mapper.createObjectNode()
@@ -268,8 +276,9 @@ public class SwaggerProposalProvider {
 	private Set<JsonNode> createStringProposal(JsonNode data, SchemaDefinition definition) {
 		Set<JsonNode> proposals = new LinkedHashSet<>();
 		proposals.add(mapper.createObjectNode()
-				.put("value", "\"\"")
-				.put("label", "\"\""));
+				.put("value", "")
+				.put("label", "")
+				.put("type", "string"));
 
 		return proposals;
 	}
