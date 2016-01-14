@@ -25,10 +25,11 @@ public class SwaggerSourceViewerConfiguration extends YEditSourceViewerConfigura
 		ca.setContentAssistProcessor(new SwaggerContentAssistProcessor(), IDocument.DEFAULT_CONTENT_TYPE);
 		ca.setInformationControlCreator(getInformationControlCreator(sourceViewer));
 
-		ca.enableAutoInsert(true);
+		ca.enableAutoInsert(false);
 		ca.enableAutoActivation(true);
 		ca.setAutoActivationDelay(100);
 		ca.enableColoredLabels(true);
+		ca.setShowEmptyList(true);
 
 		return ca;
 	}

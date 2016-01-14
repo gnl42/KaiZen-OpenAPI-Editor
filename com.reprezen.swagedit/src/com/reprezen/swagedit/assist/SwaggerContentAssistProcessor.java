@@ -79,15 +79,6 @@ public class SwaggerContentAssistProcessor extends TemplateCompletionProcessor i
 			proposals.addAll(Lists.newArrayList(templateProposals));
 		}
 
-		if (proposals.isEmpty()) {
-			proposals.add(new NoCompletionProposal());
-		}
-
-		// make sure the proposal dialog shows up
-		if (proposals.size() == 1) {
-			proposals.add(new EmptyCompletionProposal());
-		}
-
 		return proposals.toArray(new ICompletionProposal[proposals.size()]);
 	}
 
