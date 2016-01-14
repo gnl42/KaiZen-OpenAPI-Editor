@@ -24,7 +24,7 @@ public abstract class SwaggerContextType extends TemplateContextType {
 		if (path == null || path.isEmpty() || ":".equals(path))
 			return RootContextType.ROOT_CONTENT_TYPE;
 
-		if (path.matches(":paths:/")) {
+		if (path.matches(":paths:/\\D*")) {
 			return PathContextType.PATH_CONTENT_TYPE;
 		}
 

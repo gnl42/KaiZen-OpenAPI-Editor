@@ -59,7 +59,6 @@ public class SwaggerContentAssistProcessor extends TemplateCompletionProcessor i
 		} catch (BadLocationException e) {}
 
 		final String prefix = extractPrefix(viewer, documentOffset);
-
 		// we have to remove the length of
 		// the prefix to obtain the correct
 		// column to resolve the path

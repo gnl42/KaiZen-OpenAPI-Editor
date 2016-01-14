@@ -10,7 +10,7 @@
       <wizard
             category="com.reprezen.swagedit"
             class="com.reprezen.swagedit.wizards.SwagEditNewWizard"
-            icon="icons/swagger_32.jpg"
+            icon="icons/swagger_32.png"
             id="com.reprezen.swagedit.wizards.SwagEditNewWizard"
             name="%wizard.name">
       </wizard>
@@ -23,7 +23,7 @@
             contributorClass="org.eclipse.ui.texteditor.BasicTextEditorActionContributor"
             default="false"
             filenames="yaml"
-            icon="icons/swagger_16.jpg"
+            icon="icons/swagger_16.png"
             id="com.reprezen.swagedit.editor"
             name="%editor.name">
          <contentTypeBinding
