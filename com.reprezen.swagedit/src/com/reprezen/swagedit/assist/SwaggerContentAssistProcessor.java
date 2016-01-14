@@ -4,7 +4,6 @@ import java.util.ArrayList;
 import java.util.List;
 
 import org.eclipse.jface.text.BadLocationException;
-import org.eclipse.jface.text.IDocument;
 import org.eclipse.jface.text.IRegion;
 import org.eclipse.jface.text.ITextSelection;
 import org.eclipse.jface.text.ITextViewer;
@@ -59,7 +58,6 @@ public class SwaggerContentAssistProcessor extends TemplateCompletionProcessor i
 		} catch (BadLocationException e) {}
 
 		final String prefix = extractPrefix(viewer, documentOffset);
-
 		// we have to remove the length of
 		// the prefix to obtain the correct
 		// column to resolve the path
@@ -79,37 +77,12 @@ public class SwaggerContentAssistProcessor extends TemplateCompletionProcessor i
 			proposals.addAll(Lists.newArrayList(templateProposals));
 		}
 
-		if (proposals.isEmpty()) {
-			proposals.add(new NoCompletionProposal());
+		final ICompletionProposal[] result = new ICompletionProposal[proposals.size()];
+		for (int i = 0; i < proposals.size(); i++) {
+			result[i] = proposals.get(i);
 		}
 
-		// make sure the proposal dialog shows up
-		if (proposals.size() == 1) {
-			proposals.add(new EmptyCompletionProposal());
-		}
-
-		return proposals.toArray(new ICompletionProposal[proposals.size()]);
-	}
-
-	@Override
-	protected String extractPrefix(ITextViewer viewer, int offset) {
-		int i= offset;
-		IDocument document= viewer.getDocument();
-		if (i > document.getLength())
-			return ""; //$NON-NLS-1$
-
-		try {
-			while (i > 0) {
-				char ch= document.getChar(i - 1);
-				if (Character.isWhitespace(ch))
-					break;
-				i--;
-			}
-
-			return document.get(i, offset - i);
-		} catch (BadLocationException e) {
-			return ""; //$NON-NLS-1$
-		}
+		return result;
 	}
 
 	@Override
