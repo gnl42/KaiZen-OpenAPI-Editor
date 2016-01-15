@@ -89,54 +89,54 @@ public class SwaggerEditor extends YEdit {
 		private final List<String> preferenceKeys = new ArrayList<>();
 		{
 			preferenceKeys.add(PreferenceConstants.COLOR_COMMENT);
-	        preferenceKeys.add(PreferenceConstants.BOLD_COMMENT);
-	        preferenceKeys.add(PreferenceConstants.ITALIC_COMMENT);
-	        preferenceKeys.add(PreferenceConstants.UNDERLINE_COMMENT);
-	        
-	        preferenceKeys.add(PreferenceConstants.COLOR_KEY);
-	        preferenceKeys.add(PreferenceConstants.BOLD_KEY);
-	        preferenceKeys.add(PreferenceConstants.ITALIC_KEY);
-	        preferenceKeys.add(PreferenceConstants.UNDERLINE_KEY);
-	        
-	        preferenceKeys.add(PreferenceConstants.COLOR_SCALAR);
-	        preferenceKeys.add(PreferenceConstants.BOLD_SCALAR);
-	        preferenceKeys.add(PreferenceConstants.ITALIC_SCALAR);
-	        preferenceKeys.add(PreferenceConstants.UNDERLINE_SCALAR);
-	        
-	        preferenceKeys.add(PreferenceConstants.COLOR_DEFAULT);
-	        preferenceKeys.add(PreferenceConstants.BOLD_DEFAULT);
-	        preferenceKeys.add(PreferenceConstants.ITALIC_DEFAULT);
-	        preferenceKeys.add(PreferenceConstants.UNDERLINE_DEFAULT);
-	        
-	        preferenceKeys.add(PreferenceConstants.COLOR_DOCUMENT);
-	        preferenceKeys.add(PreferenceConstants.BOLD_DOCUMENT);
-	        preferenceKeys.add(PreferenceConstants.ITALIC_DOCUMENT);
-	        preferenceKeys.add(PreferenceConstants.UNDERLINE_DOCUMENT);
-	        
-	        preferenceKeys.add(PreferenceConstants.COLOR_ANCHOR);
-	        preferenceKeys.add(PreferenceConstants.BOLD_ANCHOR);
-	        preferenceKeys.add(PreferenceConstants.ITALIC_ANCHOR);
-	        preferenceKeys.add(PreferenceConstants.UNDERLINE_ANCHOR);
-	        
-	        preferenceKeys.add(PreferenceConstants.COLOR_ALIAS);
-	        preferenceKeys.add(PreferenceConstants.BOLD_ALIAS);
-	        preferenceKeys.add(PreferenceConstants.ITALIC_ALIAS);
-	        preferenceKeys.add(PreferenceConstants.UNDERLINE_ALIAS);
-	        
-	        preferenceKeys.add(PreferenceConstants.COLOR_TAG_PROPERTY);
-	        preferenceKeys.add(PreferenceConstants.BOLD_TAG_PROPERTY);
-	        preferenceKeys.add(PreferenceConstants.ITALIC_TAG_PROPERTY);
-	        preferenceKeys.add(PreferenceConstants.UNDERLINE_TAG_PROPERTY);
-	        
-	        preferenceKeys.add(PreferenceConstants.COLOR_INDICATOR_CHARACTER);
-	        preferenceKeys.add(PreferenceConstants.BOLD_INDICATOR_CHARACTER);
-	        preferenceKeys.add(PreferenceConstants.ITALIC_INDICATOR_CHARACTER);
-	        preferenceKeys.add(PreferenceConstants.UNDERLINE_INDICATOR_CHARACTER);
-	        
-	        preferenceKeys.add(PreferenceConstants.COLOR_CONSTANT);
-	        preferenceKeys.add(PreferenceConstants.BOLD_CONSTANT);
-	        preferenceKeys.add(PreferenceConstants.ITALIC_CONSTANT);
-	        preferenceKeys.add(PreferenceConstants.UNDERLINE_CONSTANT);
+			preferenceKeys.add(PreferenceConstants.BOLD_COMMENT);
+			preferenceKeys.add(PreferenceConstants.ITALIC_COMMENT);
+			preferenceKeys.add(PreferenceConstants.UNDERLINE_COMMENT);
+
+			preferenceKeys.add(PreferenceConstants.COLOR_KEY);
+			preferenceKeys.add(PreferenceConstants.BOLD_KEY);
+			preferenceKeys.add(PreferenceConstants.ITALIC_KEY);
+			preferenceKeys.add(PreferenceConstants.UNDERLINE_KEY);
+
+			preferenceKeys.add(PreferenceConstants.COLOR_SCALAR);
+			preferenceKeys.add(PreferenceConstants.BOLD_SCALAR);
+			preferenceKeys.add(PreferenceConstants.ITALIC_SCALAR);
+			preferenceKeys.add(PreferenceConstants.UNDERLINE_SCALAR);
+
+			preferenceKeys.add(PreferenceConstants.COLOR_DEFAULT);
+			preferenceKeys.add(PreferenceConstants.BOLD_DEFAULT);
+			preferenceKeys.add(PreferenceConstants.ITALIC_DEFAULT);
+			preferenceKeys.add(PreferenceConstants.UNDERLINE_DEFAULT);
+
+			preferenceKeys.add(PreferenceConstants.COLOR_DOCUMENT);
+			preferenceKeys.add(PreferenceConstants.BOLD_DOCUMENT);
+			preferenceKeys.add(PreferenceConstants.ITALIC_DOCUMENT);
+			preferenceKeys.add(PreferenceConstants.UNDERLINE_DOCUMENT);
+
+			preferenceKeys.add(PreferenceConstants.COLOR_ANCHOR);
+			preferenceKeys.add(PreferenceConstants.BOLD_ANCHOR);
+			preferenceKeys.add(PreferenceConstants.ITALIC_ANCHOR);
+			preferenceKeys.add(PreferenceConstants.UNDERLINE_ANCHOR);
+
+			preferenceKeys.add(PreferenceConstants.COLOR_ALIAS);
+			preferenceKeys.add(PreferenceConstants.BOLD_ALIAS);
+			preferenceKeys.add(PreferenceConstants.ITALIC_ALIAS);
+			preferenceKeys.add(PreferenceConstants.UNDERLINE_ALIAS);
+
+			preferenceKeys.add(PreferenceConstants.COLOR_TAG_PROPERTY);
+			preferenceKeys.add(PreferenceConstants.BOLD_TAG_PROPERTY);
+			preferenceKeys.add(PreferenceConstants.ITALIC_TAG_PROPERTY);
+			preferenceKeys.add(PreferenceConstants.UNDERLINE_TAG_PROPERTY);
+
+			preferenceKeys.add(PreferenceConstants.COLOR_INDICATOR_CHARACTER);
+			preferenceKeys.add(PreferenceConstants.BOLD_INDICATOR_CHARACTER);
+			preferenceKeys.add(PreferenceConstants.ITALIC_INDICATOR_CHARACTER);
+			preferenceKeys.add(PreferenceConstants.UNDERLINE_INDICATOR_CHARACTER);
+
+			preferenceKeys.add(PreferenceConstants.COLOR_CONSTANT);
+			preferenceKeys.add(PreferenceConstants.BOLD_CONSTANT);
+			preferenceKeys.add(PreferenceConstants.ITALIC_CONSTANT);
+			preferenceKeys.add(PreferenceConstants.UNDERLINE_CONSTANT);
 		}
 
 		@Override
@@ -145,8 +145,8 @@ public class SwaggerEditor extends YEdit {
 				if(getSourceViewer() instanceof SourceViewer){
 					((SourceViewer) getSourceViewer()).unconfigure();
 					initializeEditor();
-		            getSourceViewer().configure(sourceViewerConfiguration);
-		        }
+					getSourceViewer().configure(sourceViewerConfiguration);
+				}
 			}
 		}
 	};
