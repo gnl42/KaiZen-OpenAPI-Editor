@@ -40,12 +40,6 @@ paths:
         - "application/json"
       produces:
         - "application/json"
-      parameters:
-        - name: "id"
-          in: "path"
-          description: "filingID of the requested TaxFiling"
-          required: true
-          type: "string"
       responses:
         200:
           description: ""
