@@ -1,6 +1,7 @@
 package com.reprezen.swagedit.editor;
 
 import org.dadacoalition.yedit.editor.YEditSourceViewerConfiguration;
+import org.dadacoalition.yedit.editor.scanner.YAMLScanner;
 import org.eclipse.jface.text.IDocument;
 import org.eclipse.jface.text.contentassist.ContentAssistant;
 import org.eclipse.jface.text.contentassist.IContentAssistant;
@@ -8,11 +9,13 @@ import org.eclipse.jface.text.reconciler.IReconciler;
 import org.eclipse.jface.text.reconciler.MonoReconciler;
 import org.eclipse.jface.text.source.ISourceViewer;
 
+import com.reprezen.swagedit.Activator;
 import com.reprezen.swagedit.assist.SwaggerContentAssistProcessor;
 
 public class SwaggerSourceViewerConfiguration extends YEditSourceViewerConfiguration {
 
 	private SwaggerEditor editor;
+	private YAMLScanner scanner;
 
 	public SwaggerSourceViewerConfiguration() {
 		super();
@@ -32,6 +35,14 @@ public class SwaggerSourceViewerConfiguration extends YEditSourceViewerConfigura
 		ca.setShowEmptyList(true);
 
 		return ca;
+	}
+
+	@Override
+	protected YAMLScanner getScanner() {
+		if (scanner == null) {
+			scanner = new SwaggerScanner(colorManager, Activator.getDefault().getPreferenceStore());
+		}
+		return scanner;
 	}
 
 	@Override

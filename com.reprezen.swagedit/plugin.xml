@@ -83,4 +83,20 @@
       <include file="resources/templates.xml"></include>
    </extension>
 
+   <extension
+         point="org.eclipse.core.runtime.preferences">
+      <initializer
+            class="com.reprezen.swagedit.preferences.SwaggerPreferenceInitializer">
+      </initializer>
+   </extension>
+
+   <extension point="com.github.eclipsecolortheme.mapper">
+       <mapper
+           class="com.github.eclipsecolortheme.mapper.GenericMapper"
+           name="SwagEdit"
+           pluginId="com.reprezen.swagedit"
+           xml="resources/com.reprezen.swagedit.xml">
+           </mapper>
+    </extension>
+
 </plugin>
