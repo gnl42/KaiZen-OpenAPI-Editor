@@ -2,20 +2,20 @@
 # This is a sample Swagger spec, describing a simple API as a starting point.  
 swagger: "2.0"
 info:
-  description: "Tax Blaster"
-  version: "1.0.0"
-  title: "TaxBlaster"
-host: "taxblaster.com"
-basePath: "/api"
+  description: Tax Blaster
+  version: 1.0.0
+  title: TaxBlaster
+host: taxblaster.com
+basePath: /api
 
 # Tags organize operations into groups for presentation in the Swagger UI.
 # Each tag has an optional description, which the Swagger UI will display in 
 # the tag group header.
 tags:
-- name: "TaxFilingObject"
-  description: "An individual Tax Filing record, accessed by its ID"
+- name: TaxFilingObject
+  description: An individual Tax Filing record, accessed by its ID
 schemes:
-- "http"
+- http
 
 paths:
 
@@ -24,63 +24,63 @@ paths:
   # responses common all of its contained operations.
   /taxFilings/{id}:
     parameters:
-      - name: "id"
-        in: "path"
-        description: "filingID of the requested TaxFiling"
-        required: true
-        type: "string"
+    - name: id
+      in: path
+      description: filingID of the requested TaxFiling
+      required: true
+      type: string
 
     # Operations are identified by an HTTP method.  
     get:
       tags:
-        - "TaxFilingObject"
-      description: ""
-      operationId: "getTaxFiling"
+      - TaxFilingObject
+      description: 
+      operationId: getTaxFiling
       consumes:
-        - "application/json"
+      - application/json
       produces:
-        - "application/json"
+      - application/json
       responses:
         200:
-          description: ""
+          description: 
           schema:
             # Reference to a Schema Object described in 'definitions' section
-            $ref: "#/definitions/TaxFilingObject"
+            $ref: #/definitions/TaxFilingObject
           examples:
             # Example message, keyed by media type
-            application/json: 
+            application/json : 
               {
-                "filingID" : "1234",
-                "jurisdiction" : "Federal",
-                "year" : "2015",
-                "period" : "CALENDAR_YEAR",
-                "currency" : "EUR",
-                "grossIncome" : "74832",
-                "taxLiability" : "15640"
+                filingID : 1234,
+                jurisdiction : Federal,
+                year : 2015,
+                period : CALENDAR_YEAR,
+                currency : EUR,
+                grossIncome : 74832,
+                taxLiability : 15640
               }
         404:
-          description: ""
+          description: 
 
 # The definitions section contains a set of named Schema Objects.  Each schema
 # object describes a reusable data type, which can be reference by name.
 definitions:
   TaxFilingObject:
-    type: "object"
-    description: "An individual Tax Filing record, accessed by its ID"
+    type: object
+    description: An individual Tax Filing record, accessed by its ID
     properties:
       filingID:
-        type: "string"
+        type: string
       jurisdiction:
-        type: "string"
+        type: string
       year:
-        type: "string"
+        type: string
       period:
-        type: "integer"
+        type: integer
       currency:
-        type: "string"
+        type: string
       grossIncome:
-        type: "number"
+        type: number
       taxLiability:
-        type: "number"
+        type: number
       taxpayer:
-        type: "object"
+        type: object
