@@ -1,0 +1,24 @@
+{
+  "level": "error",
+  "schema": {
+    "loadingURI": "#",
+    "pointer": ""
+  },
+  "instance": {
+    "pointer": ""
+  },
+  "domain": "validation",
+  "keyword": "additionalProperties",
+  "message": "object instance has properties which are not allowed by the schema: [\"domain\",\"instance\",\"keyword\",\"level\",\"matched\",\"message\",\"nrSchemas\",\"reports\",\"schema\"]",
+  "unwanted": [
+    "domain",
+    "instance",
+    "keyword",
+    "level",
+    "matched",
+    "message",
+    "nrSchemas",
+    "reports",
+    "schema"
+  ]
+}

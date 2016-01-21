@@ -1,0 +1,215 @@
+{
+  "level": "error",
+  "schema": {
+    "loadingURI": "http://swagger.io/v2/schema.json#",
+    "pointer": "/definitions/parametersList/items"
+  },
+  "instance": {
+    "pointer": "/paths/~1taxFilings~1{id}/put/parameters/0"
+  },
+  "domain": "validation",
+  "keyword": "oneOf",
+  "message": "instance failed to match exactly one schema (matched 0 out of 2)",
+  "matched": 0,
+  "nrSchemas": 2,
+  "reports": {
+    "/definitions/parametersList/items/oneOf/0": [
+      {
+        "level": "error",
+        "schema": {
+          "loadingURI": "http://swagger.io/v2/schema.json#",
+          "pointer": "/definitions/parameter"
+        },
+        "instance": {
+          "pointer": "/paths/~1taxFilings~1{id}/put/parameters/0"
+        },
+        "domain": "validation",
+        "keyword": "oneOf",
+        "message": "instance failed to match exactly one schema (matched 0 out of 2)",
+        "matched": 0,
+        "nrSchemas": 2,
+        "reports": {
+          "/definitions/parameter/oneOf/0": [
+            {
+              "level": "error",
+              "schema": {
+                "loadingURI": "http://swagger.io/v2/schema.json#",
+                "pointer": "/definitions/bodyParameter"
+              },
+              "instance": {
+                "pointer": "/paths/~1taxFilings~1{id}/put/parameters/0"
+              },
+              "domain": "validation",
+              "keyword": "required",
+              "message": "object has missing required properties ([\"schema\"])",
+              "required": [
+                "in",
+                "name",
+                "schema"
+              ],
+              "missing": [
+                "schema"
+              ]
+            }
+          ],
+          "/definitions/parameter/oneOf/1": [
+            {
+              "level": "error",
+              "schema": {
+                "loadingURI": "http://swagger.io/v2/schema.json#",
+                "pointer": "/definitions/nonBodyParameter"
+              },
+              "instance": {
+                "pointer": "/paths/~1taxFilings~1{id}/put/parameters/0"
+              },
+              "domain": "validation",
+              "keyword": "oneOf",
+              "message": "instance failed to match exactly one schema (matched 0 out of 4)",
+              "matched": 0,
+              "nrSchemas": 4,
+              "reports": {
+                "/definitions/nonBodyParameter/oneOf/0": [
+                  {
+                    "level": "error",
+                    "schema": {
+                      "loadingURI": "http://swagger.io/v2/schema.json#",
+                      "pointer": "/definitions/headerParameterSubSchema/properties/in"
+                    },
+                    "instance": {
+                      "pointer": "/paths/~1taxFilings~1{id}/put/parameters/0/in"
+                    },
+                    "domain": "validation",
+                    "keyword": "enum",
+                    "message": "instance value (\"body\") not found in enum (possible values: [\"header\"])",
+                    "value": "body",
+                    "enum": [
+                      "header"
+                    ]
+                  }
+                ],
+                "/definitions/nonBodyParameter/oneOf/1": [
+                  {
+                    "level": "error",
+                    "schema": {
+                      "loadingURI": "http://swagger.io/v2/schema.json#",
+                      "pointer": "/definitions/formDataParameterSubSchema/properties/in"
+                    },
+                    "instance": {
+                      "pointer": "/paths/~1taxFilings~1{id}/put/parameters/0/in"
+                    },
+                    "domain": "validation",
+                    "keyword": "enum",
+                    "message": "instance value (\"body\") not found in enum (possible values: [\"formData\"])",
+                    "value": "body",
+                    "enum": [
+                      "formData"
+                    ]
+                  }
+                ],
+                "/definitions/nonBodyParameter/oneOf/2": [
+                  {
+                    "level": "error",
+                    "schema": {
+                      "loadingURI": "http://swagger.io/v2/schema.json#",
+                      "pointer": "/definitions/queryParameterSubSchema/properties/in"
+                    },
+                    "instance": {
+                      "pointer": "/paths/~1taxFilings~1{id}/put/parameters/0/in"
+                    },
+                    "domain": "validation",
+                    "keyword": "enum",
+                    "message": "instance value (\"body\") not found in enum (possible values: [\"query\"])",
+                    "value": "body",
+                    "enum": [
+                      "query"
+                    ]
+                  }
+                ],
+                "/definitions/nonBodyParameter/oneOf/3": [
+                  {
+                    "level": "error",
+                    "schema": {
+                      "loadingURI": "http://swagger.io/v2/schema.json#",
+                      "pointer": "/definitions/pathParameterSubSchema/properties/in"
+                    },
+                    "instance": {
+                      "pointer": "/paths/~1taxFilings~1{id}/put/parameters/0/in"
+                    },
+                    "domain": "validation",
+                    "keyword": "enum",
+                    "message": "instance value (\"body\") not found in enum (possible values: [\"path\"])",
+                    "value": "body",
+                    "enum": [
+                      "path"
+                    ]
+                  }
+                ]
+              }
+            },
+            {
+              "level": "error",
+              "schema": {
+                "loadingURI": "http://swagger.io/v2/schema.json#",
+                "pointer": "/definitions/nonBodyParameter"
+              },
+              "instance": {
+                "pointer": "/paths/~1taxFilings~1{id}/put/parameters/0"
+              },
+              "domain": "validation",
+              "keyword": "required",
+              "message": "object has missing required properties ([\"type\"])",
+              "required": [
+                "in",
+                "name",
+                "type"
+              ],
+              "missing": [
+                "type"
+              ]
+            }
+          ]
+        }
+      }
+    ],
+    "/definitions/parametersList/items/oneOf/1": [
+      {
+        "level": "error",
+        "schema": {
+          "loadingURI": "http://swagger.io/v2/schema.json#",
+          "pointer": "/definitions/jsonReference"
+        },
+        "instance": {
+          "pointer": "/paths/~1taxFilings~1{id}/put/parameters/0"
+        },
+        "domain": "validation",
+        "keyword": "additionalProperties",
+        "message": "object instance has properties which are not allowed by the schema: [\"description\",\"in\",\"name\",\"required\"]",
+        "unwanted": [
+          "description",
+          "in",
+          "name",
+          "required"
+        ]
+      },
+      {
+        "level": "error",
+        "schema": {
+          "loadingURI": "http://swagger.io/v2/schema.json#",
+          "pointer": "/definitions/jsonReference"
+        },
+        "instance": {
+          "pointer": "/paths/~1taxFilings~1{id}/put/parameters/0"
+        },
+        "domain": "validation",
+        "keyword": "required",
+        "message": "object has missing required properties ([\"$ref\"])",
+        "required": [
+          "$ref"
+        ],
+        "missing": [
+          "$ref"
+        ]
+      }
+    ]
+  }
+}

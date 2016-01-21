@@ -170,7 +170,7 @@ class ValidatorTest {
 		document.set(content)
 		val errors = validator.validate(document)
 
-		assertEquals(5, errors.size())
+		assertEquals(1, errors.size())
 
 		errors.forEach[
 			assertTrue(it.line == 10 || it.line == 11)
