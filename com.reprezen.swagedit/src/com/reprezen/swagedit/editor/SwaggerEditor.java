@@ -303,7 +303,7 @@ public class SwaggerEditor extends YEdit {
 
 	protected void validateYaml(IFile file, SwaggerDocument document) {
 		if (document.getYamlError() instanceof YAMLException) {
-			addMarker(SwaggerError.create((YAMLException) document.getYamlError()), file, document);
+			addMarker(new SwaggerError((YAMLException) document.getYamlError()), file, document);
 		}
 	}
 

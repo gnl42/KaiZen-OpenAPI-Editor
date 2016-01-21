@@ -4,6 +4,8 @@ import org.junit.runner.RunWith;
 import org.junit.runners.Suite;
 import org.junit.runners.Suite.SuiteClasses;
 
+import com.reprezen.swagedit.validation.ErrorProcessorTest;
+
 @RunWith(Suite.class)
 @SuiteClasses({
 	SwaggerContentAssistProcessorTest.class,
@@ -11,6 +13,7 @@ import org.junit.runners.Suite.SuiteClasses;
 	SwaggerProposalProviderTest.class,
 	SwaggerSchemaTest.class,
 	ValidationMessageTest.class,
-	ValidatorTest.class
+	ValidatorTest.class,
+	ErrorProcessorTest.class
 })
 public class TestSuite {}

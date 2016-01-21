@@ -117,11 +117,7 @@ class ValidationMessageTest {
 		document.set(content)
 		val errors = validator.validate(document)
 
-		assertThat(errors.map[message], hasItems(
-			"value of type integer is not allowed, value should be of type string",
-			"object has properties \"description\" which are not allowed",
-			"object has missing required properties \"$ref\""
-		))
+		assertEquals(1, errors.size)
 	}
 
 	@Test
