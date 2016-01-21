@@ -415,25 +415,7 @@
           ]
         },
         "format": {
-          "oneOf": [
-          	{
-          		"type": "string"
-          	},
-          	{
-          		"type": "string",
-          		"enum": [
-          			"int32",
-          			"int64",
-          			"float",
-          			"double",
-          			"byte",
-          			"binary",
-          			"date",
-          			"date-time",
-          			"password"          			
-          		]
-          	}
-          ]
+          "$ref": "#/definitions/format"
         },
         "items": {
           "$ref": "#/definitions/primitivesItems"
@@ -573,25 +555,7 @@
           ]
         },
         "format": {
-          "oneOf": [
-          	{
-          		"type": "string"
-          	},
-          	{
-          		"type": "string",
-          		"enum": [
-          			"int32",
-          			"int64",
-          			"float",
-          			"double",
-          			"byte",
-          			"binary",
-          			"date",
-          			"date-time",
-          			"password"          			
-          		]
-          	}
-          ]
+          "$ref": "#/definitions/format"
         },
         "items": {
           "$ref": "#/definitions/primitivesItems"
@@ -684,25 +648,7 @@
           ]
         },
         "format": {
-          "oneOf": [
-          	{
-          		"type": "string"
-          	},
-          	{
-          		"type": "string",
-          		"enum": [
-          			"int32",
-          			"int64",
-          			"float",
-          			"double",
-          			"byte",
-          			"binary",
-          			"date",
-          			"date-time",
-          			"password"          			
-          		]
-          	}
-          ]
+          "$ref": "#/definitions/format"
         },
         "items": {
           "$ref": "#/definitions/primitivesItems"
@@ -796,25 +742,7 @@
           ]
         },
         "format": {
-          "oneOf": [
-          	{
-          		"type": "string"
-          	},
-          	{
-          		"type": "string",
-          		"enum": [
-          			"int32",
-          			"int64",
-          			"float",
-          			"double",
-          			"byte",
-          			"binary",
-          			"date",
-          			"date-time",
-          			"password"          			
-          		]
-          	}
-          ]
+          "$ref": "#/definitions/format"
         },
         "items": {
           "$ref": "#/definitions/primitivesItems"
@@ -907,25 +835,7 @@
           ]
         },
         "format": {
-          "oneOf": [
-          	{
-          		"type": "string"
-          	},
-          	{
-          		"type": "string",
-          		"enum": [
-          			"int32",
-          			"int64",
-          			"float",
-          			"double",
-          			"byte",
-          			"binary",
-          			"date",
-          			"date-time",
-          			"password"          			
-          		]
-          	}
-          ]
+          "$ref": "#/definitions/format"
         },
         "items": {
           "$ref": "#/definitions/primitivesItems"
@@ -1019,25 +929,7 @@
           "type": "string"
         },
         "format": {
-          "oneOf": [
-          	{
-          		"type": "string"
-          	},
-          	{
-          		"type": "string",
-          		"enum": [
-          			"int32",
-          			"int64",
-          			"float",
-          			"double",
-          			"byte",
-          			"binary",
-          			"date",
-          			"date-time",
-          			"password"          			
-          		]
-          	}
-          ]
+          "$ref": "#/definitions/format"
         },
         "title": {
           "$ref": "http://json-schema.org/draft-04/schema#/properties/title"
@@ -1163,25 +1055,7 @@
       },
       "properties": {
         "format": {
-          "oneOf": [
-          	{
-          		"type": "string"
-          	},
-          	{
-          		"type": "string",
-          		"enum": [
-          			"int32",
-          			"int64",
-          			"float",
-          			"double",
-          			"byte",
-          			"binary",
-          			"date",
-          			"date-time",
-          			"password"          			
-          		]
-          	}
-          ]
+          "$ref": "#/definitions/format"
         },
         "title": {
           "$ref": "http://json-schema.org/draft-04/schema#/properties/title"
@@ -1227,25 +1101,7 @@
           ]
         },
         "format": {
-          "oneOf": [
-          	{
-          		"type": "string"
-          	},
-          	{
-          		"type": "string",
-          		"enum": [
-          			"int32",
-          			"int64",
-          			"float",
-          			"double",
-          			"byte",
-          			"binary",
-          			"date",
-          			"date-time",
-          			"password"          			
-          		]
-          	}
-          ]
+          "$ref": "#/definitions/format"
         },
         "items": {
           "$ref": "#/definitions/primitivesItems"
@@ -1727,6 +1583,27 @@
           "type": "string"
         }
       }
+    },
+    "format": {
+      "anyOf": [
+        {
+          "type": "string"
+        },
+        {
+          "type": "string",
+            "enum": [
+              "int32",
+              "int64",
+              "float",
+              "double",
+              "byte",
+              "binary",
+              "date",
+              "date-time",
+              "password"          			
+          	]
+        }
+      ]   
     }
   }
 }
