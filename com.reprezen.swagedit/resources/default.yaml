@@ -7,6 +7,8 @@ info:
   title: TaxBlaster
 host: taxblaster.com
 basePath: /api
+schemes:
+- http
 
 # Tags organize operations into groups for presentation in the Swagger UI.
 # Each tag has an optional description, which the Swagger UI will display in 
@@ -14,8 +16,6 @@ basePath: /api
 tags:
 - name: TaxFilingObject
   description: An individual Tax Filing record, accessed by its ID
-schemes:
-- http
 
 paths:
 
@@ -23,32 +23,32 @@ paths:
   # at a specified path.  The Path Item object can define parameters and 
   # responses common all of its contained operations.
   /taxFilings/{id}:
-    parameters:
-    - name: id
-      in: path
-      description: filingID of the requested TaxFiling
-      required: true
-      type: string
 
     # Operations are identified by an HTTP method.  
     get:
       tags:
       - TaxFilingObject
-      description: 
+      description: Retrieves a tax filing having the specified id.
       operationId: getTaxFiling
       consumes:
       - application/json
       produces:
       - application/json
+      parameters:
+      - name: id
+        in: path
+        description: ID of the requested TaxFiling
+        required: true
+        type: string
       responses:
         200:
-          description: 
+          description: Successful response, with a representation of the Tax Filing.
           schema:
             # Reference to a Schema Object described in 'definitions' section
-            $ref: #/definitions/TaxFilingObject
+            $ref: TaxFilingObject
           examples:
             # Example message, keyed by media type
-            application/json : 
+            application/json :
               {
                 filingID : 1234,
                 jurisdiction : Federal,
@@ -59,14 +59,14 @@ paths:
                 taxLiability : 15640
               }
         404:
-          description: 
+          description: The requested tax filing was not found.
 
 # The definitions section contains a set of named Schema Objects.  Each schema
 # object describes a reusable data type, which can be reference by name.
 definitions:
   TaxFilingObject:
     type: object
-    description: An individual Tax Filing record, accessed by its ID
+    description: An individual Tax Filing record.
     properties:
       filingID:
         type: string
