@@ -28,7 +28,7 @@ paths:
     get:
       tags:
       - TaxFilingObject
-      description: 
+      description: Retrieves a tax filing having the specified id.
       operationId: getTaxFiling
       consumes:
       - application/json
@@ -37,13 +37,14 @@ paths:
       parameters:
       - name: id
         in: path
-        description: filingID of the requested TaxFiling
+        description: ID of the requested TaxFiling
         required: true
         type: string
       responses:
         200:
-          description: Non-empty description
+          description: Successful response, with a representation of the Tax Filing.
           schema:
+            # Reference to a Schema Object described in 'definitions' section
             $ref: TaxFilingObject
           examples:
             # Example message, keyed by media type
@@ -58,14 +59,14 @@ paths:
                 taxLiability : 15640
               }
         404:
-          description: 
+          description: The requested tax filing was not found.
 
 # The definitions section contains a set of named Schema Objects.  Each schema
 # object describes a reusable data type, which can be reference by name.
 definitions:
   TaxFilingObject:
     type: object
-    description: An individual Tax Filing record, accessed by its ID
+    description: An individual Tax Filing record.
     properties:
       filingID:
         type: string
