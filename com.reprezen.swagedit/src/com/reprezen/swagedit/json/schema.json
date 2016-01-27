@@ -332,6 +332,7 @@
       "additionalProperties": false,
       "patternProperties": {
         "^([0-9]{3})$|^(default)$": {
+          "title": "response: HTTP status code or 'default'",
           "$ref": "#/definitions/responseValue"
         },
         "^x-": {
