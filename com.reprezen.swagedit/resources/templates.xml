@@ -163,6 +163,19 @@ definitions:
        description="OK template" 
        context="com.reprezen.swagedit.templates.swagger.responses" 
        enabled="true">200:
-          description: Ok
+   description: Ok
      </template>
+     
+     <template name="integer parameter" 
+       id="com.reprezen.swagedit.templates.int_parameter" 
+       description="integer parameter template" 
+       context="com.reprezen.swagedit.templates.swagger.parameters" 
+       enabled="true">name: id
+in: path
+description: ID of the element
+required: true
+type: integer
+format: int64
+     </template>
+ 
  </templates>

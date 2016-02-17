@@ -31,51 +31,60 @@ public abstract class SwaggerContextType extends TemplateContextType {
 			path = path.substring(0, path.length() - 1);
 		}
 		if (path == null || path.isEmpty() || ":".equals(path)) {
-			return RootContextType.ROOT_CONTENT_TYPE;
+			return RootContextType.CONTEXT_ID;
 		}
 		if (path.equals(":securityDefinitions")) {
-			return SecurityDefContextType.SECURITY_DEF_CONTENT_TYPE;
+			return SecurityDefContextType.CONTEXT_ID;
 		}
 		if (path.equals(":paths")) {
-			return PathsContextType.PATHS_CONTENT_TYPE;
+			return PathsContextType.CONTEXT_ID;
 		}
 		if (path.matches(":paths:(/[^:]*)+")) { // /paths/[pathItem]/
-			return PathItemContextType.PATH_ITEM_CONTENT_TYPE;
+			return PathItemContextType.CONTEXT_ID;
 		}
 		if (path.equals(":responses") || path.matches(":paths:/[^:]*:[^:]*:responses")) {
-			return ResponsesContextType.CONTENT_TYPE;
+			return ResponsesContextType.CONTEXT_ID;
+		}
+		if (path.matches(":parameters:[^:]*") || path.matches(":paths:/[^:]*:[^:]*:parameters(:@\\d+)?")
+				|| path.matches(":paths:/[^:]*:parameters")) {
+			return ParametersContextType.CONTEXT_ID;
 		}
 		return null;
 	}
 
 	public static Collection<String> allContextTypes() {
 		return Collections.unmodifiableList(Lists.newArrayList(//
-				RootContextType.ROOT_CONTENT_TYPE, //
-				SecurityDefContextType.SECURITY_DEF_CONTENT_TYPE, //
-				PathsContextType.PATHS_CONTENT_TYPE, //
-				PathItemContextType.PATH_ITEM_CONTENT_TYPE, //
-				ResponsesContextType.CONTENT_TYPE));
+				RootContextType.CONTEXT_ID, //
+				SecurityDefContextType.CONTEXT_ID, //
+				PathsContextType.CONTEXT_ID, //
+				PathItemContextType.CONTEXT_ID, //
+				ResponsesContextType.CONTEXT_ID, //
+				ParametersContextType.CONTEXT_ID//
+		));
 	}
 
 	public static class PathItemContextType extends SwaggerContextType {
-		public static final String PATH_ITEM_CONTENT_TYPE = "com.reprezen.swagedit.templates.swagger.path_item";
+		public static final String CONTEXT_ID = "com.reprezen.swagedit.templates.swagger.path_item";
 	}
 
 	public static class SecurityDefContextType extends SwaggerContextType {
-		public static final String SECURITY_DEF_CONTENT_TYPE = "com.reprezen.swagedit.templates.swagger.security_def";
+		public static final String CONTEXT_ID = "com.reprezen.swagedit.templates.swagger.security_def";
 	}
 
 	public static class RootContextType extends SwaggerContextType {
-		public static final String ROOT_CONTENT_TYPE = "com.reprezen.swagedit.templates.swagger.root";
+		public static final String CONTEXT_ID = "com.reprezen.swagedit.templates.swagger.root";
 	}
 
 	public static class PathsContextType extends SwaggerContextType {
-		public static final String PATHS_CONTENT_TYPE = "com.reprezen.swagedit.templates.swagger.paths";
+		public static final String CONTEXT_ID = "com.reprezen.swagedit.templates.swagger.paths";
 
 	}
 
 	public static class ResponsesContextType extends SwaggerContextType {
-		public static final String CONTENT_TYPE = "com.reprezen.swagedit.templates.swagger.responses";
+		public static final String CONTEXT_ID = "com.reprezen.swagedit.templates.swagger.responses";
 	}
 
+	public static class ParametersContextType extends SwaggerContextType {
+		public static final String CONTEXT_ID = "com.reprezen.swagedit.templates.swagger.parameters";
+	}
 }

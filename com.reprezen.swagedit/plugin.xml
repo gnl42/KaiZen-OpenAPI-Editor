@@ -96,6 +96,11 @@
             id="com.reprezen.swagedit.templates.swagger.responses"
             name="Responses Context">
       </contextType>
+      <contextType
+            class="com.reprezen.swagedit.templates.SwaggerContextType$ParametersContextType"
+            id="com.reprezen.swagedit.templates.swagger.parameters"
+            name="Parameters Context">
+      </contextType>
 
       <include file="resources/templates.xml"></include>
    </extension>

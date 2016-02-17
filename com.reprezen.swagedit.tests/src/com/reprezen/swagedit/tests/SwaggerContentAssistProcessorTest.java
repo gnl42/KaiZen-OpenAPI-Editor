@@ -54,7 +54,7 @@ public class SwaggerContentAssistProcessorTest {
 		String yaml = "swa";
 		int offset = 3;
 
-		when(registry.getContextType(com.reprezen.swagedit.templates.SwaggerContextType.RootContextType.ROOT_CONTENT_TYPE)).thenReturn(null);
+		when(registry.getContextType(com.reprezen.swagedit.templates.SwaggerContextType.RootContextType.CONTEXT_ID)).thenReturn(null);
 		when(templateStore.getTemplates()).thenReturn(new Template[0]);
 		when(viewer.getDocument()).thenReturn(document);
 		when(viewer.getSelectedRange()).thenReturn(new Point(0, 0));
