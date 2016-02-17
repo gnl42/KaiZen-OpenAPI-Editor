@@ -19,7 +19,6 @@ import org.junit.Test;
 
 import com.reprezen.swagedit.assist.SwaggerContentAssistProcessor;
 import com.reprezen.swagedit.editor.SwaggerDocument;
-import com.reprezen.swagedit.templates.RootContextType;
 
 public class SwaggerContentAssistProcessorTest {
 
@@ -55,7 +54,7 @@ public class SwaggerContentAssistProcessorTest {
 		String yaml = "swa";
 		int offset = 3;
 
-		when(registry.getContextType(RootContextType.ROOT_CONTENT_TYPE)).thenReturn(null);
+		when(registry.getContextType(com.reprezen.swagedit.templates.SwaggerContextType.RootContextType.ROOT_CONTENT_TYPE)).thenReturn(null);
 		when(templateStore.getTemplates()).thenReturn(new Template[0]);
 		when(viewer.getDocument()).thenReturn(document);
 		when(viewer.getSelectedRange()).thenReturn(new Point(0, 0));

@@ -139,7 +139,9 @@ public class SwaggerContentAssistProcessor extends TemplateCompletionProcessor i
 
 	@Override
 	protected TemplateContextType getContextType(ITextViewer viewer, IRegion region) {
-		return getContextTypeRegistry().getContextType(SwaggerContextType.getContentType(currentPath));
+		String contextType = SwaggerContextType.getContentType(currentPath);
+		System.out.println("contextType " + contextType);
+		return getContextTypeRegistry().getContextType(contextType);
 	}
 
 	@Override

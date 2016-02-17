@@ -14,6 +14,7 @@ import com.reprezen.swagedit.validation.ErrorProcessorTest;
 	SwaggerSchemaTest.class,
 	ValidationMessageTest.class,
 	ValidatorTest.class,
-	ErrorProcessorTest.class
+	ErrorProcessorTest.class,
+	CodeTemplateContextTest.class
 })
 public class TestSuite {}

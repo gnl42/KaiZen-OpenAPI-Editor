@@ -72,14 +72,24 @@
    <extension
          point="org.eclipse.ui.editors.templates">
       <contextType
-            class="com.reprezen.swagedit.templates.RootContextType"
+            class="com.reprezen.swagedit.templates.SwaggerContextType$RootContextType"
             id="com.reprezen.swagedit.templates.swagger.root"
-            name="Swagger Context">
+            name="Root Context">
       </contextType>
       <contextType
-            class="com.reprezen.swagedit.templates.PathContextType"
-            id="com.reprezen.swagedit.templates.swagger.path"
-            name="Path Context">
+            class="com.reprezen.swagedit.templates.SwaggerContextType$SecurityDefContextType"
+            id="com.reprezen.swagedit.templates.swagger.security_def"
+            name="Security Def Context">
+      </contextType>
+      <contextType
+            class="com.reprezen.swagedit.templates.SwaggerContextType$PathsContextType"
+            id="com.reprezen.swagedit.templates.swagger.paths"
+            name="Paths Context">
+      </contextType>
+      <contextType
+            class="com.reprezen.swagedit.templates.SwaggerContextType$PathItemContextType"
+            id="com.reprezen.swagedit.templates.swagger.path_item"
+            name="Path Item Context">
       </contextType>
       <include file="resources/templates.xml"></include>
    </extension>
