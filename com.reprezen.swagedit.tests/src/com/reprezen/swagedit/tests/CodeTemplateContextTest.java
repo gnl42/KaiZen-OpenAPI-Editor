@@ -7,6 +7,7 @@ import static com.reprezen.swagedit.templates.SwaggerContextType.getContentType;
 import org.junit.Test;
 
 import com.reprezen.swagedit.templates.SwaggerContextType.PathItemContextType;
+import com.reprezen.swagedit.templates.SwaggerContextType.ResponsesContextType;
 import com.reprezen.swagedit.templates.SwaggerContextType.SecurityDefContextType;;
 
 public class CodeTemplateContextTest {
@@ -28,6 +29,12 @@ public class CodeTemplateContextTest {
 	@Test
 	public void testSecurityDef() throws Exception {
 		assertThat(getContentType(":securityDefinitions"), equalTo(SecurityDefContextType.SECURITY_DEF_CONTENT_TYPE));
+	}
+
+	@Test
+	public void testResponses() throws Exception {
+		assertThat(getContentType(":responses"), equalTo(ResponsesContextType.CONTENT_TYPE));
+		assertThat(getContentType(":paths:/resource:get:responses"), equalTo(ResponsesContextType.CONTENT_TYPE));
 	}
 
 }

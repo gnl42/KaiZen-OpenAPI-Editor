@@ -39,8 +39,11 @@ public abstract class SwaggerContextType extends TemplateContextType {
 		if (path.equals(":paths")) {
 			return PathsContextType.PATHS_CONTENT_TYPE;
 		}
-		if (path.matches(":paths:(/[^:]*)+")) {
+		if (path.matches(":paths:(/[^:]*)+")) { // /paths/[pathItem]/
 			return PathItemContextType.PATH_ITEM_CONTENT_TYPE;
+		}
+		if (path.equals(":responses") || path.matches(":paths:/[^:]*:[^:]*:responses")) {
+			return ResponsesContextType.CONTENT_TYPE;
 		}
 		return null;
 	}
@@ -50,8 +53,8 @@ public abstract class SwaggerContextType extends TemplateContextType {
 				RootContextType.ROOT_CONTENT_TYPE, //
 				SecurityDefContextType.SECURITY_DEF_CONTENT_TYPE, //
 				PathsContextType.PATHS_CONTENT_TYPE, //
-				PathItemContextType.PATH_ITEM_CONTENT_TYPE//
-		));
+				PathItemContextType.PATH_ITEM_CONTENT_TYPE, //
+				ResponsesContextType.CONTENT_TYPE));
 	}
 
 	public static class PathItemContextType extends SwaggerContextType {
@@ -69,6 +72,10 @@ public abstract class SwaggerContextType extends TemplateContextType {
 	public static class PathsContextType extends SwaggerContextType {
 		public static final String PATHS_CONTENT_TYPE = "com.reprezen.swagedit.templates.swagger.paths";
 
+	}
+
+	public static class ResponsesContextType extends SwaggerContextType {
+		public static final String CONTENT_TYPE = "com.reprezen.swagedit.templates.swagger.responses";
 	}
 
 }

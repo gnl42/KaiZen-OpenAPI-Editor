@@ -88,7 +88,7 @@ definitions:
      
      <template name="get" 
        id="com.reprezen.swagedit.templates.path_get_template" 
-       description="swagger template" 
+       description="GET template" 
        context="com.reprezen.swagedit.templates.swagger.path_item" 
        enabled="true">get:
       summary:
@@ -100,7 +100,7 @@ definitions:
 
      <template name="post" 
        id="com.reprezen.swagedit.templates.path_post_template" 
-       description="swagger template" 
+       description="POST template" 
        context="com.reprezen.swagedit.templates.swagger.path_item" 
        enabled="true">post:
       summary:
@@ -112,7 +112,7 @@ definitions:
 
      <template name="put" 
        id="com.reprezen.swagedit.templates.path_put_template" 
-       description="swagger template" 
+       description="PUT template" 
        context="com.reprezen.swagedit.templates.swagger.path_item" 
        enabled="true">put:
       summary:
@@ -124,7 +124,7 @@ definitions:
 
      <template name="delete" 
        id="com.reprezen.swagedit.templates.path_delete_template" 
-       description="swagger template" 
+       description="DELETE template" 
        context="com.reprezen.swagedit.templates.swagger.path_item" 
        enabled="true">delete:
       summary:
@@ -136,7 +136,7 @@ definitions:
     
     <template name="patch" 
        id="com.reprezen.swagedit.templates.path_patch_template" 
-       description="swagger template" 
+       description="PATCH template" 
        context="com.reprezen.swagedit.templates.swagger.path_item" 
        enabled="true">patch:
       summary:
@@ -148,7 +148,7 @@ definitions:
 
     <template name="options" 
        id="com.reprezen.swagedit.templates.path_options_template" 
-       description="swagger template" 
+       description="OPTIONS template" 
        context="com.reprezen.swagedit.templates.swagger.path_item" 
        enabled="true">options:
       summary:
@@ -158,4 +158,11 @@ definitions:
           description: OK
      </template>
 
+    <template name="OK response" 
+       id="com.reprezen.swagedit.templates.ok_response" 
+       description="OK template" 
+       context="com.reprezen.swagedit.templates.swagger.responses" 
+       enabled="true">200:
+          description: Ok
+     </template>
  </templates>

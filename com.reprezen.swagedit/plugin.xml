@@ -91,6 +91,12 @@
             id="com.reprezen.swagedit.templates.swagger.path_item"
             name="Path Item Context">
       </contextType>
+      <contextType
+            class="com.reprezen.swagedit.templates.SwaggerContextType$ResponsesContextType"
+            id="com.reprezen.swagedit.templates.swagger.responses"
+            name="Responses Context">
+      </contextType>
+
       <include file="resources/templates.xml"></include>
    </extension>
 
