@@ -177,5 +177,18 @@ required: true
 type: integer
 format: int64
      </template>
+     
+     <template name="schema" 
+       id="com.reprezen.swagedit.templates.schema" 
+       description="schema template" 
+       context="com.reprezen.swagedit.templates.swagger.schema" 
+       enabled="true">required:
+      - name  
+    properties:
+      name:
+        type: string
+      tag:
+        type: string
+     </template>
  
  </templates>

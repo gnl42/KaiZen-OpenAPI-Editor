@@ -9,6 +9,7 @@ import org.junit.Test;
 import com.reprezen.swagedit.templates.SwaggerContextType.ParametersContextType;
 import com.reprezen.swagedit.templates.SwaggerContextType.PathItemContextType;
 import com.reprezen.swagedit.templates.SwaggerContextType.ResponsesContextType;
+import com.reprezen.swagedit.templates.SwaggerContextType.SchemaContextType;
 import com.reprezen.swagedit.templates.SwaggerContextType.SecurityDefContextType;;
 
 public class CodeTemplateContextTest {
@@ -37,12 +38,23 @@ public class CodeTemplateContextTest {
 		assertThat(getContentType(":responses"), equalTo(ResponsesContextType.CONTEXT_ID));
 		assertThat(getContentType(":paths:/resource:get:responses"), equalTo(ResponsesContextType.CONTEXT_ID));
 	}
-	
+
 	@Test
 	public void testParameters() throws Exception {
-		assertThat(getContentType(":paths:/taxFilings/{id}:get:parameters:@0:"), equalTo(ParametersContextType.CONTEXT_ID));
+		assertThat(getContentType(":paths:/taxFilings/{id}:get:parameters:@0:"),
+				equalTo(ParametersContextType.CONTEXT_ID));
 		assertThat(getContentType(":paths:/taxFilings/{id}:get:parameters"), equalTo(ParametersContextType.CONTEXT_ID));
 		assertThat(getContentType(":paths:/resource:parameters:"), equalTo(ParametersContextType.CONTEXT_ID));
 		assertThat(getContentType(":parameters:skipParam:"), equalTo(ParametersContextType.CONTEXT_ID));
+	}
+
+	@Test
+	public void testSchema() throws Exception {
+		assertThat(getContentType(":definitions:Pet:"), equalTo(SchemaContextType.CONTEXT_ID));
+		assertThat(getContentType(":paths:/pets/{id}:delete:responses:default:schema:"),
+				equalTo(SchemaContextType.CONTEXT_ID));
+		assertThat(getContentType(":paths:/pets/{id}:get:responses:200:schema:"),
+				equalTo(SchemaContextType.CONTEXT_ID));
+		assertThat(getContentType(":paths:/pets:post:parameters:@0:schema:"), equalTo(SchemaContextType.CONTEXT_ID));
 	}
 }

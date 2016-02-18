@@ -101,6 +101,11 @@
             id="com.reprezen.swagedit.templates.swagger.parameters"
             name="Parameters Context">
       </contextType>
+      <contextType
+            class="com.reprezen.swagedit.templates.SwaggerContextType$SchemaContextType"
+            id="com.reprezen.swagedit.templates.swagger.schema"
+            name="Schema Context">
+      </contextType>
 
       <include file="resources/templates.xml"></include>
    </extension>
