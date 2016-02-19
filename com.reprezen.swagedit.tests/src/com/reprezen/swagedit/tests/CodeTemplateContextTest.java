@@ -24,8 +24,10 @@ public class CodeTemplateContextTest {
 		assertThat(getContentType(":paths:/my-pets/v1/{pet-id}"), equalTo(PathItemContextType.CONTEXT_ID));
 		assertThat(getContentType(":paths:/pets"), equalTo(PathItemContextType.CONTEXT_ID));
 
+		// tests for #Templates defined in the Path context show in other contexts
 		assertThat(getContentType(":paths:"), not(equalTo(PathItemContextType.CONTEXT_ID)));
 		assertThat(getContentType(":paths:/pets:get"), not(equalTo(PathItemContextType.CONTEXT_ID)));
+		assertThat(getContentType(":paths:/pets:get:responses"), not(equalTo(PathItemContextType.CONTEXT_ID)));
 	}
 
 	@Test
@@ -57,4 +59,5 @@ public class CodeTemplateContextTest {
 				equalTo(SchemaContextType.CONTEXT_ID));
 		assertThat(getContentType(":paths:/pets:post:parameters:@0:schema:"), equalTo(SchemaContextType.CONTEXT_ID));
 	}
+	
 }
