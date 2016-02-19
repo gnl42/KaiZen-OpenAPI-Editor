@@ -6,7 +6,7 @@
        context="com.reprezen.swagedit.templates.swagger.root" 
        enabled="true">
 swagger: "2.0"
-     </template>
+</template>
 
      <template name="info" 
        id="com.reprezen.swagedit.templates.info_template" 
@@ -25,33 +25,33 @@ info:
   license:
     name: MIT
     url: http://opensource.org/licenses/MIT
-     </template>
+</template>
 
      <template name="paths" 
-       id="com.reprezen.swagedit.templates.paths_template" 
-       description="swagger template" 
-       context="com.reprezen.swagedit.templates.swagger.root" 
-       enabled="true">
+ id="com.reprezen.swagedit.templates.paths_template" 
+ description="swagger template" 
+ context="com.reprezen.swagedit.templates.swagger.root" 
+ enabled="true">
 paths:
   /:
     get:
       responses:
         '200':
           description: Ok
-     </template>
+</template>
      
      <template name="oath2" 
        id="com.reprezen.swagedit.templates.securityDef_oath2" 
        description="OAuth2 security def" 
        context="com.reprezen.swagedit.templates.swagger.security_def" 
        enabled="true">oauth2:
-    type: oauth2
-    scopes:
-      user: Grants read/write access to profile info only.
-    flow: accessCode
-    authorizationUrl: https://github.com/login/oauth/authorize
-    tokenUrl: https://github.com/login/oauth/access_token
-     </template>     
+ type: oauth2
+ scopes:
+   user: Grants read/write access to profile info only.
+ flow: accessCode
+ authorizationUrl: https://github.com/login/oauth/authorize
+ tokenUrl: https://github.com/login/oauth/access_token
+</template>     
      
      <template name="definitions" 
        id="com.reprezen.swagedit.templates.definitions_template" 
@@ -62,29 +62,29 @@ definitions:
   ${model}:
     title: "${model}"
     type: string
-     </template>
+</template>
      
      <template name="object resource" 
        id="com.reprezen.swagedit.templates.collection_resource_template" 
        description="object resource template" 
        context="com.reprezen.swagedit.templates.swagger.paths" 
        enabled="true">/resource:
-    get:
-      responses:
-        '200':
-          description: Ok
-     </template>     
+ get:
+   responses:
+     '200':
+       description: Ok
+</template>     
 
      <template name="collection resource" 
        id="com.reprezen.swagedit.templates.object_resource_template" 
        description="collection resource template" 
        context="com.reprezen.swagedit.templates.swagger.paths" 
        enabled="true">/resources:
-    get:
-      responses:
-        '200':
-          description: Ok
-     </template>   
+ get:
+   responses:
+     '200':
+       description: Ok
+</template>   
      
      <template name="get" 
        id="com.reprezen.swagedit.templates.path_get_template" 
@@ -96,31 +96,31 @@ definitions:
       responses:
         '200':
           description: OK
-     </template>
+</template>
 
      <template name="post" 
        id="com.reprezen.swagedit.templates.path_post_template" 
        description="POST template" 
        context="com.reprezen.swagedit.templates.swagger.path_item" 
        enabled="true">post:
-      summary:
-      description: 
-      responses:
-        '200':
-          description: OK
-     </template>
+ summary:
+ description: 
+ responses:
+   '200':
+     description: OK
+</template>
 
      <template name="put" 
        id="com.reprezen.swagedit.templates.path_put_template" 
        description="PUT template" 
        context="com.reprezen.swagedit.templates.swagger.path_item" 
        enabled="true">put:
-      summary:
-      description: 
-      responses:
-        '200':
-          description: OK
-     </template>
+ summary:
+ description: 
+ responses:
+   '200':
+     description: OK
+</template>
 
      <template name="delete" 
        id="com.reprezen.swagedit.templates.path_delete_template" 
@@ -132,39 +132,39 @@ definitions:
       responses:
         '200':
           description: OK
-     </template>
+</template>
     
     <template name="patch" 
        id="com.reprezen.swagedit.templates.path_patch_template" 
        description="PATCH template" 
        context="com.reprezen.swagedit.templates.swagger.path_item" 
        enabled="true">patch:
-      summary:
-      description: 
-      responses:
-        '200':
-          description: OK
-     </template>
+ summary:
+ description: 
+ responses:
+   '200':
+     description: OK
+</template>
 
     <template name="options" 
        id="com.reprezen.swagedit.templates.path_options_template" 
        description="OPTIONS template" 
        context="com.reprezen.swagedit.templates.swagger.path_item" 
        enabled="true">options:
-      summary:
-      description: 
-      responses:
-        '200':
-          description: OK
-     </template>
+ summary:
+ description: 
+ responses:
+   '200':
+     description: OK
+</template>
 
     <template name="OK response" 
        id="com.reprezen.swagedit.templates.ok_response" 
        description="OK template" 
        context="com.reprezen.swagedit.templates.swagger.responses" 
        enabled="true">200:
-   description: Ok
-     </template>
+ description: Ok
+</template>
      
      <template name="integer parameter" 
        id="com.reprezen.swagedit.templates.int_parameter" 
@@ -176,19 +176,19 @@ description: ID of the element
 required: true
 type: integer
 format: int64
-     </template>
+</template>
      
      <template name="schema" 
        id="com.reprezen.swagedit.templates.schema" 
        description="schema template" 
        context="com.reprezen.swagedit.templates.swagger.schema" 
        enabled="true">required:
-      - name  
-    properties:
-      name:
-        type: string
-      tag:
-        type: string
-     </template>
+  - name  
+properties:
+  name:
+    type: string
+  tag:
+    type: string
+</template>
  
  </templates>
