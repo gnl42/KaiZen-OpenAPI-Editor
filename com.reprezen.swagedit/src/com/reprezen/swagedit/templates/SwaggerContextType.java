@@ -42,14 +42,19 @@ public abstract class SwaggerContextType extends TemplateContextType {
 		if (path.matches(":paths:(/[^:]*)+")) { // /paths/[pathItem]/
 			return PathItemContextType.CONTEXT_ID;
 		}
-		if (path.equals(":responses") || path.matches(":paths:/[^:]*:[^:]*:responses")) {
+		if (path.equals(":responses")//
+				|| path.matches(":paths:/[^:]*:[^:]*:responses")) {
 			return ResponsesContextType.CONTEXT_ID;
 		}
-		if (path.matches(":parameters:[^:]*") || path.matches(":paths:/[^:]*:[^:]*:parameters(:@\\d+)?")
+		if (path.matches(":parameters:[^:]*") //
+				|| path.matches(":paths:/[^:]*:[^:]*:parameters(:@\\d+)?")
 				|| path.matches(":paths:/[^:]*:parameters")) {
 			return ParametersContextType.CONTEXT_ID;
 		}
-		if (path.matches(":definitions:[^:]*") || path.matches(".*:parameters(:@\\d+):schema")
+		if (path.matches(":definitions:[^:]*") //
+				|| path.matches(".*:parameters(:@\\d+):schema")//
+				|| path.matches(".*:parameters(:@\\d+):schema:items")//
+				|| path.matches(".*:parameters(:@\\d+):schema:properties:[^:]+")//
 				|| path.matches(".*:responses:[^:]*:schema")) {
 			return SchemaContextType.CONTEXT_ID;
 		}
