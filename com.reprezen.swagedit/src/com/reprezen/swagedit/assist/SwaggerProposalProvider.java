@@ -133,7 +133,7 @@ public class SwaggerProposalProvider {
 				String key = it.next();
 				
 				proposals.add( mapper.createObjectNode()
-						.put("value", "\"#/definitions/" + key + "\"")
+						.put("value", key)
 						.put("label", key)
 						.put("type", "ref") );
 			}
