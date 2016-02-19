@@ -170,12 +170,12 @@ definitions:
        id="com.reprezen.swagedit.templates.int_parameter" 
        description="integer parameter template" 
        context="com.reprezen.swagedit.templates.swagger.parameters" 
-       enabled="true">name: id
-in: path
-description: ID of the element
-required: true
-type: integer
-format: int64
+       enabled="true">- name: id
+  in: path
+  description: ID of the element
+  required: true
+  type: integer
+  format: int64
 </template>
      
      <template name="schema" 

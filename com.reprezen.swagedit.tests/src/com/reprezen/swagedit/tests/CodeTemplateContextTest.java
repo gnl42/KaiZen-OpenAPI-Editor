@@ -49,6 +49,7 @@ public class CodeTemplateContextTest {
 		assertThat(getContentType(":paths:/taxFilings/{id}:get:parameters"), equalTo(ParametersContextType.CONTEXT_ID));
 		assertThat(getContentType(":paths:/resource:parameters:"), equalTo(ParametersContextType.CONTEXT_ID));
 		assertThat(getContentType(":parameters:skipParam:"), equalTo(ParametersContextType.CONTEXT_ID));
+		//assertThat(getContentType(":parameters"), equalTo(ParametersContextType.CONTEXT_ID));
 	}
 
 	@Test

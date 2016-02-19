@@ -26,7 +26,7 @@ public abstract class SwaggerContextType extends TemplateContextType {
 	}
 
 	public static String getContentType(String path) {
-		System.out.println("Context Type " + path);
+		//System.out.println("Context Type " + path);
 		if (path != null && path.endsWith(":")) {
 			path = path.substring(0, path.length() - 1);
 		}
@@ -46,7 +46,8 @@ public abstract class SwaggerContextType extends TemplateContextType {
 				|| path.matches(":paths:/[^:]*:[^:]*:responses")) {
 			return ResponsesContextType.CONTEXT_ID;
 		}
-		if (path.matches(":parameters:[^:]*") //
+		if (/* path.equals(":parameters") || */ // is an object, not an array
+		path.matches(":parameters:[^:]*") //
 				|| path.matches(":paths:/[^:]*:[^:]*:parameters(:@\\d+)?")
 				|| path.matches(":paths:/[^:]*:parameters")) {
 			return ParametersContextType.CONTEXT_ID;
