@@ -10,6 +10,9 @@ import com.google.common.collect.Lists;
 
 public abstract class SwaggerContextType extends TemplateContextType {
 
+	private static final String PARAMETERS_SCHEMA_REGEX = ".*:parameters(:@\\d+):schema";
+	private static final String PATH_ITEM_REGEX = ":paths:/[^:]+";
+
 	public SwaggerContextType() {
 		addGlobalResolvers();
 	}
@@ -25,8 +28,8 @@ public abstract class SwaggerContextType extends TemplateContextType {
 		addResolver(new GlobalTemplateVariables.User());
 	}
 
-	public static String getContentType(String path) {
-		//System.out.println("Context Type " + path);
+	public static String getContextType(String path) {
+		// System.out.println("Context Type " + path);
 		if (path != null && path.endsWith(":")) {
 			path = path.substring(0, path.length() - 1);
 		}
@@ -39,23 +42,23 @@ public abstract class SwaggerContextType extends TemplateContextType {
 		if (path.equals(":paths")) {
 			return PathsContextType.CONTEXT_ID;
 		}
-		if (path.matches(":paths:(/[^:]*)+")) { // /paths/[pathItem]/
+		if (path.matches(PATH_ITEM_REGEX)) { // /paths/[pathItem]/
 			return PathItemContextType.CONTEXT_ID;
 		}
 		if (path.equals(":responses")//
-				|| path.matches(":paths:/[^:]*:[^:]*:responses")) {
+				|| path.matches(PATH_ITEM_REGEX + ":[^:]+:responses")) {
 			return ResponsesContextType.CONTEXT_ID;
 		}
 		if (/* path.equals(":parameters") || */ // is an object, not an array
 		path.matches(":parameters:[^:]*") //
-				|| path.matches(":paths:/[^:]*:[^:]*:parameters(:@\\d+)?")
-				|| path.matches(":paths:/[^:]*:parameters")) {
+				|| path.matches(PATH_ITEM_REGEX + ":[^:]*:parameters(:@\\d+)?")
+				|| path.matches(PATH_ITEM_REGEX + ":parameters")) {
 			return ParametersContextType.CONTEXT_ID;
 		}
 		if (path.matches(":definitions:[^:]*") //
-				|| path.matches(".*:parameters(:@\\d+):schema")//
-				|| path.matches(".*:parameters(:@\\d+):schema:items")//
-				|| path.matches(".*:parameters(:@\\d+):schema:properties:[^:]+")//
+				|| path.matches(PARAMETERS_SCHEMA_REGEX)//
+				|| path.matches(PARAMETERS_SCHEMA_REGEX + ":items")//
+				|| path.matches(PARAMETERS_SCHEMA_REGEX + ":properties:[^:]+")//
 				|| path.matches(".*:responses:[^:]*:schema")) {
 			return SchemaContextType.CONTEXT_ID;
 		}
