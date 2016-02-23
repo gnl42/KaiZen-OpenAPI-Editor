@@ -49,11 +49,13 @@ public abstract class SwaggerContextType extends TemplateContextType {
 				|| path.matches(PATH_ITEM_REGEX + ":[^:]+:responses")) {
 			return ResponsesContextType.CONTEXT_ID;
 		}
-		if (/* path.equals(":parameters") || */ // is an object, not an array
-		path.matches(":parameters:[^:]*") //
-				|| path.matches(PATH_ITEM_REGEX + ":[^:]*:parameters(:@\\d+)?")
+		if (path.matches(PATH_ITEM_REGEX + ":[^:]*:parameters(:@\\d+)?")
 				|| path.matches(PATH_ITEM_REGEX + ":parameters")) {
 			return ParametersContextType.CONTEXT_ID;
+		}
+		if (path.equals(":parameters") //
+				|| path.matches(":parameters:[^:]*")) {
+			return ParameterContextType.CONTEXT_ID;
 		}
 		if (path.matches(":definitions:[^:]*") //
 				|| path.matches(PARAMETERS_SCHEMA_REGEX)//
@@ -73,6 +75,7 @@ public abstract class SwaggerContextType extends TemplateContextType {
 				PathItemContextType.CONTEXT_ID, //
 				ResponsesContextType.CONTEXT_ID, //
 				ParametersContextType.CONTEXT_ID, //
+				ParameterContextType.CONTEXT_ID, //
 				SchemaContextType.CONTEXT_ID));
 	}
 
@@ -98,7 +101,11 @@ public abstract class SwaggerContextType extends TemplateContextType {
 	}
 
 	public static class ParametersContextType extends SwaggerContextType {
-		public static final String CONTEXT_ID = "com.reprezen.swagedit.templates.swagger.parameters";
+		public static final String CONTEXT_ID = "com.reprezen.swagedit.templates.swagger.parameters_list";
+	}
+
+	public static class ParameterContextType extends SwaggerContextType {
+		public static final String CONTEXT_ID = "com.reprezen.swagedit.templates.swagger.parameter_single";
 	}
 
 	public static class SchemaContextType extends SwaggerContextType {

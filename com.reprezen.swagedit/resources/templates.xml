@@ -167,9 +167,9 @@ definitions:
 </template>
      
      <template name="integer parameter" 
-       id="com.reprezen.swagedit.templates.int_parameter" 
+       id="com.reprezen.swagedit.templates.int_parameter_in_list" 
        description="integer parameter template" 
-       context="com.reprezen.swagedit.templates.swagger.parameters" 
+       context="com.reprezen.swagedit.templates.swagger.parameters_list" 
        enabled="true">- name: id
   in: path
   description: ID of the element
@@ -178,6 +178,19 @@ definitions:
   format: int64
 </template>
      
+     <template name="integer parameter" 
+       id="com.reprezen.swagedit.templates.int_parameter" 
+       description="integer parameter template" 
+       context="com.reprezen.swagedit.templates.swagger.parameter_single" 
+       enabled="true">param:
+  name: id
+  in: path
+  description: ID of the element
+  required: true
+  type: integer
+  format: int64
+</template>
+
      <template name="schema" 
        id="com.reprezen.swagedit.templates.schema" 
        description="schema template" 
