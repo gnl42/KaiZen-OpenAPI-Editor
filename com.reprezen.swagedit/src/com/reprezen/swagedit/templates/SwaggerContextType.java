@@ -29,7 +29,7 @@ public abstract class SwaggerContextType extends TemplateContextType {
 	}
 
 	public static String getContextType(String path) {
-		// System.out.println("Context Type " + path);
+		//System.out.println("Context Type " + path);
 		if (path != null && path.endsWith(":")) {
 			path = path.substring(0, path.length() - 1);
 		}
@@ -49,7 +49,7 @@ public abstract class SwaggerContextType extends TemplateContextType {
 				|| path.matches(PATH_ITEM_REGEX + ":[^:]+:responses")) {
 			return ResponsesContextType.CONTEXT_ID;
 		}
-		if (path.matches(PATH_ITEM_REGEX + ":[^:]*:parameters(:@\\d+)?")
+		if (path.matches(PATH_ITEM_REGEX + ":[^:]+:parameters(:@\\d+)?")
 				|| path.matches(PATH_ITEM_REGEX + ":parameters")) {
 			return ParametersContextType.CONTEXT_ID;
 		}
@@ -58,10 +58,11 @@ public abstract class SwaggerContextType extends TemplateContextType {
 			return ParameterContextType.CONTEXT_ID;
 		}
 		if (path.matches(":definitions:[^:]*") //
+				|| path.matches(".*:[^:]+:additionalProperties")//
 				|| path.matches(PARAMETERS_SCHEMA_REGEX)//
 				|| path.matches(PARAMETERS_SCHEMA_REGEX + ":items")//
 				|| path.matches(PARAMETERS_SCHEMA_REGEX + ":properties:[^:]+")//
-				|| path.matches(".*:responses:[^:]*:schema")) {
+				|| path.matches(".*:responses:[^:]+:schema")) {
 			return SchemaContextType.CONTEXT_ID;
 		}
 		return null;

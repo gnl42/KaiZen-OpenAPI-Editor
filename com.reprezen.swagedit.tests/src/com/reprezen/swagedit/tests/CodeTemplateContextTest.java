@@ -68,6 +68,8 @@ public class CodeTemplateContextTest {
 				equalTo(SchemaContextType.CONTEXT_ID));
 		assertThat(getContextType(":paths:/pets:post:parameters:@0:schema:items"),
 				equalTo(SchemaContextType.CONTEXT_ID));
+		assertThat(getContextType(":definitions:TaxFilingObject:additionalProperties"),
+				equalTo(SchemaContextType.CONTEXT_ID));
 	}
 
 }
