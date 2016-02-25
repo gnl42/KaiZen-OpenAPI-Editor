@@ -48,7 +48,12 @@ public class CodeTemplateContextTest {
 
 	@Test
 	public void testParameterObject() throws Exception {
+		// top-level parameter definition
 		assertThat(getContextType(":parameters:skipParam:"), equalTo(ParameterObjectContextType.CONTEXT_ID));
+		// resource parameter
+		assertThat(getContextType(":paths:/taxFilings/{id}:parameters:@0:"),
+				equalTo(ParameterObjectContextType.CONTEXT_ID));
+		// method parameter
 		assertThat(getContextType(":paths:/taxFilings/{id}:get:parameters:@0:"),
 				equalTo(ParameterObjectContextType.CONTEXT_ID));
 	}
@@ -60,7 +65,9 @@ public class CodeTemplateContextTest {
 
 	@Test
 	public void testParametersList() throws Exception {
+		// resource parameters list
 		assertThat(getContextType(":paths:/resource:parameters:"), equalTo(ParametersListContextType.CONTEXT_ID));
+		// method parameters list
 		assertThat(getContextType(":paths:/taxFilings/{id}:get:parameters"),
 				equalTo(ParametersListContextType.CONTEXT_ID));
 	}
