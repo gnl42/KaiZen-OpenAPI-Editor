@@ -167,9 +167,21 @@ definitions:
 </template>
      
      <template name="integer parameter" 
-       id="com.reprezen.swagedit.templates.int_parameter_in_list" 
+       id="com.reprezen.swagedit.templates.int_parameter_list" 
        description="integer parameter template" 
        context="com.reprezen.swagedit.templates.swagger.parameters_list" 
+       enabled="true">- name: id
+  in: path
+  description: ID of the element
+  required: true
+  type: integer
+  format: int64
+</template>
+
+     <template name="integer parameter" 
+       id="com.reprezen.swagedit.templates.int_parameter_in_list" 
+       description="integer parameter template" 
+       context="com.reprezen.swagedit.templates.swagger.parameters_list_item" 
        enabled="true">- name: id
   in: path
   description: ID of the element

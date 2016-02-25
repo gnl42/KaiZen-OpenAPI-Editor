@@ -97,8 +97,13 @@
             name="Responses Context">
       </contextType>
       <contextType
-            class="com.reprezen.swagedit.templates.SwaggerContextType$ParametersContextType"
+            class="com.reprezen.swagedit.templates.SwaggerContextType$ParametersListContextType"
             id="com.reprezen.swagedit.templates.swagger.parameters_list"
+            name="Parameters List Context">
+      </contextType>
+      <contextType
+            class="com.reprezen.swagedit.templates.SwaggerContextType$ParametersListItemContextType"
+            id="com.reprezen.swagedit.templates.swagger.parameters_list_item"
             name="Parameters List Context">
       </contextType>
       <contextType

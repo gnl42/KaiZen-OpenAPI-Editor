@@ -49,15 +49,18 @@ public abstract class SwaggerContextType extends TemplateContextType {
 				|| path.matches(PATH_ITEM_REGEX + ":[^:]+:responses$")) {
 			return ResponsesContextType.CONTEXT_ID;
 		}
-		if (path.matches(PATH_ITEM_REGEX + ":[^:]+:parameters(:@\\d+)?$")
-				|| path.matches(PATH_ITEM_REGEX + ":parameters$")) {
-			return ParametersContextType.CONTEXT_ID;
+		if (path.matches(PATH_ITEM_REGEX + ":parameters$") //
+				|| path.matches(PATH_ITEM_REGEX + ":[^:]+:parameters$")) {
+			return ParametersListContextType.CONTEXT_ID;
 		}
-		if (path.equals(":parameters") //
-				|| path.matches(":parameters:[^:]+$")) {
+		if (path.matches(PATH_ITEM_REGEX + ":[^:]+:parameters:@\\d+$")) {
+			return ParametersListItemContextType.CONTEXT_ID;
+		}
+		if (path.matches(":parameters:[^:]+$")) {
 			return ParameterObjectContextType.CONTEXT_ID;
 		}
-		if (path.matches(":definitions:[^:]+$") //
+		if (path.equals(":parameters") //
+				|| path.matches(":definitions:[^:]+$") //
 				|| path.matches(".+:[^:]+:additionalProperties$")//
 				|| path.matches(PARAMETERS_SCHEMA_REGEX + "$")//
 				|| path.matches(PARAMETERS_SCHEMA_REGEX + ":items$")//
@@ -75,7 +78,8 @@ public abstract class SwaggerContextType extends TemplateContextType {
 				PathsContextType.CONTEXT_ID, //
 				PathItemContextType.CONTEXT_ID, //
 				ResponsesContextType.CONTEXT_ID, //
-				ParametersContextType.CONTEXT_ID, //
+				ParametersListContextType.CONTEXT_ID, //
+				ParametersListItemContextType.CONTEXT_ID, //
 				ParameterObjectContextType.CONTEXT_ID, //
 				SchemaContextType.CONTEXT_ID));
 	}
@@ -101,8 +105,12 @@ public abstract class SwaggerContextType extends TemplateContextType {
 		public static final String CONTEXT_ID = "com.reprezen.swagedit.templates.swagger.responses";
 	}
 
-	public static class ParametersContextType extends SwaggerContextType {
+	public static class ParametersListContextType extends SwaggerContextType {
 		public static final String CONTEXT_ID = "com.reprezen.swagedit.templates.swagger.parameters_list";
+	}
+
+	public static class ParametersListItemContextType extends SwaggerContextType {
+		public static final String CONTEXT_ID = "com.reprezen.swagedit.templates.swagger.parameters_list_item";
 	}
 
 	public static class ParameterObjectContextType extends SwaggerContextType {
