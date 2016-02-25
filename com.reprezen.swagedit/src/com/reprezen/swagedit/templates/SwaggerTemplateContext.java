@@ -22,9 +22,10 @@ import org.eclipse.jface.text.templates.TemplateTranslator;
 import org.eclipse.swt.widgets.Link;
 
 /**
- * Modification of {@link org.eclipse.xtext.ui.editor.templates.XtextTemplateContext}
- * with removed Xtext dependencies ({@link org.eclipse.xtext.scoping.IScopeProvider} and
- * {@link org.eclipse.xtext.ui.editor.contentassist.ContentAssistContext})
+ * Modification of
+ * {@link org.eclipse.xtext.ui.editor.templates.XtextTemplateContext} with
+ * removed Xtext dependencies ({@link org.eclipse.xtext.scoping.IScopeProvider}
+ * and {@link org.eclipse.xtext.ui.editor.contentassist.ContentAssistContext})
  * <br/>
  * <br/>
  * Represents an extended version of class {@link DocumentTemplateContext} to
@@ -36,14 +37,15 @@ import org.eclipse.swt.widgets.Link;
  * @author Sebastian Zarnekow
  */
 public class SwaggerTemplateContext extends DocumentTemplateContext {
-	
-	
+
 	public SwaggerTemplateContext(DocumentTemplateContext context) {
-		super(context.getContextType(), context.getDocument(), context.getCompletionOffset(), context.getCompletionLength());
+		super(context.getContextType(), context.getDocument(), context.getCompletionOffset(),
+				context.getCompletionLength());
 	}
-	
-	// Unmodified code from org.eclipse.xtext.ui.editor.templates.XtextTemplateContext below
-	
+
+	// Unmodified code from
+	// org.eclipse.xtext.ui.editor.templates.XtextTemplateContext below
+
 	@Override
 	public TemplateBuffer evaluate(Template template) throws BadLocationException, TemplateException {
 		if (!canEvaluate(template))
@@ -78,11 +80,22 @@ public class SwaggerTemplateContext extends DocumentTemplateContext {
 			IRegion lineRegion = getDocument().getLineInformationOfOffset(offset);
 			String line = getDocument().get(lineRegion.getOffset(), lineRegion.getLength());
 			int i = 0;
-			while (i < line.length() && Character.isWhitespace(line.charAt(i))) {
-				i++;
+			// support for array items
+			StringBuilder indentation = new StringBuilder();
+			while (i < line.length()) {
+				char indentSymbol = line.charAt(i);
+				if (Character.isWhitespace(indentSymbol)) {
+					indentation.append(indentSymbol);
+					i++;
+				} else if ('-' == indentSymbol) {// array item
+					indentation.append(' ');
+					i++;
+				} else {
+					break;
+				}
 			}
 			if (i != 0)
-				return new IndentationAwareTemplateTranslator(line.substring(0, i));
+				return new IndentationAwareTemplateTranslator(indentation.toString());
 			return new TemplateTranslator();
 		} catch (BadLocationException ex) {
 			return new TemplateTranslator();
