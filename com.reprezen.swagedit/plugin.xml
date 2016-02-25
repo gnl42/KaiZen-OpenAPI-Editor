@@ -102,12 +102,12 @@
             name="Parameters List Context">
       </contextType>
       <contextType
-            class="com.reprezen.swagedit.templates.SwaggerContextType$ParametersListItemContextType"
-            id="com.reprezen.swagedit.templates.swagger.parameters_list_item"
+            class="com.reprezen.swagedit.templates.SwaggerContextType$ParameterDefinitionContextType"
+            id="com.reprezen.swagedit.templates.swagger.parameters_definition"
             name="Parameters List Context">
       </contextType>
       <contextType
-            class="com.reprezen.swagedit.templates.SwaggerContextType$ParameterContextType"
+            class="com.reprezen.swagedit.templates.SwaggerContextType$ParameterObjectContextType"
             id="com.reprezen.swagedit.templates.swagger.parameter_object"
             name="Individual Parameter Context">
       </contextType>

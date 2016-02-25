@@ -12,6 +12,9 @@ public abstract class SwaggerContextType extends TemplateContextType {
 
 	private static final String PARAMETERS_SCHEMA_REGEX = ".*:parameters(:@\\d+):schema";
 	private static final String PATH_ITEM_REGEX = ":paths:/[^:]+";
+	// we can use a ? here as both 'PATH_ITEM_REGEX + ":parameters$"' and
+	// 'PATH_ITEM_REGEX + ":[^:]+:parameters$"' are supported
+	private static final String PARAMETERS_LIST_REGEX = PATH_ITEM_REGEX + ":([^:]+:)?parameters";
 
 	public SwaggerContextType() {
 		addGlobalResolvers();
@@ -29,7 +32,7 @@ public abstract class SwaggerContextType extends TemplateContextType {
 	}
 
 	public static String getContextType(String path) {
-		// System.out.println("Context Type " + path);
+		//System.out.println("Context Type " + path);
 		if (path != null && path.endsWith(":")) {
 			path = path.substring(0, path.length() - 1);
 		}
@@ -49,18 +52,17 @@ public abstract class SwaggerContextType extends TemplateContextType {
 				|| path.matches(PATH_ITEM_REGEX + ":[^:]+:responses$")) {
 			return ResponsesContextType.CONTEXT_ID;
 		}
-		if (path.matches(PATH_ITEM_REGEX + ":parameters$") //
-				|| path.matches(PATH_ITEM_REGEX + ":[^:]+:parameters$")) {
+		if (path.matches(PARAMETERS_LIST_REGEX + "$")) {
 			return ParametersListContextType.CONTEXT_ID;
 		}
-		if (path.matches(PATH_ITEM_REGEX + ":[^:]+:parameters:@\\d+$")) {
-			return ParametersListItemContextType.CONTEXT_ID;
-		}
-		if (path.matches(":parameters:[^:]+$")) {
+		if (path.matches(PARAMETERS_LIST_REGEX + ":@\\d+$")//
+				|| path.matches(":parameters:[^:]+$")) {
 			return ParameterObjectContextType.CONTEXT_ID;
 		}
-		if (path.equals(":parameters") //
-				|| path.matches(":definitions:[^:]+$") //
+		if (path.equals(":parameters")) {
+			return ParameterDefinitionContextType.CONTEXT_ID;
+		}
+		if (path.matches(":definitions:[^:]+$") //
 				|| path.matches(".+:[^:]+:additionalProperties$")//
 				|| path.matches(PARAMETERS_SCHEMA_REGEX + "$")//
 				|| path.matches(PARAMETERS_SCHEMA_REGEX + ":items$")//
@@ -79,8 +81,8 @@ public abstract class SwaggerContextType extends TemplateContextType {
 				PathItemContextType.CONTEXT_ID, //
 				ResponsesContextType.CONTEXT_ID, //
 				ParametersListContextType.CONTEXT_ID, //
-				ParametersListItemContextType.CONTEXT_ID, //
 				ParameterObjectContextType.CONTEXT_ID, //
+				ParameterDefinitionContextType.CONTEXT_ID, //
 				SchemaContextType.CONTEXT_ID));
 	}
 
@@ -109,12 +111,12 @@ public abstract class SwaggerContextType extends TemplateContextType {
 		public static final String CONTEXT_ID = "com.reprezen.swagedit.templates.swagger.parameters_list";
 	}
 
-	public static class ParametersListItemContextType extends SwaggerContextType {
-		public static final String CONTEXT_ID = "com.reprezen.swagedit.templates.swagger.parameters_list_item";
-	}
-
 	public static class ParameterObjectContextType extends SwaggerContextType {
 		public static final String CONTEXT_ID = "com.reprezen.swagedit.templates.swagger.parameter_object";
+	}
+
+	public static class ParameterDefinitionContextType extends SwaggerContextType {
+		public static final String CONTEXT_ID = "com.reprezen.swagedit.templates.swagger.parameter_definition";
 	}
 
 	public static class SchemaContextType extends SwaggerContextType {

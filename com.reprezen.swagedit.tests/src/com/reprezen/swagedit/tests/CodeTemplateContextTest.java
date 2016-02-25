@@ -6,9 +6,9 @@ import static com.reprezen.swagedit.templates.SwaggerContextType.getContextType;
 
 import org.junit.Test;
 
-import com.reprezen.swagedit.templates.SwaggerContextType.ParameterObjectContextType;
+import com.reprezen.swagedit.templates.SwaggerContextType.ParameterDefinitionContextType;
 import com.reprezen.swagedit.templates.SwaggerContextType.ParametersListContextType;
-import com.reprezen.swagedit.templates.SwaggerContextType.ParametersListItemContextType;
+import com.reprezen.swagedit.templates.SwaggerContextType.ParameterObjectContextType;
 import com.reprezen.swagedit.templates.SwaggerContextType.PathItemContextType;
 import com.reprezen.swagedit.templates.SwaggerContextType.ResponsesContextType;
 import com.reprezen.swagedit.templates.SwaggerContextType.SchemaContextType;
@@ -49,13 +49,17 @@ public class CodeTemplateContextTest {
 	@Test
 	public void testParameterObject() throws Exception {
 		assertThat(getContextType(":parameters:skipParam:"), equalTo(ParameterObjectContextType.CONTEXT_ID));
+		assertThat(getContextType(":paths:/taxFilings/{id}:get:parameters:@0:"),
+				equalTo(ParameterObjectContextType.CONTEXT_ID));
+	}
+
+	@Test
+	public void testParameterDefinition() throws Exception {
+		assertThat(getContextType(":parameters:"), equalTo(ParameterDefinitionContextType.CONTEXT_ID));
 	}
 
 	@Test
 	public void testParametersList() throws Exception {
-		assertThat(getContextType(":paths:/taxFilings/{id}:get:parameters:@0:"),
-				equalTo(ParametersListItemContextType.CONTEXT_ID));
-
 		assertThat(getContextType(":paths:/resource:parameters:"), equalTo(ParametersListContextType.CONTEXT_ID));
 		assertThat(getContextType(":paths:/taxFilings/{id}:get:parameters"),
 				equalTo(ParametersListContextType.CONTEXT_ID));
