@@ -103,7 +103,7 @@
       </contextType>
       <contextType
             class="com.reprezen.swagedit.templates.SwaggerContextType$ParameterContextType"
-            id="com.reprezen.swagedit.templates.swagger.parameter_single"
+            id="com.reprezen.swagedit.templates.swagger.parameter_object"
             name="Individual Parameter Context">
       </contextType>
       <contextType

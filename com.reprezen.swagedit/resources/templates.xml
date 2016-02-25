@@ -181,7 +181,7 @@ definitions:
      <template name="integer parameter" 
        id="com.reprezen.swagedit.templates.int_parameter" 
        description="integer parameter template" 
-       context="com.reprezen.swagedit.templates.swagger.parameter_single" 
+       context="com.reprezen.swagedit.templates.swagger.parameter_object" 
        enabled="true">param:
   name: id
   in: path

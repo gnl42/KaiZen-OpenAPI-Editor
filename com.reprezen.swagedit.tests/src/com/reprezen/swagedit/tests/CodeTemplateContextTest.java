@@ -6,7 +6,7 @@ import static com.reprezen.swagedit.templates.SwaggerContextType.getContextType;
 
 import org.junit.Test;
 
-import com.reprezen.swagedit.templates.SwaggerContextType.ParameterContextType;
+import com.reprezen.swagedit.templates.SwaggerContextType.ParameterObjectContextType;
 import com.reprezen.swagedit.templates.SwaggerContextType.ParametersContextType;
 import com.reprezen.swagedit.templates.SwaggerContextType.PathItemContextType;
 import com.reprezen.swagedit.templates.SwaggerContextType.ResponsesContextType;
@@ -47,7 +47,7 @@ public class CodeTemplateContextTest {
 
 	@Test
 	public void testParameter() throws Exception {
-		assertThat(getContextType(":parameters:skipParam:"), equalTo(ParameterContextType.CONTEXT_ID));
+		assertThat(getContextType(":parameters:skipParam:"), equalTo(ParameterObjectContextType.CONTEXT_ID));
 	}
 
 	@Test
