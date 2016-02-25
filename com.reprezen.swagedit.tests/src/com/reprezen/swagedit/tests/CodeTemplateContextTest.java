@@ -30,6 +30,8 @@ public class CodeTemplateContextTest {
 		assertThat(getContextType(":paths:"), not(equalTo(PathItemContextType.CONTEXT_ID)));
 		assertThat(getContextType(":paths:/pets:get"), not(equalTo(PathItemContextType.CONTEXT_ID)));
 		assertThat(getContextType(":paths:/pets:get:responses"), not(equalTo(PathItemContextType.CONTEXT_ID)));
+		assertThat(getContextType(":paths:/my-pets/v1/{pet-id}:somethingElse"),
+				not(equalTo(PathItemContextType.CONTEXT_ID)));
 	}
 
 	@Test
@@ -70,6 +72,15 @@ public class CodeTemplateContextTest {
 				equalTo(SchemaContextType.CONTEXT_ID));
 		assertThat(getContextType(":definitions:TaxFilingObject:additionalProperties"),
 				equalTo(SchemaContextType.CONTEXT_ID));
+	}
+
+	@Test
+	public void test$InRegex() throws Exception {
+		assertFalse("abcd".matches("abc"));
+		assertTrue("abc".matches("abc"));
+
+		assertFalse("abcd".matches("abc$"));
+		assertTrue("abc".matches("abc$"));
 	}
 
 }
