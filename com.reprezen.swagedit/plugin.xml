@@ -23,7 +23,6 @@
             class="com.reprezen.swagedit.editor.SwaggerEditor"
             contributorClass="org.eclipse.ui.texteditor.BasicTextEditorActionContributor"
             default="false"
-            filenames="yaml"
             icon="icons/swagger_16.png"
             id="com.reprezen.swagedit.editor"
             name="%editor.name">
