@@ -18,8 +18,7 @@ import org.eclipse.ui.plugin.AbstractUIPlugin;
 import org.osgi.framework.Bundle;
 import org.osgi.framework.BundleContext;
 
-import com.reprezen.swagedit.templates.PathContextType;
-import com.reprezen.swagedit.templates.RootContextType;
+import com.reprezen.swagedit.templates.SwaggerContextType;
 
 public class Activator extends AbstractUIPlugin {
 
@@ -107,6 +106,7 @@ public class Activator extends AbstractUIPlugin {
 			try {
 				templateStore.load();
 			} catch (IOException e) {
+				
 				YEditLog.logException(e);
 			}
 		}
@@ -116,8 +116,9 @@ public class Activator extends AbstractUIPlugin {
 	public ContextTypeRegistry getContextTypeRegistry() {
 		if (contextTypeRegistry == null) {
 			contextTypeRegistry = new ContributionContextTypeRegistry();
-			contextTypeRegistry.addContextType(RootContextType.ROOT_CONTENT_TYPE);
-			contextTypeRegistry.addContextType(PathContextType.PATH_CONTENT_TYPE);
+			for (String contextType : SwaggerContextType.allContextTypes()) {
+				contextTypeRegistry.addContextType(contextType);
+			}
 		}
 		return contextTypeRegistry;
 	}

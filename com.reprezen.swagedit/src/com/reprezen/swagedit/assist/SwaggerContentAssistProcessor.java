@@ -8,11 +8,13 @@ import org.eclipse.jface.text.IDocument;
 import org.eclipse.jface.text.IRegion;
 import org.eclipse.jface.text.ITextSelection;
 import org.eclipse.jface.text.ITextViewer;
+import org.eclipse.jface.text.Position;
 import org.eclipse.jface.text.contentassist.ICompletionProposal;
 import org.eclipse.jface.text.contentassist.IContentAssistProcessor;
 import org.eclipse.jface.text.contentassist.IContextInformation;
 import org.eclipse.jface.text.contentassist.IContextInformationValidator;
 import org.eclipse.jface.text.templates.ContextTypeRegistry;
+import org.eclipse.jface.text.templates.DocumentTemplateContext;
 import org.eclipse.jface.text.templates.Template;
 import org.eclipse.jface.text.templates.TemplateCompletionProcessor;
 import org.eclipse.jface.text.templates.TemplateContext;
@@ -31,6 +33,7 @@ import com.reprezen.swagedit.Activator;
 import com.reprezen.swagedit.Activator.Icons;
 import com.reprezen.swagedit.editor.SwaggerDocument;
 import com.reprezen.swagedit.templates.SwaggerContextType;
+import com.reprezen.swagedit.templates.SwaggerTemplateContext;
 
 /**
  * This class provides basic content assist based on keywords used by the
@@ -128,8 +131,13 @@ public class SwaggerContentAssistProcessor extends TemplateCompletionProcessor i
 	}
 
 	@Override
-	protected ICompletionProposal createProposal(Template template, TemplateContext context, IRegion region, int relevance) {
-		return new StyledTemplateProposal(template, context, region, getImage(template), getTemplateLabel(template), relevance);
+	protected ICompletionProposal createProposal(Template template, TemplateContext context, IRegion region,
+			int relevance) {
+		if (context instanceof DocumentTemplateContext) {
+			context = new SwaggerTemplateContext((DocumentTemplateContext) context);
+		}
+		return new StyledTemplateProposal(template, context, region, getImage(template), getTemplateLabel(template),
+				relevance);
 	}
 
 	@Override
@@ -139,7 +147,9 @@ public class SwaggerContentAssistProcessor extends TemplateCompletionProcessor i
 
 	@Override
 	protected TemplateContextType getContextType(ITextViewer viewer, IRegion region) {
-		return getContextTypeRegistry().getContextType(SwaggerContextType.getContentType(currentPath));
+		String contextType = SwaggerContextType.getContextType(currentPath);
+		System.out.println("contextType " + contextType);
+		return getContextTypeRegistry().getContextType(contextType);
 	}
 
 	@Override
