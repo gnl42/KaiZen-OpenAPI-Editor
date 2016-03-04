@@ -1005,6 +1005,7 @@
               "$ref": "#/definitions/schema"
             },
             {
+              "title": "schema array",
               "type": "array",
               "minItems": 1,
               "items": {
@@ -1587,9 +1588,11 @@
     "format": {
       "anyOf": [
         {
+          "title": "user-defined format",
           "type": "string"
         },
         {
+          "title": "pre-defined format",
           "type": "string",
             "enum": [
               "int32",
