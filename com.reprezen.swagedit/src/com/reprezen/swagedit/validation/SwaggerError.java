@@ -10,7 +10,9 @@
  *******************************************************************************/
 package com.reprezen.swagedit.validation;
 
+import java.util.Arrays;
 import java.util.HashMap;
+import java.util.LinkedList;
 import java.util.Map;
 import java.util.Set;
 
@@ -18,7 +20,10 @@ import org.eclipse.core.resources.IMarker;
 import org.yaml.snakeyaml.error.MarkedYAMLException;
 import org.yaml.snakeyaml.error.YAMLException;
 
+import com.fasterxml.jackson.databind.JsonNode;
 import com.google.common.base.Strings;
+import com.google.common.collect.Lists;
+import com.reprezen.swagedit.json.JsonSchemaManager;
 
 public class SwaggerError {
 
@@ -31,6 +36,7 @@ public class SwaggerError {
 	public int level;
 	public int line;
 	public int indent = 0;
+	private static final JsonNode swaggerSchema = new JsonSchemaManager().getSwaggerSchema().asJson();;
 
 	public SwaggerError(int line, int level, String message) {
 		this.line = line;
@@ -75,7 +81,7 @@ public class SwaggerError {
 
 			return builder.toString();
 		}
-		
+
 		return message;
 	}
 
@@ -109,19 +115,65 @@ public class SwaggerError {
 			builder.append("Failed to match exactly one schema:");
 			builder.append("\n");
 
-			for (String key: errors.keySet()) {
+			for (String location : errors.keySet()) {
 				builder.append(tabs);
 				builder.append(" - ");
-				builder.append(key);
+				builder.append(getHumanFriendlyText(location));
 				builder.append(":");
 				builder.append("\n");
 
-				for (SwaggerError e: errors.get(key)) {
+				for (SwaggerError e : errors.get(location)) {
 					builder.append(e.getMessage(true));
 				}
 			}
 
 			return builder.toString();
+		}
+
+		protected String getHumanFriendlyText(String location) {
+			JsonNode swaggerSchemaNode = findNode(location);
+			if (swaggerSchemaNode == null) {
+				return location;
+			}
+			JsonNode title = swaggerSchemaNode.get("title");
+			if (title != null) {
+				return title.asText();
+			}
+			JsonNode description = swaggerSchemaNode.get("title");
+			if (description != null) {
+				return description.asText();
+			}
+			// "$ref":"#/definitions/headerParameterSubSchema"
+			JsonNode ref = swaggerSchemaNode.get("$ref");
+			if (ref != null) {
+				return ref.asText().substring(ref.asText().lastIndexOf("/") + 1);
+			}
+			return location;
+		}
+
+		protected JsonNode findNode(String path) {
+			JsonNode result = findNode(Lists.newLinkedList(Arrays.asList(path.split("/"))), swaggerSchema);
+			return result;
+		}
+
+		protected JsonNode findNode(LinkedList<String> path, JsonNode root) {
+			// retrieves the first element, and also *removes* it
+			String firstSegment = path.pop();
+			if (Strings.isNullOrEmpty(firstSegment)) {
+				return findNode(path, root);
+			}
+			int firstSegmentAsNumber = -1;
+			try {
+				firstSegmentAsNumber = Integer.parseInt(firstSegment);
+			} catch (NumberFormatException e) {
+				// ignore
+			}
+			JsonNode nodeForSegment = firstSegmentAsNumber == -1 ? root.get(firstSegment)
+					: root.get(firstSegmentAsNumber);
+			if (path.isEmpty()) {
+				return nodeForSegment;
+			}
+			return findNode(path, nodeForSegment);
 		}
 	}
 
