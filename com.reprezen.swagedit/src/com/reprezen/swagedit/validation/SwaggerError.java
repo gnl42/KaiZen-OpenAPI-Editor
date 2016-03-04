@@ -11,10 +11,12 @@
 package com.reprezen.swagedit.validation;
 
 import java.util.Arrays;
+import java.util.Comparator;
 import java.util.HashMap;
 import java.util.LinkedList;
 import java.util.Map;
 import java.util.Set;
+import java.util.TreeSet;
 
 import org.eclipse.core.resources.IMarker;
 import org.yaml.snakeyaml.error.MarkedYAMLException;
@@ -108,6 +110,17 @@ public class SwaggerError {
 
 		@Override
 		public String getMessage() {
+			Set<String> orderedErrorLocations = new TreeSet<>(new Comparator<String>() {
+				@Override
+				public int compare(String o1, String o2) {
+					if (errors.get(o1).size() != errors.get(o2).size()) {
+						return errors.get(o1).size() - errors.get(o2).size();
+					}
+					return o1.compareTo(o2);
+				}
+			});
+			orderedErrorLocations.addAll(errors.keySet());
+
 			final StringBuilder builder = new StringBuilder();
 			final String tabs = Strings.repeat("\t", indent);
 
@@ -115,7 +128,7 @@ public class SwaggerError {
 			builder.append("Failed to match exactly one schema:");
 			builder.append("\n");
 
-			for (String location : errors.keySet()) {
+			for (String location : orderedErrorLocations) {
 				builder.append(tabs);
 				builder.append(" - ");
 				builder.append(getHumanFriendlyText(location));
