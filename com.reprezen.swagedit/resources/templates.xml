@@ -69,10 +69,10 @@ definitions:
        description="object resource template" 
        context="com.reprezen.swagedit.templates.swagger.paths" 
        enabled="true">/resource:
- get:
-   responses:
-     '200':
-       description: Ok
+  get:
+    responses:
+      '200':
+        description: Ok
 </template>     
 
      <template name="collection resource" 
@@ -91,11 +91,11 @@ definitions:
        description="GET template" 
        context="com.reprezen.swagedit.templates.swagger.path_item" 
        enabled="true">get:
-      summary:
-      description: 
-      responses:
-        '200':
-          description: OK
+  summary:
+  description: 
+  responses:
+    '200':
+      description: OK
 </template>
 
      <template name="post" 
@@ -103,11 +103,11 @@ definitions:
        description="POST template" 
        context="com.reprezen.swagedit.templates.swagger.path_item" 
        enabled="true">post:
- summary:
- description: 
- responses:
-   '200':
-     description: OK
+  summary:
+  description: 
+  responses:
+    '200':
+      description: OK
 </template>
 
      <template name="put" 
@@ -115,11 +115,11 @@ definitions:
        description="PUT template" 
        context="com.reprezen.swagedit.templates.swagger.path_item" 
        enabled="true">put:
- summary:
- description: 
- responses:
-   '200':
-     description: OK
+  summary:
+  description: 
+  responses:
+    '200':
+      description: OK
 </template>
 
      <template name="delete" 
@@ -127,11 +127,11 @@ definitions:
        description="DELETE template" 
        context="com.reprezen.swagedit.templates.swagger.path_item" 
        enabled="true">delete:
-      summary:
-      description: 
-      responses:
-        '200':
-          description: OK
+  summary:
+  description: 
+  responses:
+    '200':
+      description: OK
 </template>
     
     <template name="patch" 
@@ -139,11 +139,11 @@ definitions:
        description="PATCH template" 
        context="com.reprezen.swagedit.templates.swagger.path_item" 
        enabled="true">patch:
- summary:
- description: 
- responses:
-   '200':
-     description: OK
+  summary:
+  description: 
+  responses:
+    '200':
+      description: OK
 </template>
 
     <template name="options" 
@@ -151,11 +151,11 @@ definitions:
        description="OPTIONS template" 
        context="com.reprezen.swagedit.templates.swagger.path_item" 
        enabled="true">options:
- summary:
- description: 
- responses:
-   '200':
-     description: OK
+  summary:
+  description: 
+  responses:
+    '200':
+      description: OK
 </template>
 
     <template name="OK response" 
