@@ -152,10 +152,6 @@ public class SwaggerError {
 			if (title != null) {
 				return title.asText();
 			}
-			JsonNode description = swaggerSchemaNode.get("title");
-			if (description != null) {
-				return description.asText();
-			}
 			// "$ref":"#/definitions/headerParameterSubSchema"
 			JsonNode ref = swaggerSchemaNode.get("$ref");
 			if (ref != null) {
