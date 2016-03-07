@@ -143,21 +143,33 @@ public class SwaggerError {
 			return builder.toString();
 		}
 
-		protected String getHumanFriendlyText(String location) {
+		/* package */ String getHumanFriendlyText(String location) {
 			JsonNode swaggerSchemaNode = findNode(location);
 			if (swaggerSchemaNode == null) {
 				return location;
 			}
+			return getHumanFriendlyText(swaggerSchemaNode, location);
+		}
+
+		/* package */ String getHumanFriendlyText(JsonNode swaggerSchemaNode, String defaultValue) {
 			JsonNode title = swaggerSchemaNode.get("title");
 			if (title != null) {
 				return title.asText();
 			}
+			// nested array
+			if (swaggerSchemaNode.get("items") != null) {
+				swaggerSchemaNode = swaggerSchemaNode.get("items");
+			}
 			// "$ref":"#/definitions/headerParameterSubSchema"
 			JsonNode ref = swaggerSchemaNode.get("$ref");
 			if (ref != null) {
-				return ref.asText().substring(ref.asText().lastIndexOf("/") + 1);
+				return getLabelForRef(ref.asText());
 			}
-			return location;
+			return defaultValue;
+		}
+
+		/* package */ String getLabelForRef(String refValue) {
+			return refValue.substring(refValue.lastIndexOf("/") + 1);
 		}
 
 		protected JsonNode findNode(String path) {
