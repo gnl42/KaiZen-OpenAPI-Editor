@@ -71,8 +71,10 @@ definitions:
        enabled="true">/resource:
   get:
     responses:
-      '200':
-        description: Ok
+      '${200}':
+        description: OK
+       schema:
+         $$ref: ${model}
 </template>     
 
      <template name="collection resource" 
@@ -82,8 +84,10 @@ definitions:
        enabled="true">/resources:
  get:
    responses:
-     '200':
-       description: Ok
+     '${200}':
+       description: OK
+       schema:
+         $$ref: ${model}
 </template>   
      
      <template name="get" 
@@ -94,8 +98,10 @@ definitions:
   summary: Read
   description: Provide details for the entire list (for collection resources) or an item (for object resources)
   responses:
-    '200':
-      description: OK
+    '${200}':
+      description: ${OK}
+      schema:
+        $$ref: ${model}
 </template>
 
      <template name="post" 
@@ -106,8 +112,10 @@ definitions:
   summary: Create
   description: Create a new item
   responses:
-    '200':
+    '${200}':
       description: OK
+      schema:
+        $$ref: ${model}
 </template>
 
      <template name="put" 
@@ -118,8 +126,10 @@ definitions:
   summary: Update
   description: Update the entire list (for collection resources) or an item (for object resources)
   responses:
-    '200':
+    '${200}':
       description: OK
+      schema:
+        $$ref: ${model}
 </template>
 
      <template name="delete" 
@@ -130,8 +140,10 @@ definitions:
   summary: Delete 
   description: Delete the entire list (for collection resources) or an item (for object resources)
   responses:
-    '200':
+    '${200}':
       description: OK
+      schema:
+        $$ref: ${model}
 </template>
     
     <template name="patch" 
@@ -142,8 +154,10 @@ definitions:
   summary: Partial update
   description: 
   responses:
-    '200':
+    '${200}':
       description: OK
+      schema:
+        $$ref: ${model}
 </template>
 
     <template name="options" 
@@ -154,7 +168,7 @@ definitions:
   summary: Request resource options
   description: Request information about methods available for resource manipulation 
   responses:
-    '200':
+    '${200}':
       description: OK
 </template>
 
@@ -166,7 +180,7 @@ definitions:
   summary: Query a resource in the server
   description: HEAD sends request and get the response only in the header, the body should not be used
   responses:
-    '200':
+    '${200}':
       description: OK
 </template>
 
@@ -178,7 +192,7 @@ definitions:
  description: OK
 </template>
 
-    <template name="Client error response" 
+    <template name="client error response" 
        id="com.reprezen.swagedit.templates.400_response" 
        description="client error response template" 
        context="com.reprezen.swagedit.templates.swagger.responses" 
@@ -198,11 +212,11 @@ definitions:
        id="com.reprezen.swagedit.templates.path_parameter_object" 
        description="path parameter template" 
        context="com.reprezen.swagedit.templates.swagger.parameter_object" 
-       enabled="true">name: id
+       enabled="true">name: ${name}
 in: path
-description: ID of the element
+description: ${ID of the element}
 required: true
-type: integer
+type: ${integer}
 format: int64
 </template>
 
@@ -211,9 +225,9 @@ format: int64
        description="schema template" 
        context="com.reprezen.swagedit.templates.swagger.schema" 
        enabled="true">required:
-  - name  
+  - ${name}  
 properties:
-  name:
+  ${name}:
     type: string
   description:
     type: string
