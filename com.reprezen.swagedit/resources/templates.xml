@@ -91,8 +91,8 @@ definitions:
        description="GET template" 
        context="com.reprezen.swagedit.templates.swagger.path_item" 
        enabled="true">get:
-  summary:
-  description: 
+  summary: Read
+  description: Provide details for the entire list (for collection resources) or an item (for object resources)
   responses:
     '200':
       description: OK
@@ -103,8 +103,8 @@ definitions:
        description="POST template" 
        context="com.reprezen.swagedit.templates.swagger.path_item" 
        enabled="true">post:
-  summary:
-  description: 
+  summary: Create
+  description: Create a new item
   responses:
     '200':
       description: OK
@@ -115,8 +115,8 @@ definitions:
        description="PUT template" 
        context="com.reprezen.swagedit.templates.swagger.path_item" 
        enabled="true">put:
-  summary:
-  description: 
+  summary: Update
+  description: Update the entire list (for collection resources) or an item (for object resources)
   responses:
     '200':
       description: OK
@@ -127,8 +127,8 @@ definitions:
        description="DELETE template" 
        context="com.reprezen.swagedit.templates.swagger.path_item" 
        enabled="true">delete:
-  summary:
-  description: 
+  summary: Delete 
+  description: Delete the entire list (for collection resources) or an item (for object resources)
   responses:
     '200':
       description: OK
@@ -139,7 +139,7 @@ definitions:
        description="PATCH template" 
        context="com.reprezen.swagedit.templates.swagger.path_item" 
        enabled="true">patch:
-  summary:
+  summary: Partial update
   description: 
   responses:
     '200':
@@ -151,24 +151,52 @@ definitions:
        description="OPTIONS template" 
        context="com.reprezen.swagedit.templates.swagger.path_item" 
        enabled="true">options:
-  summary:
-  description: 
+  summary: Request resource options
+  description: Request information about methods available for resource manipulation 
+  responses:
+    '200':
+      description: OK
+</template>
+
+    <template name="head" 
+       id="com.reprezen.swagedit.templates.path_head_template" 
+       description="HEAD template" 
+       context="com.reprezen.swagedit.templates.swagger.path_item" 
+       enabled="true">head:
+  summary: Query a resource in the server
+  description: HEAD sends request and get the response only in the header, the body should not be used
   responses:
     '200':
       description: OK
 </template>
 
     <template name="OK response" 
-       id="com.reprezen.swagedit.templates.ok_response" 
+       id="com.reprezen.swagedit.templates.200_response" 
        description="OK template" 
        context="com.reprezen.swagedit.templates.swagger.responses" 
        enabled="true">200:
- description: Ok
+ description: OK
+</template>
+
+    <template name="Client error response" 
+       id="com.reprezen.swagedit.templates.400_response" 
+       description="client error response template" 
+       context="com.reprezen.swagedit.templates.swagger.responses" 
+       enabled="true">400:
+ description: Client error
+</template>
+
+    <template name="server error response" 
+       id="com.reprezen.swagedit.templates.500_response" 
+       description="server error response template" 
+       context="com.reprezen.swagedit.templates.swagger.responses" 
+       enabled="true">500:
+ description: Server error
 </template>
      
-     <template name="integer parameter" 
-       id="com.reprezen.swagedit.templates.int_parameter_object" 
-       description="integer parameter template" 
+     <template name="path parameter" 
+       id="com.reprezen.swagedit.templates.path_parameter_object" 
+       description="path parameter template" 
        context="com.reprezen.swagedit.templates.swagger.parameter_object" 
        enabled="true">name: id
 in: path
@@ -187,7 +215,7 @@ format: int64
 properties:
   name:
     type: string
-  tag:
+  description:
     type: string
 </template>
  
