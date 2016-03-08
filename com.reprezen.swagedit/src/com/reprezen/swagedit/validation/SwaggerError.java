@@ -95,8 +95,8 @@ public class SwaggerError {
 			super(line, level, null);
 		}
 
-		public void put(String key, Set<SwaggerError> errors) {
-			this.errors.put(key, errors);
+		public void put(String path, Set<SwaggerError> errors) {
+			this.errors.put(path, errors);
 		}
 
 		public Map<String, Set<SwaggerError>> getErrors() {
