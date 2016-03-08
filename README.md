@@ -1,9 +1,12 @@
-SwagEdit
----
+# SwagEdit - Eclipse Editor for Swagger–OpenAPI
 
-Eclipse Editor for Swagger API Description Language.
+SwagEdit is an Eclipse Editor for the [Swagger](http://swagger.io) API Description Language, now known as the [OpenAPI Specification](http://openapis.org).
 
-# Development
+SwagEdit was developed for [RepreZen API Studio](http://reprezen.com/swagger-tools), a comprehensive solution for API modeling, documentation, visualization, testing and code generation, built on Eclipse. Swagger–OpenAPI.
+
+We welcome your suggestions and contributions!
+
+## Development
 
 Development of SwagEdit should be done with Eclipse. This project uses Maven/Tycho so you should have the Eclipse maven plugin `m2e` 
 already installed.
@@ -17,11 +20,11 @@ git clone git@github.com:ModelSolv/SwagEdit.git
 Open Eclipse and select `File > Import... > Maven > Existing Maven Project` and select the folder SwagEdit.
 This will put the project SwagEdit into your current workspace. 
 
-## Use a published update site 
+### Use a published update site 
 You can now install SwagEdit into your Eclipse by clicking on `Help > Install New Software... > Add...`
 This will show a dialog box from where you can select the location of the update site. Use "http://products.modelsolv.com/swagedit/kepler/" as URL. 
 
-## Build a local update site from sources
+### Build a local update site from sources
 
 From inside your SwagEdit folder, run the following command:
 
@@ -37,8 +40,8 @@ Click on `Local...` and select the folder `SwagEdit/com.reprezen.swagedit.reposi
 
 You can now select and install SwagEdit from the Eclipse update manager.
 
-# Troubleshooting
-## Autoformat(Ctrl-Shift-F) removes YAML comments 
+## Troubleshooting
+### Autoformat(Ctrl-Shift-F) removes YAML comments 
 This is a known issue of YEdit - the tool that we use for SwagEdit implementation. There is no fix for this yet, our erecommendation is to desable the key binding. 
 To disable the key binding for YEdit format, please open the Eclipse Preferences. 
 <img width="954" alt="yedit_disableformat" src="https://cloud.githubusercontent.com/assets/644582/13615520/b0411e3a-e543-11e5-93d7-dd4917be20da.png">
