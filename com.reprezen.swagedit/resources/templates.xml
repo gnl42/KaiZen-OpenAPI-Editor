@@ -29,15 +29,15 @@ info:
 
      <template name="paths" 
        id="com.reprezen.swagedit.templates.paths_template" 
-       description="swagger template" 
+       description="swagger paths template" 
        context="com.reprezen.swagedit.templates.swagger.root" 
        enabled="true">
 paths:
-  /:
+  /${}:
     get:
       responses:
         '200':
-          description: Ok
+          description: OK
 </template>
      
      <template name="oath2" 
@@ -188,24 +188,24 @@ definitions:
        id="com.reprezen.swagedit.templates.200_response" 
        description="OK template" 
        context="com.reprezen.swagedit.templates.swagger.responses" 
-       enabled="true">200:
- description: OK
+       enabled="true">2${00}:
+ description: ${OK}
 </template>
 
     <template name="client error response" 
        id="com.reprezen.swagedit.templates.400_response" 
        description="client error response template" 
        context="com.reprezen.swagedit.templates.swagger.responses" 
-       enabled="true">400:
- description: Client error
+       enabled="true">4${00}:
+ description: ${Client} error
 </template>
 
     <template name="server error response" 
        id="com.reprezen.swagedit.templates.500_response" 
        description="server error response template" 
        context="com.reprezen.swagedit.templates.swagger.responses" 
-       enabled="true">500:
- description: Server error
+       enabled="true">5${00}:
+ description: ${Server} error
 </template>
      
      <template name="path parameter" 
@@ -214,10 +214,58 @@ definitions:
        context="com.reprezen.swagedit.templates.swagger.parameter_object" 
        enabled="true">name: ${name}
 in: path
-description: ${ID of the element}
+description: ${ID}
 required: true
 type: ${integer}
 format: int64
+</template>
+
+     <template name="header parameter" 
+       id="com.reprezen.swagedit.templates.header_parameter_object" 
+       description="header parameter template" 
+       context="com.reprezen.swagedit.templates.swagger.parameter_object" 
+       enabled="true">name: ${name}
+in: header
+description: ${ID}
+required: true
+type: ${integer}
+format: int64
+</template>
+
+     <template name="query parameter" 
+       id="com.reprezen.swagedit.templates.query_parameter_object" 
+       description="query parameter template" 
+       context="com.reprezen.swagedit.templates.swagger.parameter_object" 
+       enabled="true">name: ${name}
+in: query
+description: ${ID}
+required: true
+type: ${integer}
+format: int64
+</template>
+
+     <template name="form data parameter" 
+       id="com.reprezen.swagedit.templates.formdata_parameter_object" 
+       description="form data parameter template" 
+       context="com.reprezen.swagedit.templates.swagger.parameter_object" 
+       enabled="true">name: ${name}
+in: formData
+description: ${ID}
+required: true
+type: ${integer}
+format: int64
+</template>
+
+     <template name="body parameter (request)" 
+       id="com.reprezen.swagedit.templates.body_parameter_object" 
+       description="body parameter (request) template" 
+       context="com.reprezen.swagedit.templates.swagger.parameter_object" 
+       enabled="true">name: ${name}
+in: body
+description: ${ID}
+required: true
+schema:
+  $$ref: ${model}
 </template>
 
      <template name="schema" 
@@ -228,7 +276,7 @@ format: int64
   - ${name}  
 properties:
   ${name}:
-    type: string
+    type: ${string}
   description:
     type: string
 </template>
