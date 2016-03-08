@@ -41,16 +41,12 @@ Click on `Local...` and select the folder `SwagEdit/com.reprezen.swagedit.reposi
 You can now select and install SwagEdit from the Eclipse update manager.
 
 ## Troubleshooting
-### Autoformat(Ctrl-Shift-F) removes YAML comments 
-This is a known issue of YEdit - the tool that we use for SwagEdit implementation. There is no fix for this yet, our erecommendation is to desable the key binding. 
-To disable the key binding for YEdit format, please open the Eclipse Preferences. 
+### Autoformat (Ctrl+Shift+F) removes YAML comments 
+This is a [known issue](https://github.com/oyse/yedit/issues/15) of YEdit, the YAML Editor on which SwagEdit is built. There is no fix for this yet, so we recommend that you disable the key binding for YEdit in Eclipse Preferences:
 <img width="954" alt="yedit_disableformat" src="https://cloud.githubusercontent.com/assets/644582/13615520/b0411e3a-e543-11e5-93d7-dd4917be20da.png">
 
-1. Open "General > Keys" page.
+1. Open the "General > Keys" page.
 2. Type "format" in the search box.
 3. Select the command from the YEdit category.
 4. Click the "Unbind Command" button.
 5. Confirm by selecting "OK".
-
-
-
