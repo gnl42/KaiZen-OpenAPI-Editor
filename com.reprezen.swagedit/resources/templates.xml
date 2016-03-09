@@ -44,14 +44,32 @@ paths:
        id="com.reprezen.swagedit.templates.securityDef_oath2" 
        description="OAuth2 security def" 
        context="com.reprezen.swagedit.templates.swagger.security_def" 
-       enabled="true">OAuth2Scheme:
+       enabled="true">${OAuth2}:
   type: oauth2
   scopes:
     user: Grants read/write access to profile info only.
   flow: accessCode
-  authorizationUrl: https://github.com/login/oauth/authorize
-  tokenUrl: https://github.com/login/oauth/access_token
-</template>     
+  authorizationUrl: ${authorizationUrl}
+  tokenUrl: ${tokenUrl}
+</template>   
+
+     <template name="api key" 
+       id="com.reprezen.swagedit.templates.securityDef_apiKey" 
+       description="API key security def" 
+       context="com.reprezen.swagedit.templates.swagger.security_def" 
+       enabled="true">${api_key}:
+  type: apiKey
+  name: ${api_key}
+  in: header
+</template>  
+
+     <template name="basic" 
+       id="com.reprezen.swagedit.templates.securityDef_basic" 
+       description="basic security def" 
+       context="com.reprezen.swagedit.templates.swagger.security_def" 
+       enabled="true">${basic_auth}:
+  type: basic
+</template>    
      
      <template name="definitions" 
        id="com.reprezen.swagedit.templates.definitions_template" 
