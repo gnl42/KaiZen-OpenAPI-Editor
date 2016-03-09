@@ -149,11 +149,15 @@ definitions:
        enabled="true">put:
   summary: Update
   description: Update the entire list (for collection resources) or an item (for object resources)
+  parameters:
+   - name: ${request}
+     in: body
+     required: true
+     schema:
+       $$ref: ${model}  
   responses:
     '${200}':
       description: OK
-      schema:
-        $$ref: ${model}
 </template>
 
      <template name="delete" 
