@@ -86,7 +86,7 @@ definitions:
        id="com.reprezen.swagedit.templates.collection_resource_template" 
        description="object resource template" 
        context="com.reprezen.swagedit.templates.swagger.paths" 
-       enabled="true">/resource:
+       enabled="true">/${resource}:
   get:
     responses:
       '${200}':
@@ -99,7 +99,7 @@ definitions:
        id="com.reprezen.swagedit.templates.object_resource_template" 
        description="collection resource template" 
        context="com.reprezen.swagedit.templates.swagger.paths" 
-       enabled="true">/resources:
+       enabled="true">/${resource}:
  get:
    responses:
      '${200}':
@@ -223,7 +223,7 @@ definitions:
        description="OK template" 
        context="com.reprezen.swagedit.templates.swagger.responses" 
        enabled="true">2${00}:
- description: ${OK}
+  description: ${OK}
 </template>
 
     <template name="client error response" 
@@ -231,7 +231,7 @@ definitions:
        description="client error response template" 
        context="com.reprezen.swagedit.templates.swagger.responses" 
        enabled="true">4${00}:
- description: ${Client} error
+  description: ${Client} error
 </template>
 
     <template name="server error response" 
@@ -239,7 +239,7 @@ definitions:
        description="server error response template" 
        context="com.reprezen.swagedit.templates.swagger.responses" 
        enabled="true">5${00}:
- description: ${Server} error
+  description: ${Server} error
 </template>
      
      <template name="path parameter" 
