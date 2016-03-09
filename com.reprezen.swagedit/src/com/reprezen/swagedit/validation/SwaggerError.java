@@ -158,7 +158,7 @@ public class SwaggerError {
 			}
 			// nested array
 			if (swaggerSchemaNode.get("items") != null) {
-				swaggerSchemaNode = swaggerSchemaNode.get("items");
+				return getHumanFriendlyText(swaggerSchemaNode.get("items"), defaultValue);
 			}
 			// "$ref":"#/definitions/headerParameterSubSchema"
 			JsonNode ref = swaggerSchemaNode.get("$ref");
