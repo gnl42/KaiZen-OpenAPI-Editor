@@ -111,6 +111,12 @@ definitions:
        enabled="true">post:
   summary: Create
   description: Create a new item
+  parameters:
+   - name: ${request}
+     in: body
+     required: true
+     schema:
+       $$ref: ${model}  
   responses:
     '${200}':
       description: OK
@@ -152,7 +158,13 @@ definitions:
        context="com.reprezen.swagedit.templates.swagger.path_item" 
        enabled="true">patch:
   summary: Partial update
-  description: 
+  description: ${Update}
+  parameters:
+   - name: ${request}
+     in: body
+     required: true
+     schema:
+       $$ref: ${model}  
   responses:
     '${200}':
       description: OK
