@@ -14,17 +14,17 @@ swagger: "2.0"
        context="com.reprezen.swagedit.templates.swagger.root" 
        enabled="true">
 info:
-  version: ${version}
-  title: ${title}
-  description: ${description}
+  version: ${1.0}
+  title: ${API title}
+  description: ${API description}
   termsOfService: ${terms}
   contact:
-    name: ${name}
-    url: ${url}
-    email: ${email}
+    name: ${contact name}
+    url: ${contact url}
+    email: ${contact email}
   license:
-    name: MIT
-    url: http://opensource.org/licenses/MIT
+    name: ${MIT}
+    url: ${http://opensource.org/licenses/MIT}
 </template>
 
      <template name="paths" 
