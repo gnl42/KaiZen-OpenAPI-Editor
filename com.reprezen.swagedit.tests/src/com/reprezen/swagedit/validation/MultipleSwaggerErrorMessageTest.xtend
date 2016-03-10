@@ -56,6 +56,23 @@ class MultipleSwaggerErrorMessageTest {
 		        }'''.assertHumanFriendlyTextForNodeEquals(defaultValue, defaultValue)
 	}
 
+	@Test
+	def void testArrayOfArraysSchema() throws Exception {
+		val String defaultValue = "MY CRAZY DEFAULT VALUE FOR TESTS"
+		'''{
+  "type": "array",
+  "minItems": 1,
+  "items": {
+    "type": "array",
+    "minItems": 1,
+    "items": {
+      "$ref": "#/definitions/foo"
+    }
+  }
+}'''.assertHumanFriendlyTextForNodeEquals("foo", defaultValue)
+
+	}
+
 	def void assertHumanFriendlyTextForNodeEquals(CharSequence json, String expectedLabel, String defaultValue) {
 		val swaggerError = new SwaggerError.MultipleSwaggerError(0, 0);
 		val JsonNode arrayOfSchemasNode = Json.mapper().readTree(json.toString);

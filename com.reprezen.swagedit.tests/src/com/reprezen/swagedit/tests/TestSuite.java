@@ -15,6 +15,7 @@ import org.junit.runners.Suite;
 import org.junit.runners.Suite.SuiteClasses;
 
 import com.reprezen.swagedit.validation.ErrorProcessorTest;
+import com.reprezen.swagedit.validation.MultipleSwaggerErrorMessageTest;
 
 @RunWith(Suite.class)
 @SuiteClasses({
@@ -24,7 +25,8 @@ import com.reprezen.swagedit.validation.ErrorProcessorTest;
 	SwaggerSchemaTest.class,
 	ValidationMessageTest.class,
 	ValidatorTest.class,
+	CodeTemplateContextTest.class,
 	ErrorProcessorTest.class,
-	CodeTemplateContextTest.class
+	MultipleSwaggerErrorMessageTest.class
 })
 public class TestSuite {}
