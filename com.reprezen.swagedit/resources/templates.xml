@@ -33,8 +33,10 @@ info:
        context="com.reprezen.swagedit.templates.swagger.security_def" 
        enabled="true">${OAuth2}:
   type: oauth2
+  #Each scope defines a set of permissions, usually limited by object type and/or change type (view, add, modify, etc.)
   scopes:
-    user: Grants read/write access to profile info only.
+    ${scope1}: ${scope1_description} 
+    ${scope2}: ${scope2_description} 
   flow: accessCode
   authorizationUrl: ${authorizationUrl}
   tokenUrl: ${tokenUrl}
