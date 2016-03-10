@@ -1,35 +1,35 @@
 <templates>
 
-     <template name="swagger" 
+     <template name="swagger version" 
        id="com.reprezen.swagedit.templates.swagger_template" 
-       description="swagger template" 
+       description="Swagger version declaration" 
        context="com.reprezen.swagedit.templates.swagger.root" 
        enabled="true">
 swagger: "2.0"
 </template>
 
-     <template name="info" 
+     <template name="info object" 
        id="com.reprezen.swagedit.templates.info_template" 
-       description="swagger template" 
+       description="Provides descriptive metadata about this API specification" 
        context="com.reprezen.swagedit.templates.swagger.root" 
        enabled="true">
 info:
   version: ${1.0}
-  title: ${API title}
-  description: ${API description}
+  title: ${API_title}
+  description: ${API_description}
   termsOfService: ${terms}
   contact:
-    name: ${contact name}
-    url: ${contact url}
-    email: ${contact email}
+    name: ${contact_name}
+    url: ${contact_url}
+    email: ${contact_email}
   license:
     name: ${MIT}
     url: ${http://opensource.org/licenses/MIT}
 </template>
 
-     <template name="oath2" 
-       id="com.reprezen.swagedit.templates.securityDef_oath2" 
-       description="OAuth2 security def" 
+     <template name="oauth2 security scheme" 
+       id="com.reprezen.swagedit.templates.securityDef_oauth2" 
+       description="Defines an OAuth2 security scheme, which can be applied to paths and methods in the API." 
        context="com.reprezen.swagedit.templates.swagger.security_def" 
        enabled="true">${OAuth2}:
   type: oauth2
@@ -40,7 +40,7 @@ info:
   tokenUrl: ${tokenUrl}
 </template>   
 
-     <template name="api key" 
+     <template name="api key security scheme" 
        id="com.reprezen.swagedit.templates.securityDef_apiKey" 
        description="API key security def" 
        context="com.reprezen.swagedit.templates.swagger.security_def" 
