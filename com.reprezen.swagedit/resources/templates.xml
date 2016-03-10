@@ -27,19 +27,6 @@ info:
     url: ${http://opensource.org/licenses/MIT}
 </template>
 
-     <template name="paths" 
-       id="com.reprezen.swagedit.templates.paths_template" 
-       description="swagger paths template" 
-       context="com.reprezen.swagedit.templates.swagger.root" 
-       enabled="true">
-paths:
-  /${}:
-    get:
-      responses:
-        '200':
-          description: OK
-</template>
-     
      <template name="oath2" 
        id="com.reprezen.swagedit.templates.securityDef_oath2" 
        description="OAuth2 security def" 
