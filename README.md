@@ -6,6 +6,14 @@ SwagEdit was developed for [RepreZen API Studio](http://reprezen.com/swagger-too
 
 We welcome your suggestions and contributions!
 
+## Watch a video about SwagEdit
+[![Editing Swagger-OpenAPI in RepreZen API Studio](http://img.youtube.com/vi/KX_tHp_KQkE/0.jpg)](https://www.youtube.com/watch?v=KX_tHp_KQkE)
+
+## Install SwagEdit
+### Use a published update site 
+You can now install SwagEdit into your Eclipse by clicking on `Help > Install New Software... > Add...`
+This will show a dialog box from where you can select the location of the update site. Use "http://products.modelsolv.com/swagedit/kepler/" as URL. 
+
 ## Development
 
 Development of SwagEdit should be done with Eclipse. This project uses Maven/Tycho so you should have the Eclipse maven plugin `m2e` 
@@ -19,10 +27,6 @@ git clone git@github.com:ModelSolv/SwagEdit.git
 
 Open Eclipse and select `File > Import... > Maven > Existing Maven Project` and select the folder SwagEdit.
 This will put the project SwagEdit into your current workspace. 
-
-### Use a published update site 
-You can now install SwagEdit into your Eclipse by clicking on `Help > Install New Software... > Add...`
-This will show a dialog box from where you can select the location of the update site. Use "http://products.modelsolv.com/swagedit/kepler/" as URL. 
 
 ### Build a local update site from sources
 
