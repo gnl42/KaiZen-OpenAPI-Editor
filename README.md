@@ -17,36 +17,6 @@ This will show a dialog box from where you can select the location of the update
 ## User Documentation
 Read more about SwagEdit features on http://www.reprezen.com/swagger-tools
 
-## Development
-
-Development of SwagEdit should be done with Eclipse. This project uses Maven/Tycho so you should have the Eclipse maven plugin `m2e` 
-already installed.
-
-To start developing SwagEdit, clone the repository with the following command:
-
-```
-git clone git@github.com:ModelSolv/SwagEdit.git
-``` 
-
-Open Eclipse and select `File > Import... > Maven > Existing Maven Project` and select the folder SwagEdit.
-This will put the project SwagEdit into your current workspace. 
-
-### Build a local update site from sources
-
-From inside your SwagEdit folder, run the following command:
-
-```
-mvn clean verify
-```
-
-This command will build the project and generate an update site under the folder `SwagEdit/com.reprezen.swagedit.repository/target/repository`.
-
-You can now install SwagEdit into your Eclipse by clicking on `Help > Install New Software... > Add...`
-This will show a dialog box from where you can select the location of the update site.
-Click on `Local...` and select the folder `SwagEdit/com.reprezen.swagedit.repository/target/repository` and then click `Ok`.
-
-You can now select and install SwagEdit from the Eclipse update manager.
-
 ## Troubleshooting
 ### Autoformat (Ctrl+Shift+F) removes YAML comments 
 This is a [known issue](https://github.com/oyse/yedit/issues/15) of YEdit, the YAML Editor on which SwagEdit is built. There is no fix for this yet, so we recommend that you disable the key binding for YEdit in Eclipse Preferences:
@@ -57,3 +27,6 @@ This is a [known issue](https://github.com/oyse/yedit/issues/15) of YEdit, the Y
 3. Select the command from the YEdit category.
 4. Click the "Unbind Command" button.
 5. Confirm by selecting "OK".
+
+## Development
+Please see https://github.com/RepreZen/SwagEdit/wiki/Developer's-Guide
