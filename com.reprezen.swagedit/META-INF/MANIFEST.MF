@@ -56,3 +56,4 @@ Export-Package: com.reprezen.swagedit,
  com.reprezen.swagedit.templates,
  com.reprezen.swagedit.validation,
  com.reprezen.swagedit.wizards
+Bundle-Vendor: ModelSolv, Inc. d.b.a. RepreZen
