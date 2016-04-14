@@ -30,3 +30,7 @@ This is a [known issue](https://github.com/oyse/yedit/issues/15) of YEdit, the Y
 
 ## Development
 Please see https://github.com/RepreZen/SwagEdit/wiki/Developer's-Guide
+
+## License
+SwagEdit is provided under the Eclipse Public License (https://www.eclipse.org/legal/epl-v10.html)
+
