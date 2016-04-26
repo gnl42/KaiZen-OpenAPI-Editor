@@ -178,6 +178,9 @@ public class SwaggerError {
 		}
 
 		protected JsonNode findNode(LinkedList<String> path, JsonNode root) {
+			if (root == null) {
+				return null;
+			}
 			// retrieves the first element, and also *removes* it
 			String firstSegment = path.pop();
 			if (Strings.isNullOrEmpty(firstSegment)) {
