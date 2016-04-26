@@ -65,7 +65,7 @@ public class ErrorProcessor {
 		return fromNode(message.asJson(), 0);
 	}
 
-	public Set<SwaggerError> processMessageNode(JsonNode value) {
+	/*package*/ Set<SwaggerError> processMessageNode(JsonNode value) {
 		return fromNode(value, 0);
 	}
 

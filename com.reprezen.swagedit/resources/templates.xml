@@ -1,57 +1,64 @@
 <templates>
 
-     <template name="swagger" 
+     <template name="swagger version" 
        id="com.reprezen.swagedit.templates.swagger_template" 
-       description="swagger template" 
+       description="Swagger version declaration" 
        context="com.reprezen.swagedit.templates.swagger.root" 
        enabled="true">
 swagger: "2.0"
 </template>
 
-     <template name="info" 
+     <template name="info object" 
        id="com.reprezen.swagedit.templates.info_template" 
-       description="swagger template" 
+       description="Provides descriptive metadata about this API specification" 
        context="com.reprezen.swagedit.templates.swagger.root" 
        enabled="true">
 info:
-  version: ${version}
-  title: ${title}
-  description: ${description}
+  version: ${1.0}
+  title: ${API_title}
+  description: ${API_description}
   termsOfService: ${terms}
   contact:
-    name: ${name}
-    url: ${url}
-    email: ${email}
+    name: ${contact_name}
+    url: ${contact_url}
+    email: ${contact_email}
   license:
-    name: MIT
-    url: http://opensource.org/licenses/MIT
+    name: ${MIT}
+    url: ${http://opensource.org/licenses/MIT}
 </template>
 
-     <template name="paths" 
-       id="com.reprezen.swagedit.templates.paths_template" 
-       description="swagger template" 
-       context="com.reprezen.swagedit.templates.swagger.root" 
-       enabled="true">
-paths:
-  /:
-    get:
-      responses:
-        '200':
-          description: Ok
-</template>
-     
-     <template name="oath2" 
-       id="com.reprezen.swagedit.templates.securityDef_oath2" 
-       description="OAuth2 security def" 
+     <template name="oauth2 security scheme" 
+       id="com.reprezen.swagedit.templates.securityDef_oauth2" 
+       description="Defines an OAuth2 security scheme, which can be applied to paths and methods in the API." 
        context="com.reprezen.swagedit.templates.swagger.security_def" 
-       enabled="true">OAuth2Scheme:
+       enabled="true">${OAuth2}:
   type: oauth2
+  #Each scope defines a set of permissions, usually limited by object type and/or change type (view, add, modify, etc.)
   scopes:
-    user: Grants read/write access to profile info only.
+    ${scope1}: ${scope1_description} 
+    ${scope2}: ${scope2_description} 
   flow: accessCode
-  authorizationUrl: https://github.com/login/oauth/authorize
-  tokenUrl: https://github.com/login/oauth/access_token
-</template>     
+  authorizationUrl: ${authorizationUrl}
+  tokenUrl: ${tokenUrl}
+</template>   
+
+     <template name="api key security scheme" 
+       id="com.reprezen.swagedit.templates.securityDef_apiKey" 
+       description="API key security def" 
+       context="com.reprezen.swagedit.templates.swagger.security_def" 
+       enabled="true">${api_key}:
+  type: apiKey
+  name: ${api_key}
+  in: header
+</template>  
+
+     <template name="basic" 
+       id="com.reprezen.swagedit.templates.securityDef_basic" 
+       description="basic security def" 
+       context="com.reprezen.swagedit.templates.swagger.security_def" 
+       enabled="true">${basic_auth}:
+  type: basic
+</template>    
      
      <template name="definitions" 
        id="com.reprezen.swagedit.templates.definitions_template" 
@@ -68,22 +75,26 @@ definitions:
        id="com.reprezen.swagedit.templates.collection_resource_template" 
        description="object resource template" 
        context="com.reprezen.swagedit.templates.swagger.paths" 
-       enabled="true">/resource:
- get:
-   responses:
-     '200':
-       description: Ok
+       enabled="true">/${resource}:
+  get:
+    responses:
+      '${200}':
+        description: OK
+       schema:
+         $$ref: ${model}
 </template>     
 
      <template name="collection resource" 
        id="com.reprezen.swagedit.templates.object_resource_template" 
        description="collection resource template" 
        context="com.reprezen.swagedit.templates.swagger.paths" 
-       enabled="true">/resources:
+       enabled="true">/${resource}:
  get:
    responses:
-     '200':
-       description: Ok
+     '${200}':
+       description: OK
+       schema:
+         $$ref: ${model}
 </template>   
      
      <template name="get" 
@@ -91,11 +102,13 @@ definitions:
        description="GET template" 
        context="com.reprezen.swagedit.templates.swagger.path_item" 
        enabled="true">get:
-      summary:
-      description: 
-      responses:
-        '200':
-          description: OK
+  summary: Read
+  description: Provide details for the entire list (for collection resources) or an item (for object resources)
+  responses:
+    '${200}':
+      description: ${OK}
+      schema:
+        $$ref: ${model}
 </template>
 
      <template name="post" 
@@ -103,11 +116,19 @@ definitions:
        description="POST template" 
        context="com.reprezen.swagedit.templates.swagger.path_item" 
        enabled="true">post:
- summary:
- description: 
- responses:
-   '200':
-     description: OK
+  summary: Create
+  description: Create a new item
+  parameters:
+   - name: ${request}
+     in: body
+     required: true
+     schema:
+       $$ref: ${model}  
+  responses:
+    '${200}':
+      description: OK
+      schema:
+        $$ref: ${model}
 </template>
 
      <template name="put" 
@@ -115,11 +136,17 @@ definitions:
        description="PUT template" 
        context="com.reprezen.swagedit.templates.swagger.path_item" 
        enabled="true">put:
- summary:
- description: 
- responses:
-   '200':
-     description: OK
+  summary: Update
+  description: Update the entire list (for collection resources) or an item (for object resources)
+  parameters:
+   - name: ${request}
+     in: body
+     required: true
+     schema:
+       $$ref: ${model}  
+  responses:
+    '${200}':
+      description: OK
 </template>
 
      <template name="delete" 
@@ -127,11 +154,13 @@ definitions:
        description="DELETE template" 
        context="com.reprezen.swagedit.templates.swagger.path_item" 
        enabled="true">delete:
-      summary:
-      description: 
-      responses:
-        '200':
-          description: OK
+  summary: Delete 
+  description: Delete the entire list (for collection resources) or an item (for object resources)
+  responses:
+    '${200}':
+      description: OK
+      schema:
+        $$ref: ${model}
 </template>
     
     <template name="patch" 
@@ -139,11 +168,19 @@ definitions:
        description="PATCH template" 
        context="com.reprezen.swagedit.templates.swagger.path_item" 
        enabled="true">patch:
- summary:
- description: 
- responses:
-   '200':
-     description: OK
+  summary: Partial update
+  description: ${Update}
+  parameters:
+   - name: ${request}
+     in: body
+     required: true
+     schema:
+       $$ref: ${model}  
+  responses:
+    '${200}':
+      description: OK
+      schema:
+        $$ref: ${model}
 </template>
 
     <template name="options" 
@@ -151,31 +188,107 @@ definitions:
        description="OPTIONS template" 
        context="com.reprezen.swagedit.templates.swagger.path_item" 
        enabled="true">options:
- summary:
- description: 
- responses:
-   '200':
-     description: OK
+  summary: Request resource options
+  description: Request information about methods available for resource manipulation 
+  responses:
+    '${200}':
+      description: OK
+</template>
+
+    <template name="head" 
+       id="com.reprezen.swagedit.templates.path_head_template" 
+       description="HEAD template" 
+       context="com.reprezen.swagedit.templates.swagger.path_item" 
+       enabled="true">head:
+  summary: Query a resource in the server
+  description: HEAD sends request and get the response only in the header, the body should not be used
+  responses:
+    '${200}':
+      description: OK
 </template>
 
     <template name="OK response" 
-       id="com.reprezen.swagedit.templates.ok_response" 
+       id="com.reprezen.swagedit.templates.200_response" 
        description="OK template" 
        context="com.reprezen.swagedit.templates.swagger.responses" 
-       enabled="true">200:
- description: Ok
+       enabled="true">2${00}:
+  description: ${OK}
+</template>
+
+    <template name="client error response" 
+       id="com.reprezen.swagedit.templates.400_response" 
+       description="client error response template" 
+       context="com.reprezen.swagedit.templates.swagger.responses" 
+       enabled="true">4${00}:
+  description: ${Client} error
+</template>
+
+    <template name="server error response" 
+       id="com.reprezen.swagedit.templates.500_response" 
+       description="server error response template" 
+       context="com.reprezen.swagedit.templates.swagger.responses" 
+       enabled="true">5${00}:
+  description: ${Server} error
 </template>
      
-     <template name="integer parameter" 
-       id="com.reprezen.swagedit.templates.int_parameter_object" 
-       description="integer parameter template" 
+     <template name="path parameter" 
+       id="com.reprezen.swagedit.templates.path_parameter_object" 
+       description="path parameter template" 
        context="com.reprezen.swagedit.templates.swagger.parameter_object" 
-       enabled="true">name: id
+       enabled="true">name: ${name}
 in: path
-description: ID of the element
+description: ${ID}
 required: true
-type: integer
+type: ${integer}
 format: int64
+</template>
+
+     <template name="header parameter" 
+       id="com.reprezen.swagedit.templates.header_parameter_object" 
+       description="header parameter template" 
+       context="com.reprezen.swagedit.templates.swagger.parameter_object" 
+       enabled="true">name: ${name}
+in: header
+description: ${ID}
+required: true
+type: ${integer}
+format: int64
+</template>
+
+     <template name="query parameter" 
+       id="com.reprezen.swagedit.templates.query_parameter_object" 
+       description="query parameter template" 
+       context="com.reprezen.swagedit.templates.swagger.parameter_object" 
+       enabled="true">name: ${name}
+in: query
+description: ${ID}
+required: true
+type: ${integer}
+format: int64
+</template>
+
+     <template name="form data parameter" 
+       id="com.reprezen.swagedit.templates.formdata_parameter_object" 
+       description="form data parameter template" 
+       context="com.reprezen.swagedit.templates.swagger.parameter_object" 
+       enabled="true">name: ${name}
+in: formData
+description: ${ID}
+required: true
+type: ${integer}
+format: int64
+</template>
+
+     <template name="body parameter (request)" 
+       id="com.reprezen.swagedit.templates.body_parameter_object" 
+       description="body parameter (request) template" 
+       context="com.reprezen.swagedit.templates.swagger.parameter_object" 
+       enabled="true">name: ${name}
+in: body
+description: ${ID}
+required: true
+schema:
+  $$ref: ${model}
 </template>
 
      <template name="schema" 
@@ -183,11 +296,11 @@ format: int64
        description="schema template" 
        context="com.reprezen.swagedit.templates.swagger.schema" 
        enabled="true">required:
-  - name  
+  - ${name}  
 properties:
-  name:
-    type: string
-  tag:
+  ${name}:
+    type: ${string}
+  description:
     type: string
 </template>
  
