@@ -15,6 +15,8 @@ import org.dadacoalition.yedit.editor.scanner.YAMLScanner;
 import org.eclipse.jface.text.IDocument;
 import org.eclipse.jface.text.contentassist.ContentAssistant;
 import org.eclipse.jface.text.contentassist.IContentAssistant;
+import org.eclipse.jface.text.hyperlink.IHyperlinkDetector;
+import org.eclipse.jface.text.hyperlink.URLHyperlinkDetector;
 import org.eclipse.jface.text.reconciler.IReconciler;
 import org.eclipse.jface.text.reconciler.MonoReconciler;
 import org.eclipse.jface.text.source.ISourceViewer;
@@ -66,6 +68,11 @@ public class SwaggerSourceViewerConfiguration extends YEditSourceViewerConfigura
 		strategy.setEditor(editor);
 		MonoReconciler reconciler = new MonoReconciler(strategy, false);
 		return reconciler;
+	}
+
+	@Override
+	public IHyperlinkDetector[] getHyperlinkDetectors(ISourceViewer sourceViewer) {
+		return new IHyperlinkDetector[] { new URLHyperlinkDetector(), new SwaggerHyperlinkDetector() };
 	}
 
 	public void setEditor(SwaggerEditor editor) {

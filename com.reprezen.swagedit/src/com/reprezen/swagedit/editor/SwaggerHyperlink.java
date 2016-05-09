@@ -1,0 +1,79 @@
+package com.reprezen.swagedit.editor;
+
+import org.eclipse.jface.text.IRegion;
+import org.eclipse.jface.text.ITextViewer;
+import org.eclipse.jface.text.hyperlink.IHyperlink;
+
+public class SwaggerHyperlink implements IHyperlink {
+
+	private final String text;
+	private final IRegion region;
+	private final ITextViewer viewer;
+
+	public SwaggerHyperlink(String text, ITextViewer viewer, IRegion region) {
+		this.text = text;
+		this.viewer = viewer;
+		this.region = region;
+	}
+
+	@Override
+	public IRegion getHyperlinkRegion() {
+		return region;
+	}
+
+	@Override
+	public String getTypeLabel() {
+		return "Hello";
+	}
+
+	@Override
+	public String getHyperlinkText() {
+		return text;
+	}
+
+	@Override
+	public void open() {
+		if (viewer != null) {
+			viewer.setSelectedRange(getHyperlinkRegion().getOffset(), getHyperlinkRegion().getLength());
+			viewer.revealRange(getHyperlinkRegion().getOffset(), getHyperlinkRegion().getLength());
+		}
+	}
+
+	@Override
+	public int hashCode() {
+		final int prime = 31;
+		int result = 1;
+		result = prime * result + ((region == null) ? 0 : region.hashCode());
+		result = prime * result + ((text == null) ? 0 : text.hashCode());
+		result = prime * result + ((viewer == null) ? 0 : viewer.hashCode());
+		return result;
+	}
+
+	@Override
+	public boolean equals(Object obj) {
+		if (this == obj)
+			return true;
+		if (obj == null)
+			return false;
+		if (getClass() != obj.getClass())
+			return false;
+		SwaggerHyperlink other = (SwaggerHyperlink) obj;
+		if (region == null) {
+			if (other.region != null)
+				return false;
+		} else if (!region.equals(other.region))
+			return false;
+		if (text == null) {
+			if (other.text != null)
+				return false;
+		} else if (!text.equals(other.text))
+			return false;
+		if (viewer == null) {
+			if (other.viewer != null)
+				return false;
+		} else if (!viewer.equals(other.viewer))
+			return false;
+		return true;
+	}
+
+}

@@ -13,9 +13,12 @@ package com.reprezen.swagedit.editor;
 import java.io.IOException;
 import java.io.StringReader;
 import java.util.Iterator;
+import java.util.Objects;
 
 import org.eclipse.jface.text.BadLocationException;
 import org.eclipse.jface.text.Document;
+import org.eclipse.jface.text.IRegion;
+import org.eclipse.jface.text.Region;
 import org.yaml.snakeyaml.Yaml;
 import org.yaml.snakeyaml.nodes.MappingNode;
 import org.yaml.snakeyaml.nodes.Node;
@@ -27,6 +30,7 @@ import org.yaml.snakeyaml.parser.ParserException;
 
 import com.fasterxml.jackson.databind.JsonNode;
 import com.fasterxml.jackson.databind.ObjectMapper;
+import com.google.common.base.Strings;
 
 /**
  * SwaggerDocument
@@ -148,8 +152,52 @@ public class SwaggerDocument extends Document {
 	}
 
 	/**
-	 * Returns the yaml path of the element at the given line and column 
-	 * in the document.
+	 * Returns the region inside the document that can be reach 
+	 * through the path.
+	 * 
+	 * @param path
+	 * @return region under the path
+	 */
+	public IRegion getRegion(String path) {
+		if (Strings.emptyToNull(path) == null)
+			return new Region(0, 0);
+
+		if (path.startsWith(":")) {
+			path = path.substring(1);
+		}
+
+		String[] paths = path.split(":");
+		final Node yaml = getYaml();
+
+		MappingNode current = (MappingNode) yaml;
+		int pPos = 0;
+
+		do {
+			for (NodeTuple node : current.getValue()) {
+				Node keyNode = node.getKeyNode();
+
+				if (keyNode.getNodeId() == NodeId.scalar) {
+					if (Objects.equals(paths[pPos], ((ScalarNode) keyNode).getValue())) {
+						pPos++;
+						current = (MappingNode) node.getValueNode();
+						break;
+					}
+				}
+			}
+		} while (pPos < paths.length);
+		try {
+			int offset = getLineOffset(current.getStartMark().getLine() - 1);
+			int length = getLineLength(current.getStartMark().getLine() - 1);
+
+			return new Region(offset, length);
+		} catch (BadLocationException e) {
+			return null;
+		}
+	}
+
+	/**
+	 * Returns the yaml path of the element at the given line and column in the
+	 * document.
 	 * 
 	 * @param line
 	 * @param column
