@@ -152,44 +152,59 @@ public class SwaggerDocument extends Document {
 	}
 
 	/**
-	 * Returns the region inside the document that can be reach 
-	 * through the path.
+	 * Returns the region inside the document that can be reach through the
+	 * path.
 	 * 
 	 * @param path
 	 * @return region under the path
 	 */
 	public IRegion getRegion(String path) {
 		if (Strings.emptyToNull(path) == null)
-			return new Region(0, 0);
+			return null;
 
 		if (path.startsWith(":")) {
 			path = path.substring(1);
 		}
 
 		String[] paths = path.split(":");
-		final Node yaml = getYaml();
+		Node current = getYaml();
 
-		MappingNode current = (MappingNode) yaml;
 		int pPos = 0;
-
 		do {
-			for (NodeTuple node : current.getValue()) {
-				Node keyNode = node.getKeyNode();
+			String currentPath = paths[pPos];
 
-				if (keyNode.getNodeId() == NodeId.scalar) {
-					if (Objects.equals(paths[pPos], ((ScalarNode) keyNode).getValue())) {
-						pPos++;
-						current = (MappingNode) node.getValueNode();
-						break;
+			if (current.getNodeId() == NodeId.mapping) {
+				MappingNode mn = (MappingNode) current;
+
+				for (NodeTuple node : mn.getValue()) {
+					Node keyNode = node.getKeyNode();
+					if (keyNode.getNodeId() == NodeId.scalar) {
+						ScalarNode scalar = (ScalarNode) keyNode;
+
+						if (Objects.equals(currentPath, scalar.getValue())) {
+							pPos++;
+							current = node.getValueNode();
+							break;
+						}
 					}
 				}
+			} else if (current.getNodeId() == NodeId.sequence) {
+				SequenceNode sq = (SequenceNode) current;
+				if (!currentPath.startsWith("@")) {
+					throw new IllegalStateException("Should be a sequence");
+				}
+				
+				Integer seqPos = Integer.valueOf(currentPath.substring(1));
+				pPos++;
+				current = sq.getValue().get(seqPos - 1);
 			}
 		} while (pPos < paths.length);
-		try {
-			int offset = getLineOffset(current.getStartMark().getLine() - 1);
-			int length = getLineLength(current.getStartMark().getLine() - 1);
 
-			return new Region(offset, length);
+		try {
+			int offset = getLineOffset(current.getStartMark().getLine());			
+			int length = getLineOffset(current.getEndMark().getLine());
+
+			return new Region(offset, length - offset);
 		} catch (BadLocationException e) {
 			return null;
 		}

@@ -1,3 +1,13 @@
+/*******************************************************************************
+ * Copyright (c) 2016 ModelSolv, Inc. and others.
+ * All rights reserved. This program and the accompanying materials
+ * are made available under the terms of the Eclipse Public License v1.0
+ * which accompanies this distribution, and is available at
+ * http://www.eclipse.org/legal/epl-v10.html
+ *
+ * Contributors:
+ *    ModelSolv, Inc. - initial API and implementation and/or initial documentation
+ *******************************************************************************/
 package com.reprezen.swagedit.editor;
 
 import org.eclipse.jface.text.IRegion;
@@ -8,12 +18,14 @@ public class SwaggerHyperlink implements IHyperlink {
 
 	private final String text;
 	private final IRegion region;
+	private final IRegion target;
 	private final ITextViewer viewer;
 
-	public SwaggerHyperlink(String text, ITextViewer viewer, IRegion region) {
+	public SwaggerHyperlink(String text, ITextViewer viewer, IRegion region, IRegion target) {
 		this.text = text;
 		this.viewer = viewer;
 		this.region = region;
+		this.target = target;
 	}
 
 	@Override
@@ -23,7 +35,7 @@ public class SwaggerHyperlink implements IHyperlink {
 
 	@Override
 	public String getTypeLabel() {
-		return "Hello";
+		return text;
 	}
 
 	@Override
@@ -34,9 +46,22 @@ public class SwaggerHyperlink implements IHyperlink {
 	@Override
 	public void open() {
 		if (viewer != null) {
-			viewer.setSelectedRange(getHyperlinkRegion().getOffset(), getHyperlinkRegion().getLength());
-			viewer.revealRange(getHyperlinkRegion().getOffset(), getHyperlinkRegion().getLength());
+			viewer.setSelectedRange(target.getOffset(), target.getLength());
+			viewer.revealRange(target.getOffset(), target.getLength());
 		}
+	}
+
+	@Override
+	public String toString() {
+		StringBuilder builder = new StringBuilder();
+		builder.append("SwaggerHyperlink [text=");
+		builder.append(text);
+		builder.append(", region=");
+		builder.append(region);
+		builder.append(", target=");
+		builder.append(target);
+		builder.append("]");
+		return builder.toString();
 	}
 
 	@Override
@@ -44,8 +69,9 @@ public class SwaggerHyperlink implements IHyperlink {
 		final int prime = 31;
 		int result = 1;
 		result = prime * result + ((region == null) ? 0 : region.hashCode());
+		result = prime * result + ((target == null) ? 0 : target.hashCode());
 		result = prime * result + ((text == null) ? 0 : text.hashCode());
-		result = prime * result + ((viewer == null) ? 0 : viewer.hashCode());
+
 		return result;
 	}
 
@@ -57,22 +83,27 @@ public class SwaggerHyperlink implements IHyperlink {
 			return false;
 		if (getClass() != obj.getClass())
 			return false;
+
 		SwaggerHyperlink other = (SwaggerHyperlink) obj;
+
 		if (region == null) {
 			if (other.region != null)
 				return false;
 		} else if (!region.equals(other.region))
 			return false;
+		
+		if (target == null) {
+			if (other.target != null)
+				return false;
+		} else if (!target.equals(other.target))
+			return false;
+
 		if (text == null) {
 			if (other.text != null)
 				return false;
 		} else if (!text.equals(other.text))
 			return false;
-		if (viewer == null) {
-			if (other.viewer != null)
-				return false;
-		} else if (!viewer.equals(other.viewer))
-			return false;
+
 		return true;
 	}
 

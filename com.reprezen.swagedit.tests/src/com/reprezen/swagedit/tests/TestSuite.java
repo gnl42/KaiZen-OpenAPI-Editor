@@ -23,6 +23,7 @@ import com.reprezen.swagedit.validation.MultipleSwaggerErrorMessageTest;
 	SwaggerDocumentTest.class,
 	SwaggerProposalProviderTest.class,
 	SwaggerSchemaTest.class,
+	SwaggerHyperlinkDetectorTest.class,
 	ValidationMessageTest.class,
 	ValidatorTest.class,
 	CodeTemplateContextTest.class,
