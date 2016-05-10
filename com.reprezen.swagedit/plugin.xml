@@ -134,5 +134,22 @@
            xml="resources/com.reprezen.swagedit.xml">
            </mapper>
     </extension>
+   <extension
+         point="org.eclipse.ui.workbench.texteditor.hyperlinkDetectorTargets">
+      <target
+            id="com.reprezen.swagedit.hyperlink.target"
+            name="SwagEdit">
+      </target>
+   </extension>
+   <extension
+         point="org.eclipse.ui.workbench.texteditor.hyperlinkDetectors">
+      <hyperlinkDetector
+            activate="true"
+            class="com.reprezen.swagedit.editor.SwaggerHyperlinkDetector"
+            id="com.reprezen.swagedit.hyperlinkDetector"
+            name="SwagEdit"
+            targetId="com.reprezen.swagedit.hyperlink.target">
+      </hyperlinkDetector>
+   </extension>
 
 </plugin>
