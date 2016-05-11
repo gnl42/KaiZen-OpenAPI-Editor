@@ -168,10 +168,13 @@ public class SwaggerDocument extends Document {
 
 		String[] paths = path.split(":");
 		Node current = getYaml();
+		Node start;
 
 		int pPos = 0;
+		boolean noPath = false;
 		do {
 			String currentPath = paths[pPos];
+			start = current;
 
 			if (current.getNodeId() == NodeId.mapping) {
 				MappingNode mn = (MappingNode) current;
@@ -193,12 +196,22 @@ public class SwaggerDocument extends Document {
 				if (!currentPath.startsWith("@")) {
 					throw new IllegalStateException("Should be a sequence");
 				}
-				
+
 				Integer seqPos = Integer.valueOf(currentPath.substring(1));
 				pPos++;
-				current = sq.getValue().get(seqPos - 1);
+				current = sq.getValue().get(seqPos);
 			}
-		} while (pPos < paths.length);
+
+			// check that we made progress in the yaml tree
+			if (start == current) {
+				noPath = true;
+				current = null;
+			}
+
+		} while (pPos < paths.length && !noPath);
+
+		if (current == null)
+			return null;
 
 		try {
 			int offset = getLineOffset(current.getStartMark().getLine());			

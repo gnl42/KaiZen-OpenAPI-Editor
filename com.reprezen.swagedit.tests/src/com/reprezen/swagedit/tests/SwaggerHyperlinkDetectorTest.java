@@ -102,4 +102,9 @@ public class SwaggerHyperlinkDetectorTest {
 				hasItem(new SwaggerHyperlink("  /{id}:", viewer, linkRegion, targetRegion)));
 	}
 
+	@Test
+	public void testShouldCreateHyperlink_() {
+		
+	}
+
 }
