@@ -223,6 +223,14 @@ public class SwaggerDocument extends Document {
 		}
 	}
 
+	public String getPath(IRegion region) throws BadLocationException {
+		int lineOfOffset = getLineOfOffset(region.getOffset());
+		// column?
+		int length = (region.getOffset() - getLineOffset(lineOfOffset)) + region.getLength();
+
+		return getPath(lineOfOffset, length);
+	}
+
 	/**
 	 * Returns the yaml path of the element at the given line and column in the
 	 * document.

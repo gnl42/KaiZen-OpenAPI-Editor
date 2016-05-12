@@ -10,6 +10,8 @@
  *******************************************************************************/
 package com.reprezen.swagedit.editor;
 
+import static com.google.common.base.Strings.emptyToNull;
+
 import java.util.ArrayList;
 import java.util.List;
 import java.util.regex.Matcher;
@@ -22,7 +24,6 @@ import org.eclipse.jface.text.ITextViewer;
 import org.eclipse.jface.text.Region;
 import org.eclipse.jface.text.hyperlink.AbstractHyperlinkDetector;
 import org.eclipse.jface.text.hyperlink.IHyperlink;
-import org.eclipse.jface.viewers.ISelection;
 
 import com.fasterxml.jackson.databind.JsonNode;
 import com.google.common.base.Function;
@@ -30,249 +31,269 @@ import com.google.common.base.Predicate;
 import com.google.common.base.Strings;
 import com.google.common.collect.Iterables;
 import com.google.common.collect.Lists;
-import com.reprezen.swagedit.templates.SwaggerContextType;
 
 import io.swagger.models.HttpMethod;
 
+/**
+ * Hyperlink detector able to identify hyperlinks inside a Swagger document.
+ * 
+ */
 public class SwaggerHyperlinkDetector extends AbstractHyperlinkDetector {
+
+	protected static final Pattern PARAMETER_PATTERN = Pattern.compile("\\{(\\w+)\\}");
+	protected static final Pattern LOCAL_REF_PATTERN = Pattern.compile("['|\\\"]?#([/\\w+]+)['|\\\"]?");
 
 	@Override
 	public IHyperlink[] detectHyperlinks(ITextViewer viewer, IRegion region, boolean canShowMultipleHyperlinks) {
 		final SwaggerDocument document = (SwaggerDocument) viewer.getDocument();
-		final HyperlinkPosition position = HyperlinkPosition.create(viewer, region);
+
+		HyperlinkInfo position;
+		try {
+			position = HyperlinkInfo.create(viewer, region);
+		} catch (BadLocationException e) {
+			return null;
+		}
+
 		if (position == null) {
 			return null;
 		}
 
-		final List<IHyperlink> links = new ArrayList<>();
-		final String basePath = document.getPath(position.line, position.column);
-		switch (Context.from(basePath)) {
-		case PATH_PARAM:
-			links.addAll(pathParamHyperlinks(viewer, document, position, basePath));
-			break;
-		case JSON_REF:
-			links.addAll(referenceHyperlinks(viewer, document, position));
-			break;
-		default:
-			links.addAll(definitionHyperlinks(viewer, document, position));
-			break;
+		final HyperlinkInfo updated = HyperlinkType.
+				from(position).
+				computeLinks(document, position);
+
+		final List<SwaggerHyperlink> links = new ArrayList<>();
+		for (String path : updated.getLinks()) {
+			IRegion target = document.getRegion(path);
+			if (target != null) {
+				links.add(new SwaggerHyperlink(updated.text, viewer, updated.region, target));
+			}
 		}
 
 		return links.size() > 0 ? links.toArray(new IHyperlink[links.size()]) : null;
 	}
 
-	private List<IHyperlink> referenceHyperlinks(ITextViewer viewer, SwaggerDocument document,
-			HyperlinkPosition position) {
-		final List<IHyperlink> links = new ArrayList<>();
-		String content = position.content.replaceAll("'|\"", "");
-
-		if (content.startsWith("#")) {
-			// is local
-			content = content.substring(1);
-			String localPath = content.replaceAll("/", ":");
-
-			IRegion link = new Region(position.getLinkOffset(), position.getLinkLength());
-			IRegion region = document.getRegion(localPath);
-
-			if (link != null && region != null) {
-				links.add(new SwaggerHyperlink(content, viewer, link, region));
-			}
-		} else {
-			// TODO
-			// external references
-		}
-
-		return links;
-	}
-
 	/**
-	 * Returns hyperlinks that target the definition of a path parameter.
-	 * 
-	 * @param viewer
-	 * @param document
-	 * @param position
-	 * @param basePath
-	 * @return array of links
+	 * Enumeration of hyperlink types.
 	 */
-	private List<IHyperlink> pathParamHyperlinks(ITextViewer viewer, SwaggerDocument document,
-			HyperlinkPosition position, String basePath) {
-		final List<IHyperlink> links = new ArrayList<>();
+	protected enum HyperlinkType {
 
-		// find the parameter selected by the user
-		// parameter is define between {} so can be
-		// match by a regex {(\w+)}
-		Matcher matcher = Pattern.compile("\\{(\\w+)\\}").matcher(position.content);
+		PATH_PARAM {
 
-		// find the group that is present under the
-		// user's cursor (current column)
-		String param = null;
-		boolean isFound = false;
-		int start = 0, end = 0, column = position.column;
-
-		while (matcher.find() && !isFound) {
-			if (matcher.start() <= column && matcher.end() >= column) {
-				isFound = true;
-				// remove {} is still present
-				param = matcher.group().replaceAll("\\{|\\}", "");
-				// keep for computing hyperlink region
-				start = matcher.start();
-				end = matcher.end();
-			}
-		}
-
-		if (isFound && Strings.emptyToNull(param) != null) {
-			JsonNode parent = document.getNodeForPath(basePath);
-			// hyperlink region computed from position of parameter in selected
-			// content
-			IRegion linkRegion = new Region(position.getLinkOffset() + start, end - start);
-
-			for (String path : findParameterPath(basePath, param, parent)) {
-				IRegion targetRegion = document.getRegion(path);
-				if (targetRegion != null) {
-					links.add(new SwaggerHyperlink(position.content, viewer, linkRegion, targetRegion));
+			@Override
+			public HyperlinkInfo computeLinks(SwaggerDocument document, HyperlinkInfo position) {
+				String basePath;
+				try {
+					basePath = document.getPath(position.region);
+				} catch (BadLocationException e) {
+					return position;
 				}
+
+				List<String> links = new ArrayList<>();
+				Matcher matcher = PARAMETER_PATTERN.matcher(position.text);
+
+				String parameter = null;
+				int start = 0, end = 0;
+				while (matcher.find() && parameter == null) {
+					if (matcher.start() <= position.column && matcher.end() >= position.column) {
+						parameter = matcher.group(1);
+						start = matcher.start();
+						end = matcher.end();
+					}
+				}
+
+				if (Strings.emptyToNull(parameter) == null) {
+					return position;
+				}
+
+				JsonNode parent = document.getNodeForPath(basePath);
+				Iterables.addAll(links, findParameterPath(basePath, parameter, parent));
+
+				HyperlinkInfo result = new HyperlinkInfo(
+						new Region(position.getOffset() + start, end - start),
+						parameter, 
+						position.column);
+				result.setLinks(links);
+
+				return result;
 			}
+
+			private Iterable<String> findParameterPath(final String basePath, final String param, JsonNode parent) {
+				if (parent == null || !parent.isObject())
+					return Lists.newArrayList();
+
+				List<String> paths = new ArrayList<>();
+				for (HttpMethod method : HttpMethod.values()) {
+					String path = getParamPath(method, param, parent);
+					if (path != null) {
+						paths.add(path);
+					}
+				}
+
+				return Iterables.transform(paths, new Function<String, String>() {
+					@Override
+					public String apply(String s) {
+						return basePath + s;
+					}
+				});
+			}
+
+			private String getParamPath(HttpMethod method, final String param, JsonNode parent) {
+				String mName = method.name().toLowerCase();
+				JsonNode parameters = parent.at("/" + mName + "/parameters");
+				List<JsonNode> values = parameters.findValues("name");
+				JsonNode found = Iterables.find(values, new Predicate<JsonNode>() {
+					@Override
+					public boolean apply(JsonNode node) {
+						return param.equals(node.asText());
+					}
+				}, null);
+
+				return found != null ? ":" + mName + ":parameters:@" + values.indexOf(found) : null;
+			}
+
+		},
+
+		JSON_REF {
+
+			@Override
+			public HyperlinkInfo computeLinks(SwaggerDocument document, HyperlinkInfo position) {
+				Matcher matcher = LOCAL_REF_PATTERN.matcher(position.text);
+
+				String ref = null;
+				if (matcher.find()) {
+					ref = matcher.group(1);
+				}
+
+				if (ref == null) {
+					return position;
+				}
+
+				HyperlinkInfo result = new HyperlinkInfo(position.region, ref, position.column);
+				result.links.add(ref.replaceAll("/", ":"));
+
+				return result;
+			}
+		},
+
+		OTHER {
+
+			@Override
+			public HyperlinkInfo computeLinks(SwaggerDocument document, HyperlinkInfo position) {
+				final JsonNode found = document.asJson().at("/definitions/" + position.text);
+				final String linkPath = found != null ? ":definitions:" + position.text : null;
+
+				if (linkPath == null) {
+					return position;
+				}
+
+				position.links.add(linkPath);
+				return position;
+			}
+		};
+
+		public static HyperlinkType from(HyperlinkInfo position) {
+			if (PARAMETER_PATTERN.matcher(position.text).find()) {
+				return PATH_PARAM;
+			} else if (LOCAL_REF_PATTERN.matcher(position.text).find()) {
+				return JSON_REF;
+			}
+
+			return OTHER;
 		}
 
-		return links;
+		public abstract HyperlinkInfo computeLinks(SwaggerDocument document, HyperlinkInfo position);
 	}
 
 	/**
-	 * Returns hyperlinks that target a schema definitions. The hyperlink can be
-	 * created from any word in the document that matches the key of the
-	 * definitions object.
-	 * 
-	 * @param viewer
-	 * @param document
-	 * @param position
-	 * @return array of links
+	 * Contains details about potential hyperlinks inside a Swagger document.
 	 */
-	private List<IHyperlink> definitionHyperlinks(ITextViewer viewer, SwaggerDocument document,
-			HyperlinkPosition position) {
+	protected static class HyperlinkInfo {
 
-		final List<IHyperlink> links = new ArrayList<>();
-		final JsonNode found = document.asJson().at("/definitions/" + position.content);
-		final String linkPath = found != null ? ":definitions:" + position.content : null;
+		public final IRegion region;
+		public final String text;
 
-		if (linkPath != null) {
-			IRegion linkRegion = new Region(position.getLinkOffset(), position.getLinkLength());
-			IRegion targetRegion = document.getRegion(linkPath);
+		private final int column;
+		private final List<String> links = new ArrayList<>();
 
-			links.add(new SwaggerHyperlink(position.content, viewer, linkRegion, targetRegion));
-		}
-
-		return links;
-	}
-
-	private Iterable<String> findParameterPath(final String basePath, final String param, JsonNode parent) {
-		if (parent == null || !parent.isObject())
-			return Lists.newArrayList();
-
-		final List<String> paths = new ArrayList<>();
-		for (HttpMethod method : HttpMethod.values()) {
-			String path = getParamPath(method, param, parent);
-			if (path != null) {
-				paths.add(path);
-			}
-		}
-
-		return Iterables.transform(paths, new Function<String, String>() {
-			@Override
-			public String apply(String s) {
-				return basePath + s;
-			}
-		});
-	}
-
-	private String getParamPath(HttpMethod method, final String param, JsonNode parent) {
-		final String mName = method.name().toLowerCase();
-		final JsonNode parameters = parent.at("/" + mName + "/parameters");
-		final List<JsonNode> values = parameters.findValues("name");
-		final JsonNode found = Iterables.find(values, new Predicate<JsonNode>() {
-			@Override
-			public boolean apply(JsonNode node) {
-				return param.equals(node.asText());
-			}
-		}, null);
-
-		return found != null ? ":" + mName + ":parameters:@" + values.indexOf(found) : null;
-	}
-
-	protected enum Context {
-		PATH_PARAM, JSON_REF, OTHER;
-
-		public static Context from(String path) {
-			if (Strings.emptyToNull(path) == null)
-				return OTHER;
-
-			String contextType = SwaggerContextType.getContextType(path);
-			if (SwaggerContextType.PathItemContextType.CONTEXT_ID.equals(contextType)) {
-				return PATH_PARAM;
-			} else if (path.endsWith("$ref")) {
-				return JSON_REF;
-			} else {
-				return OTHER;
-			}
-		}
-
-	}
-
-	protected static class HyperlinkPosition {
-		public final IRegion lineInfo;
-		public final String content;
-		public final int line;
-		public final int column;
-		public final int lastSpace;
-
-		private HyperlinkPosition(IRegion lineInfo, String content, int line, int column, int lastSpace) {
-			this.lineInfo = lineInfo;
-			this.content = content;
-			this.line = line;
+		HyperlinkInfo(IRegion region, String text, int column) {
+			this.region = region;
+			this.text = text;
 			this.column = column;
-			this.lastSpace = lastSpace;
 		}
 
-		public int getLinkOffset() {
-			return lineInfo.getOffset() + lastSpace + 1;
+		public List<String> getLinks() {
+			return links;
 		}
 
-		public int getLinkLength() {
-			return lineInfo.getLength() - (lastSpace + 1);
+		public void setLinks(List<String> links) {
+			this.links.addAll(links);
 		}
 
-		public static HyperlinkPosition create(ITextViewer viewer, IRegion region) {
+		public int getOffset() {
+			return region.getOffset();
+		}
+
+		public int getLength() {
+			return region.getLength();
+		}
+
+		public static HyperlinkInfo create(ITextViewer viewer, IRegion region) throws BadLocationException {
 			final SwaggerDocument document = (SwaggerDocument) viewer.getDocument();
+			final ITextSelection textSelection = (ITextSelection) viewer.getSelectionProvider().getSelection();
 
-			IRegion lineInfo;
-			String selectedContent;
-			int column = 0;
-			int line = 0;
+			// get offset of selected word
+			// get length of selected word
 
-			try {
-				lineInfo = document.getLineInformationOfOffset(region.getOffset());
-				line = document.getLineOfOffset(region.getOffset());
-				selectedContent = document.get(lineInfo.getOffset(), lineInfo.getLength());
-			} catch (BadLocationException ex) {
+			IRegion line = document.getLineInformationOfOffset(region.getOffset());
+
+			final String lineContent = document.get(line.getOffset(), line.getLength());
+			if (lineContent == null || emptyToNull(lineContent) == null) {
 				return null;
 			}
 
-			final ISelection selection = viewer.getSelectionProvider().getSelection();
-			if (selection instanceof ITextSelection) {
-				ITextSelection textSelection = (ITextSelection) selection;
+			final int column = textSelection.getOffset() - document.getLineOffset(textSelection.getStartLine());
+			final IRegion selected = getSelectedRegion(line, lineContent, column);
+			final String text = document.get(selected.getOffset(), selected.getLength());
 
-				try {
-					column = textSelection.getOffset() - document.getLineOffset(textSelection.getStartLine());
-				} catch (BadLocationException e) {
-					// TODO: handle exception
+			return new HyperlinkInfo(selected, text, column);
+		}
+
+		/**
+		 * Returns the region containing the word selected or under the user's
+		 * cursor.
+		 * 
+		 * @param region
+		 * @param content
+		 * @param column
+		 * @return Region
+		 */
+		protected static Region getSelectedRegion(IRegion region, String content, int column) {
+			// find next space or if not
+			// after position is end of content.
+			int end = content.indexOf(" ", column);
+			if (end == -1) {
+				end = content.length();
+			}
+
+			// find previous space
+			// if not, start is 0.
+			int start = 0;
+			int idx = 0;
+			do {
+				idx = content.indexOf(" ", idx);
+				if (idx != -1) {
+					idx++;
+					if (column >= idx) {
+						start = idx;
+					}
 				}
-			}
+			} while (start < column && idx != -1);
 
-			int lastSpace = selectedContent.lastIndexOf(" ");
-			if (lastSpace > -1) {
-				selectedContent = selectedContent.substring(lastSpace + 1, selectedContent.length());
-			}
+			int offset = region.getOffset() + start;
+			int length = end - start;
 
-			return new HyperlinkPosition(lineInfo, selectedContent, line, column, lastSpace);
+			return new Region(offset, length);
 		}
 	}
 }
