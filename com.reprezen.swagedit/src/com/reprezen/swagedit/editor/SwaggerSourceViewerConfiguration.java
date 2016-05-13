@@ -72,7 +72,12 @@ public class SwaggerSourceViewerConfiguration extends YEditSourceViewerConfigura
 
 	@Override
 	public IHyperlinkDetector[] getHyperlinkDetectors(ISourceViewer sourceViewer) {
-		return new IHyperlinkDetector[] { new URLHyperlinkDetector(), new SwaggerHyperlinkDetector() };
+		return new IHyperlinkDetector[] { 
+			new URLHyperlinkDetector(), 
+			new JsonReferenceHyperlinkDetector(),
+			new PathParamHyperlinkDetector(),
+			new DefinitionHyperlinkDetector()
+		};
 	}
 
 	public void setEditor(SwaggerEditor editor) {
