@@ -91,7 +91,7 @@ public class SwaggerHyperlink implements IHyperlink {
 				return false;
 		} else if (!region.equals(other.region))
 			return false;
-		
+
 		if (target == null) {
 			if (other.target != null)
 				return false;

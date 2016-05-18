@@ -17,9 +17,9 @@ import static org.junit.Assert.assertThat;
 import static org.mockito.Mockito.mock;
 import static org.mockito.Mockito.when;
 
+import java.util.ArrayList;
 import java.util.Arrays;
-import java.util.HashSet;
-import java.util.Set;
+import java.util.List;
 import java.util.regex.Matcher;
 
 import org.eclipse.jface.text.BadLocationException;
@@ -31,8 +31,6 @@ import org.junit.Before;
 import org.junit.Test;
 
 import com.reprezen.swagedit.editor.SwaggerDocument;
-import com.reprezen.swagedit.editor.hyperlinks.JsonReferenceHyperlinkDetector;
-import com.reprezen.swagedit.editor.hyperlinks.SwaggerHyperlink;
 
 public class JsonReferenceHyperlinkDetectorTest {
 
@@ -78,8 +76,8 @@ public class JsonReferenceHyperlinkDetectorTest {
 		String text = "'#/definitions/User'";
 
 		Matcher matcher = JsonReferenceHyperlinkDetector.LOCAL_REF_PATTERN.matcher(text);
-		Set<String> groups = new HashSet<>();
-		while(matcher.find()) {
+		List<String> groups = new ArrayList<>();
+		if(matcher.find()) {
 			groups.add(matcher.group(1));
 		}
 
@@ -89,8 +87,8 @@ public class JsonReferenceHyperlinkDetectorTest {
 		text = "\"#/definitions/User\"";
 
 		matcher = JsonReferenceHyperlinkDetector.LOCAL_REF_PATTERN.matcher(text);
-		groups = new HashSet<>();
-		while(matcher.find()) {
+		groups = new ArrayList<>();
+		if(matcher.find()) {
 			groups.add(matcher.group(1));
 		}
 
@@ -100,8 +98,8 @@ public class JsonReferenceHyperlinkDetectorTest {
 		text = "#/definitions/User";
 
 		matcher = JsonReferenceHyperlinkDetector.LOCAL_REF_PATTERN.matcher(text);
-		groups = new HashSet<>();
-		while(matcher.find()) {
+		groups = new ArrayList<>();
+		if(matcher.find()) {
 			groups.add(matcher.group(1));
 		}
 

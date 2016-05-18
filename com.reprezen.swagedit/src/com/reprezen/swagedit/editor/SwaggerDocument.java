@@ -195,11 +195,17 @@ public class SwaggerDocument extends Document {
 				}
 			} else if (current.getNodeId() == NodeId.sequence) {
 				SequenceNode sq = (SequenceNode) current;
-				if (!currentPath.startsWith("@")) {
+				Integer seqPos;
+				try {
+					if (currentPath.startsWith("@")) {
+						currentPath = currentPath.substring(1);
+					}
+					
+					seqPos = Integer.valueOf(currentPath);
+				} catch (Exception e) {
 					throw new IllegalStateException("Should be a sequence");
 				}
 
-				Integer seqPos = Integer.valueOf(currentPath.substring(1));
 				pPos++;
 				current = sq.getValue().get(seqPos);
 			}
