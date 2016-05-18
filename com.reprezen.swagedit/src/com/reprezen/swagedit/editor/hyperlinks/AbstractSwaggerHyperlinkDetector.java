@@ -8,7 +8,7 @@
  * Contributors:
  *    ModelSolv, Inc. - initial API and implementation and/or initial documentation
  *******************************************************************************/
-package com.reprezen.swagedit.editor;
+package com.reprezen.swagedit.editor.hyperlinks;
 
 import static com.google.common.base.Strings.emptyToNull;
 
@@ -17,6 +17,9 @@ import org.eclipse.jface.text.IRegion;
 import org.eclipse.jface.text.ITextViewer;
 import org.eclipse.jface.text.Region;
 import org.eclipse.jface.text.hyperlink.AbstractHyperlinkDetector;
+import org.eclipse.jface.text.hyperlink.IHyperlink;
+
+import com.reprezen.swagedit.editor.SwaggerDocument;
 
 public abstract class AbstractSwaggerHyperlinkDetector extends AbstractHyperlinkDetector {
 
@@ -44,18 +47,62 @@ public abstract class AbstractSwaggerHyperlinkDetector extends AbstractHyperlink
 		}
 	}
 
-	protected HyperlinkInfo getHyperlinkInfo(ITextViewer viewer, IRegion region) throws BadLocationException {
-		final SwaggerDocument document = (SwaggerDocument) viewer.getDocument();
-		IRegion line = document.getLineInformationOfOffset(region.getOffset());
+	@Override
+	public IHyperlink[] detectHyperlinks(ITextViewer textViewer, IRegion region, boolean canShowMultipleHyperlinks) {
+		SwaggerDocument document = (SwaggerDocument) textViewer.getDocument();
 
-		final String lineContent = document.get(line.getOffset(), line.getLength());
+		String basePath;
+		try {
+			basePath = document.getPath(region);
+		} catch (BadLocationException e) {
+			basePath = null;
+		}
+
+		if (!canDetect(basePath)) {
+			return null;
+		}
+
+		HyperlinkInfo info = getHyperlinkInfo(textViewer, region);
+		if (info == null) {
+			return null;
+		}
+
+		return doDetect(document, textViewer, info, basePath);
+	}
+
+	protected abstract boolean canDetect(String basePath);
+
+	protected abstract IHyperlink[] doDetect(SwaggerDocument doc, ITextViewer viewer, HyperlinkInfo info,
+			String basePath);
+
+	protected HyperlinkInfo getHyperlinkInfo(ITextViewer viewer, IRegion region) {
+		final SwaggerDocument document = (SwaggerDocument) viewer.getDocument();
+		IRegion line;
+		try {
+			line = document.getLineInformationOfOffset(region.getOffset());
+		} catch (BadLocationException e) {
+			return null;
+		}
+
+		String lineContent;
+		try {
+			lineContent = document.get(line.getOffset(), line.getLength());
+		} catch (BadLocationException e) {
+			return null;
+		}
+
 		if (lineContent == null || emptyToNull(lineContent) == null) {
 			return null;
 		}
 
 		final int column = region.getOffset() - line.getOffset();
 		final IRegion selected = getSelectedRegion(line, lineContent, column);
-		final String text = document.get(selected.getOffset(), selected.getLength());
+		String text;
+		try {
+			text = document.get(selected.getOffset(), selected.getLength());
+		} catch (BadLocationException e) {
+			return null;
+		}
 
 		if (emptyToNull(text) == null) {
 			return null;

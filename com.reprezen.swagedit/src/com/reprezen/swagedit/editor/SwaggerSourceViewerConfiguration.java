@@ -23,6 +23,9 @@ import org.eclipse.jface.text.source.ISourceViewer;
 
 import com.reprezen.swagedit.Activator;
 import com.reprezen.swagedit.assist.SwaggerContentAssistProcessor;
+import com.reprezen.swagedit.editor.hyperlinks.DefinitionHyperlinkDetector;
+import com.reprezen.swagedit.editor.hyperlinks.JsonReferenceHyperlinkDetector;
+import com.reprezen.swagedit.editor.hyperlinks.PathParamHyperlinkDetector;
 
 public class SwaggerSourceViewerConfiguration extends YEditSourceViewerConfiguration {
 

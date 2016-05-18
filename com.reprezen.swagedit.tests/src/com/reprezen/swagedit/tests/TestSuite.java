@@ -14,9 +14,9 @@ import org.junit.runner.RunWith;
 import org.junit.runners.Suite;
 import org.junit.runners.Suite.SuiteClasses;
 
-import com.reprezen.swagedit.editor.DefinitionHyperlinkDetectorTest;
-import com.reprezen.swagedit.editor.JsonReferenceHyperlinkDetectorTest;
-import com.reprezen.swagedit.editor.PathParamHyperlinkDetectorTest;
+import com.reprezen.swagedit.editor.hyperlinks.DefinitionHyperlinkDetectorTest;
+import com.reprezen.swagedit.editor.hyperlinks.JsonReferenceHyperlinkDetectorTest;
+import com.reprezen.swagedit.editor.hyperlinks.PathParamHyperlinkDetectorTest;
 import com.reprezen.swagedit.validation.ErrorProcessorTest;
 import com.reprezen.swagedit.validation.MultipleSwaggerErrorMessageTest;
 

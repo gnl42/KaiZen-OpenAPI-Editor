@@ -8,7 +8,7 @@
  * Contributors:
  *    ModelSolv, Inc. - initial API and implementation and/or initial documentation
  *******************************************************************************/
-package com.reprezen.swagedit.editor;
+package com.reprezen.swagedit.editor.hyperlinks;
 
 import static org.hamcrest.core.IsCollectionContaining.hasItem;
 import static org.hamcrest.core.IsCollectionContaining.hasItems;
@@ -29,6 +29,10 @@ import org.eclipse.jface.text.Region;
 import org.eclipse.jface.text.hyperlink.IHyperlink;
 import org.junit.Before;
 import org.junit.Test;
+
+import com.reprezen.swagedit.editor.SwaggerDocument;
+import com.reprezen.swagedit.editor.hyperlinks.JsonReferenceHyperlinkDetector;
+import com.reprezen.swagedit.editor.hyperlinks.SwaggerHyperlink;
 
 public class JsonReferenceHyperlinkDetectorTest {
 

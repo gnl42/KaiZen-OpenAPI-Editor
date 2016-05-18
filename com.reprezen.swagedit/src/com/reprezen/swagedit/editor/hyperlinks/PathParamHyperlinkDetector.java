@@ -8,7 +8,7 @@
  * Contributors:
  *    ModelSolv, Inc. - initial API and implementation and/or initial documentation
  *******************************************************************************/
-package com.reprezen.swagedit.editor;
+package com.reprezen.swagedit.editor.hyperlinks;
 
 import static com.google.common.base.Strings.emptyToNull;
 
@@ -17,7 +17,6 @@ import java.util.List;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
 
-import org.eclipse.jface.text.BadLocationException;
 import org.eclipse.jface.text.IRegion;
 import org.eclipse.jface.text.ITextViewer;
 import org.eclipse.jface.text.Region;
@@ -26,6 +25,7 @@ import org.eclipse.jface.text.hyperlink.IHyperlink;
 import com.fasterxml.jackson.core.JsonPointer;
 import com.fasterxml.jackson.databind.JsonNode;
 import com.google.common.collect.Lists;
+import com.reprezen.swagedit.editor.SwaggerDocument;
 import com.reprezen.swagedit.json.JsonUtil;
 
 import io.swagger.models.HttpMethod;
@@ -39,32 +39,12 @@ public class PathParamHyperlinkDetector extends AbstractSwaggerHyperlinkDetector
 	protected static final Pattern PARAMETER_PATTERN = Pattern.compile("\\{(\\w+)\\}");
 
 	@Override
-	public IHyperlink[] detectHyperlinks(ITextViewer textViewer, IRegion region, boolean canShowMultipleHyperlinks) {
-		SwaggerDocument document = (SwaggerDocument) textViewer.getDocument();
+	protected boolean canDetect(String basePath) {
+		return emptyToNull(basePath) != null && basePath.startsWith(":paths:");
+	}
 
-		String basePath;
-		try {
-			basePath = document.getPath(region);
-		} catch (BadLocationException e) {
-			basePath = null;
-		}
-
-		// not a path definition
-		if (emptyToNull(basePath) == null || !basePath.startsWith(":paths:")) {
-			return null;
-		}
-
-		HyperlinkInfo info;
-		try {
-			info = getHyperlinkInfo(textViewer, region);
-		} catch (BadLocationException e) {
-			return null;
-		}
-
-		if (info == null) {
-			return null;
-		}
-
+	@Override
+	protected IHyperlink[] doDetect(SwaggerDocument doc, ITextViewer viewer, HyperlinkInfo info, String basePath) {
 		// find selected parameter
 		Matcher matcher = PARAMETER_PATTERN.matcher(info.text);
 		String parameter = null;
@@ -82,22 +62,22 @@ public class PathParamHyperlinkDetector extends AbstractSwaggerHyperlinkDetector
 			return null;
 		}
 
-		Iterable<String> targetPaths = findParameterPath(document, basePath, parameter);
+		Iterable<String> targetPaths = findParameterPath(doc, basePath, parameter);
 		IRegion linkRegion = new Region(info.getOffset() + start, end - start);
 
 		List<IHyperlink> links = new ArrayList<>();
-		for (String path: targetPaths) {
-			IRegion target = document.getRegion(path);
+		for (String path : targetPaths) {
+			IRegion target = doc.getRegion(path);
 			if (target != null) {
-				links.add(new SwaggerHyperlink(parameter, textViewer, linkRegion, target));
+				links.add(new SwaggerHyperlink(parameter, viewer, linkRegion, target));
 			}
 		}
 
 		return links.isEmpty() ? null : links.toArray(new IHyperlink[links.size()]);
 	}
 
-	private Iterable<String> findParameterPath(final SwaggerDocument document, final String basePath, String parameter) {
-		JsonNode parent = document.getNodeForPath(basePath);
+	private Iterable<String> findParameterPath(SwaggerDocument doc, String basePath, String parameter) {
+		JsonNode parent = doc.getNodeForPath(basePath);
 
 		if (parent == null || !parent.isObject())
 			return Lists.newArrayList();
@@ -107,7 +87,7 @@ public class PathParamHyperlinkDetector extends AbstractSwaggerHyperlinkDetector
 			String mName = method.name().toLowerCase();
 			JsonNode parameters = parent.at("/" + mName + "/parameters");
 
-			if (parameters != null && parameters.isArray()) {		
+			if (parameters != null && parameters.isArray()) {
 
 				for (int i = 0; i < parameters.size(); i++) {
 					JsonNode current = parameters.get(i);
@@ -115,17 +95,17 @@ public class PathParamHyperlinkDetector extends AbstractSwaggerHyperlinkDetector
 					if (JsonUtil.isRef(current)) {
 
 						JsonPointer ptr = getPointer(current);
-						JsonNode resolved = document.asJson().at(ptr);
+						JsonNode resolved = doc.asJson().at(ptr);
 
 						if (resolved != null && resolved.isObject() && resolved.has("name")) {
-							if (parameter.equals( resolved.get("name").asText() )) {
+							if (parameter.equals(resolved.get("name").asText())) {
 								paths.add(ptr.toString().replaceAll("/", ":"));
 							}
 						}
 
 					} else if (current.isObject() && current.has("name")) {
 
-						if (parameter.equals( current.get("name").asText() )) {
+						if (parameter.equals(current.get("name").asText())) {
 							paths.add(basePath + ":" + mName + ":parameters:@" + i);
 						}
 					}
@@ -136,7 +116,7 @@ public class PathParamHyperlinkDetector extends AbstractSwaggerHyperlinkDetector
 		return paths;
 	}
 
-	protected JsonPointer getPointer(JsonNode ref) {
+	private JsonPointer getPointer(JsonNode ref) {
 		String asText = ref.get("$ref").asText();
 		if (asText.startsWith("#"))
 			asText = asText.substring(1);

@@ -8,17 +8,18 @@
  * Contributors:
  *    ModelSolv, Inc. - initial API and implementation and/or initial documentation
  *******************************************************************************/
-package com.reprezen.swagedit.editor;
+package com.reprezen.swagedit.editor.hyperlinks;
 
 import static com.google.common.base.Strings.emptyToNull;
 
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
 
-import org.eclipse.jface.text.BadLocationException;
 import org.eclipse.jface.text.IRegion;
 import org.eclipse.jface.text.ITextViewer;
 import org.eclipse.jface.text.hyperlink.IHyperlink;
+
+import com.reprezen.swagedit.editor.SwaggerDocument;
 
 /**
  * Hyperlink detector that detects links from JSON references.
@@ -30,32 +31,12 @@ public class JsonReferenceHyperlinkDetector extends AbstractSwaggerHyperlinkDete
 	protected static final Pattern EXTERN_REF_PATTERN = Pattern.compile("^['|\"]?(\\w+\\.y[a]?ml)#([/\\w*]*)['|\"]?");
 
 	@Override
-	public IHyperlink[] detectHyperlinks(ITextViewer textViewer, IRegion region, boolean canShowMultipleHyperlinks) {
-		SwaggerDocument document = (SwaggerDocument) textViewer.getDocument();
+	protected boolean canDetect(String basePath) {
+		return emptyToNull(basePath) != null && basePath.endsWith("$ref");
+	}
 
-		String basePath;
-		try {
-			basePath = document.getPath(region);
-		} catch (BadLocationException e) {
-			basePath = null;
-		}
-
-		// not a json reference
-		if (emptyToNull(basePath) == null || !basePath.endsWith("$ref")) {
-			return null;
-		}
-
-		HyperlinkInfo info;
-		try {
-			info = getHyperlinkInfo(textViewer, region);
-		} catch (BadLocationException e) {
-			return null;
-		}
-
-		if (info == null) {
-			return null;
-		}
-
+	@Override
+	protected IHyperlink[] doDetect(SwaggerDocument doc, ITextViewer viewer, HyperlinkInfo info, String basePath) {
 		String label = null;
 		IRegion target = null;
 		String ref = null;
@@ -83,7 +64,7 @@ public class JsonReferenceHyperlinkDetector extends AbstractSwaggerHyperlinkDete
 			}
 
 			label = ref;
-			target = document.getRegion(ref.replaceAll("/", ":"));
+			target = doc.getRegion(ref.replaceAll("/", ":"));
 		}
 
 		// no target means no hyperlink
@@ -91,7 +72,7 @@ public class JsonReferenceHyperlinkDetector extends AbstractSwaggerHyperlinkDete
 			return null;
 		}
 
-		return new IHyperlink[] { new SwaggerHyperlink(label, textViewer, info.region, target) };
+		return new IHyperlink[] { new SwaggerHyperlink(label, viewer, info.region, target) };
 	}
 
 }
