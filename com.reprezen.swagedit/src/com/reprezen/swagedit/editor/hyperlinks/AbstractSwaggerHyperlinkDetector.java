@@ -51,13 +51,7 @@ public abstract class AbstractSwaggerHyperlinkDetector extends AbstractHyperlink
 	public IHyperlink[] detectHyperlinks(ITextViewer textViewer, IRegion region, boolean canShowMultipleHyperlinks) {
 		SwaggerDocument document = (SwaggerDocument) textViewer.getDocument();
 
-		String basePath;
-		try {
-			basePath = document.getPath(region);
-		} catch (BadLocationException e) {
-			basePath = null;
-		}
-
+		String basePath = document.getPath(region);
 		if (!canDetect(basePath)) {
 			return null;
 		}

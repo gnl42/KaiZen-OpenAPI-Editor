@@ -45,7 +45,8 @@ public class SwaggerDocument extends Document {
 	private Node yamlContent;
 	private Exception yamlError;
 
-	public SwaggerDocument() {}
+	public SwaggerDocument() {
+	}
 
 	public Exception getYamlError() {
 		return yamlError;
@@ -59,7 +60,7 @@ public class SwaggerDocument extends Document {
 	public Node getYaml() {
 		if (yamlContent == null) {
 			try {
-				 yamlContent = yaml.compose(new StringReader(get()));
+				yamlContent = yaml.compose(new StringReader(get()));
 			} catch (Exception e) {
 				yamlContent = null;
 			}
@@ -121,7 +122,7 @@ public class SwaggerDocument extends Document {
 	}
 
 	/**
-	 * Returns the json node present at the given yaml path. 
+	 * Returns the json node present at the given yaml path.
 	 * 
 	 * @param path
 	 * @return json node
@@ -159,8 +160,9 @@ public class SwaggerDocument extends Document {
 	 * @return region under the path
 	 */
 	public IRegion getRegion(String path) {
-		if (Strings.emptyToNull(path) == null)
+		if (Strings.emptyToNull(path) == null) {
 			return null;
+		}
 
 		if (path.startsWith(":")) {
 			path = path.substring(1);
@@ -210,11 +212,12 @@ public class SwaggerDocument extends Document {
 
 		} while (pPos < paths.length && !noPath);
 
-		if (current == null)
+		if (current == null) {
 			return null;
+		}
 
 		try {
-			int offset = getLineOffset(current.getStartMark().getLine());			
+			int offset = getLineOffset(current.getStartMark().getLine());
 			int length = getLineOffset(current.getEndMark().getLine());
 
 			return new Region(offset, length - offset);
@@ -223,12 +226,17 @@ public class SwaggerDocument extends Document {
 		}
 	}
 
-	public String getPath(IRegion region) throws BadLocationException {
-		int lineOfOffset = getLineOfOffset(region.getOffset());
-		// column?
-		int length = (region.getOffset() - getLineOffset(lineOfOffset)) + region.getLength();
+	public String getPath(IRegion region) {
+		int lineOfOffset;
+		int line;
+		try {
+			lineOfOffset = getLineOfOffset(region.getOffset());
+			line = getLineOffset(lineOfOffset);
+		} catch (BadLocationException e) {
+			return null;
+		}
 
-		return getPath(lineOfOffset, length);
+		return getPath(lineOfOffset, (region.getOffset() - line) + region.getLength());
 	}
 
 	/**
@@ -258,7 +266,7 @@ public class SwaggerDocument extends Document {
 			final NodeTuple current = it.next();
 			final Node key = current.getKeyNode();
 
-			if (key.getStartMark().getLine() > line) {				
+			if (key.getStartMark().getLine() > line) {
 				found = previous;
 			}
 
@@ -275,13 +283,15 @@ public class SwaggerDocument extends Document {
 
 	private String getPath(NodeTuple tuple, int line, int column) {
 		String path = "";
-		
-		if (tuple == null)
+
+		if (tuple == null) {
 			return path;
+		}
 
 		final String id = getId(tuple.getKeyNode());
-		if (!id.isEmpty())
+		if (!id.isEmpty()) {
 			path += ":" + id;
+		}
 
 		if (tuple.getValueNode().getNodeId() != NodeId.scalar) {
 			return path += getPath(tuple.getValueNode(), line, column);
@@ -297,7 +307,7 @@ public class SwaggerDocument extends Document {
 			int currentLine = 0;
 
 			final Iterator<NodeTuple> it = map.getValue().iterator();
-			while (currentLine <= line && it.hasNext()) {			
+			while (currentLine <= line && it.hasNext()) {
 				final NodeTuple tuple = it.next();
 				currentLine = tuple.getKeyNode().getStartMark().getLine();
 				if (currentLine <= line) {
@@ -307,8 +317,8 @@ public class SwaggerDocument extends Document {
 
 			if (found != null) {
 				int c = found.getKeyNode().getStartMark().getColumn();
-				if (column > c) {			
-					return getPath(found, line, column);					
+				if (column > c) {
+					return getPath(found, line, column);
 				}
 			}
 		}
@@ -365,7 +375,9 @@ public class SwaggerDocument extends Document {
 
 			try {
 				jsonContent = mapper.readTree(content);
-			} catch (Exception e) {}
+			} catch (Exception e) {
+				jsonContent = null;
+			}
 
 			yamlError = null;
 
