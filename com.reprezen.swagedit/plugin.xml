@@ -145,9 +145,23 @@
          point="org.eclipse.ui.workbench.texteditor.hyperlinkDetectors">
       <hyperlinkDetector
             activate="true"
-            class="com.reprezen.swagedit.editor.SwaggerHyperlinkDetector"
-            id="com.reprezen.swagedit.hyperlinkDetector"
-            name="SwagEdit"
+            class="com.reprezen.swagedit.editor.hyperlinks.PathParamHyperlinkDetector"
+            id="com.reprezen.swagedit.hyperlink.paths"
+            name="Open Path Parameter"
+            targetId="com.reprezen.swagedit.hyperlink.target">
+      </hyperlinkDetector>
+      <hyperlinkDetector
+            activate="true"
+            class="com.reprezen.swagedit.editor.hyperlinks.DefinitionHyperlinkDetector"
+            id="com.reprezen.swagedit.hyperlink.definitions"
+            name="Open Schema Definition"
+            targetId="com.reprezen.swagedit.hyperlink.target">
+      </hyperlinkDetector>
+      <hyperlinkDetector
+            activate="true"
+            class="com.reprezen.swagedit.editor.hyperlinks.JsonReferenceHyperlinkDetector"
+            id="com.reprezen.swagedit.hyperlink.references"
+            name="Open Reference"
             targetId="com.reprezen.swagedit.hyperlink.target">
       </hyperlinkDetector>
    </extension>
