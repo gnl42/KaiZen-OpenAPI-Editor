@@ -15,12 +15,17 @@ import org.dadacoalition.yedit.editor.scanner.YAMLScanner;
 import org.eclipse.jface.text.IDocument;
 import org.eclipse.jface.text.contentassist.ContentAssistant;
 import org.eclipse.jface.text.contentassist.IContentAssistant;
+import org.eclipse.jface.text.hyperlink.IHyperlinkDetector;
+import org.eclipse.jface.text.hyperlink.URLHyperlinkDetector;
 import org.eclipse.jface.text.reconciler.IReconciler;
 import org.eclipse.jface.text.reconciler.MonoReconciler;
 import org.eclipse.jface.text.source.ISourceViewer;
 
 import com.reprezen.swagedit.Activator;
 import com.reprezen.swagedit.assist.SwaggerContentAssistProcessor;
+import com.reprezen.swagedit.editor.hyperlinks.DefinitionHyperlinkDetector;
+import com.reprezen.swagedit.editor.hyperlinks.JsonReferenceHyperlinkDetector;
+import com.reprezen.swagedit.editor.hyperlinks.PathParamHyperlinkDetector;
 
 public class SwaggerSourceViewerConfiguration extends YEditSourceViewerConfiguration {
 
@@ -66,6 +71,16 @@ public class SwaggerSourceViewerConfiguration extends YEditSourceViewerConfigura
 		strategy.setEditor(editor);
 		MonoReconciler reconciler = new MonoReconciler(strategy, false);
 		return reconciler;
+	}
+
+	@Override
+	public IHyperlinkDetector[] getHyperlinkDetectors(ISourceViewer sourceViewer) {
+		return new IHyperlinkDetector[] { 
+			new URLHyperlinkDetector(), 
+			new JsonReferenceHyperlinkDetector(),
+			new PathParamHyperlinkDetector(),
+			new DefinitionHyperlinkDetector()
+		};
 	}
 
 	public void setEditor(SwaggerEditor editor) {
