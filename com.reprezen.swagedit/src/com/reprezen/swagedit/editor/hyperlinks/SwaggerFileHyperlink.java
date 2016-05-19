@@ -10,26 +10,47 @@
  *******************************************************************************/
 package com.reprezen.swagedit.editor.hyperlinks;
 
+import java.io.IOException;
+import java.io.InputStream;
+import java.io.InputStreamReader;
+
+import org.eclipse.core.filesystem.EFS;
+import org.eclipse.core.filesystem.IFileStore;
 import org.eclipse.core.resources.IFile;
+import org.eclipse.core.runtime.CoreException;
 import org.eclipse.jface.text.IRegion;
 import org.eclipse.jface.text.hyperlink.IHyperlink;
-import org.eclipse.ui.PartInitException;
+import org.eclipse.ui.IEditorPart;
+import org.eclipse.ui.IWorkbenchPage;
 import org.eclipse.ui.PlatformUI;
 import org.eclipse.ui.ide.IDE;
 import org.eclipse.ui.texteditor.ITextEditor;
 
+import com.google.common.io.CharStreams;
+import com.reprezen.swagedit.editor.SwaggerDocument;
+
 public class SwaggerFileHyperlink implements IHyperlink {
 
-	private final IFile targetFile;
-	private final IRegion targetRegion;
 	private final IRegion linkRegion;
 	private final String label;
+	private final IFile targetFile;
+	private final IFileStore targetStore;
+	private final String pointer;
 
-	public SwaggerFileHyperlink(IRegion linkRegion, String label, IFile targetFile, IRegion targetRegion) {
+	public SwaggerFileHyperlink(IRegion linkRegion, String label, IFile targetFile, String pointer) {
 		this.linkRegion = linkRegion;
 		this.label = label;
 		this.targetFile = targetFile;
-		this.targetRegion = targetRegion;
+		this.targetStore = null;
+		this.pointer = pointer;
+	}
+
+	public SwaggerFileHyperlink(IRegion linkRegion, String label, IFileStore targetStore, String pointer) {
+		this.linkRegion = linkRegion;
+		this.label = label;
+		this.targetFile = null;
+		this.targetStore = targetStore;
+		this.pointer = pointer;
 	}
 
 	@Override
@@ -49,18 +70,53 @@ public class SwaggerFileHyperlink implements IHyperlink {
 
 	@Override
 	public void open() {
-		try {
-			ITextEditor openEditor = (ITextEditor) IDE.openEditor(
-					PlatformUI.getWorkbench().getActiveWorkbenchWindow().getActivePage(), 
-					targetFile);
+		if (targetFile == null && targetStore == null)
+			return;
 
-			if (targetRegion != null) {
-				openEditor.selectAndReveal(targetRegion.getOffset(), targetRegion.getLength());
+		try {
+			final IWorkbenchPage page = PlatformUI
+					.getWorkbench()
+					.getActiveWorkbenchWindow()
+					.getActivePage();
+
+			IEditorPart editor;
+			if (targetStore == null) {
+				editor = IDE.openEditor(page, targetFile);
+			} else {
+				editor = IDE.openEditorOnFileStore(page, targetStore);
 			}
 
-		} catch (PartInitException | ClassCastException e) {
+			if (editor instanceof ITextEditor && pointer != null) {
+				IRegion region = getTarget();
+				if (region != null) {
+					((ITextEditor) editor).selectAndReveal(region.getOffset(), region.getLength());
+				}
+			}
+		} catch (ClassCastException | CoreException e) {
 			e.printStackTrace();
 		}
+	}
+
+	private IRegion getTarget() throws CoreException {
+		SwaggerDocument doc;
+		if (targetStore != null) {
+			doc = getExternalDocument(targetStore.openInputStream(EFS.NONE, null));
+		} else {
+			doc = getExternalDocument(targetFile.getContents());
+		}
+
+		return doc.getRegion(pointer);
+	}
+
+	private SwaggerDocument getExternalDocument(InputStream content) {
+		final SwaggerDocument doc = new SwaggerDocument();
+		try {
+			doc.set(CharStreams.toString(new InputStreamReader(content)));
+		} catch (IOException e) {
+			return null;
+		}
+
+		return doc;
 	}
 
 }
