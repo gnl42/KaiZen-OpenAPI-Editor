@@ -16,8 +16,9 @@ import java.io.IOException
 import org.eclipse.core.resources.IMarker
 import org.junit.Test
 
-import static org.junit.Assert.assertEquals
-import static org.junit.Assert.assertTrue
+import static org.hamcrest.core.IsCollectionContaining.*
+import static org.junit.Assert.*
+import com.reprezen.swagedit.validation.SwaggerError
 
 class ValidatorTest {
 
@@ -187,4 +188,59 @@ class ValidatorTest {
 			assertEquals(IMarker.SEVERITY_ERROR, it.level)
 		]
 	}
+
+	@Test
+	def void shouldWarnOnDuplicateKeys() {
+		val content = '''
+			swagger: '2.0'
+			swagger: '2.0'
+			info:
+			  version: 0.0.0
+			  title: Simple API
+			paths:
+			  /foo/{bar}:
+			    get:
+			      responses:
+			        '200':
+			          description: OK
+		'''
+
+		document.set(content)
+		val errors = validator.validate(document)
+
+		assertEquals(2, errors.size())
+		assertThat(errors, hasItems(
+			new SwaggerError(1, IMarker.SEVERITY_WARNING, "Object has a duplicate key swagger"),
+			new SwaggerError(2, IMarker.SEVERITY_WARNING, "Object has a duplicate key swagger")
+		))
+	}
+
+	@Test
+	def void shouldWarnOnDuplicateKeys_InsideObjects() {
+		val content = '''
+			swagger: '2.0'
+			info:
+			  version: 0.0.0
+			  version: 1.0.0
+			  title: Simple API
+			paths:
+			  /foo/{bar}:
+			    get:
+			      responses:
+			        '200':
+			          description: OK
+		'''
+
+		document.set(content)
+		val errors = validator.validate(document)
+
+		assertEquals(2, errors.size())
+		assertThat(errors, hasItems(
+			new SwaggerError(3, IMarker.SEVERITY_WARNING, "Object has a duplicate key version"),
+			new SwaggerError(4, IMarker.SEVERITY_WARNING, "Object has a duplicate key version")
+		))
+	}
+
 }
+
+

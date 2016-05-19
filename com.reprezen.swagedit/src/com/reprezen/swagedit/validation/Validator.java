@@ -11,17 +11,23 @@
 package com.reprezen.swagedit.validation;
 
 import java.io.IOException;
-import java.util.Collections;
+import java.util.Map;
 import java.util.Set;
 
 import org.dadacoalition.yedit.YEditLog;
 import org.eclipse.core.resources.IMarker;
+import org.yaml.snakeyaml.nodes.MappingNode;
 import org.yaml.snakeyaml.nodes.Node;
+import org.yaml.snakeyaml.nodes.NodeId;
+import org.yaml.snakeyaml.nodes.NodeTuple;
+import org.yaml.snakeyaml.nodes.ScalarNode;
 
 import com.fasterxml.jackson.databind.JsonNode;
 import com.fasterxml.jackson.dataformat.yaml.snakeyaml.parser.ParserException;
 import com.github.fge.jsonschema.core.exceptions.ProcessingException;
 import com.github.fge.jsonschema.core.report.ProcessingReport;
+import com.google.common.collect.Maps;
+import com.google.common.collect.Sets;
 import com.reprezen.swagedit.editor.SwaggerDocument;
 import com.reprezen.swagedit.json.JsonSchemaManager;
 
@@ -48,6 +54,8 @@ public class Validator {
 	 * @throws ParserException
 	 */
 	public Set<SwaggerError> validate(SwaggerDocument document) {
+		Set<SwaggerError> errors = Sets.newHashSet();
+
 		JsonNode jsonContent = null;
 		try {
 			jsonContent = document.asJson();
@@ -56,21 +64,73 @@ public class Validator {
 		}
 
 		if (jsonContent == null) {
-			return Collections.singleton(new SwaggerError(IMarker.SEVERITY_ERROR, 
+			errors.add(new SwaggerError(
+					IMarker.SEVERITY_ERROR, 
 					"Unable to read content. It may be invalid YAML"));
 		} else {
 			final Node yaml = document.getYaml();
 			final ErrorProcessor processor = new ErrorProcessor(yaml);
 
-			ProcessingReport report = null;
-			try {
-				report = schemaManager.getSwaggerSchema().getSchema().validate(jsonContent, true);
-			} catch (ProcessingException e) {
-				return processor.processMessage(e.getProcessingMessage());
+			errors.addAll(validateAgainstSchema(processor, jsonContent));
+			errors.addAll(checkDuplicateKeys(yaml));
+		}
+
+		return errors;
+	}
+
+	protected Set<SwaggerError> validateAgainstSchema(ErrorProcessor processor, JsonNode jsonContent) {
+		final Set<SwaggerError> errors = Sets.newHashSet();
+
+		try {
+			ProcessingReport report = 
+					schemaManager.getSwaggerSchema()
+					.getSchema()
+					.validate(jsonContent, true);
+
+			errors.addAll(processor.processReport(report));
+		} catch (ProcessingException e) {
+			errors.addAll(processor.processMessage(e.getProcessingMessage()));
+		}
+
+		return errors;
+	}
+
+	protected Set<SwaggerError> checkDuplicateKeys(Node document) {
+		Set<SwaggerError> errors = Sets.newHashSet();
+		
+		if (document.getNodeId() == NodeId.mapping) {
+			MappingNode n = (MappingNode) document;
+
+			Map<String, Set<Node>> duplicates = Maps.newHashMap();
+			for (NodeTuple tuple: n.getValue()) {
+				Node keyNode = tuple.getKeyNode();
+
+				if (keyNode.getNodeId() == NodeId.scalar) {
+					String key = ((ScalarNode) keyNode).getValue();
+					if (duplicates.containsKey(key)) {
+						duplicates.get(key).add(keyNode);
+					} else {
+						duplicates.put(key, Sets.newHashSet(keyNode));
+					}
+				}
+
+				errors.addAll(checkDuplicateKeys(tuple.getValueNode()));
 			}
 
-			return processor.processReport(report);
+			for (String key: duplicates.keySet()) {
+				Set<Node> values = duplicates.get(key);
+				if (values.size() > 1) {
+					for (Node duplicate: values) {
+						errors.add(new SwaggerError(
+								duplicate.getStartMark().getLine() + 1, 
+								IMarker.SEVERITY_WARNING, 
+								String.format("Object has a duplicate key %s", key)));
+					}
+				}
+			}
 		}
+
+		return errors;
 	}
 
 }
