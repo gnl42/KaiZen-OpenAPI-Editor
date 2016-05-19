@@ -21,6 +21,7 @@ import org.yaml.snakeyaml.nodes.Node;
 import org.yaml.snakeyaml.nodes.NodeId;
 import org.yaml.snakeyaml.nodes.NodeTuple;
 import org.yaml.snakeyaml.nodes.ScalarNode;
+import org.yaml.snakeyaml.nodes.SequenceNode;
 
 import com.fasterxml.jackson.databind.JsonNode;
 import com.fasterxml.jackson.dataformat.yaml.snakeyaml.parser.ParserException;
@@ -28,6 +29,7 @@ import com.github.fge.jsonschema.core.exceptions.ProcessingException;
 import com.github.fge.jsonschema.core.report.ProcessingReport;
 import com.google.common.collect.Maps;
 import com.google.common.collect.Sets;
+import com.reprezen.swagedit.Messages;
 import com.reprezen.swagedit.editor.SwaggerDocument;
 import com.reprezen.swagedit.json.JsonSchemaManager;
 
@@ -66,7 +68,7 @@ public class Validator {
 		if (jsonContent == null) {
 			errors.add(new SwaggerError(
 					IMarker.SEVERITY_ERROR, 
-					"Unable to read content. It may be invalid YAML"));
+					Messages.error_cannot_read_content));
 		} else {
 			final Node yaml = document.getYaml();
 			final ErrorProcessor processor = new ErrorProcessor(yaml);
@@ -78,6 +80,9 @@ public class Validator {
 		return errors;
 	}
 
+	/*
+	 * Validates the yaml document against the Swagger schema
+	 */
 	protected Set<SwaggerError> validateAgainstSchema(ErrorProcessor processor, JsonNode jsonContent) {
 		final Set<SwaggerError> errors = Sets.newHashSet();
 
@@ -95,11 +100,14 @@ public class Validator {
 		return errors;
 	}
 
-	protected Set<SwaggerError> checkDuplicateKeys(Node document) {
+	/*
+	 * Finds all duplicate keys in all objects present in the yaml document.
+	 */
+	protected Set<SwaggerError> checkDuplicateKeys(Node node) {
 		Set<SwaggerError> errors = Sets.newHashSet();
 		
-		if (document.getNodeId() == NodeId.mapping) {
-			MappingNode n = (MappingNode) document;
+		if (node.getNodeId() == NodeId.mapping) {
+			MappingNode n = (MappingNode) node;
 
 			Map<String, Set<Node>> duplicates = Maps.newHashMap();
 			for (NodeTuple tuple: n.getValue()) {
@@ -124,9 +132,15 @@ public class Validator {
 						errors.add(new SwaggerError(
 								duplicate.getStartMark().getLine() + 1, 
 								IMarker.SEVERITY_WARNING, 
-								String.format("Object has a duplicate key %s", key)));
+								String.format(Messages.error_duplicate_keys, key)));
 					}
 				}
+			}
+		} else if (node.getNodeId() == NodeId.sequence) {
+			SequenceNode n = (SequenceNode) node;
+
+			for (Node value: n.getValue()) {
+				errors.addAll(checkDuplicateKeys(value));
 			}
 		}
 

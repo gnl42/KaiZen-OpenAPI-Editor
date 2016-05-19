@@ -19,6 +19,7 @@ import org.junit.Test
 import static org.hamcrest.core.IsCollectionContaining.*
 import static org.junit.Assert.*
 import com.reprezen.swagedit.validation.SwaggerError
+import com.reprezen.swagedit.Messages
 
 class ValidatorTest {
 
@@ -210,8 +211,8 @@ class ValidatorTest {
 
 		assertEquals(2, errors.size())
 		assertThat(errors, hasItems(
-			new SwaggerError(1, IMarker.SEVERITY_WARNING, "Object has a duplicate key swagger"),
-			new SwaggerError(2, IMarker.SEVERITY_WARNING, "Object has a duplicate key swagger")
+			new SwaggerError(1, IMarker.SEVERITY_WARNING, String.format(Messages.error_duplicate_keys, "swagger")),
+			new SwaggerError(2, IMarker.SEVERITY_WARNING, String.format(Messages.error_duplicate_keys, "swagger"))
 		))
 	}
 
@@ -236,11 +237,41 @@ class ValidatorTest {
 
 		assertEquals(2, errors.size())
 		assertThat(errors, hasItems(
-			new SwaggerError(3, IMarker.SEVERITY_WARNING, "Object has a duplicate key version"),
-			new SwaggerError(4, IMarker.SEVERITY_WARNING, "Object has a duplicate key version")
+			new SwaggerError(3, IMarker.SEVERITY_WARNING, String.format(Messages.error_duplicate_keys, "version")),
+			new SwaggerError(4, IMarker.SEVERITY_WARNING, String.format(Messages.error_duplicate_keys, "version"))
 		))
 	}
 
+	@Test
+	def void shouldWarnOnDuplicateKeys_InsideItems() {
+		val content = '''
+			swagger: '2.0'
+			info:
+			  version: 0.0.0
+			  title: Simple API
+			paths:
+			  /foo/{bar}:
+			    get:
+			      parameters:
+			         - name: bar
+			           in: path
+			           in: path
+			           type: string
+			           required: true
+			      responses:
+			        '200':
+			          description: OK
+		'''
+
+		document.set(content)
+		val errors = validator.validate(document)
+
+		assertEquals(2, errors.size())
+		assertThat(errors, hasItems(
+			new SwaggerError(10, IMarker.SEVERITY_WARNING, String.format(Messages.error_duplicate_keys, "in")),
+			new SwaggerError(11, IMarker.SEVERITY_WARNING, String.format(Messages.error_duplicate_keys, "in"))
+		))
+	}
 }
 
 
