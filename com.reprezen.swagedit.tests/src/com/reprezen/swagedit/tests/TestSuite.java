@@ -14,6 +14,9 @@ import org.junit.runner.RunWith;
 import org.junit.runners.Suite;
 import org.junit.runners.Suite.SuiteClasses;
 
+import com.reprezen.swagedit.editor.hyperlinks.DefinitionHyperlinkDetectorTest;
+import com.reprezen.swagedit.editor.hyperlinks.JsonReferenceHyperlinkDetectorTest;
+import com.reprezen.swagedit.editor.hyperlinks.PathParamHyperlinkDetectorTest;
 import com.reprezen.swagedit.validation.ErrorProcessorTest;
 import com.reprezen.swagedit.validation.MultipleSwaggerErrorMessageTest;
 
@@ -23,6 +26,9 @@ import com.reprezen.swagedit.validation.MultipleSwaggerErrorMessageTest;
 	SwaggerDocumentTest.class,
 	SwaggerProposalProviderTest.class,
 	SwaggerSchemaTest.class,
+	JsonReferenceHyperlinkDetectorTest.class,
+	PathParamHyperlinkDetectorTest.class,
+	DefinitionHyperlinkDetectorTest.class,
 	ValidationMessageTest.class,
 	ValidatorTest.class,
 	CodeTemplateContextTest.class,
