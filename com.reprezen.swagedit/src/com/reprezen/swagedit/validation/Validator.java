@@ -22,9 +22,10 @@ import org.yaml.snakeyaml.nodes.NodeId;
 import org.yaml.snakeyaml.nodes.NodeTuple;
 import org.yaml.snakeyaml.nodes.ScalarNode;
 import org.yaml.snakeyaml.nodes.SequenceNode;
+import org.yaml.snakeyaml.parser.ParserException;
 
 import com.fasterxml.jackson.databind.JsonNode;
-import com.fasterxml.jackson.dataformat.yaml.snakeyaml.parser.ParserException;
+import com.fasterxml.jackson.databind.node.MissingNode;
 import com.github.fge.jsonschema.core.exceptions.ProcessingException;
 import com.github.fge.jsonschema.core.report.ProcessingReport;
 import com.google.common.collect.HashMultimap;
@@ -33,6 +34,7 @@ import com.google.common.collect.Sets;
 import com.reprezen.swagedit.Messages;
 import com.reprezen.swagedit.editor.SwaggerDocument;
 import com.reprezen.swagedit.json.JsonSchemaManager;
+import com.reprezen.swagedit.json.JsonUtil;
 
 /**
  * This class contains methods for validating a Swagger YAML document.
@@ -73,6 +75,7 @@ public class Validator {
 			if (yaml != null) {
 				errors.addAll(validateAgainstSchema(new ErrorProcessor(yaml), jsonContent));
 				errors.addAll(checkDuplicateKeys(yaml));
+				errors.addAll(validateReferences(yaml, document));
 			}
 		}
 
@@ -157,5 +160,54 @@ public class Validator {
 				node.getStartMark().getLine() + 1, 
 				IMarker.SEVERITY_WARNING,
 				String.format(Messages.error_duplicate_keys, key));
+	}
+
+	protected Set<SwaggerError> validateReferences(Node document, SwaggerDocument swagDoc) {
+		Set<SwaggerError> errors = Sets.newHashSet();
+		Set<NodeTuple> references = Sets.newHashSet();
+		collectReferences(document, references);
+
+		for (NodeTuple tuple: references) {
+			ScalarNode value = (ScalarNode) tuple.getValueNode();
+			String text = value.getValue();
+			JsonNode pointed = JsonUtil.at(swagDoc, text);
+
+			if (pointed == null || pointed instanceof MissingNode) {
+				errors.add(createReferenceError(value));
+			}
+		}
+
+		return errors;
+	}
+
+	private SwaggerError createReferenceError(Node node) {
+		return new SwaggerError(
+				node.getStartMark().getLine() + 1,
+				IMarker.SEVERITY_WARNING,
+				Messages.error_invalid_reference);
+	}
+
+	protected void collectReferences(Node parent, Set<NodeTuple> acc) {
+		switch (parent.getNodeId()) {
+		case mapping:
+			for (NodeTuple tuple: ((MappingNode) parent).getValue()) {
+				Node keyNode = tuple.getKeyNode();
+				if (keyNode.getNodeId() == NodeId.scalar) {
+
+					if ("$ref".equals(((ScalarNode) keyNode).getValue())) {
+						acc.add(tuple);
+					}
+				}
+				collectReferences(tuple.getValueNode(), acc);
+			}
+			break;
+		case sequence:
+			for (Node value: ((SequenceNode) parent).getValue()) {
+				collectReferences(value, acc);
+			}
+			break;
+		default:
+			break;
+		}
 	}
 }

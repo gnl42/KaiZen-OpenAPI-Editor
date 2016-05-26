@@ -19,6 +19,7 @@ import com.reprezen.swagedit.editor.hyperlinks.JsonReferenceHyperlinkDetectorTes
 import com.reprezen.swagedit.editor.hyperlinks.PathParamHyperlinkDetectorTest;
 import com.reprezen.swagedit.validation.ErrorProcessorTest;
 import com.reprezen.swagedit.validation.MultipleSwaggerErrorMessageTest;
+import com.reprezen.swagedit.validation.ValidatorTest;
 
 @RunWith(Suite.class)
 @SuiteClasses({

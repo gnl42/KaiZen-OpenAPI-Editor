@@ -8,7 +8,7 @@
  *  Contributors:
  *     ModelSolv, Inc. - initial API and implementation and/or initial documentation
  *******************************************************************************/
-package com.reprezen.swagedit.tests
+package com.reprezen.swagedit.validation
 
 import com.reprezen.swagedit.editor.SwaggerDocument
 import com.reprezen.swagedit.validation.Validator
@@ -20,6 +20,9 @@ import static org.hamcrest.core.IsCollectionContaining.*
 import static org.junit.Assert.*
 import com.reprezen.swagedit.validation.SwaggerError
 import com.reprezen.swagedit.Messages
+import com.google.common.collect.Sets
+import org.yaml.snakeyaml.nodes.NodeTuple
+import org.yaml.snakeyaml.nodes.ScalarNode
 
 class ValidatorTest {
 
@@ -325,5 +328,61 @@ class ValidatorTest {
 			new SwaggerError(11, IMarker.SEVERITY_WARNING, String.format(Messages.error_duplicate_keys, "responses"))
 		))
 	}
+
+	@Test
+	def void collectReferences() {
+		val content = '''
+			swagger: '2.0'
+			info:
+			  version: 0.0.0
+			  title: Simple API
+			paths:
+			  /foo/{bar}:
+			    get:
+			      parameters:
+			        - $ref: '#/definitions/Invalid'
+			      responses:
+			        '200':
+			          description: OK
+		'''
+
+		document.set(content)
+
+		val acc = Sets.<NodeTuple> newHashSet
+		validator.collectReferences(document.yaml, acc)
+
+		assertEquals(1, acc.size)
+		// yaml line starts at 0
+		assertEquals(8, acc.head.keyNode.startMark.line)
+		assertEquals("$ref", (acc.head.keyNode as ScalarNode).value)
+		assertEquals("#/definitions/Invalid", (acc.head.valueNode as ScalarNode).value)
+	}
+
+	@Test
+	def void shouldValidateReference_To_Definition() {
+		val content = '''
+			swagger: '2.0'
+			info:
+			  version: 0.0.0
+			  title: Simple API
+			paths:
+			  /foo/{bar}:
+			    get:
+			      parameters:
+			        - $ref: '#/definitions/Invalid'
+			      responses:
+			        '200':
+			          description: OK
+		'''
+
+		document.set(content)
+		val errors = validator.validate(document)
+
+		assertEquals(1, errors.size())
+		assertThat(errors, hasItems(
+			new SwaggerError(9, IMarker.SEVERITY_WARNING, Messages.error_invalid_reference)
+		))
+	}
+
 }
 
