@@ -217,6 +217,31 @@ class ValidatorTest {
 	}
 
 	@Test
+	def void shouldNotWarnOnDuplicateKeys_InDifferentObjects() {
+		val content = '''
+			swagger: '2.0'
+			info:
+			  version: 0.0.0
+			  title: Simple API
+			paths:
+			  /foo/{bar}:
+			    get:
+			      responses:
+			        '200':
+			          description: OK
+			    put:
+			      responses:
+			        '200':
+			          description: OK
+		'''
+
+		document.set(content)
+		val errors = validator.validate(document)
+
+		assertEquals(0, errors.size())
+	}
+
+	@Test
 	def void shouldWarnOnDuplicateKeys_InsideObjects() {
 		val content = '''
 			swagger: '2.0'
@@ -272,6 +297,33 @@ class ValidatorTest {
 			new SwaggerError(11, IMarker.SEVERITY_WARNING, String.format(Messages.error_duplicate_keys, "in"))
 		))
 	}
-}
 
+	@Test
+	def void shouldWarnOnDuplicateKeys_InsidePaths() {
+		val content = '''
+			swagger: '2.0'
+			info:
+			  version: 0.0.0
+			  title: Simple API
+			paths:
+			  /foo/{bar}:
+			    get:
+			      responses:
+			        '200':
+			          description: OK
+			      responses:
+			        '201':
+			          description: OK
+		'''
+
+		document.set(content)
+		val errors = validator.validate(document)
+
+		assertEquals(2, errors.size())
+		assertThat(errors, hasItems(
+			new SwaggerError(8, IMarker.SEVERITY_WARNING, String.format(Messages.error_duplicate_keys, "responses")),
+			new SwaggerError(11, IMarker.SEVERITY_WARNING, String.format(Messages.error_duplicate_keys, "responses"))
+		))
+	}
+}
 
