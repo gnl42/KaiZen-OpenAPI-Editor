@@ -12,15 +12,15 @@ package com.reprezen.swagedit.editor.hyperlinks;
 
 import static com.google.common.base.Strings.emptyToNull;
 
-import java.io.IOException;
-import java.io.InputStreamReader;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
 
+import org.eclipse.core.filesystem.EFS;
+import org.eclipse.core.filesystem.IFileInfo;
+import org.eclipse.core.filesystem.IFileStore;
 import org.eclipse.core.resources.IFile;
 import org.eclipse.core.resources.IWorkspaceRoot;
 import org.eclipse.core.resources.ResourcesPlugin;
-import org.eclipse.core.runtime.CoreException;
 import org.eclipse.core.runtime.IPath;
 import org.eclipse.core.runtime.Path;
 import org.eclipse.jface.text.IRegion;
@@ -31,7 +31,6 @@ import org.eclipse.ui.PlatformUI;
 import org.eclipse.ui.part.FileEditorInput;
 
 import com.google.common.base.Strings;
-import com.google.common.io.CharStreams;
 import com.reprezen.swagedit.editor.SwaggerDocument;
 
 /**
@@ -59,7 +58,6 @@ public class JsonReferenceHyperlinkDetector extends AbstractSwaggerHyperlinkDete
 	private IHyperlink[] doDetectExternalLink(HyperlinkInfo info) {
 		String filePath;
 		String pointer = null;
-		IRegion target = null;
 
 		if (info.text.contains("#")) {
 			filePath = sanitize(info.text.split("#")[0]);
@@ -68,19 +66,26 @@ public class JsonReferenceHyperlinkDetector extends AbstractSwaggerHyperlinkDete
 			filePath = sanitize(info.text);
 		}
 
-		IFile file = getFile(filePath);
-		if (file == null || !file.exists()) {
+		IPath path = getPath(filePath);
+		if (path == null) {
 			return null;
 		}
 
-		if (pointer != null) {
-			SwaggerDocument doc = getExternalDocument(file);
-			if (doc != null) {
-				target = doc.getRegion(asPath(pointer));
+		IFile file = getFile(path);
+		if (file == null) {
+			IFileStore fileStore = getExternalFile(path);
+			if (fileStore == null) {
+				return null;
+			} else {
+				return new IHyperlink[] { new SwaggerFileHyperlink(info.region, info.text, fileStore, asPath(pointer)) };
+			}
+		} else {
+			if (file.exists()) {
+				return new IHyperlink[] { new SwaggerFileHyperlink(info.region, info.text, file, asPath(pointer)) };
+			} else {
+				return null;
 			}
 		}
-
-		return new IHyperlink[] { new SwaggerFileHyperlink(info.region, info.text, file, target) };
 	}
 
 	private IHyperlink[] doDetectLocalLink(SwaggerDocument doc, ITextViewer viewer, HyperlinkInfo info) {
@@ -98,37 +103,36 @@ public class JsonReferenceHyperlinkDetector extends AbstractSwaggerHyperlinkDete
 		return new IHyperlink[] { new SwaggerHyperlink(pointer, viewer, info.region, target) };
 	}
 
-	private IFile getFile(String filePath) {
+	private IPath getPath(String file) {
 		IEditorInput input = PlatformUI.getWorkbench()
 				.getActiveWorkbenchWindow()
 				.getActivePage()
 				.getActiveEditor()
 				.getEditorInput();
 
-		if (input instanceof FileEditorInput) {
-			FileEditorInput fileInput = (FileEditorInput) input;
-
-			IWorkspaceRoot root = ResourcesPlugin.getWorkspace().getRoot();
-			IPath extPath = new Path(filePath);
-			if (!extPath.isAbsolute()) {
-				extPath = new Path(fileInput.getURI().resolve(extPath.toOSString()).getPath());
-			}
-
-			return root.getFileForLocation(extPath);
-		}
-
-		return null;
-	}
-
-	private SwaggerDocument getExternalDocument(IFile file) {
-		final SwaggerDocument doc = new SwaggerDocument();
-		try {
-			doc.set(CharStreams.toString(new InputStreamReader(file.getContents())));
-		} catch (IOException | CoreException e) {
+		if (input instanceof FileEditorInput == false) {
 			return null;
 		}
 
-		return doc;
+		FileEditorInput fileInput = (FileEditorInput) input;
+		IPath extPath = new Path(file);
+		if (!extPath.isAbsolute()) {
+			extPath = new Path(fileInput.getURI().resolve(extPath.toOSString()).getPath());
+		}
+
+		return extPath;
+	}
+
+	private IFile getFile(IPath path) {
+		IWorkspaceRoot root = ResourcesPlugin.getWorkspace().getRoot();
+		return root.getFileForLocation(path);
+	}
+
+	private IFileStore getExternalFile(IPath path) {
+		IFileStore fileStore = EFS.getLocalFileSystem().getStore(path.toFile().toURI());
+		IFileInfo fileInfo = fileStore.fetchInfo();
+
+		return fileInfo != null && fileInfo.exists() ? fileStore : null;
 	}
 
 	private String asPath(String pointer) {

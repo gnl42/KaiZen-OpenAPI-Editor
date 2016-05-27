@@ -49,6 +49,7 @@ import org.eclipse.swt.widgets.Composite;
 import org.eclipse.swt.widgets.Display;
 import org.eclipse.ui.IEditorInput;
 import org.eclipse.ui.IFileEditorInput;
+import org.eclipse.ui.texteditor.IDocumentProvider;
 import org.yaml.snakeyaml.error.YAMLException;
 
 import com.reprezen.swagedit.Activator;
@@ -176,12 +177,16 @@ public class SwaggerEditor extends YEdit {
 	@Override
 	protected void doSetInput(IEditorInput input) throws CoreException {
 		super.doSetInput(input);
-		
-		getDocumentProvider().getDocument(getEditorInput()).addDocumentListener(changeListener);
+
+		IDocumentProvider provider = getDocumentProvider();
+		IDocument document = provider.getDocument(input);
+		if (document != null) {
+			document.addDocumentListener(changeListener);
+		}
 	}
-	
+
 	public ProjectionViewer getProjectionViewer() {
-	    return (ProjectionViewer) getSourceViewer();
+		return (ProjectionViewer) getSourceViewer();
 	}
 
 	@Override
@@ -352,7 +357,7 @@ public class SwaggerEditor extends YEdit {
 	
 	@Override
 	public void addDocumentIdleListener(IDocumentIdleListener listener) {
-	    super.addDocumentIdleListener(listener);
+		super.addDocumentIdleListener(listener);
 	}
 
 }
