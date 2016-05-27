@@ -10,11 +10,6 @@
  *******************************************************************************/
 package com.reprezen.swagedit.editor.hyperlinks;
 
-import java.io.IOException;
-import java.io.InputStream;
-import java.io.InputStreamReader;
-
-import org.eclipse.core.filesystem.EFS;
 import org.eclipse.core.filesystem.IFileStore;
 import org.eclipse.core.resources.IFile;
 import org.eclipse.core.runtime.CoreException;
@@ -22,35 +17,25 @@ import org.eclipse.jface.text.IRegion;
 import org.eclipse.jface.text.hyperlink.IHyperlink;
 import org.eclipse.ui.IEditorPart;
 import org.eclipse.ui.IWorkbenchPage;
+import org.eclipse.ui.PartInitException;
 import org.eclipse.ui.PlatformUI;
 import org.eclipse.ui.ide.IDE;
 import org.eclipse.ui.texteditor.ITextEditor;
 
-import com.google.common.io.CharStreams;
+import com.reprezen.swagedit.editor.DocumentUtils;
 import com.reprezen.swagedit.editor.SwaggerDocument;
+import com.reprezen.swagedit.json.references.ExternalReference;
 
 public class SwaggerFileHyperlink implements IHyperlink {
 
 	private final IRegion linkRegion;
 	private final String label;
-	private final IFile targetFile;
-	private final IFileStore targetStore;
-	private final String pointer;
+	private com.reprezen.swagedit.json.references.ExternalReference reference;
 
-	public SwaggerFileHyperlink(IRegion linkRegion, String label, IFile targetFile, String pointer) {
+	public SwaggerFileHyperlink(IRegion linkRegion, String label, ExternalReference reference) {
 		this.linkRegion = linkRegion;
 		this.label = label;
-		this.targetFile = targetFile;
-		this.targetStore = null;
-		this.pointer = pointer;
-	}
-
-	public SwaggerFileHyperlink(IRegion linkRegion, String label, IFileStore targetStore, String pointer) {
-		this.linkRegion = linkRegion;
-		this.label = label;
-		this.targetFile = null;
-		this.targetStore = targetStore;
-		this.pointer = pointer;
+		this.reference = reference;
 	}
 
 	@Override
@@ -70,8 +55,9 @@ public class SwaggerFileHyperlink implements IHyperlink {
 
 	@Override
 	public void open() {
-		if (targetFile == null && targetStore == null)
+		if (reference == null || !reference.isValid()) {
 			return;
+		}
 
 		try {
 			final IWorkbenchPage page = PlatformUI
@@ -79,44 +65,39 @@ public class SwaggerFileHyperlink implements IHyperlink {
 					.getActiveWorkbenchWindow()
 					.getActivePage();
 
-			IEditorPart editor;
-			if (targetStore == null) {
-				editor = IDE.openEditor(page, targetFile);
+			IEditorPart editor = null;		
+			IFile file = DocumentUtils.getWorkspaceFile(reference.path);
+			if (file != null) {
+				editor = IDE.openEditor(page, file);
 			} else {
-				editor = IDE.openEditorOnFileStore(page, targetStore);
+				IFileStore fileStore = DocumentUtils.getExternalFile(reference.path);
+				if (fileStore != null && fileStore.fetchInfo().exists()) {
+					try {
+						editor = IDE.openEditorOnFileStore(page, fileStore);
+					} catch (PartInitException e) {
+						// TODO: handle exception
+					}
+				}
 			}
 
-			if (editor instanceof ITextEditor && pointer != null) {
+			if (editor instanceof ITextEditor) {
 				IRegion region = getTarget();
 				if (region != null) {
 					((ITextEditor) editor).selectAndReveal(region.getOffset(), region.getLength());
 				}
 			}
 		} catch (ClassCastException | CoreException e) {
-			e.printStackTrace();
+			// TODO
 		}
 	}
 
 	private IRegion getTarget() throws CoreException {
-		SwaggerDocument doc;
-		if (targetStore != null) {
-			doc = getExternalDocument(targetStore.openInputStream(EFS.NONE, null));
-		} else {
-			doc = getExternalDocument(targetFile.getContents());
-		}
-
-		return doc.getRegion(pointer);
-	}
-
-	private SwaggerDocument getExternalDocument(InputStream content) {
-		final SwaggerDocument doc = new SwaggerDocument();
-		try {
-			doc.set(CharStreams.toString(new InputStreamReader(content)));
-		} catch (IOException e) {
+		SwaggerDocument doc = DocumentUtils.getDocument(reference.path);
+		if (doc == null) {
 			return null;
 		}
 
-		return doc;
+		return doc.getRegion(reference.pointerAsPath());
 	}
 
 }

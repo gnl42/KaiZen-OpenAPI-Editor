@@ -16,6 +16,7 @@ import java.util.Set;
 import org.apache.commons.lang3.tuple.Pair;
 import org.dadacoalition.yedit.YEditLog;
 import org.eclipse.core.resources.IMarker;
+import org.eclipse.ui.part.FileEditorInput;
 import org.yaml.snakeyaml.nodes.MappingNode;
 import org.yaml.snakeyaml.nodes.Node;
 import org.yaml.snakeyaml.nodes.NodeId;
@@ -32,9 +33,10 @@ import com.google.common.collect.HashMultimap;
 import com.google.common.collect.Multimap;
 import com.google.common.collect.Sets;
 import com.reprezen.swagedit.Messages;
+import com.reprezen.swagedit.editor.DocumentUtils;
 import com.reprezen.swagedit.editor.SwaggerDocument;
 import com.reprezen.swagedit.json.JsonSchemaManager;
-import com.reprezen.swagedit.json.JsonUtil;
+import com.reprezen.swagedit.json.references.JsonReference;
 
 /**
  * This class contains methods for validating a Swagger YAML document.
@@ -166,11 +168,16 @@ public class Validator {
 		Set<SwaggerError> errors = Sets.newHashSet();
 		Set<NodeTuple> references = Sets.newHashSet();
 		collectReferences(document, references);
+		
+		FileEditorInput input = DocumentUtils
+				.getActiveEditorInput();
 
 		for (NodeTuple tuple: references) {
 			ScalarNode value = (ScalarNode) tuple.getValueNode();
 			String text = value.getValue();
-			JsonNode pointed = JsonUtil.at(swagDoc, text);
+			JsonReference reference = JsonReference.create(
+					swagDoc.asJson(), input != null ? input.getPath() : null, text);
+			JsonNode pointed = reference.get();
 
 			if (pointed == null || pointed instanceof MissingNode) {
 				errors.add(createReferenceError(value));
