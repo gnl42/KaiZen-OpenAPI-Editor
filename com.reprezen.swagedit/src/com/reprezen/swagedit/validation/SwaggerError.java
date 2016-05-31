@@ -87,6 +87,37 @@ public class SwaggerError {
 		return message;
 	}
 
+	@Override
+	public int hashCode() {
+		final int prime = 31;
+		int result = 1;
+		result = prime * result + level;
+		result = prime * result + line;
+		result = prime * result + ((message == null) ? 0 : message.hashCode());
+		return result;
+	}
+
+	@Override
+	public boolean equals(Object obj) {
+		if (this == obj)
+			return true;
+		if (obj == null)
+			return false;
+		if (getClass() != obj.getClass())
+			return false;
+		SwaggerError other = (SwaggerError) obj;
+		if (level != other.level)
+			return false;
+		if (line != other.line)
+			return false;
+		if (message == null) {
+			if (other.message != null)
+				return false;
+		} else if (!message.equals(other.message))
+			return false;
+		return true;
+	}
+
 	public static class MultipleSwaggerError extends SwaggerError {
 
 		private final Map<String, Set<SwaggerError>> errors = new HashMap<>();
@@ -199,6 +230,32 @@ public class SwaggerError {
 			}
 			return findNode(path, nodeForSegment);
 		}
+
+		@Override
+		public int hashCode() {
+			final int prime = 31;
+			int result = super.hashCode();
+			result = prime * result + ((errors == null) ? 0 : errors.hashCode());
+			return result;
+		}
+
+		@Override
+		public boolean equals(Object obj) {
+			if (this == obj)
+				return true;
+			if (!super.equals(obj))
+				return false;
+			if (getClass() != obj.getClass())
+				return false;
+			MultipleSwaggerError other = (MultipleSwaggerError) obj;
+			if (errors == null) {
+				if (other.errors != null)
+					return false;
+			} else if (!errors.equals(other.errors))
+				return false;
+			return true;
+		}
+	
 	}
 
 }
