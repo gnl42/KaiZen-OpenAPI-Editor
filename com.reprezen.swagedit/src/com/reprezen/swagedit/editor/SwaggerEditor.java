@@ -175,11 +175,16 @@ public class SwaggerEditor extends YEdit {
 
 	@Override
 	protected void doSetInput(IEditorInput input) throws CoreException {
-		super.doSetInput(input);
-		
-		getDocumentProvider().getDocument(getEditorInput()).addDocumentListener(changeListener);
+		if (input != null) {
+			super.doSetInput(input);
+
+			IDocument document = getDocumentProvider().getDocument(getEditorInput());
+			if (document != null) {
+				document.addDocumentListener(changeListener);
+			}
+		}
 	}
-	
+
 	public ProjectionViewer getProjectionViewer() {
 	    return (ProjectionViewer) getSourceViewer();
 	}
