@@ -70,7 +70,7 @@ public class JsonUtil {
 	public static JsonPointer asPointer(String ptr) {
 		String sanitized = sanitize(ptr);
 		if (sanitized == null) {
-			return null;
+			return JsonPointer.compile("");
 		}
 		if (sanitized.startsWith("#")) {
 			sanitized = sanitized.substring(1);

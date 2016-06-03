@@ -12,8 +12,7 @@ package com.reprezen.swagedit.editor.hyperlinks;
 
 import static org.hamcrest.core.IsCollectionContaining.hasItem;
 import static org.hamcrest.core.IsCollectionContaining.hasItems;
-import static org.junit.Assert.assertNotNull;
-import static org.junit.Assert.assertThat;
+import static org.junit.Assert.*;
 import static org.mockito.Mockito.mock;
 import static org.mockito.Mockito.when;
 
@@ -27,6 +26,7 @@ import org.eclipse.jface.text.IRegion;
 import org.eclipse.jface.text.ITextViewer;
 import org.eclipse.jface.text.Region;
 import org.eclipse.jface.text.hyperlink.IHyperlink;
+import org.eclipse.ui.part.FileEditorInput;
 import org.junit.Before;
 import org.junit.Test;
 
@@ -34,7 +34,12 @@ import com.reprezen.swagedit.editor.SwaggerDocument;
 
 public class JsonReferenceHyperlinkDetectorTest {
 
-	private JsonReferenceHyperlinkDetector detector = new JsonReferenceHyperlinkDetector();
+	private JsonReferenceHyperlinkDetector detector = new JsonReferenceHyperlinkDetector() {
+		// allow running tests as non plugin tests
+		protected FileEditorInput getActiveEditor() {
+			return null;
+		};
+	};
 	private ITextViewer viewer;
 
 	@Before
@@ -68,6 +73,76 @@ public class JsonReferenceHyperlinkDetectorTest {
 
 		assertThat(Arrays.asList(hyperlinks), 
 				hasItem(new SwaggerHyperlink("/definitions/User", viewer, linkRegion, targetRegion)));
+	}
+
+	@Test
+	public void testShould_Not_CreateHyperlink_For_Invalid_JsonReference() throws BadLocationException {
+		SwaggerDocument document = new SwaggerDocument();
+		when(viewer.getDocument()).thenReturn(document);
+
+		String text = 
+				"schema:\n" +
+				"  $ref: '#/definitions/Invalid'\n" +
+				"definitions:\n" +
+				"  User:\n" +
+				"    type: object";
+
+		document.set(text);
+
+		// region that includes `$ref: '#/definitions/User'`
+		IRegion region = new Region("schema:\n  $ref: '#/definitions".length(), 1);
+		IHyperlink[] hyperlinks = detector.detectHyperlinks(viewer, region, false);
+
+		assertNull(hyperlinks);
+	}
+
+	@Test
+	public void testShouldCreateHyperlink_ForPathReference() throws BadLocationException {
+		SwaggerDocument document = new SwaggerDocument();
+		when(viewer.getDocument()).thenReturn(document);
+
+		String text = 
+				"schema:\n" +
+				"  $ref: '#/paths/~1foo~1{bar}'\n" +
+				"paths:\n" +
+				"  /foo/{bar}:\n" +
+				"    get: ";
+
+		document.set(text);
+
+		// region that includes `$ref: '#/paths/~1foo~1{bar}'`
+		IRegion region = new Region("schema:\n  $ref: '#/paths/~1foo".length(), 1);
+		IHyperlink[] hyperlinks = detector.detectHyperlinks(viewer, region, false);
+
+		assertNotNull(hyperlinks);
+
+		// expected region
+		IRegion linkRegion = new Region(document.getLineOffset(1) + "  $ref: ".length(), "'#/paths/~1foo~1{bar}'".length());
+		IRegion targetRegion = new Region(document.getLineOffset(4), 0);
+
+		assertThat(Arrays.asList(hyperlinks), 
+				hasItem(new SwaggerHyperlink("/paths/~1foo~1{bar}", viewer, linkRegion, targetRegion)));
+	}
+
+	@Test
+	public void testShould_Not_CreateHyperlink_For_Invalid_PathReference() throws BadLocationException {
+		SwaggerDocument document = new SwaggerDocument();
+		when(viewer.getDocument()).thenReturn(document);
+
+		String text = 
+				"schema:\n" +
+				"  $ref: '#/paths/~1foo'\n" +
+				"paths:\n" +
+				"  /foo/{bar}:\n" +
+				"    get: ";
+
+		document.set(text);
+
+		// region that includes `$ref: '#/paths/~1foo~1{bar}'`
+		IRegion region = new Region("schema:\n  $ref: '#/paths/~1foo".length(), 1);
+		IHyperlink[] hyperlinks = detector.detectHyperlinks(viewer, region, false);
+
+		assertNull(hyperlinks);
 	}
 
 	@Test

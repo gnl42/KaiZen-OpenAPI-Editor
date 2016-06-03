@@ -12,17 +12,20 @@ package com.reprezen.swagedit.editor.hyperlinks;
 
 import static com.google.common.base.Strings.emptyToNull;
 
+import java.net.URI;
 import java.util.regex.Pattern;
 
+import org.eclipse.core.resources.IFile;
 import org.eclipse.jface.text.IRegion;
 import org.eclipse.jface.text.ITextViewer;
 import org.eclipse.jface.text.hyperlink.IHyperlink;
 import org.eclipse.ui.part.FileEditorInput;
 
+import com.fasterxml.jackson.core.JsonPointer;
 import com.reprezen.swagedit.editor.DocumentUtils;
 import com.reprezen.swagedit.editor.SwaggerDocument;
-import com.reprezen.swagedit.json.references.ExternalReference;
 import com.reprezen.swagedit.json.references.JsonReference;
+import com.reprezen.swagedit.json.references.JsonReferenceFactory;
 
 /**
  * Hyperlink detector that detects links from JSON references.
@@ -32,6 +35,8 @@ public class JsonReferenceHyperlinkDetector extends AbstractSwaggerHyperlinkDete
 
 	protected static final Pattern LOCAL_REF_PATTERN = Pattern.compile("['|\"]?#([/\\w+]+)['|\"]?");
 
+	protected final JsonReferenceFactory factory = new JsonReferenceFactory();
+
 	@Override
 	protected boolean canDetect(String basePath) {
 		return emptyToNull(basePath) != null && basePath.endsWith("$ref");
@@ -39,32 +44,37 @@ public class JsonReferenceHyperlinkDetector extends AbstractSwaggerHyperlinkDete
 
 	@Override
 	protected IHyperlink[] doDetect(SwaggerDocument doc, ITextViewer viewer, HyperlinkInfo info, String basePath) {
-		FileEditorInput input = DocumentUtils
-				.getActiveEditorInput();
-		
+		FileEditorInput input = getActiveEditor();
+		URI baseURI = input != null ? input.getURI() : null;
 
-		JsonReference reference = JsonReference.create(
-				doc.asJson(),
-				input != null ? input.getPath() : null,
-				info.text.trim().replaceAll("'|\"", ""));
-
-		if (!reference.isValid()) {
+		JsonReference reference = factory.create(doc.getNodeForPath(basePath));
+		if (!reference.isValid(baseURI)) {
 			return null;
 		}
 
-		if (reference instanceof ExternalReference) {		
-			return new IHyperlink[] { 
-				new SwaggerFileHyperlink(info.region, info.text, (ExternalReference) reference) 
-			};
-		} else {
-			IRegion target = doc.getRegion(reference.pointerAsPath());
+		if (reference.isLocal()) {
+			IRegion target = doc.getRegion(pointer(reference.getPointer()));
 			if (target == null) {
 				return null;
 			}
-			return new IHyperlink[] { 
-				new SwaggerHyperlink(reference.pointer.toString(), viewer, info.region, target) 
-			};
+			return new IHyperlink[] {
+					new SwaggerHyperlink(reference.getPointer().toString(), viewer, info.region, target) };
+		} else {
+			IFile file = DocumentUtils.getWorkspaceFile(baseURI.resolve(reference.getUri()));
+			if (file != null && file.exists()) {
+				return new IHyperlink[] {
+						new SwaggerFileHyperlink(info.region, info.text, file, pointer(reference.getPointer())) };
+			}
 		}
+
+		return null;
 	}
 
+	protected FileEditorInput getActiveEditor() {
+		return DocumentUtils.getActiveEditorInput();
+	}
+
+	protected String pointer(JsonPointer pointer) {
+		return pointer.toString().replaceAll("/", ":").replaceAll("~1", "/");
+	}
 }

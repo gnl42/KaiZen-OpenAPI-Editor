@@ -1,71 +1,91 @@
 package com.reprezen.swagedit.json.references;
 
-import org.eclipse.core.runtime.IPath;
+import java.io.IOException;
+import java.net.MalformedURLException;
+import java.net.URI;
+import java.nio.file.Files;
+import java.nio.file.Paths;
 
 import com.fasterxml.jackson.core.JsonPointer;
 import com.fasterxml.jackson.databind.JsonNode;
-import com.google.common.base.Strings;
-import com.reprezen.swagedit.editor.DocumentUtils;
-import com.reprezen.swagedit.json.JsonUtil;
+import com.fasterxml.jackson.databind.ObjectMapper;
+import com.fasterxml.jackson.dataformat.yaml.YAMLFactory;
 
-public abstract class JsonReference {
+public class JsonReference {
 
-	public final JsonPointer pointer;
+	private final URI uri;
+	private final JsonPointer pointer;
+	private final Object source;
+	private final boolean absolute;
+	private final boolean local;
 
-	JsonReference(JsonPointer pointer) {
+	private JsonNode resolved;
+
+	JsonReference(URI uri, JsonPointer pointer, boolean absolute, boolean local, Object source) {
+		this.uri = uri;
 		this.pointer = pointer;
+		this.absolute = absolute;
+		this.local = local;
+		this.source = source;
 	}
 
-	public abstract boolean isValid();
-
-	/*
-	 * TODO
-	 * We use different paths to locate elements in swagger documents
-	 * paths like :paths:get:parameters
-	 * This should be changed to use only json pointers.
-	 * 
-	 * See SwaggerDocument.getPath
-	 * 
-	 */
-	public String pointerAsPath() {
-		return pointer.toString().replaceAll("/", ":").replaceAll("~1", "/");
-	}
-
-	/**
-	 * Returns the resolved node.
-	 * 
-	 * @return node
-	 */
-	public abstract JsonNode get();
-
-	/**
-	 * Creates a JSON reference from a path or pointer.
-	 * 
-	 * @param document current doc containing the ref node
-	 * @param pathOrPointer pointing to a local node or external node
-	 * @return JSON reference
-	 */
-	public static JsonReference create(JsonNode document, IPath basePath, String pathOrPointer) {
-		if (Strings.emptyToNull(pathOrPointer) == null) {
-			return new InvalidReference();
+	public boolean isValid(URI baseURI) {
+		if (uri == null) {
+			return false;
 		}
 
-		if (JsonUtil.isPointer(pathOrPointer)) {
-			// local
-			return new LocalReference(document, JsonUtil.asPointer(pathOrPointer));
-		} else {
-			String filePath = pathOrPointer.contains("#") ? pathOrPointer.split("#")[0] : pathOrPointer;
-			String pointer = pathOrPointer.contains("#") ? pathOrPointer.split("#")[1] : "";
+		JsonNode resolved = resolve(baseURI);
+		return resolved != null && !resolved.isMissingNode();
+	}
 
-			// resolve the path against the path 
-			// of the currently active editor
-			IPath target = DocumentUtils.resolve(basePath, filePath);
-			if (target == null) {
-				return new InvalidReference();
+	public JsonNode resolve(URI baseURI) {
+		URI resolvedURI = baseURI != null ? baseURI.resolve(uri) : uri;
+		String filePath;
+		try {
+			filePath = resolvedURI.toURL().getFile();
+		} catch (MalformedURLException e) {
+			return null;
+		}
+
+		boolean exists = Files.exists(Paths.get(filePath));
+		if (exists && resolved == null) {
+			ObjectMapper mapper = getMapper();
+			JsonNode doc;
+			try {
+				doc = mapper.readTree(resolvedURI.toURL());
+			} catch (IOException e) {
+				e.printStackTrace();
+				return null;
 			}
 
-			return new ExternalReference(target, JsonUtil.asPointer(pointer));
+			resolved = doc.at(pointer);
 		}
+
+		return resolved;
+	}
+
+	public JsonPointer getPointer() {
+		return pointer;
+	}
+
+	public URI getUri() {
+		return uri;
+	}
+
+	public boolean isLocal() {
+		return local;
+	}
+
+	public boolean isAbsolute() {
+		return absolute;
+	}
+
+	public Object getSource() {
+		return source;
+	}
+
+	protected ObjectMapper getMapper() {
+		return new ObjectMapper(new YAMLFactory());
 	}
 
 }

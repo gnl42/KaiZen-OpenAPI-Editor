@@ -26,7 +26,6 @@ import org.yaml.snakeyaml.nodes.SequenceNode;
 import org.yaml.snakeyaml.parser.ParserException;
 
 import com.fasterxml.jackson.databind.JsonNode;
-import com.fasterxml.jackson.databind.node.MissingNode;
 import com.github.fge.jsonschema.core.exceptions.ProcessingException;
 import com.github.fge.jsonschema.core.report.ProcessingReport;
 import com.google.common.collect.HashMultimap;
@@ -36,7 +35,8 @@ import com.reprezen.swagedit.Messages;
 import com.reprezen.swagedit.editor.DocumentUtils;
 import com.reprezen.swagedit.editor.SwaggerDocument;
 import com.reprezen.swagedit.json.JsonSchemaManager;
-import com.reprezen.swagedit.json.references.JsonReference;
+import com.reprezen.swagedit.json.references.JsonReferenceFactory;
+import com.reprezen.swagedit.json.references.JsonReferenceValidator;
 
 /**
  * This class contains methods for validating a Swagger YAML document.
@@ -48,6 +48,9 @@ import com.reprezen.swagedit.json.references.JsonReference;
 public class Validator {
 
 	private static final JsonSchemaManager schemaManager = new JsonSchemaManager();
+
+	private final JsonReferenceValidator referenceValidator = 
+			new JsonReferenceValidator(new JsonReferenceFactory());
 
 	/**
 	 * Returns a list or errors if validation fails.
@@ -75,9 +78,11 @@ public class Validator {
 		} else {
 			Node yaml = document.getYaml();
 			if (yaml != null) {
+				FileEditorInput input = getActiveEditorInput();
+
 				errors.addAll(validateAgainstSchema(new ErrorProcessor(yaml), jsonContent));
 				errors.addAll(checkDuplicateKeys(yaml));
-				errors.addAll(validateReferences(yaml, document));
+				errors.addAll(referenceValidator.validate(input != null ? input.getURI() : null, yaml));
 			}
 		}
 
@@ -164,57 +169,8 @@ public class Validator {
 				String.format(Messages.error_duplicate_keys, key));
 	}
 
-	protected Set<SwaggerError> validateReferences(Node document, SwaggerDocument swagDoc) {
-		Set<SwaggerError> errors = Sets.newHashSet();
-		Set<NodeTuple> references = Sets.newHashSet();
-		collectReferences(document, references);
-		
-		FileEditorInput input = DocumentUtils
-				.getActiveEditorInput();
-
-		for (NodeTuple tuple: references) {
-			ScalarNode value = (ScalarNode) tuple.getValueNode();
-			String text = value.getValue();
-			JsonReference reference = JsonReference.create(
-					swagDoc.asJson(), input != null ? input.getPath() : null, text);
-			JsonNode pointed = reference.get();
-
-			if (pointed == null || pointed instanceof MissingNode) {
-				errors.add(createReferenceError(value));
-			}
-		}
-
-		return errors;
+	protected FileEditorInput getActiveEditorInput() {
+		return DocumentUtils.getActiveEditorInput();
 	}
 
-	private SwaggerError createReferenceError(Node node) {
-		return new SwaggerError(
-				node.getStartMark().getLine() + 1,
-				IMarker.SEVERITY_WARNING,
-				Messages.error_invalid_reference);
-	}
-
-	protected void collectReferences(Node parent, Set<NodeTuple> acc) {
-		switch (parent.getNodeId()) {
-		case mapping:
-			for (NodeTuple tuple: ((MappingNode) parent).getValue()) {
-				Node keyNode = tuple.getKeyNode();
-				if (keyNode.getNodeId() == NodeId.scalar) {
-
-					if ("$ref".equals(((ScalarNode) keyNode).getValue())) {
-						acc.add(tuple);
-					}
-				}
-				collectReferences(tuple.getValueNode(), acc);
-			}
-			break;
-		case sequence:
-			for (Node value: ((SequenceNode) parent).getValue()) {
-				collectReferences(value, acc);
-			}
-			break;
-		default:
-			break;
-		}
-	}
 }

@@ -26,7 +26,12 @@ import org.yaml.snakeyaml.nodes.ScalarNode
 
 class ValidatorTest {
 
-	val validator = new Validator
+	val validator = new Validator() {
+		// allow running tests as non plugin tests
+		override protected getActiveEditorInput() {
+			null
+		}
+	}
 	val document = new SwaggerDocument
 
 	@Test
@@ -329,8 +334,37 @@ class ValidatorTest {
 		))
 	}
 
+//	@Test
+//	def void collectReferences() {
+//		val content = '''
+//			swagger: '2.0'
+//			info:
+//			  version: 0.0.0
+//			  title: Simple API
+//			paths:
+//			  /foo/{bar}:
+//			    get:
+//			      parameters:
+//			        - $ref: '#/definitions/Invalid'
+//			      responses:
+//			        '200':
+//			          description: OK
+//		'''
+//
+//		document.set(content)
+//
+//		val acc = Sets.<NodeTuple> newHashSet
+//		validator.collectReferences(document.yaml, acc)
+//
+//		assertEquals(1, acc.size)
+//		// yaml line starts at 0
+//		assertEquals(8, acc.head.keyNode.startMark.line)
+//		assertEquals("$ref", (acc.head.keyNode as ScalarNode).value)
+//		assertEquals("#/definitions/Invalid", (acc.head.valueNode as ScalarNode).value)
+//	}
+
 	@Test
-	def void collectReferences() {
+	def void shouldValidateReference_To_ValidDefinition() {
 		val content = '''
 			swagger: '2.0'
 			info:
@@ -340,26 +374,23 @@ class ValidatorTest {
 			  /foo/{bar}:
 			    get:
 			      parameters:
-			        - $ref: '#/definitions/Invalid'
+			        - $ref: '#/definitions/Valid'
 			      responses:
 			        '200':
 			          description: OK
+			definitions:
+			  Valid:
+			    type: string
 		'''
 
 		document.set(content)
+		val errors = validator.validate(document)
 
-		val acc = Sets.<NodeTuple> newHashSet
-		validator.collectReferences(document.yaml, acc)
-
-		assertEquals(1, acc.size)
-		// yaml line starts at 0
-		assertEquals(8, acc.head.keyNode.startMark.line)
-		assertEquals("$ref", (acc.head.keyNode as ScalarNode).value)
-		assertEquals("#/definitions/Invalid", (acc.head.valueNode as ScalarNode).value)
+		assertEquals(0, errors.size())
 	}
 
 	@Test
-	def void shouldValidateReference_To_Definition() {
+	def void shouldValidateReference_To_InvalidDefinition() {
 		val content = '''
 			swagger: '2.0'
 			info:
@@ -383,6 +414,54 @@ class ValidatorTest {
 			new SwaggerError(9, IMarker.SEVERITY_WARNING, Messages.error_invalid_reference)
 		))
 	}
+	
+	@Test
+	def void shouldValidateReference_To_ValidPath() {
+		val content = '''
+			swagger: '2.0'
+			info:
+			  version: 0.0.0
+			  title: Simple API
+			paths:
+			  /foo/{bar}:
+			    get:
+			      parameters:
+			        - $ref: '#/paths/~1foo~1{bar}'
+			      responses:
+			        '200':
+			          description: OK
+		'''
 
+		document.set(content)
+		val errors = validator.validate(document)
+
+		assertEquals(0, errors.size())
+	}
+
+	@Test
+	def void shouldValidateReference_To_InvalidPath() {
+		val content = '''
+			swagger: '2.0'
+			info:
+			  version: 0.0.0
+			  title: Simple API
+			paths:
+			  /foo/{bar}:
+			    get:
+			      parameters:
+			        - $ref: '#/paths/~1foo'
+			      responses:
+			        '200':
+			          description: OK
+		'''
+
+		document.set(content)
+		val errors = validator.validate(document)
+
+		assertEquals(1, errors.size())
+		assertThat(errors, hasItems(
+			new SwaggerError(9, IMarker.SEVERITY_WARNING, Messages.error_invalid_reference)
+		))
+	}
 }
 

@@ -32,22 +32,6 @@ public class DocumentUtils {
 		return input instanceof FileEditorInput ? (FileEditorInput) input : null;
 	}
 
-	public static IPath resolve(IPath base, String path) {
-		IPath extPath = new Path(path);
-		if (!extPath.isAbsolute() && base != null) {
-			URI baseURI = base.toFile().toURI();
-			URI resolvedURI;
-			try {
-				resolvedURI = baseURI.resolve(extPath.toOSString());
-			} catch (IllegalArgumentException e) {
-				return null;
-			}
-
-			extPath = new Path(resolvedURI.getPath());
-		}
-		return extPath;
-	}
-
 	public static SwaggerDocument getDocument(IPath path) {
 		if (path == null || !path.getFileExtension().matches("ya?ml")) {
 			return null;
@@ -86,12 +70,30 @@ public class DocumentUtils {
 		return doc;
 	}
 
+	public static IFile getWorkspaceFile(URI uri) {
+		IWorkspaceRoot root = ResourcesPlugin
+				.getWorkspace()
+				.getRoot();
+
+		URI relativize = root.getLocationURI().relativize(uri);
+		IPath path = new Path(relativize.getPath());
+		try {
+			return root.getFile(path);
+		} catch (Exception e) {
+			return null;
+		}
+	}
+
 	public static IFile getWorkspaceFile(IPath path) {
 		IWorkspaceRoot root = ResourcesPlugin
 				.getWorkspace()
 				.getRoot();
 
-		return root.getFileForLocation(path);
+		try {
+			return root.getFileForLocation(path);
+		} catch (Exception e) {
+			return null;
+		}
 	}
 
 	public static IFileStore getExternalFile(IPath path) {

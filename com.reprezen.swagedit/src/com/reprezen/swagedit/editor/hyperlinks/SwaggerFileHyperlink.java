@@ -10,7 +10,6 @@
  *******************************************************************************/
 package com.reprezen.swagedit.editor.hyperlinks;
 
-import org.eclipse.core.filesystem.IFileStore;
 import org.eclipse.core.resources.IFile;
 import org.eclipse.core.runtime.CoreException;
 import org.eclipse.jface.text.IRegion;
@@ -24,18 +23,19 @@ import org.eclipse.ui.texteditor.ITextEditor;
 
 import com.reprezen.swagedit.editor.DocumentUtils;
 import com.reprezen.swagedit.editor.SwaggerDocument;
-import com.reprezen.swagedit.json.references.ExternalReference;
 
 public class SwaggerFileHyperlink implements IHyperlink {
 
 	private final IRegion linkRegion;
 	private final String label;
-	private com.reprezen.swagedit.json.references.ExternalReference reference;
+	private final IFile file;
+	private final String pointer;
 
-	public SwaggerFileHyperlink(IRegion linkRegion, String label, ExternalReference reference) {
+	public SwaggerFileHyperlink(IRegion linkRegion, String label, IFile file, String pointer) {
 		this.linkRegion = linkRegion;
 		this.label = label;
-		this.reference = reference;
+		this.file = file;
+		this.pointer = pointer;
 	}
 
 	@Override
@@ -55,7 +55,7 @@ public class SwaggerFileHyperlink implements IHyperlink {
 
 	@Override
 	public void open() {
-		if (reference == null || !reference.isValid()) {
+		if (file == null || !file.exists()) {
 			return;
 		}
 
@@ -65,19 +65,11 @@ public class SwaggerFileHyperlink implements IHyperlink {
 					.getActiveWorkbenchWindow()
 					.getActivePage();
 
-			IEditorPart editor = null;		
-			IFile file = DocumentUtils.getWorkspaceFile(reference.path);
-			if (file != null) {
+			IEditorPart editor;
+			try {
 				editor = IDE.openEditor(page, file);
-			} else {
-				IFileStore fileStore = DocumentUtils.getExternalFile(reference.path);
-				if (fileStore != null && fileStore.fetchInfo().exists()) {
-					try {
-						editor = IDE.openEditorOnFileStore(page, fileStore);
-					} catch (PartInitException e) {
-						// TODO: handle exception
-					}
-				}
+			} catch(PartInitException e) {
+				return;
 			}
 
 			if (editor instanceof ITextEditor) {
@@ -92,12 +84,12 @@ public class SwaggerFileHyperlink implements IHyperlink {
 	}
 
 	private IRegion getTarget() throws CoreException {
-		SwaggerDocument doc = DocumentUtils.getDocument(reference.path);
+		SwaggerDocument doc = DocumentUtils.getDocument(file.getLocation());
 		if (doc == null) {
 			return null;
 		}
 
-		return doc.getRegion(reference.pointerAsPath());
+		return doc.getRegion(pointer);
 	}
 
 }

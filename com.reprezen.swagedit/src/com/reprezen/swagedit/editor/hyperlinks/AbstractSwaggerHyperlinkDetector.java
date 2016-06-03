@@ -45,6 +45,14 @@ public abstract class AbstractSwaggerHyperlinkDetector extends AbstractHyperlink
 		public int getLength() {
 			return region.getLength();
 		}
+
+		public String getText() {
+			return text;
+		}
+
+		public String getUnquotedText() {
+			return text.replaceAll("'|\"", "");
+		}
 	}
 
 	@Override
