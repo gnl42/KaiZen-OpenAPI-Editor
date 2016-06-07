@@ -11,17 +11,26 @@
 package com.reprezen.swagedit.validation;
 
 import java.io.IOException;
-import java.util.Collections;
 import java.util.Set;
 
+import org.apache.commons.lang3.tuple.Pair;
 import org.dadacoalition.yedit.YEditLog;
 import org.eclipse.core.resources.IMarker;
+import org.yaml.snakeyaml.nodes.MappingNode;
 import org.yaml.snakeyaml.nodes.Node;
+import org.yaml.snakeyaml.nodes.NodeId;
+import org.yaml.snakeyaml.nodes.NodeTuple;
+import org.yaml.snakeyaml.nodes.ScalarNode;
+import org.yaml.snakeyaml.nodes.SequenceNode;
 
 import com.fasterxml.jackson.databind.JsonNode;
 import com.fasterxml.jackson.dataformat.yaml.snakeyaml.parser.ParserException;
 import com.github.fge.jsonschema.core.exceptions.ProcessingException;
 import com.github.fge.jsonschema.core.report.ProcessingReport;
+import com.google.common.collect.HashMultimap;
+import com.google.common.collect.Multimap;
+import com.google.common.collect.Sets;
+import com.reprezen.swagedit.Messages;
 import com.reprezen.swagedit.editor.SwaggerDocument;
 import com.reprezen.swagedit.json.JsonSchemaManager;
 
@@ -48,6 +57,8 @@ public class Validator {
 	 * @throws ParserException
 	 */
 	public Set<SwaggerError> validate(SwaggerDocument document) {
+		Set<SwaggerError> errors = Sets.newHashSet();
+
 		JsonNode jsonContent = null;
 		try {
 			jsonContent = document.asJson();
@@ -56,21 +67,95 @@ public class Validator {
 		}
 
 		if (jsonContent == null) {
-			return Collections.singleton(new SwaggerError(IMarker.SEVERITY_ERROR, 
-					"Unable to read content. It may be invalid YAML"));
+			errors.add(new SwaggerError(IMarker.SEVERITY_ERROR, Messages.error_cannot_read_content));
 		} else {
-			final Node yaml = document.getYaml();
-			final ErrorProcessor processor = new ErrorProcessor(yaml);
-
-			ProcessingReport report = null;
-			try {
-				report = schemaManager.getSwaggerSchema().getSchema().validate(jsonContent, true);
-			} catch (ProcessingException e) {
-				return processor.processMessage(e.getProcessingMessage());
+			Node yaml = document.getYaml();
+			if (yaml != null) {
+				errors.addAll(validateAgainstSchema(new ErrorProcessor(yaml), jsonContent));
+				errors.addAll(checkDuplicateKeys(yaml));
 			}
+		}
 
-			return processor.processReport(report);
+		return errors;
+	}
+
+	/*
+	 * Validates the YAML document against the Swagger schema
+	 */
+	protected Set<SwaggerError> validateAgainstSchema(ErrorProcessor processor, JsonNode jsonContent) {
+		final Set<SwaggerError> errors = Sets.newHashSet();
+
+		try {
+			ProcessingReport report = schemaManager.getSwaggerSchema().getSchema().validate(jsonContent, true);
+
+			errors.addAll(processor.processReport(report));
+		} catch (ProcessingException e) {
+			errors.addAll(processor.processMessage(e.getProcessingMessage()));
+		}
+
+		return errors;
+	}
+
+	/*
+	 * Finds all duplicate keys in all objects present in the YAML document.
+	 */
+	protected Set<SwaggerError> checkDuplicateKeys(Node document) {
+		HashMultimap<Pair<Node, String>, Node> acc = 
+				HashMultimap.<Pair<Node, String>, Node>create();
+
+		collectDuplicates(document, acc);
+
+		Set<SwaggerError> errors = Sets.newHashSet();
+		for (Pair<Node, String> key: acc.keys()) {
+			Set<Node> duplicates = acc.get(key);
+
+			if (duplicates.size() > 1) {
+				for (Node duplicate : duplicates) {
+					errors.add(createDuplicateError(key.getValue(), duplicate));
+				}
+			}
+		}
+
+		return errors;
+	}
+
+	/*
+	 * This method iterates through the YAML tree to collect the pairs of Node x String 
+	 * representing an object and one of it's keys. Each pair is associated to a Set of 
+	 * Nodes which contains all nodes being a key to the pair's Node and having for value 
+	 * the pair's key.
+	 * Once the iteration is done, the resulting map should be traversed. Each pair having 
+	 * more than one element in its associated Set are duplicate keys. 
+	 */
+	protected void collectDuplicates(Node parent, Multimap<Pair<Node, String>, Node> acc) {
+		switch (parent.getNodeId()) {
+		case mapping: {
+			for (NodeTuple value: ((MappingNode) parent).getValue()) {
+				Node keyNode = value.getKeyNode();
+
+				if (keyNode.getNodeId() == NodeId.scalar) {
+					acc.put(Pair.of(parent, ((ScalarNode) keyNode).getValue()), keyNode);
+				}
+
+				collectDuplicates(value.getValueNode(), acc);
+			}
+		}
+			break;
+		case sequence: {
+			for (Node value: ((SequenceNode) parent).getValue()) {
+				collectDuplicates(value, acc);
+			}
+		}
+			break;
+		default:
+			break;
 		}
 	}
 
+	protected SwaggerError createDuplicateError(String key, Node node) {
+		return new SwaggerError(
+				node.getStartMark().getLine() + 1, 
+				IMarker.SEVERITY_WARNING,
+				String.format(Messages.error_duplicate_keys, key));
+	}
 }
