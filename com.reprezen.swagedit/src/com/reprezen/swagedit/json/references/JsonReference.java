@@ -1,25 +1,43 @@
+/*******************************************************************************
+ * Copyright (c) 2016 ModelSolv, Inc. and others.
+ * All rights reserved. This program and the accompanying materials
+ * are made available under the terms of the Eclipse Public License v1.0
+ * which accompanies this distribution, and is available at
+ * http://www.eclipse.org/legal/epl-v10.html
+ *
+ * Contributors:
+ *    ModelSolv, Inc. - initial API and implementation and/or initial documentation
+ *******************************************************************************/
 package com.reprezen.swagedit.json.references;
 
-import java.io.IOException;
-import java.net.MalformedURLException;
 import java.net.URI;
-import java.nio.file.Files;
-import java.nio.file.Paths;
+
+import org.yaml.snakeyaml.nodes.NodeId;
+import org.yaml.snakeyaml.nodes.NodeTuple;
+import org.yaml.snakeyaml.nodes.ScalarNode;
 
 import com.fasterxml.jackson.core.JsonPointer;
 import com.fasterxml.jackson.databind.JsonNode;
-import com.fasterxml.jackson.databind.ObjectMapper;
-import com.fasterxml.jackson.dataformat.yaml.YAMLFactory;
+import com.reprezen.swagedit.json.JsonDocumentManager;
 
+/**
+ * Represents a JSON reference as defined by https://tools.ietf.org/html/draft-pbryan-zyp-json-ref-03.
+ * 
+ * A JSON reference is made of a valid URI and of a JSON Pointer (https://tools.ietf.org/html/rfc6901). 
+ *
+ */
 public class JsonReference {
+
+	public static final String PROPERTY = "$ref";
 
 	private final URI uri;
 	private final JsonPointer pointer;
-	private final Object source;
 	private final boolean absolute;
 	private final boolean local;
+	private final Object source;
 
 	private JsonNode resolved;
+	private JsonDocumentManager manager = JsonDocumentManager.getInstance();
 
 	JsonReference(URI uri, JsonPointer pointer, boolean absolute, boolean local, Object source) {
 		this.uri = uri;
@@ -29,6 +47,18 @@ public class JsonReference {
 		this.source = source;
 	}
 
+	public void setDocumentManager(JsonDocumentManager manager) {
+		this.manager = manager;
+	}
+
+	/**
+	 * Returns true if the reference is valid, e.g. if this reference URI   
+	 * points to an existing JSON document and the pointer to an existing 
+	 * node inside that document.
+	 * 
+	 * @param baseURI
+	 * @return true if valid
+	 */
 	public boolean isValid(URI baseURI) {
 		if (uri == null) {
 			return false;
@@ -38,30 +68,38 @@ public class JsonReference {
 		return resolved != null && !resolved.isMissingNode();
 	}
 
+	/**
+	 * Returns the node that is referenced by this reference.
+	 * 
+	 * If the resolution of the referenced node fails, this method returns 
+	 * null. If the pointer does not points to an existing node, this method 
+	 * will return a missing node (see JsonNode.isMissingNode()).
+	 * 
+	 * @param baseURI
+	 * @return referenced node
+	 */
 	public JsonNode resolve(URI baseURI) {
-		URI resolvedURI = baseURI != null ? baseURI.resolve(uri) : uri;
-		String filePath;
-		try {
-			filePath = resolvedURI.toURL().getFile();
-		} catch (MalformedURLException e) {
-			return null;
-		}
-
-		boolean exists = Files.exists(Paths.get(filePath));
-		if (exists && resolved == null) {
-			ObjectMapper mapper = getMapper();
-			JsonNode doc;
-			try {
-				doc = mapper.readTree(resolvedURI.toURL());
-			} catch (IOException e) {
-				e.printStackTrace();
-				return null;
+		if (resolved == null) {
+			final URI resolvedURI = resolveURI(baseURI);
+			final JsonNode doc = manager.getDocument(resolvedURI);
+			if (doc != null) {
+				resolved = doc.at(pointer);
 			}
-
-			resolved = doc.at(pointer);
 		}
 
 		return resolved;
+	}
+
+	protected URI resolveURI(URI baseURI) {
+		if (baseURI == null || absolute) {
+			return getUri();
+		} else {
+			try {
+				return baseURI.resolve(getUri());
+			} catch (NullPointerException e) {
+				return null;
+			}
+		}
 	}
 
 	public JsonPointer getPointer() {
@@ -84,8 +122,32 @@ public class JsonReference {
 		return source;
 	}
 
-	protected ObjectMapper getMapper() {
-		return new ObjectMapper(new YAMLFactory());
+	/**
+	 * Returns true if the argument can be identified as a JSON reference node.
+	 * 
+	 * A node is considered a reference if it is an object node and has a field 
+	 * named $ref having a textual value. 
+	 * 
+	 * @param node
+	 * @return true if a reference node
+	 */
+	public static boolean isReference(JsonNode value) {
+		return value != null && value.isObject() && value.has(PROPERTY) && value.get(PROPERTY).isTextual();
+	}
+
+	/**
+	 * Returns true if the argument can be identified as a JSON reference node.
+	 * 
+	 * @param tuple
+	 * @return true if a reference node
+	 */
+	public static boolean isReference(NodeTuple tuple) {
+		if (tuple.getKeyNode().getNodeId() == NodeId.scalar) {
+			String value = ((ScalarNode) tuple.getKeyNode()).getValue();
+
+			return JsonReference.PROPERTY.equals(value) && tuple.getValueNode().getNodeId() == NodeId.scalar; 
+		}
+		return false;
 	}
 
 }

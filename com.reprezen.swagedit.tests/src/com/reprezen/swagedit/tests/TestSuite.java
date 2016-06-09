@@ -17,8 +17,10 @@ import org.junit.runners.Suite.SuiteClasses;
 import com.reprezen.swagedit.editor.hyperlinks.DefinitionHyperlinkDetectorTest;
 import com.reprezen.swagedit.editor.hyperlinks.JsonReferenceHyperlinkDetectorTest;
 import com.reprezen.swagedit.editor.hyperlinks.PathParamHyperlinkDetectorTest;
+import com.reprezen.swagedit.json.references.JsonReferenceFactoryTest;
 import com.reprezen.swagedit.validation.ErrorProcessorTest;
 import com.reprezen.swagedit.validation.MultipleSwaggerErrorMessageTest;
+import com.reprezen.swagedit.validation.ReferenceValidatorTest;
 import com.reprezen.swagedit.validation.ValidatorTest;
 
 @RunWith(Suite.class)
@@ -28,12 +30,14 @@ import com.reprezen.swagedit.validation.ValidatorTest;
 	SwaggerProposalProviderTest.class,
 	SwaggerSchemaTest.class,
 	JsonReferenceHyperlinkDetectorTest.class,
+	JsonReferenceFactoryTest.class,
 	PathParamHyperlinkDetectorTest.class,
 	DefinitionHyperlinkDetectorTest.class,
 	ValidationMessageTest.class,
 	ValidatorTest.class,
 	CodeTemplateContextTest.class,
 	ErrorProcessorTest.class,
-	MultipleSwaggerErrorMessageTest.class
+	MultipleSwaggerErrorMessageTest.class,
+	ReferenceValidatorTest.class
 })
 public class TestSuite {}

@@ -14,20 +14,11 @@ import com.fasterxml.jackson.core.JsonPointer;
 import com.fasterxml.jackson.databind.JsonNode;
 import com.google.common.base.Strings;
 import com.reprezen.swagedit.json.JsonSchemaManager.JSONSchema;
+import com.reprezen.swagedit.json.references.JsonReference;
 
 public class JsonUtil {
 
 	private static final JsonSchemaManager schemaManager = new JsonSchemaManager();
-
-	/**
-	 * Returns true if the node is a reference to another node.
-	 * 
-	 * @param node
-	 * @return true if is reference
-	 */
-	public static boolean isRef(JsonNode node) {
-		return node.isObject() && node.has("$ref");
-	}
 
 	/**
 	 * Returns the node that is referenced by the refNode.
@@ -37,11 +28,12 @@ public class JsonUtil {
 	 * @return referenced node
 	 */
 	public static SchemaDefinition getReference(JsonNode document, JsonNode refNode) {
-		if (!isRef(refNode) || document == null)
+		if (!JsonReference.isReference(refNode) || document == null) {
 			return new SchemaDefinition(document, refNode);
+		}
 
+		// TODO Make use of JSONReference
 		String ref = refNode.get("$ref").asText();
-
 		if (ref.startsWith("http") || ref.startsWith("https")) {
 			JSONSchema schema = schemaManager.getSchema(ref);
 			if (schema != null) {
@@ -52,9 +44,10 @@ public class JsonUtil {
 
 		JsonPointer pointer = asPointer(ref);
 		JsonNode found = document.at(pointer);
-		String description = pointer.toString().substring(
-				pointer.toString().lastIndexOf("/") + 1, 
-				pointer.toString().length());
+		String ptr = pointer.toString();
+		String description = ptr.substring(
+				ptr.lastIndexOf("/") + 1, 
+				ptr.length());
 
 		return new SchemaDefinition(document, !found.isMissingNode() ? found : refNode, description);
 	}
@@ -76,6 +69,15 @@ public class JsonUtil {
 			sanitized = sanitized.substring(1);
 		}
 		return JsonPointer.compile(sanitized);
+	}
+
+	public static JsonPointer getPointer(JsonNode ref) {
+		String asText = ref.get("$ref").asText();
+		if (asText.startsWith("#")) {
+			asText = asText.substring(1);
+		}
+
+		return JsonPointer.compile(asText);
 	}
 
 	/*

@@ -44,10 +44,9 @@ public class JsonReferenceHyperlinkDetector extends AbstractSwaggerHyperlinkDete
 
 	@Override
 	protected IHyperlink[] doDetect(SwaggerDocument doc, ITextViewer viewer, HyperlinkInfo info, String basePath) {
-		FileEditorInput input = getActiveEditor();
-		URI baseURI = input != null ? input.getURI() : null;
+		URI baseURI = getBaseURI();
 
-		JsonReference reference = factory.create(doc.getNodeForPath(basePath));
+		JsonReference reference = getFactory().create(doc.getNodeForPath(basePath));
 		if (!reference.isValid(baseURI)) {
 			return null;
 		}
@@ -74,7 +73,18 @@ public class JsonReferenceHyperlinkDetector extends AbstractSwaggerHyperlinkDete
 		return DocumentUtils.getActiveEditorInput();
 	}
 
+	protected URI getBaseURI() {
+		FileEditorInput editor = getActiveEditor();
+
+		return editor != null ? editor.getURI() : null;
+	}
+
+	protected JsonReferenceFactory getFactory() {
+		return factory;
+	}
+
 	protected String pointer(JsonPointer pointer) {
 		return pointer.toString().replaceAll("/", ":").replaceAll("~1", "/");
 	}
+
 }

@@ -12,10 +12,14 @@ package com.reprezen.swagedit.editor.hyperlinks;
 
 import static org.hamcrest.core.IsCollectionContaining.hasItem;
 import static org.hamcrest.core.IsCollectionContaining.hasItems;
-import static org.junit.Assert.*;
+import static org.junit.Assert.assertNotNull;
+import static org.junit.Assert.assertNull;
+import static org.junit.Assert.assertThat;
 import static org.mockito.Mockito.mock;
 import static org.mockito.Mockito.when;
 
+import java.net.URI;
+import java.net.URISyntaxException;
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.List;
@@ -26,25 +30,48 @@ import org.eclipse.jface.text.IRegion;
 import org.eclipse.jface.text.ITextViewer;
 import org.eclipse.jface.text.Region;
 import org.eclipse.jface.text.hyperlink.IHyperlink;
-import org.eclipse.ui.part.FileEditorInput;
 import org.junit.Before;
 import org.junit.Test;
+import org.mockito.Mockito;
 
+import com.fasterxml.jackson.databind.JsonNode;
 import com.reprezen.swagedit.editor.SwaggerDocument;
+import com.reprezen.swagedit.json.JsonDocumentManager;
+import com.reprezen.swagedit.json.references.JsonReference;
+import com.reprezen.swagedit.json.references.JsonReferenceFactory;
 
 public class JsonReferenceHyperlinkDetectorTest {
 
-	private JsonReferenceHyperlinkDetector detector = new JsonReferenceHyperlinkDetector() {
-		// allow running tests as non plugin tests
-		protected FileEditorInput getActiveEditor() {
-			return null;
-		};
-	};
 	private ITextViewer viewer;
+	private JsonDocumentManager manager;
+	private URI uri;
+
+	protected JsonReferenceHyperlinkDetector detector(JsonNode document) {
+		when(manager.getDocument(Mockito.any(URI.class))).thenReturn(document);
+
+		return new JsonReferenceHyperlinkDetector() {
+			// allow running tests as non plugin tests
+			protected URI getBaseURI() {
+				return uri;
+			}
+
+			protected JsonReferenceFactory getFactory() {
+				return new JsonReferenceFactory() {
+					public JsonReference create(JsonNode node) {
+						JsonReference ref = super.create(node);
+						ref.setDocumentManager(manager);
+						return ref;
+					};
+				};
+			}
+		};
+	}
 
 	@Before
-	public void setUp() {
+	public void setUp() throws URISyntaxException {
 		viewer = mock(ITextViewer.class);
+		manager = mock(JsonDocumentManager.class);
+		uri = new URI(null, null, null);
 	}
 
 	@Test
@@ -63,7 +90,8 @@ public class JsonReferenceHyperlinkDetectorTest {
 
 		// region that includes `$ref: '#/definitions/User'`
 		IRegion region = new Region("schema:\n  $ref: '#/definitions".length(), 1);
-		IHyperlink[] hyperlinks = detector.detectHyperlinks(viewer, region, false);
+		IHyperlink[] hyperlinks = detector(document.asJson())
+				.detectHyperlinks(viewer, region, false);
 
 		assertNotNull(hyperlinks);
 
@@ -91,7 +119,8 @@ public class JsonReferenceHyperlinkDetectorTest {
 
 		// region that includes `$ref: '#/definitions/User'`
 		IRegion region = new Region("schema:\n  $ref: '#/definitions".length(), 1);
-		IHyperlink[] hyperlinks = detector.detectHyperlinks(viewer, region, false);
+		IHyperlink[] hyperlinks = detector(document.asJson())
+				.detectHyperlinks(viewer, region, false);
 
 		assertNull(hyperlinks);
 	}
@@ -112,7 +141,8 @@ public class JsonReferenceHyperlinkDetectorTest {
 
 		// region that includes `$ref: '#/paths/~1foo~1{bar}'`
 		IRegion region = new Region("schema:\n  $ref: '#/paths/~1foo".length(), 1);
-		IHyperlink[] hyperlinks = detector.detectHyperlinks(viewer, region, false);
+		IHyperlink[] hyperlinks = detector(document.asJson())
+				.detectHyperlinks(viewer, region, false);
 
 		assertNotNull(hyperlinks);
 
@@ -140,7 +170,8 @@ public class JsonReferenceHyperlinkDetectorTest {
 
 		// region that includes `$ref: '#/paths/~1foo~1{bar}'`
 		IRegion region = new Region("schema:\n  $ref: '#/paths/~1foo".length(), 1);
-		IHyperlink[] hyperlinks = detector.detectHyperlinks(viewer, region, false);
+		IHyperlink[] hyperlinks = detector(document.asJson())
+				.detectHyperlinks(viewer, region, false);
 
 		assertNull(hyperlinks);
 	}

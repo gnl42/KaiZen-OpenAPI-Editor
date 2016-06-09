@@ -11,6 +11,7 @@
 package com.reprezen.swagedit.validation;
 
 import java.io.IOException;
+import java.net.URI;
 import java.util.Set;
 
 import org.apache.commons.lang3.tuple.Pair;
@@ -49,8 +50,15 @@ public class Validator {
 
 	private static final JsonSchemaManager schemaManager = new JsonSchemaManager();
 
-	private final JsonReferenceValidator referenceValidator = 
-			new JsonReferenceValidator(new JsonReferenceFactory());
+	private final JsonReferenceValidator referenceValidator;
+
+	public Validator(JsonReferenceValidator referenceValidator) {
+		this.referenceValidator = referenceValidator;
+	}
+	
+	public Validator() {
+		this.referenceValidator = new JsonReferenceValidator(new JsonReferenceFactory());
+	}
 
 	/**
 	 * Returns a list or errors if validation fails.
@@ -78,11 +86,9 @@ public class Validator {
 		} else {
 			Node yaml = document.getYaml();
 			if (yaml != null) {
-				FileEditorInput input = getActiveEditorInput();
-
 				errors.addAll(validateAgainstSchema(new ErrorProcessor(yaml), jsonContent));
 				errors.addAll(checkDuplicateKeys(yaml));
-				errors.addAll(referenceValidator.validate(input != null ? input.getURI() : null, yaml));
+				errors.addAll(referenceValidator.validate(getBaseURI(), yaml));
 			}
 		}
 
@@ -171,6 +177,12 @@ public class Validator {
 
 	protected FileEditorInput getActiveEditorInput() {
 		return DocumentUtils.getActiveEditorInput();
+	}
+
+	protected URI getBaseURI() {
+		FileEditorInput input = getActiveEditorInput();
+
+		return input != null ? input.getURI() : null;
 	}
 
 }
