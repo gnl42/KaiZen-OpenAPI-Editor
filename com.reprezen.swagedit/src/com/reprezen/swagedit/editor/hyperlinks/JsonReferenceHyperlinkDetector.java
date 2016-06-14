@@ -58,13 +58,19 @@ public class JsonReferenceHyperlinkDetector extends AbstractSwaggerHyperlinkDete
 			}
 			return new IHyperlink[] {
 					new SwaggerHyperlink(reference.getPointer().toString(), viewer, info.region, target) };
-		} else {
-			IFile file = DocumentUtils.getWorkspaceFile(baseURI.resolve(reference.getUri()));
-			if (file != null && file.exists()) {
-				return new IHyperlink[] {
-						new SwaggerFileHyperlink(info.region, info.text, file, pointer(reference.getPointer())) };
-			}
-		}
+        } else {
+            URI resolved;
+            try {
+                resolved = baseURI.resolve(reference.getUri());
+            } catch (IllegalArgumentException e) { // the given string violates RFC 2396
+                return null;
+            }
+            IFile file = DocumentUtils.getWorkspaceFile(resolved);
+            if (file != null && file.exists()) {
+                return new IHyperlink[] { new SwaggerFileHyperlink(info.region, info.text, file,
+                        pointer(reference.getPointer())) };
+            }
+        }
 
 		return null;
 	}
