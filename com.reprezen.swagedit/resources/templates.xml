@@ -80,8 +80,8 @@ definitions:
     responses:
       '${200}':
         description: OK
-       schema:
-         $$ref: ${model}
+        schema:
+          $$ref: ${model}
 </template>     
 
      <template name="collection resource" 
