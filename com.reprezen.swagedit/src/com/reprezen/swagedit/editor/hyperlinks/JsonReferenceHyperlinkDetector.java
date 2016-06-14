@@ -110,13 +110,9 @@ public class JsonReferenceHyperlinkDetector extends AbstractSwaggerHyperlinkDete
 
 			IWorkspaceRoot root = ResourcesPlugin.getWorkspace().getRoot();
 			IPath extPath = new Path(filePath);
-            if (!extPath.isAbsolute()) {
-                try {
-                    extPath = new Path(fileInput.getURI().resolve(extPath.toOSString()).getPath());
-                } catch (IllegalArgumentException e) { // the given string violates RFC 2396
-                    return null;
-                }
-            }
+			if (!extPath.isAbsolute()) {
+				extPath = new Path(fileInput.getURI().resolve(extPath.toOSString()).getPath());
+			}
 
 			return root.getFileForLocation(extPath);
 		}
