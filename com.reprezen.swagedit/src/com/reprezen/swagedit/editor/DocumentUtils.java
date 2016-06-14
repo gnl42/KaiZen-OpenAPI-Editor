@@ -74,14 +74,7 @@ public class DocumentUtils {
 		IWorkspaceRoot root = ResourcesPlugin
 				.getWorkspace()
 				.getRoot();
-
-		URI relativize = root.getLocationURI().relativize(uri);
-		IPath path = new Path(relativize.getPath());
-		try {
-			return root.getFile(path);
-		} catch (Exception e) {
-			return null;
-		}
+		return root.getFileForLocation(new Path(uri.getPath()));
 	}
 
 	public static IFile getWorkspaceFile(IPath path) {
