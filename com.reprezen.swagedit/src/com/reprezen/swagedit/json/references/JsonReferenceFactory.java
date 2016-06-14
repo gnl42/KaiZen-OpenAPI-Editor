@@ -28,7 +28,7 @@ import com.google.common.base.Strings;
 public class JsonReferenceFactory {
 
 	public JsonReference create(JsonNode node) {
-		if (node == null) {
+		if (node == null || node.isMissingNode()) {
 			return new JsonReference(null, null, false, false, node);
 		}
 
