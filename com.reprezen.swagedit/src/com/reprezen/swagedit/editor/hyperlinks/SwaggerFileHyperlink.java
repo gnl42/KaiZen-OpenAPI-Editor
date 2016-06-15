@@ -11,25 +11,31 @@
 package com.reprezen.swagedit.editor.hyperlinks;
 
 import org.eclipse.core.resources.IFile;
+import org.eclipse.core.runtime.CoreException;
 import org.eclipse.jface.text.IRegion;
 import org.eclipse.jface.text.hyperlink.IHyperlink;
+import org.eclipse.ui.IEditorPart;
+import org.eclipse.ui.IWorkbenchPage;
 import org.eclipse.ui.PartInitException;
 import org.eclipse.ui.PlatformUI;
 import org.eclipse.ui.ide.IDE;
 import org.eclipse.ui.texteditor.ITextEditor;
 
+import com.reprezen.swagedit.editor.DocumentUtils;
+import com.reprezen.swagedit.editor.SwaggerDocument;
+
 public class SwaggerFileHyperlink implements IHyperlink {
 
-	private final IFile targetFile;
-	private final IRegion targetRegion;
 	private final IRegion linkRegion;
 	private final String label;
+	private final IFile file;
+	private final String pointer;
 
-	public SwaggerFileHyperlink(IRegion linkRegion, String label, IFile targetFile, IRegion targetRegion) {
+	public SwaggerFileHyperlink(IRegion linkRegion, String label, IFile file, String pointer) {
 		this.linkRegion = linkRegion;
 		this.label = label;
-		this.targetFile = targetFile;
-		this.targetRegion = targetRegion;
+		this.file = file;
+		this.pointer = pointer;
 	}
 
 	@Override
@@ -49,18 +55,41 @@ public class SwaggerFileHyperlink implements IHyperlink {
 
 	@Override
 	public void open() {
-		try {
-			ITextEditor openEditor = (ITextEditor) IDE.openEditor(
-					PlatformUI.getWorkbench().getActiveWorkbenchWindow().getActivePage(), 
-					targetFile);
+		if (file == null || !file.exists()) {
+			return;
+		}
 
-			if (targetRegion != null) {
-				openEditor.selectAndReveal(targetRegion.getOffset(), targetRegion.getLength());
+		try {
+			final IWorkbenchPage page = PlatformUI
+					.getWorkbench()
+					.getActiveWorkbenchWindow()
+					.getActivePage();
+
+			IEditorPart editor;
+			try {
+				editor = IDE.openEditor(page, file);
+			} catch(PartInitException e) {
+				return;
 			}
 
-		} catch (PartInitException | ClassCastException e) {
-			e.printStackTrace();
+			if (editor instanceof ITextEditor) {
+				IRegion region = getTarget();
+				if (region != null) {
+					((ITextEditor) editor).selectAndReveal(region.getOffset(), region.getLength());
+				}
+			}
+		} catch (ClassCastException | CoreException e) {
+			// TODO
 		}
+	}
+
+	private IRegion getTarget() throws CoreException {
+		SwaggerDocument doc = DocumentUtils.getDocument(file.getLocation());
+		if (doc == null) {
+			return null;
+		}
+
+		return doc.getRegion(pointer);
 	}
 
 }

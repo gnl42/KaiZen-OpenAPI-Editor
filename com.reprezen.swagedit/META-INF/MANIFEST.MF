@@ -6,6 +6,7 @@ Bundle-SymbolicName: com.reprezen.swagedit;singleton:=true
 Bundle-Version: 0.1.0.qualifier
 Require-Bundle: org.eclipse.ui,
  org.eclipse.core.runtime,
+ org.eclipse.core.filesystem,
  org.eclipse.ui.editors,
  org.eclipse.jface.text,
  org.eclipse.ui.views,

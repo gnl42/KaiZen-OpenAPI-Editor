@@ -12,6 +12,8 @@ package com.reprezen.swagedit.json;
 
 import java.io.IOException;
 import java.io.InputStream;
+import java.net.URI;
+import java.net.URISyntaxException;
 import java.net.URL;
 import java.util.Map;
 import java.util.concurrent.ConcurrentHashMap;
@@ -39,6 +41,15 @@ public class JsonSchemaManager {
 	 */
 	public JSONSchema getSwaggerSchema() {
 		return getSchema("swagger");
+	}
+
+	public URI getSwaggerUri() {
+		URL url = getClass().getResource("schema.json");
+		try {
+			return url.toURI();
+		} catch (NullPointerException | URISyntaxException e) {
+			return null;
+		}
 	}
 
 	public JSONSchema getSchema(String url) {

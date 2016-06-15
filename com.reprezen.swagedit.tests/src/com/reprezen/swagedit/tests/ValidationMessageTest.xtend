@@ -24,7 +24,12 @@ import static org.hamcrest.core.IsCollectionContaining.*
  */
 class ValidationMessageTest {
 
-	val validator = new Validator
+	val validator = new Validator() {
+		// allow running tests as non plugin tests
+		override protected getActiveEditorInput() {
+			null
+		}
+	}
 	val document = new SwaggerDocument
 
 	@Test
