@@ -70,13 +70,18 @@ public class DocumentUtils {
 		return doc;
 	}
 
-	public static IFile getWorkspaceFile(URI uri) {
-		IWorkspaceRoot root = ResourcesPlugin
-				.getWorkspace()
-				.getRoot();
-		return root.getFileForLocation(new Path(uri.getPath()));
-	}
+    /**
+     * @param uri - URI, representing an absolute path
+     * @return
+     */
+    public static IFile getWorkspaceFile(URI uri) {
+        return getWorkspaceFile(new Path(uri.getPath()));
+    }
 
+	/**
+	 * @param path - absolute path to the element
+	 * @return
+	 */
 	public static IFile getWorkspaceFile(IPath path) {
 		IWorkspaceRoot root = ResourcesPlugin
 				.getWorkspace()
