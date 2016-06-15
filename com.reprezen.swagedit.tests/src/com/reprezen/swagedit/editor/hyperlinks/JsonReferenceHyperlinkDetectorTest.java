@@ -13,10 +13,13 @@ package com.reprezen.swagedit.editor.hyperlinks;
 import static org.hamcrest.core.IsCollectionContaining.hasItem;
 import static org.hamcrest.core.IsCollectionContaining.hasItems;
 import static org.junit.Assert.assertNotNull;
+import static org.junit.Assert.assertNull;
 import static org.junit.Assert.assertThat;
 import static org.mockito.Mockito.mock;
 import static org.mockito.Mockito.when;
 
+import java.net.URI;
+import java.net.URISyntaxException;
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.List;
@@ -29,17 +32,46 @@ import org.eclipse.jface.text.Region;
 import org.eclipse.jface.text.hyperlink.IHyperlink;
 import org.junit.Before;
 import org.junit.Test;
+import org.mockito.Mockito;
 
+import com.fasterxml.jackson.databind.JsonNode;
 import com.reprezen.swagedit.editor.SwaggerDocument;
+import com.reprezen.swagedit.json.JsonDocumentManager;
+import com.reprezen.swagedit.json.references.JsonReference;
+import com.reprezen.swagedit.json.references.JsonReferenceFactory;
 
 public class JsonReferenceHyperlinkDetectorTest {
 
-	private JsonReferenceHyperlinkDetector detector = new JsonReferenceHyperlinkDetector();
 	private ITextViewer viewer;
+	private JsonDocumentManager manager;
+	private URI uri;
+
+	protected JsonReferenceHyperlinkDetector detector(JsonNode document) {
+		when(manager.getDocument(Mockito.any(URI.class))).thenReturn(document);
+
+		return new JsonReferenceHyperlinkDetector() {
+			// allow running tests as non plugin tests
+			protected URI getBaseURI() {
+				return uri;
+			}
+
+			protected JsonReferenceFactory getFactory() {
+				return new JsonReferenceFactory() {
+					public JsonReference create(JsonNode node) {
+						JsonReference ref = super.create(node);
+						ref.setDocumentManager(manager);
+						return ref;
+					};
+				};
+			}
+		};
+	}
 
 	@Before
-	public void setUp() {
+	public void setUp() throws URISyntaxException {
 		viewer = mock(ITextViewer.class);
+		manager = mock(JsonDocumentManager.class);
+		uri = new URI(null, null, null);
 	}
 
 	@Test
@@ -58,7 +90,8 @@ public class JsonReferenceHyperlinkDetectorTest {
 
 		// region that includes `$ref: '#/definitions/User'`
 		IRegion region = new Region("schema:\n  $ref: '#/definitions".length(), 1);
-		IHyperlink[] hyperlinks = detector.detectHyperlinks(viewer, region, false);
+		IHyperlink[] hyperlinks = detector(document.asJson())
+				.detectHyperlinks(viewer, region, false);
 
 		assertNotNull(hyperlinks);
 
@@ -68,6 +101,79 @@ public class JsonReferenceHyperlinkDetectorTest {
 
 		assertThat(Arrays.asList(hyperlinks), 
 				hasItem(new SwaggerHyperlink("/definitions/User", viewer, linkRegion, targetRegion)));
+	}
+
+	@Test
+	public void testShould_Not_CreateHyperlink_For_Invalid_JsonReference() throws BadLocationException {
+		SwaggerDocument document = new SwaggerDocument();
+		when(viewer.getDocument()).thenReturn(document);
+
+		String text = 
+				"schema:\n" +
+				"  $ref: '#/definitions/Invalid'\n" +
+				"definitions:\n" +
+				"  User:\n" +
+				"    type: object";
+
+		document.set(text);
+
+		// region that includes `$ref: '#/definitions/User'`
+		IRegion region = new Region("schema:\n  $ref: '#/definitions".length(), 1);
+		IHyperlink[] hyperlinks = detector(document.asJson())
+				.detectHyperlinks(viewer, region, false);
+
+		assertNull(hyperlinks);
+	}
+
+	@Test
+	public void testShouldCreateHyperlink_ForPathReference() throws BadLocationException {
+		SwaggerDocument document = new SwaggerDocument();
+		when(viewer.getDocument()).thenReturn(document);
+
+		String text = 
+				"schema:\n" +
+				"  $ref: '#/paths/~1foo~1{bar}'\n" +
+				"paths:\n" +
+				"  /foo/{bar}:\n" +
+				"    get: ";
+
+		document.set(text);
+
+		// region that includes `$ref: '#/paths/~1foo~1{bar}'`
+		IRegion region = new Region("schema:\n  $ref: '#/paths/~1foo".length(), 1);
+		IHyperlink[] hyperlinks = detector(document.asJson())
+				.detectHyperlinks(viewer, region, false);
+
+		assertNotNull(hyperlinks);
+
+		// expected region
+		IRegion linkRegion = new Region(document.getLineOffset(1) + "  $ref: ".length(), "'#/paths/~1foo~1{bar}'".length());
+		IRegion targetRegion = new Region(document.getLineOffset(4), 0);
+
+		assertThat(Arrays.asList(hyperlinks), 
+				hasItem(new SwaggerHyperlink("/paths/~1foo~1{bar}", viewer, linkRegion, targetRegion)));
+	}
+
+	@Test
+	public void testShould_Not_CreateHyperlink_For_Invalid_PathReference() throws BadLocationException {
+		SwaggerDocument document = new SwaggerDocument();
+		when(viewer.getDocument()).thenReturn(document);
+
+		String text = 
+				"schema:\n" +
+				"  $ref: '#/paths/~1foo'\n" +
+				"paths:\n" +
+				"  /foo/{bar}:\n" +
+				"    get: ";
+
+		document.set(text);
+
+		// region that includes `$ref: '#/paths/~1foo~1{bar}'`
+		IRegion region = new Region("schema:\n  $ref: '#/paths/~1foo".length(), 1);
+		IHyperlink[] hyperlinks = detector(document.asJson())
+				.detectHyperlinks(viewer, region, false);
+
+		assertNull(hyperlinks);
 	}
 
 	@Test

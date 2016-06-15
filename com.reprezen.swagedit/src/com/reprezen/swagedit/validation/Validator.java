@@ -11,28 +11,33 @@
 package com.reprezen.swagedit.validation;
 
 import java.io.IOException;
+import java.net.URI;
 import java.util.Set;
 
 import org.apache.commons.lang3.tuple.Pair;
 import org.dadacoalition.yedit.YEditLog;
 import org.eclipse.core.resources.IMarker;
+import org.eclipse.ui.part.FileEditorInput;
 import org.yaml.snakeyaml.nodes.MappingNode;
 import org.yaml.snakeyaml.nodes.Node;
 import org.yaml.snakeyaml.nodes.NodeId;
 import org.yaml.snakeyaml.nodes.NodeTuple;
 import org.yaml.snakeyaml.nodes.ScalarNode;
 import org.yaml.snakeyaml.nodes.SequenceNode;
+import org.yaml.snakeyaml.parser.ParserException;
 
 import com.fasterxml.jackson.databind.JsonNode;
-import com.fasterxml.jackson.dataformat.yaml.snakeyaml.parser.ParserException;
 import com.github.fge.jsonschema.core.exceptions.ProcessingException;
 import com.github.fge.jsonschema.core.report.ProcessingReport;
 import com.google.common.collect.HashMultimap;
 import com.google.common.collect.Multimap;
 import com.google.common.collect.Sets;
 import com.reprezen.swagedit.Messages;
+import com.reprezen.swagedit.editor.DocumentUtils;
 import com.reprezen.swagedit.editor.SwaggerDocument;
 import com.reprezen.swagedit.json.JsonSchemaManager;
+import com.reprezen.swagedit.json.references.JsonReferenceFactory;
+import com.reprezen.swagedit.json.references.JsonReferenceValidator;
 
 /**
  * This class contains methods for validating a Swagger YAML document.
@@ -44,6 +49,16 @@ import com.reprezen.swagedit.json.JsonSchemaManager;
 public class Validator {
 
 	private static final JsonSchemaManager schemaManager = new JsonSchemaManager();
+
+	private final JsonReferenceValidator referenceValidator;
+
+	public Validator(JsonReferenceValidator referenceValidator) {
+		this.referenceValidator = referenceValidator;
+	}
+	
+	public Validator() {
+		this.referenceValidator = new JsonReferenceValidator(new JsonReferenceFactory());
+	}
 
 	/**
 	 * Returns a list or errors if validation fails.
@@ -73,6 +88,7 @@ public class Validator {
 			if (yaml != null) {
 				errors.addAll(validateAgainstSchema(new ErrorProcessor(yaml), jsonContent));
 				errors.addAll(checkDuplicateKeys(yaml));
+				errors.addAll(referenceValidator.validate(getBaseURI(), yaml));
 			}
 		}
 
@@ -158,4 +174,15 @@ public class Validator {
 				IMarker.SEVERITY_WARNING,
 				String.format(Messages.error_duplicate_keys, key));
 	}
+
+	protected FileEditorInput getActiveEditorInput() {
+		return DocumentUtils.getActiveEditorInput();
+	}
+
+	protected URI getBaseURI() {
+		FileEditorInput input = getActiveEditorInput();
+
+		return input != null ? input.getURI() : null;
+	}
+
 }

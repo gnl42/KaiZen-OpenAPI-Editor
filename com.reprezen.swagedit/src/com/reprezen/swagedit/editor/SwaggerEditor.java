@@ -186,7 +186,7 @@ public class SwaggerEditor extends YEdit {
 	}
 
 	public ProjectionViewer getProjectionViewer() {
-	    return (ProjectionViewer) getSourceViewer();
+		return (ProjectionViewer) getSourceViewer();
 	}
 
 	@Override
@@ -357,7 +357,7 @@ public class SwaggerEditor extends YEdit {
 	
 	@Override
 	public void addDocumentIdleListener(IDocumentIdleListener listener) {
-	    super.addDocumentIdleListener(listener);
+		super.addDocumentIdleListener(listener);
 	}
 
 }

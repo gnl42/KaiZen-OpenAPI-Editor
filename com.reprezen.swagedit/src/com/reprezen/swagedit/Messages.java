@@ -27,6 +27,7 @@ public class Messages extends NLS {
 	public static String error_required_properties;
 	public static String error_duplicate_keys;
 	public static String error_cannot_read_content;
+	public static String error_invalid_reference;
 
 	static {
 		NLS.initializeMessages(BUNDLE_NAME, Messages.class);

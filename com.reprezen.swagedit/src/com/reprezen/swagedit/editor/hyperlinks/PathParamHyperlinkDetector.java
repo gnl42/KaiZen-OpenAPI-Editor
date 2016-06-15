@@ -27,6 +27,7 @@ import com.fasterxml.jackson.databind.JsonNode;
 import com.google.common.collect.Lists;
 import com.reprezen.swagedit.editor.SwaggerDocument;
 import com.reprezen.swagedit.json.JsonUtil;
+import com.reprezen.swagedit.json.references.JsonReference;
 
 import io.swagger.models.HttpMethod;
 
@@ -92,9 +93,9 @@ public class PathParamHyperlinkDetector extends AbstractSwaggerHyperlinkDetector
 				for (int i = 0; i < parameters.size(); i++) {
 					JsonNode current = parameters.get(i);
 
-					if (JsonUtil.isRef(current)) {
+					if (JsonReference.isReference(current)) {
 
-						JsonPointer ptr = getPointer(current);
+						JsonPointer ptr = JsonUtil.getPointer(current);
 						JsonNode resolved = doc.asJson().at(ptr);
 
 						if (resolved != null && resolved.isObject() && resolved.has("name")) {
@@ -114,14 +115,6 @@ public class PathParamHyperlinkDetector extends AbstractSwaggerHyperlinkDetector
 		}
 
 		return paths;
-	}
-
-	private JsonPointer getPointer(JsonNode ref) {
-		String asText = ref.get("$ref").asText();
-		if (asText.startsWith("#"))
-			asText = asText.substring(1);
-
-		return JsonPointer.compile(asText);
 	}
 
 }

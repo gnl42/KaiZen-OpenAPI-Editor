@@ -8,22 +8,26 @@
  *  Contributors:
  *     ModelSolv, Inc. - initial API and implementation and/or initial documentation
  *******************************************************************************/
-package com.reprezen.swagedit.tests
+package com.reprezen.swagedit.validation
 
+import com.reprezen.swagedit.Messages
 import com.reprezen.swagedit.editor.SwaggerDocument
-import com.reprezen.swagedit.validation.Validator
 import java.io.IOException
 import org.eclipse.core.resources.IMarker
 import org.junit.Test
 
 import static org.hamcrest.core.IsCollectionContaining.*
 import static org.junit.Assert.*
-import com.reprezen.swagedit.validation.SwaggerError
-import com.reprezen.swagedit.Messages
 
 class ValidatorTest {
 
-	val validator = new Validator
+	val validator = new Validator() {
+		// allow running tests as non plugin tests
+		override protected getBaseURI() {
+			null
+		}
+		
+	}
 	val document = new SwaggerDocument
 
 	@Test
@@ -325,5 +329,6 @@ class ValidatorTest {
 			new SwaggerError(11, IMarker.SEVERITY_WARNING, String.format(Messages.error_duplicate_keys, "responses"))
 		))
 	}
+
 }
 

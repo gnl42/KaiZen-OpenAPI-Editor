@@ -12,27 +12,20 @@ package com.reprezen.swagedit.editor.hyperlinks;
 
 import static com.google.common.base.Strings.emptyToNull;
 
-import java.io.IOException;
-import java.io.InputStreamReader;
-import java.util.regex.Matcher;
+import java.net.URI;
 import java.util.regex.Pattern;
 
 import org.eclipse.core.resources.IFile;
-import org.eclipse.core.resources.IWorkspaceRoot;
-import org.eclipse.core.resources.ResourcesPlugin;
-import org.eclipse.core.runtime.CoreException;
-import org.eclipse.core.runtime.IPath;
-import org.eclipse.core.runtime.Path;
 import org.eclipse.jface.text.IRegion;
 import org.eclipse.jface.text.ITextViewer;
 import org.eclipse.jface.text.hyperlink.IHyperlink;
-import org.eclipse.ui.IEditorInput;
-import org.eclipse.ui.PlatformUI;
 import org.eclipse.ui.part.FileEditorInput;
 
-import com.google.common.base.Strings;
-import com.google.common.io.CharStreams;
+import com.fasterxml.jackson.core.JsonPointer;
+import com.reprezen.swagedit.editor.DocumentUtils;
 import com.reprezen.swagedit.editor.SwaggerDocument;
+import com.reprezen.swagedit.json.references.JsonReference;
+import com.reprezen.swagedit.json.references.JsonReferenceFactory;
 
 /**
  * Hyperlink detector that detects links from JSON references.
@@ -42,6 +35,8 @@ public class JsonReferenceHyperlinkDetector extends AbstractSwaggerHyperlinkDete
 
 	protected static final Pattern LOCAL_REF_PATTERN = Pattern.compile("['|\"]?#([/\\w+]+)['|\"]?");
 
+	protected final JsonReferenceFactory factory = new JsonReferenceFactory();
+
 	@Override
 	protected boolean canDetect(String basePath) {
 		return emptyToNull(basePath) != null && basePath.endsWith("$ref");
@@ -49,102 +44,53 @@ public class JsonReferenceHyperlinkDetector extends AbstractSwaggerHyperlinkDete
 
 	@Override
 	protected IHyperlink[] doDetect(SwaggerDocument doc, ITextViewer viewer, HyperlinkInfo info, String basePath) {
-		if (info.text.matches(LOCAL_REF_PATTERN.pattern())) {
-			return doDetectLocalLink(doc, viewer, info);
-		} else {
-			return doDetectExternalLink(info);
-		}
-	}
+		URI baseURI = getBaseURI();
 
-	private IHyperlink[] doDetectExternalLink(HyperlinkInfo info) {
-		String filePath;
-		String pointer = null;
-		IRegion target = null;
-
-		if (info.text.contains("#")) {
-			filePath = sanitize(info.text.split("#")[0]);
-			pointer = sanitize(info.text.split("#")[1]);
-		} else {
-			filePath = sanitize(info.text);
-		}
-
-		IFile file = getFile(filePath);
-		if (file == null || !file.exists()) {
+		JsonReference reference = getFactory().create(doc.getNodeForPath(basePath));
+		if (!reference.isValid(baseURI)) {
 			return null;
 		}
 
-		if (pointer != null) {
-			SwaggerDocument doc = getExternalDocument(file);
-			if (doc != null) {
-				target = doc.getRegion(asPath(pointer));
+		if (reference.isLocal()) {
+			IRegion target = doc.getRegion(pointer(reference.getPointer()));
+			if (target == null) {
+				return null;
 			}
-		}
-
-		return new IHyperlink[] { new SwaggerFileHyperlink(info.region, info.text, file, target) };
-	}
-
-	private IHyperlink[] doDetectLocalLink(SwaggerDocument doc, ITextViewer viewer, HyperlinkInfo info) {
-		Matcher matcher = LOCAL_REF_PATTERN.matcher(info.text);
-		String pointer = null;
-		if (matcher.find()) {
-			pointer = matcher.group(1);
-		}
-
-		IRegion target = doc.getRegion(asPath(pointer));
-		if (target == null) {
-			return null;
-		}
-
-		return new IHyperlink[] { new SwaggerHyperlink(pointer, viewer, info.region, target) };
-	}
-
-	private IFile getFile(String filePath) {
-		IEditorInput input = PlatformUI.getWorkbench()
-				.getActiveWorkbenchWindow()
-				.getActivePage()
-				.getActiveEditor()
-				.getEditorInput();
-
-		if (input instanceof FileEditorInput) {
-			FileEditorInput fileInput = (FileEditorInput) input;
-
-			IWorkspaceRoot root = ResourcesPlugin.getWorkspace().getRoot();
-			IPath extPath = new Path(filePath);
-			if (!extPath.isAbsolute()) {
-				extPath = new Path(fileInput.getURI().resolve(extPath.toOSString()).getPath());
-			}
-
-			return root.getFileForLocation(extPath);
-		}
+			return new IHyperlink[] {
+					new SwaggerHyperlink(reference.getPointer().toString(), viewer, info.region, target) };
+        } else {
+            URI resolved;
+            try {
+                resolved = baseURI.resolve(reference.getUri());
+            } catch (IllegalArgumentException e) { // the given string violates RFC 2396
+                return null;
+            }
+            IFile file = DocumentUtils.getWorkspaceFile(resolved);
+            if (file != null && file.exists()) {
+                return new IHyperlink[] { new SwaggerFileHyperlink(info.region, info.text, file,
+                        pointer(reference.getPointer())) };
+            }
+        }
 
 		return null;
 	}
 
-	private SwaggerDocument getExternalDocument(IFile file) {
-		final SwaggerDocument doc = new SwaggerDocument();
-		try {
-			doc.set(CharStreams.toString(new InputStreamReader(file.getContents())));
-		} catch (IOException | CoreException e) {
-			return null;
-		}
-
-		return doc;
+	protected FileEditorInput getActiveEditor() {
+		return DocumentUtils.getActiveEditorInput();
 	}
 
-	private String asPath(String pointer) {
-		if (Strings.emptyToNull(pointer) == null) {
-			return null;
-		}
+	protected URI getBaseURI() {
+		FileEditorInput editor = getActiveEditor();
 
-		return pointer.replaceAll("/", ":").replaceAll("~1", "/");
+		return editor != null ? editor.getURI() : null;
 	}
 
-	private String sanitize(String s) {
-		if (Strings.emptyToNull(s) == null) {
-			return null;
-		}
+	protected JsonReferenceFactory getFactory() {
+		return factory;
+	}
 
-		return s.trim().replaceAll("'|\"", "");
+	protected String pointer(JsonPointer pointer) {
+		return pointer.toString().replaceAll("/", ":").replaceAll("~1", "/");
 	}
 
 }
