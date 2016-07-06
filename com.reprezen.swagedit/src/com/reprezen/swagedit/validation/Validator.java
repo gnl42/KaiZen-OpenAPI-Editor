@@ -11,13 +11,12 @@
 package com.reprezen.swagedit.validation;
 
 import java.io.IOException;
-import java.net.URI;
 import java.util.Set;
 
 import org.apache.commons.lang3.tuple.Pair;
 import org.dadacoalition.yedit.YEditLog;
 import org.eclipse.core.resources.IMarker;
-import org.eclipse.ui.part.FileEditorInput;
+import org.eclipse.ui.IFileEditorInput;
 import org.yaml.snakeyaml.nodes.MappingNode;
 import org.yaml.snakeyaml.nodes.Node;
 import org.yaml.snakeyaml.nodes.NodeId;
@@ -33,7 +32,6 @@ import com.google.common.collect.HashMultimap;
 import com.google.common.collect.Multimap;
 import com.google.common.collect.Sets;
 import com.reprezen.swagedit.Messages;
-import com.reprezen.swagedit.editor.DocumentUtils;
 import com.reprezen.swagedit.editor.SwaggerDocument;
 import com.reprezen.swagedit.json.JsonSchemaManager;
 import com.reprezen.swagedit.json.references.JsonReferenceFactory;
@@ -67,11 +65,12 @@ public class Validator {
 	 * against the swagger JSON Schema.
 	 * 
 	 * @param content
+	 * @param editorInput current input
 	 * @return list or errors
 	 * @throws IOException
 	 * @throws ParserException
 	 */
-	public Set<SwaggerError> validate(SwaggerDocument document) {
+	public Set<SwaggerError> validate(SwaggerDocument document, IFileEditorInput editorInput) {
 		Set<SwaggerError> errors = Sets.newHashSet();
 
 		JsonNode jsonContent = null;
@@ -88,7 +87,7 @@ public class Validator {
 			if (yaml != null) {
 				errors.addAll(validateAgainstSchema(new ErrorProcessor(yaml), jsonContent));
 				errors.addAll(checkDuplicateKeys(yaml));
-				errors.addAll(referenceValidator.validate(getBaseURI(), yaml));
+				errors.addAll(referenceValidator.validate(editorInput != null ? editorInput.getFile().getLocationURI() : null, yaml));
 			}
 		}
 
@@ -173,16 +172,6 @@ public class Validator {
 				node.getStartMark().getLine() + 1, 
 				IMarker.SEVERITY_WARNING,
 				String.format(Messages.error_duplicate_keys, key));
-	}
-
-	protected FileEditorInput getActiveEditorInput() {
-		return DocumentUtils.getActiveEditorInput();
-	}
-
-	protected URI getBaseURI() {
-		FileEditorInput input = getActiveEditorInput();
-
-		return input != null ? input.getURI() : null;
 	}
 
 }

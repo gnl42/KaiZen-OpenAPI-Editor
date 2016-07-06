@@ -59,11 +59,7 @@ public class SwaggerDocument extends Document {
 	 */
 	public Node getYaml() {
 		if (yamlContent == null) {
-			try {
-				yamlContent = yaml.compose(new StringReader(get()));
-			} catch (Exception e) {
-				yamlContent = null;
-			}
+			parseYaml(get());
 		}
 
 		return yamlContent;
@@ -80,11 +76,7 @@ public class SwaggerDocument extends Document {
 	 */
 	public JsonNode asJson() {
 		if (jsonContent == null) {
-			try {
-				jsonContent = mapper.readTree(get());
-			} catch (Exception e) {
-				jsonContent = mapper.createObjectNode();
-			}
+			parseJson(get());
 		}
 
 		return jsonContent;
@@ -200,7 +192,7 @@ public class SwaggerDocument extends Document {
 					if (currentPath.startsWith("@")) {
 						currentPath = currentPath.substring(1);
 					}
-					
+
 					seqPos = Integer.valueOf(currentPath);
 				} catch (Exception e) {
 					throw new IllegalStateException("Should be a sequence");
@@ -376,19 +368,32 @@ public class SwaggerDocument extends Document {
 	public void onChange() {
 		final String content = get();
 
+		parseYaml(content);
+
+		// not need to parse json if 
+		// there is a yaml parsing error.
+		if (yamlError != null) {
+			jsonContent = null;
+		} else {
+			parseJson(content);
+		}
+	}
+
+	private void parseYaml(String content) {
 		try {
 			yamlContent = yaml.compose(new StringReader(content));
-
-			try {
-				jsonContent = mapper.readTree(content);
-			} catch (Exception e) {
-				jsonContent = null;
-			}
-
 			yamlError = null;
-
 		} catch (Exception e) {
+			yamlContent = null;
 			yamlError = e;
+		}
+	}
+
+	private void parseJson(String content) {
+		try {
+			jsonContent = mapper.readTree(content);
+		} catch (Exception e) {
+			jsonContent = null;
 		}
 	}
 

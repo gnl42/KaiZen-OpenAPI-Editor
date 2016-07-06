@@ -21,13 +21,7 @@ import static org.junit.Assert.*
 
 class ValidatorTest {
 
-	val validator = new Validator() {
-		// allow running tests as non plugin tests
-		override protected getBaseURI() {
-			null
-		}
-		
-	}
+	val validator = new Validator
 	val document = new SwaggerDocument
 
 	@Test
@@ -47,7 +41,7 @@ class ValidatorTest {
 		'''
 
 		document.set(content)
-		val errors = validator.validate(document)
+		val errors = validator.validate(document, null)
 		assertEquals(0, errors.size())
 	}
 
@@ -62,7 +56,7 @@ class ValidatorTest {
 		'''
 
 		document.set(content)
-		val errors = validator.validate(document)
+		val errors = validator.validate(document, null)
 		assertEquals(1, errors.size())
 
 		val error = errors.get(0)
@@ -82,7 +76,7 @@ class ValidatorTest {
 		'''
 
 		document.set(content)
-		val errors = validator.validate(document)
+		val errors = validator.validate(document, null)
 		assertEquals(1, errors.size())
 
 		val error = errors.get(0)
@@ -105,7 +99,7 @@ class ValidatorTest {
 		'''
 
 		document.set(content)
-		val errors = validator.validate(document)
+		val errors = validator.validate(document, null)
 		assertEquals(1, errors.size())
 
 		val error = errors.get(0)
@@ -130,7 +124,7 @@ class ValidatorTest {
 		'''
 
 		document.set(content)
-		val errors = validator.validate(document)
+		val errors = validator.validate(document, null)
 		assertEquals(1, errors.size())
 
 		val error = errors.get(0)
@@ -158,7 +152,7 @@ class ValidatorTest {
 		'''
 
 		document.set(content)
-		val errors = validator.validate(document)
+		val errors = validator.validate(document, null)
 		assertEquals(1, errors.size())
 
 		val error = errors.get(0)
@@ -184,7 +178,7 @@ class ValidatorTest {
 		'''
 
 		document.set(content)
-		val errors = validator.validate(document)
+		val errors = validator.validate(document, null)
 
 		assertEquals(1, errors.size())
 
@@ -211,7 +205,7 @@ class ValidatorTest {
 		'''
 
 		document.set(content)
-		val errors = validator.validate(document)
+		val errors = validator.validate(document, null)
 
 		assertEquals(2, errors.size())
 		assertThat(errors, hasItems(
@@ -240,7 +234,7 @@ class ValidatorTest {
 		'''
 
 		document.set(content)
-		val errors = validator.validate(document)
+		val errors = validator.validate(document, null)
 
 		assertEquals(0, errors.size())
 	}
@@ -262,7 +256,7 @@ class ValidatorTest {
 		'''
 
 		document.set(content)
-		val errors = validator.validate(document)
+		val errors = validator.validate(document, null)
 
 		assertEquals(2, errors.size())
 		assertThat(errors, hasItems(
@@ -293,7 +287,7 @@ class ValidatorTest {
 		'''
 
 		document.set(content)
-		val errors = validator.validate(document)
+		val errors = validator.validate(document, null)
 
 		assertEquals(2, errors.size())
 		assertThat(errors, hasItems(
@@ -321,7 +315,7 @@ class ValidatorTest {
 		'''
 
 		document.set(content)
-		val errors = validator.validate(document)
+		val errors = validator.validate(document, null)
 
 		assertEquals(2, errors.size())
 		assertThat(errors, hasItems(
