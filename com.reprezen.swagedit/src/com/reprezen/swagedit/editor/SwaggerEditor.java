@@ -84,7 +84,7 @@ public class SwaggerEditor extends YEdit {
 					@Override
 					public void run() {
 						document.onChange();
-						validate(false);
+						validate();
 					}
 				});
 			}
@@ -282,12 +282,16 @@ public class SwaggerEditor extends YEdit {
 	@Override
 	public void doSave(IProgressMonitor monitor) {
 		super.doSave(monitor);
-		validate(false);
+		validate();
 	}
 
 	@Override
 	public void doSaveAs() {
 		super.doSaveAs();
+		validate();
+	}
+
+	protected void validate() {
 		validate(false);
 	}
 
