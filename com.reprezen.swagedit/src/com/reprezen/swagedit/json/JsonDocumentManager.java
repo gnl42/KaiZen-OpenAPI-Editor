@@ -18,9 +18,12 @@ import java.util.Collections;
 import java.util.Map;
 import java.util.WeakHashMap;
 
+import org.eclipse.core.resources.IFile;
+
 import com.fasterxml.jackson.databind.JsonNode;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import com.fasterxml.jackson.dataformat.yaml.YAMLFactory;
+import com.reprezen.swagedit.editor.DocumentUtils;
 
 /**
  * JsonDocumentManager
@@ -93,4 +96,16 @@ public class JsonDocumentManager {
 			return null;
 		}
 	}
+
+	/**
+	 * Returns the file located at the given URI if present 
+	 * in the workspace. Returns null otherwise.
+	 * 
+	 * @param uri - workspace file URI
+	 * @return file
+	 */
+	public IFile getFile(URI uri) {
+		return DocumentUtils.getWorkspaceFile(uri);
+	}
+
 }

@@ -2,36 +2,24 @@ package com.reprezen.swagedit.validation
 
 import com.fasterxml.jackson.databind.JsonNode
 import com.fasterxml.jackson.databind.ObjectMapper
+import com.fasterxml.jackson.dataformat.yaml.YAMLFactory
 import com.reprezen.swagedit.Messages
 import com.reprezen.swagedit.editor.SwaggerDocument
-import com.reprezen.swagedit.json.JsonDocumentManager
-import com.reprezen.swagedit.json.references.JsonReferenceFactory
 import com.reprezen.swagedit.json.references.JsonReferenceValidator
+import com.reprezen.swagedit.mocks.Mocks
 import java.net.URI
+import java.util.Map
 import org.eclipse.core.resources.IMarker
 import org.junit.Test
-import org.yaml.snakeyaml.nodes.ScalarNode
 
 import static org.junit.Assert.*
-import com.fasterxml.jackson.dataformat.yaml.YAMLFactory
-import java.util.Map
 
 class ReferenceValidatorTest {
-	
+
 	val document = new SwaggerDocument
 
 	def validator(Map<URI, JsonNode> entries) {
-		new JsonReferenceValidator(new JsonReferenceFactory {
-			override create(ScalarNode node) {
-				val ref = super.create(node)
-				ref.documentManager = new JsonDocumentManager {			
-					override getDocument(URI uri) {
-						entries.get(uri)
-					}			
-				}
-				ref
-			}
-		})
+		new JsonReferenceValidator(Mocks.mockJsonReferenceFactory(entries))
 	}
 
 	@Test

@@ -12,6 +12,7 @@ package com.reprezen.swagedit.json.references;
 
 import java.net.URI;
 
+import org.eclipse.core.resources.IFile;
 import org.yaml.snakeyaml.nodes.NodeId;
 import org.yaml.snakeyaml.nodes.NodeTuple;
 import org.yaml.snakeyaml.nodes.ScalarNode;
@@ -81,6 +82,10 @@ public class JsonReference {
 	public JsonNode resolve(URI baseURI) {
 		if (resolved == null) {
 			final URI resolvedURI = resolveURI(baseURI);
+			final IFile file = manager.getFile(resolvedURI);
+			if (file == null || !file.exists()) {
+				return null;
+			}
 			final JsonNode doc = manager.getDocument(resolvedURI);
 			if (doc != null) {
 				resolved = doc.at(pointer);
