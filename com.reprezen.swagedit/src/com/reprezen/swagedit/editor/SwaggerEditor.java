@@ -24,8 +24,11 @@ import org.dadacoalition.yedit.preferences.PreferenceConstants;
 import org.eclipse.core.resources.IFile;
 import org.eclipse.core.resources.IMarker;
 import org.eclipse.core.resources.IResource;
+import org.eclipse.core.resources.WorkspaceJob;
 import org.eclipse.core.runtime.CoreException;
 import org.eclipse.core.runtime.IProgressMonitor;
+import org.eclipse.core.runtime.IStatus;
+import org.eclipse.core.runtime.Status;
 import org.eclipse.jface.text.DocumentEvent;
 import org.eclipse.jface.text.IDocument;
 import org.eclipse.jface.text.IDocumentListener;
@@ -297,7 +300,7 @@ public class SwaggerEditor extends YEdit {
 
 	protected void validate(boolean onOpen) {
 		IEditorInput editorInput = getEditorInput();
-		IDocument document = getDocumentProvider().getDocument(getEditorInput());
+		final IDocument document = getDocumentProvider().getDocument(getEditorInput());
 
 		// if the file is not part of a workspace it does not seems that it is a
 		// IFileEditorInput
@@ -310,17 +313,23 @@ public class SwaggerEditor extends YEdit {
 		}
 
 		if (document instanceof SwaggerDocument) {
-			IFileEditorInput fileEditorInput = (IFileEditorInput) editorInput;
-			IFile file = fileEditorInput.getFile();
+			final IFileEditorInput fileEditorInput = (IFileEditorInput) editorInput;
+			final IFile file = fileEditorInput.getFile();
 
 			if (onOpen) {
 				// force parsing of yaml to init parsing errors
 				((SwaggerDocument) document).onChange();
 			}
-
-			clearMarkers(file);
-			validateYaml(file, (SwaggerDocument) document);
-			validateSwagger(file, (SwaggerDocument) document, fileEditorInput);
+			new WorkspaceJob("Update SwagEdit validation markers") {
+                
+                @Override
+                public IStatus runInWorkspace(IProgressMonitor monitor) throws CoreException {
+                    clearMarkers(file);
+                    validateYaml(file, (SwaggerDocument) document);
+                    validateSwagger(file, (SwaggerDocument) document, fileEditorInput);
+                    return Status.OK_STATUS;
+                }
+            }.schedule();
 		}
 	}
 
