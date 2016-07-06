@@ -84,7 +84,7 @@ public class SwaggerEditor extends YEdit {
 					@Override
 					public void run() {
 						document.onChange();
-						validate();
+						validate(false);
 					}
 				});
 			}
@@ -184,7 +184,7 @@ public class SwaggerEditor extends YEdit {
 			if (document != null) {
 				document.addDocumentListener(changeListener);
 				// validate content before editor opens
-				validate();
+				validate(true);
 			}
 		}
 	}
@@ -282,16 +282,16 @@ public class SwaggerEditor extends YEdit {
 	@Override
 	public void doSave(IProgressMonitor monitor) {
 		super.doSave(monitor);
-		validate();
+		validate(false);
 	}
 
 	@Override
 	public void doSaveAs() {
 		super.doSaveAs();
-		validate();
+		validate(false);
 	}
 
-	protected void validate() {
+	protected void validate(boolean onOpen) {
 		IEditorInput editorInput = getEditorInput();
 		IDocument document = getDocumentProvider().getDocument(getEditorInput());
 
@@ -308,6 +308,11 @@ public class SwaggerEditor extends YEdit {
 		if (document instanceof SwaggerDocument) {
 			IFileEditorInput fileEditorInput = (IFileEditorInput) editorInput;
 			IFile file = fileEditorInput.getFile();
+
+			if (onOpen) {
+				// force parsing of yaml to init parsing errors
+				((SwaggerDocument) document).onChange();
+			}
 
 			clearMarkers(file);
 			validateYaml(file, (SwaggerDocument) document);
