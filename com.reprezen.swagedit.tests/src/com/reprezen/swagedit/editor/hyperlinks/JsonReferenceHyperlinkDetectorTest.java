@@ -32,45 +32,23 @@ import org.eclipse.jface.text.Region;
 import org.eclipse.jface.text.hyperlink.IHyperlink;
 import org.junit.Before;
 import org.junit.Test;
-import org.mockito.Mockito;
 
 import com.fasterxml.jackson.databind.JsonNode;
 import com.reprezen.swagedit.editor.SwaggerDocument;
-import com.reprezen.swagedit.json.JsonDocumentManager;
-import com.reprezen.swagedit.json.references.JsonReference;
-import com.reprezen.swagedit.json.references.JsonReferenceFactory;
+import com.reprezen.swagedit.mocks.Mocks;
 
 public class JsonReferenceHyperlinkDetectorTest {
 
 	private ITextViewer viewer;
-	private JsonDocumentManager manager;
 	private URI uri;
 
 	protected JsonReferenceHyperlinkDetector detector(JsonNode document) {
-		when(manager.getDocument(Mockito.any(URI.class))).thenReturn(document);
-
-		return new JsonReferenceHyperlinkDetector() {
-			// allow running tests as non plugin tests
-			protected URI getBaseURI() {
-				return uri;
-			}
-
-			protected JsonReferenceFactory getFactory() {
-				return new JsonReferenceFactory() {
-					public JsonReference create(JsonNode node) {
-						JsonReference ref = super.create(node);
-						ref.setDocumentManager(manager);
-						return ref;
-					};
-				};
-			}
-		};
+		return Mocks.mockHyperlinkDetector(uri, document);
 	}
 
 	@Before
 	public void setUp() throws URISyntaxException {
 		viewer = mock(ITextViewer.class);
-		manager = mock(JsonDocumentManager.class);
 		uri = new URI(null, null, null);
 	}
 
