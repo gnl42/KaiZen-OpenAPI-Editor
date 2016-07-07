@@ -14,6 +14,7 @@ import org.junit.runner.RunWith;
 import org.junit.runners.Suite;
 import org.junit.runners.Suite.SuiteClasses;
 
+import com.reprezen.swagedit.assist.JsonReferenceProposalProviderTest;
 import com.reprezen.swagedit.editor.hyperlinks.DefinitionHyperlinkDetectorTest;
 import com.reprezen.swagedit.editor.hyperlinks.JsonReferenceHyperlinkDetectorTest;
 import com.reprezen.swagedit.editor.hyperlinks.PathParamHyperlinkDetectorTest;
@@ -38,6 +39,7 @@ import com.reprezen.swagedit.validation.ValidatorTest;
 	CodeTemplateContextTest.class,
 	ErrorProcessorTest.class,
 	MultipleSwaggerErrorMessageTest.class,
-	ReferenceValidatorTest.class
+	ReferenceValidatorTest.class,
+	JsonReferenceProposalProviderTest.class
 })
 public class TestSuite {}
