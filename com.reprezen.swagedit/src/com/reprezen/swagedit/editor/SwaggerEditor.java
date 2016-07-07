@@ -298,30 +298,30 @@ public class SwaggerEditor extends YEdit {
 		validate(false);
 	}
 
-	protected void validate(boolean onOpen) {
-		IEditorInput editorInput = getEditorInput();
-		final IDocument document = getDocumentProvider().getDocument(getEditorInput());
+    protected void validate(boolean onOpen) {
+        IEditorInput editorInput = getEditorInput();
+        final IDocument document = getDocumentProvider().getDocument(getEditorInput());
 
-		// if the file is not part of a workspace it does not seems that it is a
-		// IFileEditorInput
-		// but instead a FileStoreEditorInput. Unclear if markers are valid for
-		// such files.
-		if (!(editorInput instanceof IFileEditorInput)) {
-			YEditLog.logError("Marking errors not supported for files outside of a project.");
-			YEditLog.logger.info("editorInput is not a part of a project.");
-			return;
-		}
+        // if the file is not part of a workspace it does not seems that it is a
+        // IFileEditorInput
+        // but instead a FileStoreEditorInput. Unclear if markers are valid for
+        // such files.
+        if (!(editorInput instanceof IFileEditorInput)) {
+            YEditLog.logError("Marking errors not supported for files outside of a project.");
+            YEditLog.logger.info("editorInput is not a part of a project.");
+            return;
+        }
 
-		if (document instanceof SwaggerDocument) {
-			final IFileEditorInput fileEditorInput = (IFileEditorInput) editorInput;
-			final IFile file = fileEditorInput.getFile();
+        if (document instanceof SwaggerDocument) {
+            final IFileEditorInput fileEditorInput = (IFileEditorInput) editorInput;
+            final IFile file = fileEditorInput.getFile();
 
-			if (onOpen) {
-				// force parsing of yaml to init parsing errors
-				((SwaggerDocument) document).onChange();
-			}
-			new WorkspaceJob("Update SwagEdit validation markers") {
-                
+            if (onOpen) {
+                // force parsing of yaml to init parsing errors
+                ((SwaggerDocument) document).onChange();
+            }
+            new WorkspaceJob("Update SwagEdit validation markers") {
+
                 @Override
                 public IStatus runInWorkspace(IProgressMonitor monitor) throws CoreException {
                     clearMarkers(file);
@@ -330,8 +330,8 @@ public class SwaggerEditor extends YEdit {
                     return Status.OK_STATUS;
                 }
             }.schedule();
-		}
-	}
+        }
+    }
 
 	protected void clearMarkers(IFile file) {
 		int depth = IResource.DEPTH_INFINITE;
