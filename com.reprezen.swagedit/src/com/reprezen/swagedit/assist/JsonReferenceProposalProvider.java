@@ -140,7 +140,7 @@ public class JsonReferenceProposalProvider extends AbstractProposalProvider {
 	 * computed.
 	 * <br/>
 	 * The context type is determined by the pointer (path) on which the completion proposal 
-	 * has been actived.
+	 * has been activated.
 	 */
 	protected enum ContextType {
 		SCHEMA_DEFINITION,
@@ -183,10 +183,10 @@ public class JsonReferenceProposalProvider extends AbstractProposalProvider {
 
 			for (Iterator<String> it = definitions.fieldNames(); it.hasNext();) {
 				String key = it.next();
-				String value = "\"" + (path != null ? path.toString() : "") + "#/definitions/" + key + "\"";
+				String value =  (path != null ? path.toString() : "") + "#/definitions/" + key;
 
 				results.add(mapper.createObjectNode()
-						.put("value", value)
+						.put("value", "\"" + value + "\"")
 						.put("label", key)
 						.put("type", value) );
 			}

@@ -13,16 +13,23 @@ package com.reprezen.swagedit.assist
 import org.junit.Test
 import com.reprezen.swagedit.editor.SwaggerDocument
 import org.junit.Before
+import com.reprezen.swagedit.mocks.Mocks
+
+import static org.hamcrest.core.IsCollectionContaining.*
+import static org.junit.Assert.*
+import com.fasterxml.jackson.databind.ObjectMapper
+import com.fasterxml.jackson.databind.JsonNode
 
 class JsonReferenceProposalProviderTest {
 
+	val mapper = new ObjectMapper
 	var JsonReferenceProposalProvider provider
 
 	@Before
 	def void setUp() {
 		provider = new JsonReferenceProposalProvider {
 			override protected getActiveFile() {
-				null
+				Mocks.mockJsonReferenceProposalFile()
 			}
 		}
 	}
@@ -51,7 +58,13 @@ class JsonReferenceProposalProviderTest {
 		document.set(text)
 
 		val proposals = provider.createProposals(":paths:/foo:get:responses:200:schema", document, 0)
-		println(proposals)
+
+		assertThat(proposals, hasItems(
+			mapper.createObjectNode
+				.put("value", "\"#/definitions/Valid\"")
+				.put("label", "Valid")
+				.put("type", "#/definitions/Valid") as JsonNode
+		))
 	}
 
 }	
