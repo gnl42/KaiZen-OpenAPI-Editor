@@ -24,8 +24,11 @@ import org.dadacoalition.yedit.preferences.PreferenceConstants;
 import org.eclipse.core.resources.IFile;
 import org.eclipse.core.resources.IMarker;
 import org.eclipse.core.resources.IResource;
+import org.eclipse.core.resources.WorkspaceJob;
 import org.eclipse.core.runtime.CoreException;
 import org.eclipse.core.runtime.IProgressMonitor;
+import org.eclipse.core.runtime.IStatus;
+import org.eclipse.core.runtime.Status;
 import org.eclipse.jface.text.DocumentEvent;
 import org.eclipse.jface.text.IDocument;
 import org.eclipse.jface.text.IDocumentListener;
@@ -295,34 +298,40 @@ public class SwaggerEditor extends YEdit {
 		validate(false);
 	}
 
-	protected void validate(boolean onOpen) {
-		IEditorInput editorInput = getEditorInput();
-		IDocument document = getDocumentProvider().getDocument(getEditorInput());
+    protected void validate(boolean onOpen) {
+        IEditorInput editorInput = getEditorInput();
+        final IDocument document = getDocumentProvider().getDocument(getEditorInput());
 
-		// if the file is not part of a workspace it does not seems that it is a
-		// IFileEditorInput
-		// but instead a FileStoreEditorInput. Unclear if markers are valid for
-		// such files.
-		if (!(editorInput instanceof IFileEditorInput)) {
-			YEditLog.logError("Marking errors not supported for files outside of a project.");
-			YEditLog.logger.info("editorInput is not a part of a project.");
-			return;
-		}
+        // if the file is not part of a workspace it does not seems that it is a
+        // IFileEditorInput
+        // but instead a FileStoreEditorInput. Unclear if markers are valid for
+        // such files.
+        if (!(editorInput instanceof IFileEditorInput)) {
+            YEditLog.logError("Marking errors not supported for files outside of a project.");
+            YEditLog.logger.info("editorInput is not a part of a project.");
+            return;
+        }
 
-		if (document instanceof SwaggerDocument) {
-			IFileEditorInput fileEditorInput = (IFileEditorInput) editorInput;
-			IFile file = fileEditorInput.getFile();
+        if (document instanceof SwaggerDocument) {
+            final IFileEditorInput fileEditorInput = (IFileEditorInput) editorInput;
+            final IFile file = fileEditorInput.getFile();
 
-			if (onOpen) {
-				// force parsing of yaml to init parsing errors
-				((SwaggerDocument) document).onChange();
-			}
+            if (onOpen) {
+                // force parsing of yaml to init parsing errors
+                ((SwaggerDocument) document).onChange();
+            }
+            new WorkspaceJob("Update SwagEdit validation markers") {
 
-			clearMarkers(file);
-			validateYaml(file, (SwaggerDocument) document);
-			validateSwagger(file, (SwaggerDocument) document, fileEditorInput);
-		}
-	}
+                @Override
+                public IStatus runInWorkspace(IProgressMonitor monitor) throws CoreException {
+                    clearMarkers(file);
+                    validateYaml(file, (SwaggerDocument) document);
+                    validateSwagger(file, (SwaggerDocument) document, fileEditorInput);
+                    return Status.OK_STATUS;
+                }
+            }.schedule();
+        }
+    }
 
 	protected void clearMarkers(IFile file) {
 		int depth = IResource.DEPTH_INFINITE;
