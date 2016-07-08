@@ -18,6 +18,9 @@ import org.eclipse.jface.text.IDocument;
 import org.eclipse.jface.text.IRegion;
 import org.eclipse.jface.text.ITextSelection;
 import org.eclipse.jface.text.ITextViewer;
+import org.eclipse.jface.text.contentassist.ContentAssistEvent;
+import org.eclipse.jface.text.contentassist.ContentAssistant;
+import org.eclipse.jface.text.contentassist.ICompletionListener;
 import org.eclipse.jface.text.contentassist.ICompletionProposal;
 import org.eclipse.jface.text.contentassist.IContentAssistProcessor;
 import org.eclipse.jface.text.contentassist.IContextInformation;
@@ -48,15 +51,36 @@ import com.reprezen.swagedit.templates.SwaggerTemplateContext;
  * This class provides basic content assist based on keywords used by the
  * swagger schema.
  */
-public class SwaggerContentAssistProcessor extends TemplateCompletionProcessor implements IContentAssistProcessor {
+public class SwaggerContentAssistProcessor extends TemplateCompletionProcessor implements IContentAssistProcessor, ICompletionListener {
 
 	private final SwaggerProposalProvider proposalProvider = new SwaggerProposalProvider();
-	private String currentPath = null;
+	private final JsonReferenceProposalProvider referenceProposalProvider = new JsonReferenceProposalProvider();
+	private final ContentAssistant contentAssistant;
 
-	public SwaggerContentAssistProcessor() {}
+	private String currentPath = null;
+	private int cyclePosition = 0;
+	private boolean isRefCompletion = false;
+
+	private String[] textMessages = new String[] {
+			"Press 'Ctrl+Space' to show all schemas in the project.",
+			"Press 'Ctrl+Space' to show all schemas in the workspace.",
+			"Press 'Ctrl+Space' to show schemas in the current file."
+	};
+
+	public SwaggerContentAssistProcessor() {
+		this(null);
+	}
+
+	public SwaggerContentAssistProcessor(ContentAssistant ca) {
+		this.contentAssistant = ca;
+	}
 
 	@Override
 	public ICompletionProposal[] computeCompletionProposals(ITextViewer viewer, int documentOffset) {
+		if (isRefCompletion) {			
+			cyclePosition = cyclePosition == 2 ? 0 : cyclePosition + 1;
+		}
+
 		if (!(viewer.getDocument() instanceof SwaggerDocument)) {
 			return super.computeCompletionProposals(viewer, documentOffset);
 		}
@@ -80,14 +104,25 @@ public class SwaggerContentAssistProcessor extends TemplateCompletionProcessor i
 
 		currentPath = document.getPath(line, column);
 
-		// compute template proposals
-		final ICompletionProposal[] templateProposals = super.computeCompletionProposals(viewer, documentOffset);
 		final List<ICompletionProposal> proposals = new ArrayList<>();
 
-		proposals.addAll(proposalProvider.getCompletionProposals(currentPath, document, prefix, documentOffset));
+		isRefCompletion = currentPath != null && currentPath.endsWith("$ref");
+		if (isRefCompletion) {
 
-		if (templateProposals != null && templateProposals.length > 0) {
-			proposals.addAll(Lists.newArrayList(templateProposals));
+			if (contentAssistant != null) {
+				contentAssistant.setStatusMessage(textMessages[cyclePosition]);
+			}
+
+			proposals.addAll(referenceProposalProvider.getCompletionProposals(
+					currentPath, document, prefix, documentOffset, cyclePosition));
+		} else {
+			// compute template proposals
+			final ICompletionProposal[] templateProposals = super.computeCompletionProposals(viewer, documentOffset);
+			proposals.addAll(proposalProvider.getCompletionProposals(currentPath, document, prefix, documentOffset, 0));
+
+			if (templateProposals != null && templateProposals.length > 0) {
+				proposals.addAll(Lists.newArrayList(templateProposals));
+			}
 		}
 
 		return proposals.toArray(new ICompletionProposal[proposals.size()]);
@@ -190,6 +225,22 @@ public class SwaggerContentAssistProcessor extends TemplateCompletionProcessor i
 		return new StyledString(template.getName(), nameStyle)
 				.append(": ", descriptionStyle)
 				.append(template.getDescription(), descriptionStyle);
+	}
+
+	@Override
+	public void assistSessionStarted(ContentAssistEvent event) {
+		cyclePosition = 0;
+		isRefCompletion = false;
+	}
+
+	@Override
+	public void assistSessionEnded(ContentAssistEvent event) {
+		cyclePosition = 0;
+		isRefCompletion = false;
+	}
+
+	@Override
+	public void selectionChanged(ICompletionProposal proposal, boolean smartToggle) {
 	}
 
 }

@@ -14,8 +14,8 @@ import com.reprezen.swagedit.editor.SwaggerDocument
 import com.reprezen.swagedit.validation.Validator
 import org.junit.Test
 
-import static org.junit.Assert.*
 import static org.hamcrest.core.IsCollectionContaining.*
+import static org.junit.Assert.*
 
 /**
  * Tests as documentation for #9 - User-friendly validation messages
@@ -24,12 +24,7 @@ import static org.hamcrest.core.IsCollectionContaining.*
  */
 class ValidationMessageTest {
 
-	val validator = new Validator() {
-		// allow running tests as non plugin tests
-		override protected getActiveEditorInput() {
-			null
-		}
-	}
+	val validator = new Validator
 	val document = new SwaggerDocument
 
 	@Test
@@ -53,7 +48,7 @@ class ValidationMessageTest {
 		'''
 
 		document.set(content)
-		val errors = validator.validate(document)
+		val errors = validator.validate(document, null)
 		
 		assertEquals(1, errors.size)
 		assertEquals(expected, errors.get(0).message)
@@ -77,7 +72,7 @@ class ValidationMessageTest {
 		'''
 
 		document.set(content)
-		val errors = validator.validate(document)
+		val errors = validator.validate(document, null)
 		
 		assertEquals(1, errors.size)
 		assertEquals(expected, errors.get(0).message)
@@ -105,7 +100,7 @@ class ValidationMessageTest {
 		'''
 
 		document.set(content)
-		val errors = validator.validate(document)
+		val errors = validator.validate(document, null)
 		
 		assertEquals(1, errors.size)
 		assertEquals(expected, errors.get(0).message)
@@ -130,7 +125,7 @@ class ValidationMessageTest {
 		'''
 		
 		document.set(content)
-		val errors = validator.validate(document)
+		val errors = validator.validate(document, null)
 
 		assertEquals(1, errors.size)
 	}
@@ -156,7 +151,7 @@ class ValidationMessageTest {
 		'''
 		
 		document.set(content)
-		val errors = validator.validate(document)
+		val errors = validator.validate(document, null)
 
 		assertThat(errors.map[message], hasItems(expected))
 	}
@@ -177,7 +172,7 @@ class ValidationMessageTest {
 		'''
 
 		document.set(content)
-		val errors = validator.validate(document)
+		val errors = validator.validate(document, null)
 		
 		assertEquals(1, errors.size)
 		assertEquals(expected, errors.get(0).message)

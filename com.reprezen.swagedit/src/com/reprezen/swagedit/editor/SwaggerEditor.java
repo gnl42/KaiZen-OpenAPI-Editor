@@ -24,8 +24,11 @@ import org.dadacoalition.yedit.preferences.PreferenceConstants;
 import org.eclipse.core.resources.IFile;
 import org.eclipse.core.resources.IMarker;
 import org.eclipse.core.resources.IResource;
+import org.eclipse.core.resources.WorkspaceJob;
 import org.eclipse.core.runtime.CoreException;
 import org.eclipse.core.runtime.IProgressMonitor;
+import org.eclipse.core.runtime.IStatus;
+import org.eclipse.core.runtime.Status;
 import org.eclipse.jface.text.DocumentEvent;
 import org.eclipse.jface.text.IDocument;
 import org.eclipse.jface.text.IDocumentListener;
@@ -72,7 +75,9 @@ public class SwaggerEditor extends YEdit {
 
 	private final IDocumentListener changeListener = new IDocumentListener() {
 		@Override
-		public void documentAboutToBeChanged(DocumentEvent event) {}
+		public void documentAboutToBeChanged(DocumentEvent event) {
+		}
+
 		@Override
 		public void documentChanged(DocumentEvent event) {
 			if (event.getDocument() instanceof SwaggerDocument) {
@@ -90,9 +95,9 @@ public class SwaggerEditor extends YEdit {
 	};
 
 	/*
-	 * This listener is added to the preference store when the editor is initialized.
-	 * It listens to changes to color preferences. Once a color change happens, the editor
-	 * is re-initialize. 
+	 * This listener is added to the preference store when the editor is
+	 * initialized. It listens to changes to color preferences. Once a color
+	 * change happens, the editor is re-initialize.
 	 */
 	private final IPropertyChangeListener preferenceChangeListener = new IPropertyChangeListener() {
 
@@ -152,7 +157,7 @@ public class SwaggerEditor extends YEdit {
 		@Override
 		public void propertyChange(PropertyChangeEvent event) {
 			if (preferenceKeys.contains(event.getProperty())) {
-				if(getSourceViewer() instanceof SourceViewer){
+				if (getSourceViewer() instanceof SourceViewer) {
 					((SourceViewer) getSourceViewer()).unconfigure();
 					initializeEditor();
 					getSourceViewer().configure(sourceViewerConfiguration);
@@ -181,6 +186,8 @@ public class SwaggerEditor extends YEdit {
 			IDocument document = getDocumentProvider().getDocument(getEditorInput());
 			if (document != null) {
 				document.addDocumentListener(changeListener);
+				// validate content before editor opens
+				validate(true);
 			}
 		}
 	}
@@ -202,7 +209,7 @@ public class SwaggerEditor extends YEdit {
 		viewer.doOperation(ProjectionViewer.TOGGLE);
 
 		annotationModel = viewer.getProjectionAnnotationModel();
-		
+
 		Activator.getDefault().getPreferenceStore().addPropertyChangeListener(preferenceChangeListener);
 	}
 
@@ -213,48 +220,50 @@ public class SwaggerEditor extends YEdit {
 		Activator.getDefault().getPreferenceStore().removePropertyChangeListener(preferenceChangeListener);
 	}
 
-    @Override
-    protected ISourceViewer createSourceViewer(Composite parent, IVerticalRuler ruler, int styles) {
-        Composite composite = new Composite(parent, SWT.NONE);
-        GridLayout compositeLayout = new GridLayout(1, false);
-        compositeLayout.marginHeight = 0;
-        compositeLayout.marginWidth = 0;
-        compositeLayout.horizontalSpacing = 0;
-        compositeLayout.verticalSpacing = 0;
-        composite.setLayout(compositeLayout);
+	@Override
+	protected ISourceViewer createSourceViewer(Composite parent, IVerticalRuler ruler, int styles) {
+		Composite composite = new Composite(parent, SWT.NONE);
+		GridLayout compositeLayout = new GridLayout(1, false);
+		compositeLayout.marginHeight = 0;
+		compositeLayout.marginWidth = 0;
+		compositeLayout.horizontalSpacing = 0;
+		compositeLayout.verticalSpacing = 0;
+		composite.setLayout(compositeLayout);
 
-        topPanel = new Composite(composite, SWT.NONE);
-        topPanel.setLayout(new StackLayout());
-        topPanel.setLayoutData(new GridData(SWT.FILL, SWT.TOP, true, false));
+		topPanel = new Composite(composite, SWT.NONE);
+		topPanel.setLayout(new StackLayout());
+		topPanel.setLayoutData(new GridData(SWT.FILL, SWT.TOP, true, false));
 
-        Composite editorComposite = new Composite(composite, SWT.NONE);
-        editorComposite.setLayoutData(new GridData(SWT.FILL, SWT.FILL, true, true));
-        FillLayout fillLayout = new FillLayout(SWT.VERTICAL);
-        fillLayout.marginHeight = 0;
-        fillLayout.marginWidth = 0;
-        fillLayout.spacing = 0;
-        editorComposite.setLayout(fillLayout);
+		Composite editorComposite = new Composite(composite, SWT.NONE);
+		editorComposite.setLayoutData(new GridData(SWT.FILL, SWT.FILL, true, true));
+		FillLayout fillLayout = new FillLayout(SWT.VERTICAL);
+		fillLayout.marginHeight = 0;
+		fillLayout.marginWidth = 0;
+		fillLayout.spacing = 0;
+		editorComposite.setLayout(fillLayout);
 
-        ISourceViewer result = doCreateSourceViewer(editorComposite, ruler, styles);
+		ISourceViewer result = doCreateSourceViewer(editorComposite, ruler, styles);
 
-        return result;
-        
-    }
-    
-    /**
-     * SwaggerEditor provides additional hidden panel on top of the source viewer, where external integrations can put
-     * their UI.
-     * <p/>
-     * The panel is only a placeholder, that is:
-     * <ul>
-     * <li>it is not visible by default</li>
-     * <li>it has a {@link StackLayout} and expect single composite to be created per contribution</li>
-     * <li>if there are more than one contributors, it is their responsibility to manage {@link StackLayout#topControl}</li>
-     * </ul>
-     */
-    public Composite getTopPanel() {
-        return topPanel;
-    }
+		return result;
+
+	}
+
+	/**
+	 * SwaggerEditor provides additional hidden panel on top of the source
+	 * viewer, where external integrations can put their UI.
+	 * <p/>
+	 * The panel is only a placeholder, that is:
+	 * <ul>
+	 * <li>it is not visible by default</li>
+	 * <li>it has a {@link StackLayout} and expect single composite to be
+	 * created per contribution</li>
+	 * <li>if there are more than one contributors, it is their responsibility
+	 * to manage {@link StackLayout#topControl}</li>
+	 * </ul>
+	 */
+	public Composite getTopPanel() {
+		return topPanel;
+	}
 
 	protected ISourceViewer doCreateSourceViewer(Composite parent, IVerticalRuler ruler, int styles) {
 		ISourceViewer viewer = new ProjectionViewer(parent, ruler, getOverviewRuler(), isOverviewRulerVisible(),
@@ -265,7 +274,7 @@ public class SwaggerEditor extends YEdit {
 
 	public void updateFoldingStructure(List<Position> positions) {
 		final Map<Annotation, Position> newAnnotations = new HashMap<Annotation, Position>();
-		for (Position position: positions) {
+		for (Position position : positions) {
 			newAnnotations.put(new ProjectionAnnotation(), position);
 		}
 
@@ -286,25 +295,43 @@ public class SwaggerEditor extends YEdit {
 	}
 
 	protected void validate() {
-		IEditorInput editorInput = getEditorInput();
-		IDocument document = getDocumentProvider().getDocument(getEditorInput());
-
-		// if the file is not part of a workspace it does not seems that it is a
-		// IFileEditorInput
-		// but instead a FileStoreEditorInput. Unclear if markers are valid for
-		// such files.
-		if (!(editorInput instanceof IFileEditorInput)) {
-			YEditLog.logError("Marking errors not supported for files outside of a project.");
-			YEditLog.logger.info("editorInput is not a part of a project.");
-			return;
-		}
-		if (document instanceof SwaggerDocument) {
-			IFile file = ((IFileEditorInput) editorInput).getFile();
-			clearMarkers(file);
-			validateYaml(file, (SwaggerDocument) document);
-			validateSwagger(file, (SwaggerDocument) document);
-		}
+		validate(false);
 	}
+
+    protected void validate(boolean onOpen) {
+        IEditorInput editorInput = getEditorInput();
+        final IDocument document = getDocumentProvider().getDocument(getEditorInput());
+
+        // if the file is not part of a workspace it does not seems that it is a
+        // IFileEditorInput
+        // but instead a FileStoreEditorInput. Unclear if markers are valid for
+        // such files.
+        if (!(editorInput instanceof IFileEditorInput)) {
+            YEditLog.logError("Marking errors not supported for files outside of a project.");
+            YEditLog.logger.info("editorInput is not a part of a project.");
+            return;
+        }
+
+        if (document instanceof SwaggerDocument) {
+            final IFileEditorInput fileEditorInput = (IFileEditorInput) editorInput;
+            final IFile file = fileEditorInput.getFile();
+
+            if (onOpen) {
+                // force parsing of yaml to init parsing errors
+                ((SwaggerDocument) document).onChange();
+            }
+            new WorkspaceJob("Update SwagEdit validation markers") {
+
+                @Override
+                public IStatus runInWorkspace(IProgressMonitor monitor) throws CoreException {
+                    clearMarkers(file);
+                    validateYaml(file, (SwaggerDocument) document);
+                    validateSwagger(file, (SwaggerDocument) document, fileEditorInput);
+                    return Status.OK_STATUS;
+                }
+            }.schedule();
+        }
+    }
 
 	protected void clearMarkers(IFile file) {
 		int depth = IResource.DEPTH_INFINITE;
@@ -322,8 +349,8 @@ public class SwaggerEditor extends YEdit {
 		}
 	}
 
-	protected void validateSwagger(IFile file, SwaggerDocument document) {
-		final Set<SwaggerError> errors = validator.validate(document);
+	protected void validateSwagger(IFile file, SwaggerDocument document, IFileEditorInput editorInput) {
+		final Set<SwaggerError> errors = validator.validate(document, editorInput);
 
 		for (SwaggerError error : errors) {
 			addMarker(error, file, document);
@@ -354,7 +381,7 @@ public class SwaggerEditor extends YEdit {
 			}
 		});
 	}
-	
+
 	@Override
 	public void addDocumentIdleListener(IDocumentIdleListener listener) {
 		super.addDocumentIdleListener(listener);

@@ -39,8 +39,9 @@ public class SwaggerSourceViewerConfiguration extends YEditSourceViewerConfigura
 	@Override
 	public IContentAssistant getContentAssistant(ISourceViewer sourceViewer) {
 		ContentAssistant ca = new ContentAssistant();
+		SwaggerContentAssistProcessor processor = new SwaggerContentAssistProcessor(ca);
 
-		ca.setContentAssistProcessor(new SwaggerContentAssistProcessor(), IDocument.DEFAULT_CONTENT_TYPE);
+		ca.setContentAssistProcessor(processor, IDocument.DEFAULT_CONTENT_TYPE);
 		ca.setInformationControlCreator(getInformationControlCreator(sourceViewer));
 
 		ca.enableAutoInsert(false);
@@ -48,6 +49,9 @@ public class SwaggerSourceViewerConfiguration extends YEditSourceViewerConfigura
 		ca.setAutoActivationDelay(100);
 		ca.enableColoredLabels(true);
 		ca.setShowEmptyList(true);
+		ca.setRepeatedInvocationMode(true);
+		ca.addCompletionListener(processor);
+		ca.setStatusLineVisible(true);
 
 		return ca;
 	}

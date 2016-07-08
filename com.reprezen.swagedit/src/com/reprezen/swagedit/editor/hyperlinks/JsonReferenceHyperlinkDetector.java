@@ -13,7 +13,6 @@ package com.reprezen.swagedit.editor.hyperlinks;
 import static com.google.common.base.Strings.emptyToNull;
 
 import java.net.URI;
-import java.util.regex.Pattern;
 
 import org.eclipse.core.resources.IFile;
 import org.eclipse.jface.text.IRegion;
@@ -32,8 +31,6 @@ import com.reprezen.swagedit.json.references.JsonReferenceFactory;
  *
  */
 public class JsonReferenceHyperlinkDetector extends AbstractSwaggerHyperlinkDetector {
-
-	protected static final Pattern LOCAL_REF_PATTERN = Pattern.compile("['|\"]?#([/\\w+]+)['|\"]?");
 
 	protected final JsonReferenceFactory factory = new JsonReferenceFactory();
 
@@ -58,19 +55,20 @@ public class JsonReferenceHyperlinkDetector extends AbstractSwaggerHyperlinkDete
 			}
 			return new IHyperlink[] {
 					new SwaggerHyperlink(reference.getPointer().toString(), viewer, info.region, target) };
-        } else {
-            URI resolved;
-            try {
-                resolved = baseURI.resolve(reference.getUri());
-            } catch (IllegalArgumentException e) { // the given string violates RFC 2396
-                return null;
-            }
-            IFile file = DocumentUtils.getWorkspaceFile(resolved);
-            if (file != null && file.exists()) {
-                return new IHyperlink[] { new SwaggerFileHyperlink(info.region, info.text, file,
-                        pointer(reference.getPointer())) };
-            }
-        }
+		} else {
+			URI resolved;
+			try {
+				resolved = baseURI.resolve(reference.getUri());
+			} catch (IllegalArgumentException e) { 
+				// the given string violates RFC 2396
+				return null;
+			}
+			IFile file = DocumentUtils.getWorkspaceFile(resolved);
+			if (file != null && file.exists()) {
+				return new IHyperlink[] {
+						new SwaggerFileHyperlink(info.region, info.text, file, pointer(reference.getPointer())) };
+			}
+		}
 
 		return null;
 	}
