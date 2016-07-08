@@ -10,27 +10,15 @@
  *******************************************************************************/
 package com.reprezen.swagedit.assist;
 
-import java.util.ArrayList;
-import java.util.Collection;
 import java.util.Collections;
 import java.util.HashSet;
 import java.util.Iterator;
 import java.util.LinkedHashSet;
-import java.util.List;
 import java.util.Set;
 
 import org.apache.commons.lang3.math.NumberUtils;
-import org.eclipse.jface.text.contentassist.ICompletionProposal;
-import org.eclipse.jface.viewers.StyledString;
-import org.eclipse.jface.viewers.StyledString.Styler;
-import org.eclipse.swt.graphics.Color;
-import org.eclipse.swt.graphics.RGB;
-import org.eclipse.swt.graphics.TextStyle;
-import org.eclipse.swt.widgets.Display;
 
 import com.fasterxml.jackson.databind.JsonNode;
-import com.fasterxml.jackson.databind.ObjectMapper;
-import com.google.common.base.Strings;
 import com.google.common.collect.Sets;
 import com.reprezen.swagedit.editor.SwaggerDocument;
 import com.reprezen.swagedit.json.JsonType;
@@ -41,116 +29,12 @@ import com.reprezen.swagedit.json.SchemaDefinitionProvider;
 /**
  * Provider of completion proposals.
  */
-public class SwaggerProposalProvider {
+public class SwaggerProposalProvider extends AbstractProposalProvider {
 
-	private final ObjectMapper mapper = new ObjectMapper();
-
-	private final Styler typeStyler = new StyledString.Styler() {
-		@Override
-		public void applyStyles(TextStyle textStyle) {
-			textStyle.foreground = new Color(Display.getCurrent(), new RGB(120, 120, 120));
-		}
-	};
-
-	/**
-	 * Returns a list of completion proposals that are created from a single
-	 * proposal object.
-	 * 
-	 * @param path
-	 * @param document
-	 * @param prefix
-	 * @param documentOffset
-	 * @return list of completion proposals
-	 */
-	public Collection<? extends ICompletionProposal> getCompletionProposals(String path, SwaggerDocument document, String prefix, int documentOffset) {
-		final List<ICompletionProposal> result = new ArrayList<>();
-		final Set<JsonNode> proposals;
+	@Override
+	protected Iterable<JsonNode> createProposals(String path, SwaggerDocument document, int cycle) {
 		final SchemaDefinitionProvider walker = new SchemaDefinitionProvider();
-
-		if (path.endsWith("$ref")) {
-			proposals = createReferenceProposals(document.asJson());
-		} else {
-			proposals = createProposals(document.getNodeForPath(path), walker.getDefinitions(path));
-		}
-
-		prefix = Strings.emptyToNull(prefix);
-
-		for (JsonNode proposal: proposals) {
-			String value = proposal.get("value").asText();
-			String label = proposal.get("label").asText();
-			String type = proposal.has("type") ? proposal.get("type").asText() : null;
-
-			StyledString styledString = new StyledString(label);
-			if (type != null) {
-				styledString
-				.append(": ", typeStyler)
-				.append(type, typeStyler);
-			}
-
-			if (prefix != null) {
-				if (value.startsWith(prefix)) {
-					value = value.substring(prefix.length(), value.length());
-					result.add(new StyledCompletionProposal(value, styledString, documentOffset, 0, value.length()));
-				}
-			} else {
-				result.add(new StyledCompletionProposal(value, styledString, documentOffset, 0, value.length()));
-			}
-		}
-
-		return result;
-	}
-
-	public List<? extends ICompletionProposal> getCompletionProposals(String path, JsonNode data, String prefix,int documentOffset) {
-		final SchemaDefinitionProvider walker = new SchemaDefinitionProvider();
-		final Set<SchemaDefinition> definitions = walker.getDefinitions(path);
-		final Set<JsonNode> proposals = createProposals(data, definitions);
-		final List<ICompletionProposal> result = new ArrayList<>();
-
-		prefix = Strings.emptyToNull(prefix);
-
-		for (JsonNode proposal: proposals) {
-			String value = proposal.get("value").asText();
-			String label = proposal.get("label").asText();
-			String type = proposal.has("type") ? proposal.get("type").asText() : null;
-
-			StyledString styledString = new StyledString(label);
-			if (type != null) {
-				styledString
-				.append(": ", typeStyler)
-				.append(type, typeStyler);
-			}
-
-			if (prefix != null) {
-				if (value.startsWith(prefix)) {
-					value = value.substring(prefix.length(), value.length());
-					result.add(new StyledCompletionProposal(value, styledString, documentOffset, 0, value.length()));
-				}
-			} else {
-				result.add(new StyledCompletionProposal(value, styledString, documentOffset, 0, value.length()));
-			}
-		}
-
-		return result;
-	}
-
-	public Set<JsonNode> createReferenceProposals(JsonNode document) {
-		final Set<JsonNode> proposals = new LinkedHashSet<>();
-
-		if (document.has("definitions")) {
-			JsonNode definitions = document.get("definitions");
-			
-			for (Iterator<String> it = definitions.fieldNames(); it.hasNext();) {
-				String key = it.next();
-				
-				proposals.add( mapper.createObjectNode()
-						.put("value", "\"#/definitions/" + key + "\"")
-						.put("label", key)
-						.put("type", "ref") );
-			}
-			
-		}
-
-		return proposals;
+		return createProposals(document.getNodeForPath(path), walker.getDefinitions(path));
 	}
 
 	/**

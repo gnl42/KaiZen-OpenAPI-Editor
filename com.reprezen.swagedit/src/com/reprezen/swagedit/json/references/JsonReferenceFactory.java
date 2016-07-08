@@ -69,10 +69,10 @@ public class JsonReferenceFactory {
 		JsonPointer pointer = JsonPointer.compile(Strings.emptyToNull(fragment));
 
 		uri = uri.normalize();
-        boolean absolute = uri.isAbsolute();
-        boolean local = !absolute && uri.getPath().isEmpty();
+		boolean absolute = uri.isAbsolute();
+		boolean local = !absolute && uri.getPath().isEmpty();
 
-        return new JsonReference(uri, pointer, absolute, local, source);
+		return new JsonReference(uri, pointer, absolute, local, source);
 	}
 
 }
