@@ -10,15 +10,15 @@
  *******************************************************************************/
 package com.reprezen.swagedit.assist
 
-import org.junit.Test
+import com.fasterxml.jackson.databind.JsonNode
+import com.fasterxml.jackson.databind.ObjectMapper
 import com.reprezen.swagedit.editor.SwaggerDocument
-import org.junit.Before
 import com.reprezen.swagedit.mocks.Mocks
+import org.junit.Before
+import org.junit.Test
 
 import static org.hamcrest.core.IsCollectionContaining.*
 import static org.junit.Assert.*
-import com.fasterxml.jackson.databind.ObjectMapper
-import com.fasterxml.jackson.databind.JsonNode
 
 class JsonReferenceProposalProviderTest {
 
@@ -57,7 +57,7 @@ class JsonReferenceProposalProviderTest {
 		val document = new SwaggerDocument
 		document.set(text)
 
-		val proposals = provider.createProposals(":paths:/foo:get:responses:200:schema", document, 0)
+		val proposals = provider.createProposals(":paths:/foo:get:responses:200:schema:$ref", document, 0)
 
 		assertThat(proposals, hasItems(
 			mapper.createObjectNode
@@ -67,4 +67,19 @@ class JsonReferenceProposalProviderTest {
 		))
 	}
 
+	@Test
+	def void testContextTypes() {
+		// schema definitions
+		assertTrue(":paths:/foo:get:responses:200:schema:$ref".matches(JsonReferenceProposalProvider.SCHEMA_DEFINITION_REGEX))
+		assertTrue(":paths:/foo:get:responses:200:schema:items:$ref".matches(JsonReferenceProposalProvider.SCHEMA_DEFINITION_REGEX))
+		
+		// responses
+		assertTrue(":paths:/foo:get:responses:200:$ref".matches(JsonReferenceProposalProvider.RESPONSE_REGEX))
+		
+		// parameters
+		assertTrue(":paths:/:get:parameters:@0:$ref".matches(JsonReferenceProposalProvider.PARAMETER_REGEX))
+
+		// path items
+		assertTrue(":paths:/pets/{id}:$ref".matches(JsonReferenceProposalProvider.PATH_ITEM_REGEX))
+	}
 }	

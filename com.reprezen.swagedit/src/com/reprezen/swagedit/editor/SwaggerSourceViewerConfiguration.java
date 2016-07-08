@@ -39,7 +39,7 @@ public class SwaggerSourceViewerConfiguration extends YEditSourceViewerConfigura
 	@Override
 	public IContentAssistant getContentAssistant(ISourceViewer sourceViewer) {
 		ContentAssistant ca = new ContentAssistant();
-		SwaggerContentAssistProcessor processor = new SwaggerContentAssistProcessor();
+		SwaggerContentAssistProcessor processor = new SwaggerContentAssistProcessor(ca);
 
 		ca.setContentAssistProcessor(processor, IDocument.DEFAULT_CONTENT_TYPE);
 		ca.setInformationControlCreator(getInformationControlCreator(sourceViewer));

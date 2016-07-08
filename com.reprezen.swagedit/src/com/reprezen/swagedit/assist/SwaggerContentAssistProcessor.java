@@ -19,6 +19,7 @@ import org.eclipse.jface.text.IRegion;
 import org.eclipse.jface.text.ITextSelection;
 import org.eclipse.jface.text.ITextViewer;
 import org.eclipse.jface.text.contentassist.ContentAssistEvent;
+import org.eclipse.jface.text.contentassist.ContentAssistant;
 import org.eclipse.jface.text.contentassist.ICompletionListener;
 import org.eclipse.jface.text.contentassist.ICompletionProposal;
 import org.eclipse.jface.text.contentassist.IContentAssistProcessor;
@@ -54,16 +55,29 @@ public class SwaggerContentAssistProcessor extends TemplateCompletionProcessor i
 
 	private final SwaggerProposalProvider proposalProvider = new SwaggerProposalProvider();
 	private final JsonReferenceProposalProvider referenceProposalProvider = new JsonReferenceProposalProvider();
+	private final ContentAssistant contentAssistant;
 
 	private String currentPath = null;
 	private int cyclePosition = 0;
 	private boolean isRefCompletion = false;
 
-	public SwaggerContentAssistProcessor() {}
+	private String[] textMessages = new String[] {
+			"Press 'Ctrl+Space' to show all schemas in the project.",
+			"Press 'Ctrl+Space' to show all schemas in the workspace.",
+			"Press 'Ctrl+Space' to show schemas in the current file."
+	};
+
+	public SwaggerContentAssistProcessor() {
+		this(null);
+	}
+
+	public SwaggerContentAssistProcessor(ContentAssistant ca) {
+		this.contentAssistant = ca;
+	}
 
 	@Override
 	public ICompletionProposal[] computeCompletionProposals(ITextViewer viewer, int documentOffset) {
-		if (isRefCompletion) {
+		if (isRefCompletion) {			
 			cyclePosition = cyclePosition == 2 ? 0 : cyclePosition + 1;
 		}
 
@@ -94,6 +108,11 @@ public class SwaggerContentAssistProcessor extends TemplateCompletionProcessor i
 
 		isRefCompletion = currentPath != null && currentPath.endsWith("$ref");
 		if (isRefCompletion) {
+
+			if (contentAssistant != null) {
+				contentAssistant.setStatusMessage(textMessages[cyclePosition]);
+			}
+
 			proposals.addAll(referenceProposalProvider.getCompletionProposals(
 					currentPath, document, prefix, documentOffset, cyclePosition));
 		} else {

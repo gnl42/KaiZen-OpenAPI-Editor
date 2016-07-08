@@ -14,7 +14,6 @@ import java.util.ArrayList;
 import java.util.Collection;
 import java.util.Iterator;
 import java.util.List;
-import java.util.Objects;
 
 import org.eclipse.core.resources.IContainer;
 import org.eclipse.core.resources.IFile;
@@ -26,16 +25,21 @@ import org.eclipse.core.runtime.IPath;
 
 import com.fasterxml.jackson.databind.JsonNode;
 import com.fasterxml.jackson.databind.ObjectMapper;
+import com.google.common.base.Strings;
 import com.google.common.collect.Lists;
 import com.reprezen.swagedit.editor.DocumentUtils;
 import com.reprezen.swagedit.editor.SwaggerDocument;
 import com.reprezen.swagedit.json.JsonDocumentManager;
-import com.reprezen.swagedit.templates.SwaggerContextType;
 
 /**
  * Completion proposal provider for JSON references. 
  */
 public class JsonReferenceProposalProvider extends AbstractProposalProvider {
+
+	protected static final String SCHEMA_DEFINITION_REGEX = ".*schema:(\\w+:)?\\$ref";
+	protected static final String RESPONSE_REGEX = ".*responses:\\d+:\\$ref";
+	protected static final String PARAMETER_REGEX = ".*:parameters:@\\d+:\\$ref";
+	protected static final String PATH_ITEM_REGEX = ":paths:/[^:]+:\\$ref";
 
 	private final ObjectMapper mapper = new ObjectMapper();
 	private final JsonDocumentManager manager = JsonDocumentManager.getInstance();
@@ -53,13 +57,8 @@ public class JsonReferenceProposalProvider extends AbstractProposalProvider {
 		final IPath basePath = currentFile.getParent().getFullPath();
 
 		if (scope == Scope.LOCAL) {
-
-			if (type == ContextType.SCHEMA_DEFINITION) {
-				proposals.addAll(collectDefinitions(document.asJson(), null));
-			}
-
+			proposals.addAll(collectProposals(type, document.asJson(), null));
 		} else {
-
 			IContainer parent;
 			if (scope == Scope.PROJECT) {
 				parent = currentFile.getProject();
@@ -67,7 +66,7 @@ public class JsonReferenceProposalProvider extends AbstractProposalProvider {
 				parent = currentFile.getWorkspace().getRoot();
 			}
 
-			Iterable<IFile> files = collectFiles(parent, currentFile);
+			Iterable<IFile> files = collectFiles(parent);
 			for (IFile file: files) {
 				IPath relative	= file.equals(currentFile) ? null : 
 					file.getFullPath().makeRelativeTo(basePath);
@@ -75,19 +74,29 @@ public class JsonReferenceProposalProvider extends AbstractProposalProvider {
 				JsonNode content = file.equals(currentFile) ? document.asJson() :
 					manager.getDocument(file.getLocationURI());
 
-				if (type == ContextType.SCHEMA_DEFINITION) {
-					proposals.addAll(collectDefinitions(content, relative));
-				} else if (type == ContextType.PATH_ITEM) {
-					proposals.addAll(collectPathItems(content, relative));
-				}
+				proposals.addAll(collectProposals(type, content, relative));
 			}
 		}
 
 		return proposals;
 	}
 
-	protected Iterable<IFile> collectFiles(IContainer parent, IFile exclude) {
-		final FileVisitor visitor = new FileVisitor(exclude);
+	protected Collection<JsonNode> collectProposals(ContextType type, JsonNode content, IPath relative) {
+		if (type == ContextType.SCHEMA_DEFINITION) {
+			return collectDefinitions(content, relative);
+		} else if (type == ContextType.PATH_ITEM) {
+			return collectPathItems(content, relative);
+		} else if (type == ContextType.PATH_PARAMETER) {
+			return collectParameters(content, relative);
+		} else if (type == ContextType.PATH_RESPONSE) {
+			return collectResponses(content, relative);
+		}
+
+		return Lists.newArrayList();
+	}
+
+	protected Iterable<IFile> collectFiles(IContainer parent) {
+		final FileVisitor visitor = new FileVisitor();
 
 		try {
 			parent.accept(visitor, 0);
@@ -146,32 +155,89 @@ public class JsonReferenceProposalProvider extends AbstractProposalProvider {
 		SCHEMA_DEFINITION,
 		PATH_ITEM,
 		PATH_PARAMETER,
-		PATH_RESPONSE;
+		PATH_RESPONSE,
+		UNKNOWN;
 
 		public static ContextType get(String path) {
-			String string = path.substring(0, path.length() - "$ref".length());
-			String contextType = SwaggerContextType.getContextType(string);
-
-			if (Objects.equals(contextType, SwaggerContextType.SchemaContextType.CONTEXT_ID)) {
-				return ContextType.SCHEMA_DEFINITION;
-			}
-			if (Objects.equals(contextType, SwaggerContextType.PathItemContextType.CONTEXT_ID)) {
-				return ContextType.PATH_ITEM;
-			}
-			if (Objects.equals(contextType, SwaggerContextType.ParameterObjectContextType.CONTEXT_ID)) {
-				return ContextType.PATH_PARAMETER;
-			}
-			if (Objects.equals(contextType, SwaggerContextType.ResponsesContextType.CONTEXT_ID)) {
-				return ContextType.PATH_RESPONSE;
+			if (Strings.emptyToNull(path) == null) {
+				return UNKNOWN;
 			}
 
-			return SCHEMA_DEFINITION;
+			if (path.matches(SCHEMA_DEFINITION_REGEX)) {
+				return SCHEMA_DEFINITION;
+			} else if (path.matches(PARAMETER_REGEX)) {
+				return PATH_PARAMETER;
+			} else if (path.matches(RESPONSE_REGEX)) {
+				return PATH_RESPONSE;
+			} else if (path.matches(PATH_ITEM_REGEX)) {
+				return PATH_ITEM;
+			}
+
+			return UNKNOWN;
 		}
 	}
 
 	protected Collection<JsonNode> collectPathItems(JsonNode document, IPath path) {
 		Collection<JsonNode> results = Lists.newArrayList();
-		
+
+		JsonNode parameters = document.get("paths");
+		if (parameters == null) {
+			return results;
+		}
+
+		for (Iterator<String> it = parameters.fieldNames(); it.hasNext();) {
+			String key = it.next();			
+			String value =  (path != null ? path.toString() : "") 
+					+ "#/paths/" + key.replaceAll("/", "~1");
+
+			results.add(mapper.createObjectNode()
+					.put("value", "\"" + value + "\"")
+					.put("label", key)
+					.put("type", value) );
+		}
+
+		return results;
+	}
+
+	protected Collection<JsonNode> collectParameters(JsonNode document, IPath path) {
+		Collection<JsonNode> results = Lists.newArrayList();
+
+		JsonNode parameters = document.get("parameters");
+		if (parameters == null) {
+			return results;
+		}
+
+		for (Iterator<String> it = parameters.fieldNames(); it.hasNext();) {
+			String key = it.next();
+			String value =  (path != null ? path.toString() : "") + "#/parameters/" + key;
+
+			results.add(mapper.createObjectNode()
+					.put("value", "\"" + value + "\"")
+					.put("label", key)
+					.put("type", value) );
+		}
+
+		return results;
+	}
+
+	protected Collection<JsonNode> collectResponses(JsonNode document, IPath path) {
+		Collection<JsonNode> results = Lists.newArrayList();
+
+		JsonNode parameters = document.get("responses");
+		if (parameters == null) {
+			return results;
+		}
+
+		for (Iterator<String> it = parameters.fieldNames(); it.hasNext();) {
+			String key = it.next();
+			String value =  (path != null ? path.toString() : "") + "#/responses/" + key;
+
+			results.add(mapper.createObjectNode()
+					.put("value", "\"" + value + "\"")
+					.put("label", key)
+					.put("type", value) );
+		}
+
 		return results;
 	}
 
@@ -198,20 +264,18 @@ public class JsonReferenceProposalProvider extends AbstractProposalProvider {
 	private static class FileVisitor implements IResourceProxyVisitor {
 
 		private final List<IFile> files = new ArrayList<>();
-		private final IFile exclude;
-
-		public FileVisitor(IFile exclude) {
-			this.exclude = exclude;
-		}
 
 		@Override
 		public boolean visit(IResourceProxy proxy) throws CoreException {
 			if (proxy.getType() == IResource.FILE && 
 					(proxy.getName().endsWith("yaml") || proxy.getName().endsWith("yml"))) {
 
-				if (!proxy.isDerived() && !proxy.requestFullPath().equals(exclude.getFullPath())) {
+				if (!proxy.isDerived()) {
 					files.add((IFile) proxy.requestResource());
 				}
+			} else if (proxy.getType() == IResource.FOLDER && 
+					(proxy.isDerived() || proxy.getName().equals("GenTargets"))) {
+				return false;
 			}
 			return true;
 		}
@@ -220,4 +284,5 @@ public class JsonReferenceProposalProvider extends AbstractProposalProvider {
 			return files;
 		}
 	}
+
 }

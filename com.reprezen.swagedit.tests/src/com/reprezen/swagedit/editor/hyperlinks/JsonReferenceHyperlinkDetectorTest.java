@@ -11,7 +11,6 @@
 package com.reprezen.swagedit.editor.hyperlinks;
 
 import static org.hamcrest.core.IsCollectionContaining.hasItem;
-import static org.hamcrest.core.IsCollectionContaining.hasItems;
 import static org.junit.Assert.assertNotNull;
 import static org.junit.Assert.assertNull;
 import static org.junit.Assert.assertThat;
@@ -20,10 +19,7 @@ import static org.mockito.Mockito.when;
 
 import java.net.URI;
 import java.net.URISyntaxException;
-import java.util.ArrayList;
 import java.util.Arrays;
-import java.util.List;
-import java.util.regex.Matcher;
 
 import org.eclipse.jface.text.BadLocationException;
 import org.eclipse.jface.text.IRegion;
@@ -152,42 +148,6 @@ public class JsonReferenceHyperlinkDetectorTest {
 				.detectHyperlinks(viewer, region, false);
 
 		assertNull(hyperlinks);
-	}
-
-	@Test
-	public void test_match_json_reference() {
-		// single quotes
-		String text = "'#/definitions/User'";
-
-		Matcher matcher = JsonReferenceHyperlinkDetector.LOCAL_REF_PATTERN.matcher(text);
-		List<String> groups = new ArrayList<>();
-		if(matcher.find()) {
-			groups.add(matcher.group(1));
-		}
-
-		assertThat(groups, hasItems("/definitions/User"));
-
-		// double quotes
-		text = "\"#/definitions/User\"";
-
-		matcher = JsonReferenceHyperlinkDetector.LOCAL_REF_PATTERN.matcher(text);
-		groups = new ArrayList<>();
-		if(matcher.find()) {
-			groups.add(matcher.group(1));
-		}
-
-		assertThat(groups, hasItems("/definitions/User"));
-
-		// no quotes
-		text = "#/definitions/User";
-
-		matcher = JsonReferenceHyperlinkDetector.LOCAL_REF_PATTERN.matcher(text);
-		groups = new ArrayList<>();
-		if(matcher.find()) {
-			groups.add(matcher.group(1));
-		}
-
-		assertThat(groups, hasItems("/definitions/User"));
 	}
 
 }
