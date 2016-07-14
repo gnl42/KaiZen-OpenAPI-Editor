@@ -32,10 +32,11 @@ public abstract class AbstractProposalProvider {
 	 * Returns a list of completion proposals that are created from a single
 	 * proposal object.
 	 * 
-	 * @param path
-	 * @param document
-	 * @param prefix
-	 * @param documentOffset
+	 * @param path - path under current cursor
+	 * @param document - current swagger document
+	 * @param prefix - already typed characters 
+	 * @param documentOffset - offset of current cursor in document
+	 * @param cycle - current position in list of proposals 
 	 * @return list of completion proposals
 	 */
 	public Collection<? extends ICompletionProposal> getCompletionProposals(String path, SwaggerDocument document,
