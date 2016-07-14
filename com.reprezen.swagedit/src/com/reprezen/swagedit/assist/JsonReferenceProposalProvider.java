@@ -239,7 +239,7 @@ public class JsonReferenceProposalProvider extends AbstractProposalProvider {
 					files.add((IFile) proxy.requestResource());
 				}
 			} else if (proxy.getType() == IResource.FOLDER && 
-					(proxy.isDerived() || proxy.getName().equals("GenTargets"))) {
+					(proxy.isDerived() || proxy.getName().equalsIgnoreCase("gentargets"))) {
 				return false;
 			}
 			return true;
