@@ -68,6 +68,36 @@ class JsonReferenceProposalProviderTest {
 	}
 
 	@Test
+	def void shouldEncodeWhiteSpaceCharacters() {
+		val text = '''
+		paths:
+		  /foo:
+		    get:
+		      responses:
+		        '200':
+		          schema:
+		            $ref: 
+		          description: OK
+		definitions:
+		  Valid:
+		    type: string
+		'''
+
+		val document = new SwaggerDocument
+		document.set(text)
+
+		val path = Mocks.mockPath("../Path With Spaces/Other  Spaces.yaml")
+		val proposals = provider.collectProposals(document.asJson, "paths", path)
+
+		assertThat(proposals, hasItems(
+			mapper.createObjectNode
+				.put("value", "\"../Path%20With%20Spaces/Other%20%20Spaces.yaml#/paths/~1foo\"")
+				.put("label", "/foo")
+				.put("type", "../Path With Spaces/Other  Spaces.yaml#/paths/~1foo") as JsonNode
+		))
+	}
+
+	@Test
 	def void testContextTypes() {
 		// schema definitions
 		assertTrue(":paths:/foo:get:responses:200:schema:$ref".matches(JsonReferenceProposalProvider.SCHEMA_DEFINITION_REGEX))
