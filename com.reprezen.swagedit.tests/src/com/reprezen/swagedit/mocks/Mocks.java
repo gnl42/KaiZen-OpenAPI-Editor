@@ -69,7 +69,7 @@ public class Mocks {
 
 	public static IFile mockJsonReferenceProposalFile() {
 		IFile file = mock(IFile.class);
-		IContainer parent = mock(IContainer.class);		
+		IContainer parent = mock(IContainer.class);
 		IPath parentPath = mock(IPath.class);
 
 		when(file.getParent()).thenReturn(parent);
@@ -77,4 +77,11 @@ public class Mocks {
 		
 		return file;
 	}
+
+	public static IPath mockPath(String path) {
+		IPath mock = mock(IPath.class);
+		when(mock.toString()).thenReturn(path);
+		return mock;
+	}
+
 }

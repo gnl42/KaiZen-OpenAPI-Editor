@@ -54,7 +54,7 @@ public class JsonReferenceFactory {
 			try {
 				uri = new URI(null, null, notNull.substring(1));
 			} catch (URISyntaxException e) {
-				uri = null;
+				return new JsonReference(null, null, false, false, source);
 			}
 		} else {
 			try {

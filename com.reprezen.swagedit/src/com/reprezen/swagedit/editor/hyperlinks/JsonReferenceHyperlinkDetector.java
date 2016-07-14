@@ -44,7 +44,7 @@ public class JsonReferenceHyperlinkDetector extends AbstractSwaggerHyperlinkDete
 		URI baseURI = getBaseURI();
 
 		JsonReference reference = getFactory().create(doc.getNodeForPath(basePath));
-		if (!reference.isValid(baseURI)) {
+		if (reference.isInvalid() || reference.isMissing(getBaseURI())) {
 			return null;
 		}
 

@@ -52,21 +52,31 @@ public class JsonReference {
 		this.manager = manager;
 	}
 
+	
 	/**
-	 * Returns true if the reference is valid, e.g. if this reference URI   
-	 * points to an existing JSON document and the pointer to an existing 
-	 * node inside that document.
+	 * Returns true if the reference was constructed from an invalid string, e.g. it 
+	 * contains invalid characters.
+	 * 
+	 * @return true if is invalid URI. 
+	 */
+	public boolean isInvalid() {
+		return uri == null;
+	}
+
+	/**
+	 * Returns true if the reference points to an existing JSON document and 
+	 * the pointer to an existing node inside that document.
 	 * 
 	 * @param baseURI
-	 * @return true if valid
+	 * @return true if the reference can be resolved.
 	 */
-	public boolean isValid(URI baseURI) {
-		if (uri == null) {
+	public boolean isMissing(URI baseURI) {
+		if (isInvalid()) {
 			return false;
 		}
 
 		JsonNode resolved = resolve(baseURI);
-		return resolved != null && !resolved.isMissingNode();
+		return resolved == null || resolved.isMissingNode();
 	}
 
 	/**
