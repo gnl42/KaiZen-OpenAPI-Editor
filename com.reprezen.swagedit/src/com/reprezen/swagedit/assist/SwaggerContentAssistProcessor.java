@@ -39,10 +39,15 @@ import org.eclipse.swt.graphics.Image;
 import org.eclipse.swt.graphics.RGB;
 import org.eclipse.swt.graphics.TextStyle;
 import org.eclipse.swt.widgets.Display;
+import org.eclipse.ui.IWorkbenchCommandConstants;
+import org.eclipse.ui.PlatformUI;
+import org.eclipse.ui.keys.IBindingService;
 
 import com.google.common.collect.Lists;
 import com.reprezen.swagedit.Activator;
 import com.reprezen.swagedit.Activator.Icons;
+import com.reprezen.swagedit.Messages;
+import com.reprezen.swagedit.assist.JsonReferenceProposalProvider.ContextType;
 import com.reprezen.swagedit.editor.SwaggerDocument;
 import com.reprezen.swagedit.templates.SwaggerContextType;
 import com.reprezen.swagedit.templates.SwaggerTemplateContext;
@@ -57,15 +62,27 @@ public class SwaggerContentAssistProcessor extends TemplateCompletionProcessor i
 	private final JsonReferenceProposalProvider referenceProposalProvider = new JsonReferenceProposalProvider();
 	private final ContentAssistant contentAssistant;
 
+	/**
+	 * This string contains the pointer that helps us locate 
+	 * the current position of the cursor inside the document. 
+	 * 
+	 */
 	private String currentPath = null;
+
+	/**
+	 * Current position in the list of proposals.
+	 * Use for JSON Reference proposals.
+	 * 
+	 * @see JsonReferenceProposalProvider.Scope
+	 */
 	private int cyclePosition = 0;
+
+	/**
+	 * True if the proposal is activated on a JSON reference.  
+	 */
 	private boolean isRefCompletion = false;
 
-	private String[] textMessages = new String[] {
-			"Press 'Ctrl+Space' to show all schemas in the project.",
-			"Press 'Ctrl+Space' to show all schemas in the workspace.",
-			"Press 'Ctrl+Space' to show schemas in the current file."
-	};
+	private String[] textMessages;
 
 	public SwaggerContentAssistProcessor() {
 		this(null);
@@ -73,12 +90,43 @@ public class SwaggerContentAssistProcessor extends TemplateCompletionProcessor i
 
 	public SwaggerContentAssistProcessor(ContentAssistant ca) {
 		this.contentAssistant = ca;
+		this.textMessages = initTextMessages();
+	}
+
+	protected String[] initTextMessages() {
+		IBindingService bindingService = (IBindingService) 
+				PlatformUI.getWorkbench().getAdapter(IBindingService.class);
+
+		String bindingKey = bindingService
+				.getBestActiveBindingFormattedFor(IWorkbenchCommandConstants.EDIT_CONTENT_ASSIST);
+
+		String context;
+		switch(ContextType.get(currentPath)) {
+			case PATH_ITEM:
+				context = "path item";
+				break;
+			case PATH_PARAMETER:
+				context = "parameter";
+				break;
+			case PATH_RESPONSE:
+				context = "response";
+				break;
+			default:
+				context = "schema";
+				break;
+		}
+
+		return new String[] {
+				String.format(Messages.content_assist_proposal_project, bindingKey, context),
+				String.format(Messages.content_assist_proposal_workspace, bindingKey, context),
+				String.format(Messages.content_assist_proposal_local, bindingKey, context)
+		};
 	}
 
 	@Override
 	public ICompletionProposal[] computeCompletionProposals(ITextViewer viewer, int documentOffset) {
-		if (isRefCompletion) {			
-			cyclePosition = cyclePosition == 2 ? 0 : cyclePosition + 1;
+		if (isRefCompletion) {
+			cyclePosition = ++cyclePosition % 3;
 		}
 
 		if (!(viewer.getDocument() instanceof SwaggerDocument)) {
@@ -110,6 +158,9 @@ public class SwaggerContentAssistProcessor extends TemplateCompletionProcessor i
 		if (isRefCompletion) {
 
 			if (contentAssistant != null) {
+				if (textMessages == null) {
+					textMessages = initTextMessages();
+				}
 				contentAssistant.setStatusMessage(textMessages[cyclePosition]);
 			}
 
@@ -231,12 +282,14 @@ public class SwaggerContentAssistProcessor extends TemplateCompletionProcessor i
 	public void assistSessionStarted(ContentAssistEvent event) {
 		cyclePosition = 0;
 		isRefCompletion = false;
+		textMessages = null;
 	}
 
 	@Override
 	public void assistSessionEnded(ContentAssistEvent event) {
 		cyclePosition = 0;
 		isRefCompletion = false;
+		textMessages = null;
 	}
 
 	@Override
