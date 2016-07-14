@@ -103,16 +103,16 @@ public class SwaggerContentAssistProcessor extends TemplateCompletionProcessor i
 		String context;
 		switch(ContextType.get(currentPath)) {
 			case PATH_ITEM:
-				context = "path item";
+				context = "path items";
 				break;
 			case PATH_PARAMETER:
-				context = "parameter";
+				context = "parameters";
 				break;
 			case PATH_RESPONSE:
-				context = "response";
+				context = "responses";
 				break;
 			default:
-				context = "schema";
+				context = "schemas";
 				break;
 		}
 
