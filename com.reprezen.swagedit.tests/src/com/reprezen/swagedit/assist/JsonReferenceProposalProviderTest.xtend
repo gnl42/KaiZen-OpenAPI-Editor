@@ -35,7 +35,7 @@ class JsonReferenceProposalProviderTest {
 	}
 
 	@Test
-	def void testLocalProposals() {
+	def void testLocalProposals_Schema() {
 		val text = '''
 		swagger: '2.0'
 		info:
@@ -68,8 +68,69 @@ class JsonReferenceProposalProviderTest {
 	}
 
 	@Test
+	def void testLocalProposals_Definitions() {
+		val text = '''
+		swagger: '2.0'
+		info:
+		  version: 0.0.0
+		  title: Simple API
+		definitions:
+		  Foo:
+		    type: object
+		  Bar:
+		    type: object
+		    properties:
+		      foo:
+		        $ref: 
+		'''
+
+		val document = new SwaggerDocument
+		document.set(text)
+
+		val proposals = provider.createProposals(":definitions:Bar:properties:foo:$ref", document, 0)
+
+		assertThat(proposals, hasItems(
+			mapper.createObjectNode
+				.put("value", "\"#/definitions/Foo\"")
+				.put("label", "Foo")
+				.put("type", "#/definitions/Foo") as JsonNode
+		))
+	}
+
+	@Test
+	def void shouldEncodeWhiteSpaceCharacters() {
+		val text = '''
+		paths:
+		  /foo:
+		    get:
+		      responses:
+		        '200':
+		          schema:
+		            $ref: 
+		          description: OK
+		definitions:
+		  Valid:
+		    type: string
+		'''
+
+		val document = new SwaggerDocument
+		document.set(text)
+
+		val path = Mocks.mockPath("../Path With Spaces/Other  Spaces.yaml")
+		val proposals = provider.collectProposals(document.asJson, "paths", path)
+
+		assertThat(proposals, hasItems(
+			mapper.createObjectNode
+				.put("value", "\"../Path%20With%20Spaces/Other%20%20Spaces.yaml#/paths/~1foo\"")
+				.put("label", "/foo")
+				.put("type", "../Path With Spaces/Other  Spaces.yaml#/paths/~1foo") as JsonNode
+		))
+	}
+
+	@Test
 	def void testContextTypes() {
 		// schema definitions
+		assertTrue(":definitions:Foo:properties:bar:$ref".matches(JsonReferenceProposalProvider.SCHEMA_DEFINITION_REGEX))
 		assertTrue(":paths:/foo:get:responses:200:schema:$ref".matches(JsonReferenceProposalProvider.SCHEMA_DEFINITION_REGEX))
 		assertTrue(":paths:/foo:get:responses:200:schema:items:$ref".matches(JsonReferenceProposalProvider.SCHEMA_DEFINITION_REGEX))
 		

@@ -19,6 +19,9 @@ public class Messages extends NLS {
 	// UI
 	public static String swagedit_wizard_title;
 	public static String swagedit_wizard_description;
+	public static String content_assist_proposal_local;
+	public static String content_assist_proposal_project;
+	public static String content_assist_proposal_workspace;
 
 	// errors
 	public static String error_typeNoMatch;
@@ -27,6 +30,7 @@ public class Messages extends NLS {
 	public static String error_required_properties;
 	public static String error_duplicate_keys;
 	public static String error_cannot_read_content;
+	public static String error_missing_reference;
 	public static String error_invalid_reference;
 
 	static {

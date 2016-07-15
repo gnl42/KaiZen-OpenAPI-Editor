@@ -60,27 +60,31 @@ public class JsonReferenceValidator {
 	protected Collection<? extends SwaggerError> doValidate(URI baseURI, Iterable<JsonReference> references) {
 		Set<SwaggerError> errors = Sets.newHashSet();
 		for (JsonReference reference: references) {
-			if (!reference.isValid(baseURI)) {
-				Object source = reference.getSource();
-
-				if (source instanceof Node) {
-					errors.add(createReferenceError((Node) source));
-				} else {
-					errors.add(createReferenceError());
-				}
+			if (reference.isInvalid()) {
+				errors.add(createReferenceError(
+						IMarker.SEVERITY_ERROR, 
+						Messages.error_invalid_reference, 
+						reference));
+			} else if (reference.isMissing(baseURI)) {
+				errors.add(createReferenceError(
+						IMarker.SEVERITY_WARNING, 
+						Messages.error_missing_reference, 
+						reference));
 			}
 		}
 		return errors;
 	}
 
-	protected SwaggerError createReferenceError(Node node) {
-		int line = node.getStartMark().getLine() + 1;
+	protected SwaggerError createReferenceError(int severity, String message, JsonReference reference) {
+		Object source = reference.getSource();
+		int line;
+		if (source instanceof Node) {
+			line = ((Node) source).getStartMark().getLine() + 1;
+		} else {
+			line = 1;
+		}
 
-		return new SwaggerError(line, IMarker.SEVERITY_WARNING, Messages.error_invalid_reference);
-	}
-
-	protected SwaggerError createReferenceError() {
-		return new SwaggerError(1, IMarker.SEVERITY_WARNING, Messages.error_invalid_reference);
+		return new SwaggerError(line, severity, message);
 	}
 
 }

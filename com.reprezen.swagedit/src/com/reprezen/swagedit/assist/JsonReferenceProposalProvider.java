@@ -10,6 +10,8 @@
  *******************************************************************************/
 package com.reprezen.swagedit.assist;
 
+import java.io.UnsupportedEncodingException;
+import java.net.URLEncoder;
 import java.util.ArrayList;
 import java.util.Collection;
 import java.util.Iterator;
@@ -36,7 +38,7 @@ import com.reprezen.swagedit.json.JsonDocumentManager;
  */
 public class JsonReferenceProposalProvider extends AbstractProposalProvider {
 
-	protected static final String SCHEMA_DEFINITION_REGEX = ".*schema:(\\w+:)?\\$ref";
+	protected static final String SCHEMA_DEFINITION_REGEX = "^:definitions:(\\w+:)+\\$ref|.*schema:(\\w+:)?\\$ref";
 	protected static final String RESPONSE_REGEX = ".*responses:\\d+:\\$ref";
 	protected static final String PARAMETER_REGEX = ".*:parameters:@\\d+:\\$ref";
 	protected static final String PATH_ITEM_REGEX = ":paths:/[^:]+:\\$ref";
@@ -57,7 +59,7 @@ public class JsonReferenceProposalProvider extends AbstractProposalProvider {
 		final IPath basePath = currentFile.getParent().getFullPath();
 
 		if (scope == Scope.LOCAL) {
-			proposals.addAll(collectProposals(type, document.asJson(), null));
+			proposals.addAll(collectProposals(document.asJson(), type.value(), null));
 		} else {
 			IContainer parent;
 			if (scope == Scope.PROJECT) {
@@ -74,25 +76,11 @@ public class JsonReferenceProposalProvider extends AbstractProposalProvider {
 				JsonNode content = file.equals(currentFile) ? document.asJson() :
 					manager.getDocument(file.getLocationURI());
 
-				proposals.addAll(collectProposals(type, content, relative));
+				proposals.addAll(collectProposals(content, type.value(), relative));
 			}
 		}
 
 		return proposals;
-	}
-
-	protected Collection<JsonNode> collectProposals(ContextType type, JsonNode content, IPath relative) {
-		if (type == ContextType.SCHEMA_DEFINITION) {
-			return collectDefinitions(content, relative);
-		} else if (type == ContextType.PATH_ITEM) {
-			return collectPathItems(content, relative);
-		} else if (type == ContextType.PATH_PARAMETER) {
-			return collectParameters(content, relative);
-		} else if (type == ContextType.PATH_RESPONSE) {
-			return collectResponses(content, relative);
-		}
-
-		return Lists.newArrayList();
 	}
 
 	protected Iterable<IFile> collectFiles(IContainer parent) {
@@ -152,11 +140,27 @@ public class JsonReferenceProposalProvider extends AbstractProposalProvider {
 	 * has been activated.
 	 */
 	protected enum ContextType {
-		SCHEMA_DEFINITION,
-		PATH_ITEM,
-		PATH_PARAMETER,
-		PATH_RESPONSE,
-		UNKNOWN;
+		SCHEMA_DEFINITION("definitions", "schemas"),
+		PATH_ITEM("paths", "path items"),
+		PATH_PARAMETER("parameters", "parameters"),
+		PATH_RESPONSE("responses", "responses"),
+		UNKNOWN(null, "");
+
+		private final String value;
+		private final String label;
+
+		private ContextType(String value, String label) {
+			this.value = value;
+			this.label = label;
+		}
+
+		public String value() {
+			return value;
+		}
+
+		public String label() {
+			return label;
+		}
 
 		public static ContextType get(String path) {
 			if (Strings.emptyToNull(path) == null) {
@@ -177,88 +181,56 @@ public class JsonReferenceProposalProvider extends AbstractProposalProvider {
 		}
 	}
 
-	protected Collection<JsonNode> collectPathItems(JsonNode document, IPath path) {
-		Collection<JsonNode> results = Lists.newArrayList();
-
-		JsonNode parameters = document.get("paths");
-		if (parameters == null) {
+	/**
+	 * Returns all proposals found in the document at the specified field. 
+	 * 
+	 * @param document
+	 * @param fieldName
+	 * @param path
+	 * @return Collection of proposals
+	 */
+	protected Collection<JsonNode> collectProposals(JsonNode document, String fieldName, IPath path) {
+		final Collection<JsonNode> results = Lists.newArrayList();
+		if (fieldName == null || !document.has(fieldName)) {
 			return results;
 		}
 
-		for (Iterator<String> it = parameters.fieldNames(); it.hasNext();) {
-			String key = it.next();			
-			String value =  (path != null ? path.toString() : "") 
-					+ "#/paths/" + key.replaceAll("/", "~1");
-
-			results.add(mapper.createObjectNode()
-					.put("value", "\"" + value + "\"")
-					.put("label", key)
-					.put("type", value) );
-		}
-
-		return results;
-	}
-
-	protected Collection<JsonNode> collectParameters(JsonNode document, IPath path) {
-		Collection<JsonNode> results = Lists.newArrayList();
-
-		JsonNode parameters = document.get("parameters");
-		if (parameters == null) {
-			return results;
-		}
+		final JsonNode parameters = document.get(fieldName);
+		final String basePath = (path != null ? path.toString() : "") + "#/" + fieldName + "/";
 
 		for (Iterator<String> it = parameters.fieldNames(); it.hasNext();) {
 			String key = it.next();
-			String value =  (path != null ? path.toString() : "") + "#/parameters/" + key;
+			String value = basePath + key.replaceAll("/", "~1");
+			String encoded = encodeURL(value);
 
 			results.add(mapper.createObjectNode()
-					.put("value", "\"" + value + "\"")
+					.put("value", "\"" + encoded + "\"")
 					.put("label", key)
-					.put("type", value) );
+					.put("type", value));
 		}
 
 		return results;
 	}
 
-	protected Collection<JsonNode> collectResponses(JsonNode document, IPath path) {
-		Collection<JsonNode> results = Lists.newArrayList();
-
-		JsonNode parameters = document.get("responses");
-		if (parameters == null) {
-			return results;
+	/*
+	 * Encodes that path string so that it does not include illegal characters in 
+	 * respect to URL encoding. 
+	 * (see http://stackoverflow.com/questions/607176/java-equivalent-to-javascripts-encodeuricomponent-that-produces-identical-outpu)
+	 */
+	protected String encodeURL(String path) {
+		try {
+			return URLEncoder.encode(path, "UTF-8")
+					// decode characters that don't 
+					// need to be encoded.
+					.replaceAll("\\+", "%20")
+					.replaceAll("\\%21", "!")
+					.replaceAll("\\%2F", "/")
+					.replaceAll("\\%23", "#")
+					.replaceAll("\\%27", "'")
+					.replaceAll("\\%7E", "~");
+		} catch (UnsupportedEncodingException e) {
+			return path;
 		}
-
-		for (Iterator<String> it = parameters.fieldNames(); it.hasNext();) {
-			String key = it.next();
-			String value =  (path != null ? path.toString() : "") + "#/responses/" + key;
-
-			results.add(mapper.createObjectNode()
-					.put("value", "\"" + value + "\"")
-					.put("label", key)
-					.put("type", value) );
-		}
-
-		return results;
-	}
-
-	protected Collection<JsonNode> collectDefinitions(JsonNode document, IPath path) {
-		Collection<JsonNode> results = Lists.newArrayList();
-
-		if (document.has("definitions")) {
-			JsonNode definitions = document.get("definitions");
-
-			for (Iterator<String> it = definitions.fieldNames(); it.hasNext();) {
-				String key = it.next();
-				String value =  (path != null ? path.toString() : "") + "#/definitions/" + key;
-
-				results.add(mapper.createObjectNode()
-						.put("value", "\"" + value + "\"")
-						.put("label", key)
-						.put("type", value) );
-			}
-		}
-
-		return results;
 	}
 
 	private static class FileVisitor implements IResourceProxyVisitor {
@@ -274,7 +246,7 @@ public class JsonReferenceProposalProvider extends AbstractProposalProvider {
 					files.add((IFile) proxy.requestResource());
 				}
 			} else if (proxy.getType() == IResource.FOLDER && 
-					(proxy.isDerived() || proxy.getName().equals("GenTargets"))) {
+					(proxy.isDerived() || proxy.getName().equalsIgnoreCase("gentargets"))) {
 				return false;
 			}
 			return true;

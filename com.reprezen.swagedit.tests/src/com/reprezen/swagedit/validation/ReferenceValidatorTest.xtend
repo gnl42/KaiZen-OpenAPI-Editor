@@ -74,7 +74,7 @@ class ReferenceValidatorTest {
 
 		assertEquals(1, errors.size())
 		assertTrue(errors.contains(
-			new SwaggerError(9, IMarker.SEVERITY_WARNING, Messages.error_invalid_reference)
+			new SwaggerError(9, IMarker.SEVERITY_WARNING, Messages.error_missing_reference)
 		))
 	}
 	
@@ -127,7 +127,7 @@ class ReferenceValidatorTest {
 
 		assertEquals(1, errors.size())
 		assertTrue(errors.contains(
-			new SwaggerError(9, IMarker.SEVERITY_WARNING, Messages.error_invalid_reference)
+			new SwaggerError(9, IMarker.SEVERITY_WARNING, Messages.error_missing_reference)
 		))
 	}
 	
@@ -184,7 +184,7 @@ class ReferenceValidatorTest {
 
 		assertEquals(1, errors.size())
 		assertTrue(errors.contains(
-			new SwaggerError(9, IMarker.SEVERITY_WARNING, Messages.error_invalid_reference)
+			new SwaggerError(9, IMarker.SEVERITY_WARNING, Messages.error_missing_reference)
 		))
 	}
 
@@ -251,7 +251,34 @@ class ReferenceValidatorTest {
 
 		assertEquals(1, errors.size())
 		assertTrue(errors.contains(
-			new SwaggerError(9, IMarker.SEVERITY_WARNING, Messages.error_invalid_reference)
+			new SwaggerError(9, IMarker.SEVERITY_WARNING, Messages.error_missing_reference)
+		))
+	}
+
+	@Test
+	def void should_ProduceError_If_URI_is_Invalid() {
+		val content = '''
+			swagger: '2.0'
+			info:
+			  version: 0.0.0
+			  title: Simple API
+			paths:
+			  /foo/{bar}:
+			    get:
+			      parameters:
+			        - $ref: 'contains space ref.yaml#/info/foo'
+			      responses:
+			        '200':
+			          description: OK
+		'''
+
+		document.set(content)
+		val baseURI = new URI(null, null, null)
+		val errors = validator(#{}).validate(baseURI, document.yaml)
+
+		assertEquals(1, errors.size())
+		assertTrue(errors.contains(
+			new SwaggerError(9, IMarker.SEVERITY_ERROR, Messages.error_invalid_reference)
 		))
 	}
 

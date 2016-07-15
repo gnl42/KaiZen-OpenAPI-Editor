@@ -54,6 +54,7 @@ import org.eclipse.ui.IEditorInput;
 import org.eclipse.ui.IFileEditorInput;
 import org.yaml.snakeyaml.error.YAMLException;
 
+import com.fasterxml.jackson.core.JsonParseException;
 import com.reprezen.swagedit.Activator;
 import com.reprezen.swagedit.validation.SwaggerError;
 import com.reprezen.swagedit.validation.Validator;
@@ -346,6 +347,9 @@ public class SwaggerEditor extends YEdit {
 	protected void validateYaml(IFile file, SwaggerDocument document) {
 		if (document.getYamlError() instanceof YAMLException) {
 			addMarker(new SwaggerError((YAMLException) document.getYamlError()), file, document);
+		}
+		if (document.getJsonError() instanceof JsonParseException) {
+			addMarker(new SwaggerError((JsonParseException) document.getJsonError()), file, document);
 		}
 	}
 
