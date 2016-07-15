@@ -22,6 +22,7 @@ import org.eclipse.core.resources.IMarker;
 import org.yaml.snakeyaml.error.MarkedYAMLException;
 import org.yaml.snakeyaml.error.YAMLException;
 
+import com.fasterxml.jackson.core.JsonParseException;
 import com.fasterxml.jackson.databind.JsonNode;
 import com.google.common.base.Strings;
 import com.google.common.collect.Lists;
@@ -56,6 +57,17 @@ public class SwaggerError {
 
 		if (exception instanceof MarkedYAMLException) {
 			this.line = ((MarkedYAMLException) exception).getProblemMark().getLine() + 1;
+		} else {
+			this.line = 1;
+		}
+	}
+
+	public SwaggerError(JsonParseException exception) {
+		this.level = IMarker.SEVERITY_ERROR;
+		this.message = exception.getMessage();
+
+		if (exception.getLocation() != null) {
+			this.line = exception.getLocation().getLineNr();
 		} else {
 			this.line = 1;
 		}
