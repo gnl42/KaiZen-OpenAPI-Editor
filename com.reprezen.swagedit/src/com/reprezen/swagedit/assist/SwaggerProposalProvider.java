@@ -31,9 +31,10 @@ import com.reprezen.swagedit.json.SchemaDefinitionProvider;
  */
 public class SwaggerProposalProvider extends AbstractProposalProvider {
 
+	private final SchemaDefinitionProvider walker = new SchemaDefinitionProvider();
+
 	@Override
 	protected Iterable<JsonNode> createProposals(String path, SwaggerDocument document, int cycle) {
-		final SchemaDefinitionProvider walker = new SchemaDefinitionProvider();
 		return createProposals(document.getNodeForPath(path), walker.getDefinitions(path));
 	}
 
@@ -198,7 +199,7 @@ public class SwaggerProposalProvider extends AbstractProposalProvider {
 			for (Iterator<String> it = properties.fieldNames(); it.hasNext();) {
 				final String key = it.next();
 
-				if (!data.has(key)) {							
+				if (data == null || !data.has(key)) {
 					proposals.add(createPropertyProposal(definition, key, properties.get(key)));
 				}
 			}
