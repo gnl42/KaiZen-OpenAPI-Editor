@@ -50,6 +50,10 @@ public class SwaggerContentAssistProcessorTest {
 		selection = mock(ITextSelection.class);
 		
 		processor = new SwaggerContentAssistProcessor() {
+			@Override
+			protected String[] initTextMessages() {
+				return new String[]{};
+			}
 			protected ContextTypeRegistry getContextTypeRegistry() {
 				return registry;
 			};

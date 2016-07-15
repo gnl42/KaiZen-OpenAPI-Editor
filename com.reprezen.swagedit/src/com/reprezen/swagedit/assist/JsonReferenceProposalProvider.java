@@ -140,19 +140,26 @@ public class JsonReferenceProposalProvider extends AbstractProposalProvider {
 	 * has been activated.
 	 */
 	protected enum ContextType {
-		SCHEMA_DEFINITION("definitions"),
-		PATH_ITEM("paths"),
-		PATH_PARAMETER("parameters"),
-		PATH_RESPONSE("responses"),
-		UNKNOWN(null);
+		SCHEMA_DEFINITION("definitions", "schemas"),
+		PATH_ITEM("paths", "path items"),
+		PATH_PARAMETER("parameters", "parameters"),
+		PATH_RESPONSE("responses", "responses"),
+		UNKNOWN(null, "");
 
 		private final String value;
-		private ContextType(String value) {
+		private final String label;
+
+		private ContextType(String value, String label) {
 			this.value = value;
+			this.label = label;
 		}
 
 		public String value() {
 			return value;
+		}
+
+		public String label() {
+			return label;
 		}
 
 		public static ContextType get(String path) {
