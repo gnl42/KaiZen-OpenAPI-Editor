@@ -43,13 +43,19 @@ public class SwaggerDocument extends Document {
 
 	private JsonNode jsonContent;
 	private Node yamlContent;
+
 	private Exception yamlError;
+	private Exception jsonError;
 
 	public SwaggerDocument() {
 	}
 
 	public Exception getYamlError() {
 		return yamlError;
+	}
+
+	public Exception getJsonError() {
+		return jsonError;
 	}
 
 	/**
@@ -392,8 +398,10 @@ public class SwaggerDocument extends Document {
 	private void parseJson(String content) {
 		try {
 			jsonContent = mapper.readTree(content);
+			jsonError = null;
 		} catch (Exception e) {
 			jsonContent = null;
+			jsonError = e;
 		}
 	}
 
