@@ -74,7 +74,7 @@ class ReferenceValidatorTest {
 
 		assertEquals(1, errors.size())
 		assertTrue(errors.contains(
-			new SwaggerError(9, IMarker.SEVERITY_WARNING, Messages.error_invalid_reference)
+			new SwaggerError(9, IMarker.SEVERITY_WARNING, Messages.error_missing_reference)
 		))
 	}
 	
@@ -127,7 +127,7 @@ class ReferenceValidatorTest {
 
 		assertEquals(1, errors.size())
 		assertTrue(errors.contains(
-			new SwaggerError(9, IMarker.SEVERITY_WARNING, Messages.error_invalid_reference)
+			new SwaggerError(9, IMarker.SEVERITY_WARNING, Messages.error_missing_reference)
 		))
 	}
 	
@@ -184,7 +184,7 @@ class ReferenceValidatorTest {
 
 		assertEquals(1, errors.size())
 		assertTrue(errors.contains(
-			new SwaggerError(9, IMarker.SEVERITY_WARNING, Messages.error_invalid_reference)
+			new SwaggerError(9, IMarker.SEVERITY_WARNING, Messages.error_missing_reference)
 		))
 	}
 
@@ -251,7 +251,7 @@ class ReferenceValidatorTest {
 
 		assertEquals(1, errors.size())
 		assertTrue(errors.contains(
-			new SwaggerError(9, IMarker.SEVERITY_WARNING, Messages.error_invalid_reference)
+			new SwaggerError(9, IMarker.SEVERITY_WARNING, Messages.error_missing_reference)
 		))
 	}
 

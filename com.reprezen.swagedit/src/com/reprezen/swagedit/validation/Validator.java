@@ -80,9 +80,7 @@ public class Validator {
 			YEditLog.logException(e);
 		}
 
-		if (jsonContent == null) {
-			errors.add(new SwaggerError(IMarker.SEVERITY_ERROR, Messages.error_cannot_read_content));
-		} else {
+		if (jsonContent != null) {
 			Node yaml = document.getYaml();
 			if (yaml != null) {
 				errors.addAll(validateAgainstSchema(new ErrorProcessor(yaml), jsonContent));

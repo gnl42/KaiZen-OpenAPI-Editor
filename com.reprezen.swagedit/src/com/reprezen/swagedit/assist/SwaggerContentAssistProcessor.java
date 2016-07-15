@@ -100,21 +100,7 @@ public class SwaggerContentAssistProcessor extends TemplateCompletionProcessor i
 		String bindingKey = bindingService
 				.getBestActiveBindingFormattedFor(IWorkbenchCommandConstants.EDIT_CONTENT_ASSIST);
 
-		String context;
-		switch(ContextType.get(currentPath)) {
-			case PATH_ITEM:
-				context = "path items";
-				break;
-			case PATH_PARAMETER:
-				context = "parameters";
-				break;
-			case PATH_RESPONSE:
-				context = "responses";
-				break;
-			default:
-				context = "schemas";
-				break;
-		}
+		String context = ContextType.get(currentPath).label();
 
 		return new String[] {
 				String.format(Messages.content_assist_proposal_project, bindingKey, context),
