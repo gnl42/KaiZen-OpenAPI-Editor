@@ -35,7 +35,7 @@ class JsonReferenceProposalProviderTest {
 	}
 
 	@Test
-	def void testLocalProposals() {
+	def void testLocalProposals_Schema() {
 		val text = '''
 		swagger: '2.0'
 		info:
@@ -64,6 +64,36 @@ class JsonReferenceProposalProviderTest {
 				.put("value", "\"#/definitions/Valid\"")
 				.put("label", "Valid")
 				.put("type", "#/definitions/Valid") as JsonNode
+		))
+	}
+
+	@Test
+	def void testLocalProposals_Definitions() {
+		val text = '''
+		swagger: '2.0'
+		info:
+		  version: 0.0.0
+		  title: Simple API
+		definitions:
+		  Foo:
+		    type: object
+		  Bar:
+		    type: object
+		    properties:
+		      foo:
+		        $ref: 
+		'''
+
+		val document = new SwaggerDocument
+		document.set(text)
+
+		val proposals = provider.createProposals(":definitions:Bar:properties:foo:$ref", document, 0)
+
+		assertThat(proposals, hasItems(
+			mapper.createObjectNode
+				.put("value", "\"#/definitions/Foo\"")
+				.put("label", "Foo")
+				.put("type", "#/definitions/Foo") as JsonNode
 		))
 	}
 
@@ -100,6 +130,7 @@ class JsonReferenceProposalProviderTest {
 	@Test
 	def void testContextTypes() {
 		// schema definitions
+		assertTrue(":definitions:Foo:properties:bar:$ref".matches(JsonReferenceProposalProvider.SCHEMA_DEFINITION_REGEX))
 		assertTrue(":paths:/foo:get:responses:200:schema:$ref".matches(JsonReferenceProposalProvider.SCHEMA_DEFINITION_REGEX))
 		assertTrue(":paths:/foo:get:responses:200:schema:items:$ref".matches(JsonReferenceProposalProvider.SCHEMA_DEFINITION_REGEX))
 		

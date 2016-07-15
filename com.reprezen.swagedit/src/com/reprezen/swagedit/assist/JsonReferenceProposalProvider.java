@@ -38,7 +38,7 @@ import com.reprezen.swagedit.json.JsonDocumentManager;
  */
 public class JsonReferenceProposalProvider extends AbstractProposalProvider {
 
-	protected static final String SCHEMA_DEFINITION_REGEX = ".*schema:(\\w+:)?\\$ref";
+	protected static final String SCHEMA_DEFINITION_REGEX = "^:definitions:(\\w+:)+\\$ref|.*schema:(\\w+:)?\\$ref";
 	protected static final String RESPONSE_REGEX = ".*responses:\\d+:\\$ref";
 	protected static final String PARAMETER_REGEX = ".*:parameters:@\\d+:\\$ref";
 	protected static final String PATH_ITEM_REGEX = ":paths:/[^:]+:\\$ref";
