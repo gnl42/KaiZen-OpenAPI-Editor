@@ -31,62 +31,50 @@ import com.reprezen.swagedit.editor.hyperlinks.SwaggerHyperlink;
 
 public class DefinitionHyperlinkDetectorTest {
 
-	private DefinitionHyperlinkDetector detector = new DefinitionHyperlinkDetector();
-	private ITextViewer viewer;
+    private DefinitionHyperlinkDetector detector = new DefinitionHyperlinkDetector();
+    private ITextViewer viewer;
 
-	@Before
-	public void setUp() {
-		viewer = mock(ITextViewer.class);
-	}
+    @Before
+    public void setUp() {
+        viewer = mock(ITextViewer.class);
+    }
 
-	@Test
-	public void testShouldCreateHyperLink_ToDefinition() throws BadLocationException {
-		SwaggerDocument document = new SwaggerDocument();
-		when(viewer.getDocument()).thenReturn(document);
+    @Test
+    public void testShouldCreateHyperLink_ToDefinition() throws BadLocationException {
+        SwaggerDocument document = new SwaggerDocument();
+        when(viewer.getDocument()).thenReturn(document);
 
-		String text = 
-				"tags:\n" + 
-				"  - foo\n" + 
-				"definitions:\n" + 
-				"  foo:\n" + 
-				"    type: object\n";
+        String text = "tags:\n" + "  - foo\n" + "definitions:\n" + "  foo:\n" + "    type: object\n";
 
-		document.set(text);
-		// region that includes `- foo`
-		IRegion region = new Region("tags:\n  - fo".length(), 1);
-		IHyperlink[] hyperlinks = detector.detectHyperlinks(viewer, region, false);
+        document.set(text);
+        // region that includes `- foo`
+        IRegion region = new Region("tags:\n  - fo".length(), 1);
+        IHyperlink[] hyperlinks = detector.detectHyperlinks(viewer, region, false);
 
-		// expected region
-		IRegion linkRegion = new Region(document.getLineOffset(1) + "  - ".length(), 3);
-		IRegion targetRegion = new Region(document.getLineOffset(4), 17);
+        // expected region
+        IRegion linkRegion = new Region(document.getLineOffset(1) + "  - ".length(), 3);
+        IRegion targetRegion = new Region(document.getLineOffset(4), 17);
 
-		assertThat(Arrays.asList(hyperlinks), hasItem(
-				new SwaggerHyperlink("foo", viewer, linkRegion, targetRegion)));
-	}
+        assertThat(Arrays.asList(hyperlinks), hasItem(new SwaggerHyperlink("foo", viewer, linkRegion, targetRegion)));
+    }
 
-	@Test
-	public void testShouldCreateHyperLink_FromRequired_ToProperty() throws BadLocationException {
-		SwaggerDocument document = new SwaggerDocument();
-		when(viewer.getDocument()).thenReturn(document);
+    @Test
+    public void testShouldCreateHyperLink_FromRequired_ToProperty() throws BadLocationException {
+        SwaggerDocument document = new SwaggerDocument();
+        when(viewer.getDocument()).thenReturn(document);
 
-		String text =
-				"NewPet:\n" +
-				"  required:\n" +
-				"    - name\n" +
-				"  properties:\n" +
-				"    name:\n" +
-				"      type: string\n";
+        String text = "NewPet:\n" + "  required:\n" + "    - name\n" + "  properties:\n" + "    name:\n"
+                + "      type: string\n";
 
-		document.set(text);
-		// region that includes `- name`
-		IRegion region = new Region("NewPet:\nrequired:\n    - nam".length(), 1);
-		IHyperlink[] hyperlinks = detector.detectHyperlinks(viewer, region, false);
+        document.set(text);
+        // region that includes `- name`
+        IRegion region = new Region("NewPet:\nrequired:\n    - nam".length(), 1);
+        IHyperlink[] hyperlinks = detector.detectHyperlinks(viewer, region, false);
 
-		// expected region
-		IRegion linkRegion = new Region(document.getLineOffset(2) + "    - ".length(), "name".length());
-		IRegion targetRegion = new Region(document.getLineOffset(5), 19);
+        // expected region
+        IRegion linkRegion = new Region(document.getLineOffset(2) + "    - ".length(), "name".length());
+        IRegion targetRegion = new Region(document.getLineOffset(5), 19);
 
-		assertThat(Arrays.asList(hyperlinks), hasItem(
-				new SwaggerHyperlink("name", viewer, linkRegion, targetRegion)));
-	}
+        assertThat(Arrays.asList(hyperlinks), hasItem(new SwaggerHyperlink("name", viewer, linkRegion, targetRegion)));
+    }
 }

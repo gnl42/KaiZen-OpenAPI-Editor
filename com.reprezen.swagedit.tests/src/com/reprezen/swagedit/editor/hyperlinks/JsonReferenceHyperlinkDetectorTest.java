@@ -35,119 +35,99 @@ import com.reprezen.swagedit.mocks.Mocks;
 
 public class JsonReferenceHyperlinkDetectorTest {
 
-	private ITextViewer viewer;
-	private URI uri;
+    private ITextViewer viewer;
+    private URI uri;
 
-	protected JsonReferenceHyperlinkDetector detector(JsonNode document) {
-		return Mocks.mockHyperlinkDetector(uri, document);
-	}
+    protected JsonReferenceHyperlinkDetector detector(JsonNode document) {
+        return Mocks.mockHyperlinkDetector(uri, document);
+    }
 
-	@Before
-	public void setUp() throws URISyntaxException {
-		viewer = mock(ITextViewer.class);
-		uri = new URI(null, null, null);
-	}
+    @Before
+    public void setUp() throws URISyntaxException {
+        viewer = mock(ITextViewer.class);
+        uri = new URI(null, null, null);
+    }
 
-	@Test
-	public void testShouldCreateHyperlink_ForJsonReference() throws BadLocationException {
-		SwaggerDocument document = new SwaggerDocument();
-		when(viewer.getDocument()).thenReturn(document);
+    @Test
+    public void testShouldCreateHyperlink_ForJsonReference() throws BadLocationException {
+        SwaggerDocument document = new SwaggerDocument();
+        when(viewer.getDocument()).thenReturn(document);
 
-		String text = 
-				"schema:\n" +
-				"  $ref: '#/definitions/User'\n" +
-				"definitions:\n" +
-				"  User:\n" +
-				"    type: object";
+        String text = "schema:\n" + "  $ref: '#/definitions/User'\n" + "definitions:\n" + "  User:\n"
+                + "    type: object";
 
-		document.set(text);
+        document.set(text);
 
-		// region that includes `$ref: '#/definitions/User'`
-		IRegion region = new Region("schema:\n  $ref: '#/definitions".length(), 1);
-		IHyperlink[] hyperlinks = detector(document.asJson())
-				.detectHyperlinks(viewer, region, false);
+        // region that includes `$ref: '#/definitions/User'`
+        IRegion region = new Region("schema:\n  $ref: '#/definitions".length(), 1);
+        IHyperlink[] hyperlinks = detector(document.asJson()).detectHyperlinks(viewer, region, false);
 
-		assertNotNull(hyperlinks);
+        assertNotNull(hyperlinks);
 
-		// expected region
-		IRegion linkRegion = new Region(document.getLineOffset(1) + "  $ref: ".length(), "'#/definitions/User'".length());
-		IRegion targetRegion = new Region(document.getLineOffset(4), 0);
+        // expected region
+        IRegion linkRegion = new Region(document.getLineOffset(1) + "  $ref: ".length(),
+                "'#/definitions/User'".length());
+        IRegion targetRegion = new Region(document.getLineOffset(4), 0);
 
-		assertThat(Arrays.asList(hyperlinks), 
-				hasItem(new SwaggerHyperlink("/definitions/User", viewer, linkRegion, targetRegion)));
-	}
+        assertThat(Arrays.asList(hyperlinks), hasItem(new SwaggerHyperlink("/definitions/User", viewer, linkRegion,
+                targetRegion)));
+    }
 
-	@Test
-	public void testShould_Not_CreateHyperlink_For_Invalid_JsonReference() throws BadLocationException {
-		SwaggerDocument document = new SwaggerDocument();
-		when(viewer.getDocument()).thenReturn(document);
+    @Test
+    public void testShould_Not_CreateHyperlink_For_Invalid_JsonReference() throws BadLocationException {
+        SwaggerDocument document = new SwaggerDocument();
+        when(viewer.getDocument()).thenReturn(document);
 
-		String text = 
-				"schema:\n" +
-				"  $ref: '#/definitions/Invalid'\n" +
-				"definitions:\n" +
-				"  User:\n" +
-				"    type: object";
+        String text = "schema:\n" + "  $ref: '#/definitions/Invalid'\n" + "definitions:\n" + "  User:\n"
+                + "    type: object";
 
-		document.set(text);
+        document.set(text);
 
-		// region that includes `$ref: '#/definitions/User'`
-		IRegion region = new Region("schema:\n  $ref: '#/definitions".length(), 1);
-		IHyperlink[] hyperlinks = detector(document.asJson())
-				.detectHyperlinks(viewer, region, false);
+        // region that includes `$ref: '#/definitions/User'`
+        IRegion region = new Region("schema:\n  $ref: '#/definitions".length(), 1);
+        IHyperlink[] hyperlinks = detector(document.asJson()).detectHyperlinks(viewer, region, false);
 
-		assertNull(hyperlinks);
-	}
+        assertNull(hyperlinks);
+    }
 
-	@Test
-	public void testShouldCreateHyperlink_ForPathReference() throws BadLocationException {
-		SwaggerDocument document = new SwaggerDocument();
-		when(viewer.getDocument()).thenReturn(document);
+    @Test
+    public void testShouldCreateHyperlink_ForPathReference() throws BadLocationException {
+        SwaggerDocument document = new SwaggerDocument();
+        when(viewer.getDocument()).thenReturn(document);
 
-		String text = 
-				"schema:\n" +
-				"  $ref: '#/paths/~1foo~1{bar}'\n" +
-				"paths:\n" +
-				"  /foo/{bar}:\n" +
-				"    get: ";
+        String text = "schema:\n" + "  $ref: '#/paths/~1foo~1{bar}'\n" + "paths:\n" + "  /foo/{bar}:\n" + "    get: ";
 
-		document.set(text);
+        document.set(text);
 
-		// region that includes `$ref: '#/paths/~1foo~1{bar}'`
-		IRegion region = new Region("schema:\n  $ref: '#/paths/~1foo".length(), 1);
-		IHyperlink[] hyperlinks = detector(document.asJson())
-				.detectHyperlinks(viewer, region, false);
+        // region that includes `$ref: '#/paths/~1foo~1{bar}'`
+        IRegion region = new Region("schema:\n  $ref: '#/paths/~1foo".length(), 1);
+        IHyperlink[] hyperlinks = detector(document.asJson()).detectHyperlinks(viewer, region, false);
 
-		assertNotNull(hyperlinks);
+        assertNotNull(hyperlinks);
 
-		// expected region
-		IRegion linkRegion = new Region(document.getLineOffset(1) + "  $ref: ".length(), "'#/paths/~1foo~1{bar}'".length());
-		IRegion targetRegion = new Region(document.getLineOffset(4), 0);
+        // expected region
+        IRegion linkRegion = new Region(document.getLineOffset(1) + "  $ref: ".length(),
+                "'#/paths/~1foo~1{bar}'".length());
+        IRegion targetRegion = new Region(document.getLineOffset(4), 0);
 
-		assertThat(Arrays.asList(hyperlinks), 
-				hasItem(new SwaggerHyperlink("/paths/~1foo~1{bar}", viewer, linkRegion, targetRegion)));
-	}
+        assertThat(Arrays.asList(hyperlinks), hasItem(new SwaggerHyperlink("/paths/~1foo~1{bar}", viewer, linkRegion,
+                targetRegion)));
+    }
 
-	@Test
-	public void testShould_Not_CreateHyperlink_For_Invalid_PathReference() throws BadLocationException {
-		SwaggerDocument document = new SwaggerDocument();
-		when(viewer.getDocument()).thenReturn(document);
+    @Test
+    public void testShould_Not_CreateHyperlink_For_Invalid_PathReference() throws BadLocationException {
+        SwaggerDocument document = new SwaggerDocument();
+        when(viewer.getDocument()).thenReturn(document);
 
-		String text = 
-				"schema:\n" +
-				"  $ref: '#/paths/~1foo'\n" +
-				"paths:\n" +
-				"  /foo/{bar}:\n" +
-				"    get: ";
+        String text = "schema:\n" + "  $ref: '#/paths/~1foo'\n" + "paths:\n" + "  /foo/{bar}:\n" + "    get: ";
 
-		document.set(text);
+        document.set(text);
 
-		// region that includes `$ref: '#/paths/~1foo~1{bar}'`
-		IRegion region = new Region("schema:\n  $ref: '#/paths/~1foo".length(), 1);
-		IHyperlink[] hyperlinks = detector(document.asJson())
-				.detectHyperlinks(viewer, region, false);
+        // region that includes `$ref: '#/paths/~1foo~1{bar}'`
+        IRegion region = new Region("schema:\n  $ref: '#/paths/~1foo".length(), 1);
+        IHyperlink[] hyperlinks = detector(document.asJson()).detectHyperlinks(viewer, region, false);
 
-		assertNull(hyperlinks);
-	}
+        assertNull(hyperlinks);
+    }
 
 }
