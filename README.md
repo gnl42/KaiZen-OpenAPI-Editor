@@ -12,7 +12,8 @@ We welcome your suggestions and contributions!
 ## Install SwagEdit
 ### Use a published update site 
 You can now install SwagEdit into your Eclipse by clicking on `Help > Install New Software... > Add...`
-This will show a dialog box from where you can select the location of the update site. Use "http://products.modelsolv.com/swagedit/kepler/" as URL. 
+This will show a dialog box from where you can select the location of the update site.
+Use the newest update site from "http://products.modelsolv.com/swagedit/mars2/" as URL, e.g. "http://products.modelsolv.com/swagedit/mars2/0.1.0.201607082009/".
 
 ## User Documentation
 Read more about SwagEdit features on http://www.reprezen.com/swagger-tools
@@ -29,7 +30,7 @@ This is a [known issue](https://github.com/oyse/yedit/issues/15) of YEdit, the Y
 5. Confirm by selecting "OK".
 
 ## Development
-Please see https://github.com/RepreZen/SwagEdit/wiki/Developer's-Guide
+Please see https://github.com/RepreZen/SwagEdit/blob/master/DEVELOPERS_GUIDE.md
 
 ## License
 SwagEdit is provided under the Eclipse Public License (https://www.eclipse.org/legal/epl-v10.html)
