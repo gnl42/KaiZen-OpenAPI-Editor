@@ -32,59 +32,62 @@ import com.reprezen.swagedit.editor.SwaggerDocument;
 
 public class SwaggerContentAssistProcessorTest {
 
-	private IDocument document;
-	private IContentAssistProcessor processor;
-	private ITextViewer viewer;
-	private ISelectionProvider selectionProvider;
-	private ITextSelection selection;
-	private ContextTypeRegistry registry;
-	private TemplateStore templateStore;
+    private IDocument document;
+    private IContentAssistProcessor processor;
+    private ITextViewer viewer;
+    private ISelectionProvider selectionProvider;
+    private ITextSelection selection;
+    private ContextTypeRegistry registry;
+    private TemplateStore templateStore;
 
-	@Before
-	public void setUp() {
-		document = new SwaggerDocument();
-		registry = mock(ContextTypeRegistry.class);
-		templateStore = mock(TemplateStore.class);
-		viewer = mock(ITextViewer.class);
-		selectionProvider = mock(ISelectionProvider.class);
-		selection = mock(ITextSelection.class);
-		
-		processor = new SwaggerContentAssistProcessor() {
-			@Override
-			protected String[] initTextMessages() {
-				return new String[]{};
-			}
-			protected ContextTypeRegistry getContextTypeRegistry() {
-				return registry;
-			};
-			protected TemplateStore geTemplateStore() {
-				return templateStore;
-			};
-		};
-	}
+    @Before
+    public void setUp() {
+        document = new SwaggerDocument();
+        registry = mock(ContextTypeRegistry.class);
+        templateStore = mock(TemplateStore.class);
+        viewer = mock(ITextViewer.class);
+        selectionProvider = mock(ISelectionProvider.class);
+        selection = mock(ITextSelection.class);
 
-	@Test
-	public void shouldProvideEndOfWord() {
-		String yaml = "swa";
-		int offset = 3;
+        processor = new SwaggerContentAssistProcessor() {
+            @Override
+            protected String[] initTextMessages() {
+                return new String[] {};
+            }
 
-		when(registry.getContextType(com.reprezen.swagedit.templates.SwaggerContextType.RootContextType.CONTEXT_ID)).thenReturn(null);
-		when(templateStore.getTemplates()).thenReturn(new Template[0]);
-		when(viewer.getDocument()).thenReturn(document);
-		when(viewer.getSelectedRange()).thenReturn(new Point(0, 0));
-		when(viewer.getSelectionProvider()).thenReturn(selectionProvider);
-		when(selectionProvider.getSelection()).thenReturn(selection);
-		when(selection.getOffset()).thenReturn(3);
-		document.set(yaml);
+            protected ContextTypeRegistry getContextTypeRegistry() {
+                return registry;
+            };
 
-		ICompletionProposal[] proposals = processor.computeCompletionProposals(viewer, offset);
+            protected TemplateStore geTemplateStore() {
+                return templateStore;
+            };
+        };
+    }
 
-		assertEquals(1, proposals.length);
-		
-		ICompletionProposal proposal = proposals[0];
-		proposal.apply(document);
+    @Test
+    public void shouldProvideEndOfWord() {
+        String yaml = "swa";
+        int offset = 3;
 
-		assertEquals("swagger:", document.get());
-	}
+        when(registry.getContextType(com.reprezen.swagedit.templates.SwaggerContextType.RootContextType.CONTEXT_ID))
+                .thenReturn(null);
+        when(templateStore.getTemplates()).thenReturn(new Template[0]);
+        when(viewer.getDocument()).thenReturn(document);
+        when(viewer.getSelectedRange()).thenReturn(new Point(0, 0));
+        when(viewer.getSelectionProvider()).thenReturn(selectionProvider);
+        when(selectionProvider.getSelection()).thenReturn(selection);
+        when(selection.getOffset()).thenReturn(3);
+        document.set(yaml);
+
+        ICompletionProposal[] proposals = processor.computeCompletionProposals(viewer, offset);
+
+        assertEquals(1, proposals.length);
+
+        ICompletionProposal proposal = proposals[0];
+        proposal.apply(document);
+
+        assertEquals("swagger:", document.get());
+    }
 
 }

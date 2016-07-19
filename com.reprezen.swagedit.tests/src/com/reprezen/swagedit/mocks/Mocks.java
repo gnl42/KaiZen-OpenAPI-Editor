@@ -19,69 +19,70 @@ import com.reprezen.swagedit.json.references.JsonReferenceFactory;
 
 public class Mocks {
 
-	public static JsonReferenceHyperlinkDetector mockHyperlinkDetector(final URI uri, final JsonNode document) {
-		final JsonDocumentManager manager = mock(JsonDocumentManager.class);
-		final IFile file = mock(IFile.class);
+    public static JsonReferenceHyperlinkDetector mockHyperlinkDetector(final URI uri, final JsonNode document) {
+        final JsonDocumentManager manager = mock(JsonDocumentManager.class);
+        final IFile file = mock(IFile.class);
 
-		when(file.exists()).thenReturn(true);
-		when(manager.getDocument(Mockito.any(URI.class))).thenReturn(document);
-		when(manager.getFile(Mockito.any(URI.class))).thenReturn(file);
+        when(file.exists()).thenReturn(true);
+        when(manager.getDocument(Mockito.any(URI.class))).thenReturn(document);
+        when(manager.getFile(Mockito.any(URI.class))).thenReturn(file);
 
-		return new JsonReferenceHyperlinkDetector() {
-			// allow running tests as non plugin tests
-			protected URI getBaseURI() {
-				return uri;
-			}
+        return new JsonReferenceHyperlinkDetector() {
+            // allow running tests as non plugin tests
+            protected URI getBaseURI() {
+                return uri;
+            }
 
-			protected JsonReferenceFactory getFactory() {
-				return new JsonReferenceFactory() {
-					public JsonReference create(JsonNode node) {
-						JsonReference ref = super.create(node);
-						ref.setDocumentManager(manager);
-						return ref;
-					};
-				};
-			}
-		};
-	}
+            protected JsonReferenceFactory getFactory() {
+                return new JsonReferenceFactory() {
+                    public JsonReference create(JsonNode node) {
+                        JsonReference ref = super.create(node);
+                        ref.setDocumentManager(manager);
+                        return ref;
+                    };
+                };
+            }
+        };
+    }
 
-	public static JsonReferenceFactory mockJsonReferenceFactory(final Map<URI, JsonNode> entries) {
-		final IFile file = mock(IFile.class);
-		when(file.exists()).thenReturn(true);
+    public static JsonReferenceFactory mockJsonReferenceFactory(final Map<URI, JsonNode> entries) {
+        final IFile file = mock(IFile.class);
+        when(file.exists()).thenReturn(true);
 
-		return new JsonReferenceFactory() {
-			public JsonReference create(org.yaml.snakeyaml.nodes.ScalarNode node) {
-				JsonReference ref = super.create(node);
-				ref.setDocumentManager(new JsonDocumentManager() {
-					@Override
-					public IFile getFile(URI uri) {
-						return file;
-					}
-					@Override
-					public JsonNode getDocument(URI uri) {
-						return entries.get(uri);
-					}
-				});
-				return ref;
-			};
-		};
-	}
+        return new JsonReferenceFactory() {
+            public JsonReference create(org.yaml.snakeyaml.nodes.ScalarNode node) {
+                JsonReference ref = super.create(node);
+                ref.setDocumentManager(new JsonDocumentManager() {
+                    @Override
+                    public IFile getFile(URI uri) {
+                        return file;
+                    }
 
-	public static IFile mockJsonReferenceProposalFile() {
-		IFile file = mock(IFile.class);
-		IContainer parent = mock(IContainer.class);
-		IPath parentPath = mock(IPath.class);
+                    @Override
+                    public JsonNode getDocument(URI uri) {
+                        return entries.get(uri);
+                    }
+                });
+                return ref;
+            };
+        };
+    }
 
-		when(file.getParent()).thenReturn(parent);
-		when(parent.getFullPath()).thenReturn(parentPath);
-		
-		return file;
-	}
+    public static IFile mockJsonReferenceProposalFile() {
+        IFile file = mock(IFile.class);
+        IContainer parent = mock(IContainer.class);
+        IPath parentPath = mock(IPath.class);
 
-	public static IPath mockPath(String path) {
-		IPath mock = mock(IPath.class);
-		when(mock.toString()).thenReturn(path);
-		return mock;
-	}
+        when(file.getParent()).thenReturn(parent);
+        when(parent.getFullPath()).thenReturn(parentPath);
+
+        return file;
+    }
+
+    public static IPath mockPath(String path) {
+        IPath mock = mock(IPath.class);
+        when(mock.toString()).thenReturn(path);
+        return mock;
+    }
 
 }

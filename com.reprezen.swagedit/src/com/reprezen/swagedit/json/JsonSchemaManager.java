@@ -30,97 +30,97 @@ import io.swagger.util.Json;
 
 public class JsonSchemaManager {
 
-	private final JsonSchemaFactory factory = JsonSchemaFactory.byDefault();
-	private final ObjectMapper mapper = Json.mapper();
-	private static final Map<String, JSONSchema> schemas = new ConcurrentHashMap<>();
+    private final JsonSchemaFactory factory = JsonSchemaFactory.byDefault();
+    private final ObjectMapper mapper = Json.mapper();
+    private static final Map<String, JSONSchema> schemas = new ConcurrentHashMap<>();
 
-	/**
-	 * Returns swagger 2.0 schema
-	 * 
-	 * @return swagger schema.
-	 */
-	public JSONSchema getSwaggerSchema() {
-		return getSchema("swagger");
-	}
+    /**
+     * Returns swagger 2.0 schema
+     * 
+     * @return swagger schema.
+     */
+    public JSONSchema getSwaggerSchema() {
+        return getSchema("swagger");
+    }
 
-	public URI getSwaggerUri() {
-		URL url = getClass().getResource("schema.json");
-		try {
-			return url.toURI();
-		} catch (NullPointerException | URISyntaxException e) {
-			return null;
-		}
-	}
+    public URI getSwaggerUri() {
+        URL url = getClass().getResource("schema.json");
+        try {
+            return url.toURI();
+        } catch (NullPointerException | URISyntaxException e) {
+            return null;
+        }
+    }
 
-	public JSONSchema getSchema(String url) {
-		if (Strings.emptyToNull(url) == null) {
-			return null;
-		}
+    public JSONSchema getSchema(String url) {
+        if (Strings.emptyToNull(url) == null) {
+            return null;
+        }
 
-		// remove fragment
-		if (url.contains("#")) {
-			url = url.substring(0, url.indexOf("#"));
-		}
+        // remove fragment
+        if (url.contains("#")) {
+            url = url.substring(0, url.indexOf("#"));
+        }
 
-		if (schemas.containsKey(url)) {
-			return schemas.get(url);
-		}
+        if (schemas.containsKey(url)) {
+            return schemas.get(url);
+        }
 
-		JSONSchema schema = null;
-		if (url.startsWith("http") || url.startsWith("https")) {
-			try {
-				schema = new JSONSchema(readTree(new URL(url)));
-			} catch (IOException e) {
-				YEditLog.logException(e);
-				return null;
-			}
-		} else if (url.equals("swagger")) {
-			try {
-				schema = new JSONSchema(readTree(getClass().getResourceAsStream("schema.json")));
-			} catch (IOException e) {
-				YEditLog.logException(e);
-				return null;
-			}
-		}
+        JSONSchema schema = null;
+        if (url.startsWith("http") || url.startsWith("https")) {
+            try {
+                schema = new JSONSchema(readTree(new URL(url)));
+            } catch (IOException e) {
+                YEditLog.logException(e);
+                return null;
+            }
+        } else if (url.equals("swagger")) {
+            try {
+                schema = new JSONSchema(readTree(getClass().getResourceAsStream("schema.json")));
+            } catch (IOException e) {
+                YEditLog.logException(e);
+                return null;
+            }
+        }
 
-		if (schema != null) {
-			schemas.put(url, schema);
-		}
+        if (schema != null) {
+            schemas.put(url, schema);
+        }
 
-		return schema;
-	}
+        return schema;
+    }
 
-	private JsonNode readTree(InputStream inputStream) throws IOException {
-		return mapper.readTree(inputStream);
-	}
+    private JsonNode readTree(InputStream inputStream) throws IOException {
+        return mapper.readTree(inputStream);
+    }
 
-	private JsonNode readTree(URL url) throws IOException {
-		return mapper.readTree(url);
-	}
+    private JsonNode readTree(URL url) throws IOException {
+        return mapper.readTree(url);
+    }
 
-	public class JSONSchema {
-		private final JsonNode content;
-		private com.github.fge.jsonschema.main.JsonSchema schema;
+    public class JSONSchema {
+        private final JsonNode content;
+        private com.github.fge.jsonschema.main.JsonSchema schema;
 
-		JSONSchema(JsonNode content) {
-			this.content = content;
-		}
+        JSONSchema(JsonNode content) {
+            this.content = content;
+        }
 
-		public JsonNode asJson() {
-			return content;
-		}
+        public JsonNode asJson() {
+            return content;
+        }
 
-		public com.github.fge.jsonschema.main.JsonSchema getSchema() {
-			if (schema == null && content != null) {
-				try {
-					schema = factory.getJsonSchema(content);
-				} catch (ProcessingException e) {
-					YEditLog.logException(e);
-				}
-			}
-			return schema;
-		}
+        public com.github.fge.jsonschema.main.JsonSchema getSchema() {
+            if (schema == null && content != null) {
+                try {
+                    schema = factory.getJsonSchema(content);
+                } catch (ProcessingException e) {
+                    YEditLog.logException(e);
+                }
+            }
+            return schema;
+        }
 
-	}
+    }
 
 }

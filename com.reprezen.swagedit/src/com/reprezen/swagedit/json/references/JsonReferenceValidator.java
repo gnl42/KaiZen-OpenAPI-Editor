@@ -27,64 +27,56 @@ import com.reprezen.swagedit.validation.SwaggerError;
  */
 public class JsonReferenceValidator {
 
-	private final JsonReferenceCollector collector;
+    private final JsonReferenceCollector collector;
 
-	public JsonReferenceValidator(JsonReferenceFactory factory) {
-		this.collector = new JsonReferenceCollector(factory);
-	}
+    public JsonReferenceValidator(JsonReferenceFactory factory) {
+        this.collector = new JsonReferenceCollector(factory);
+    }
 
-	/**
-	 * Returns a collection containing all errors being invalid JSON references 
-	 * present in the JSON document.
-	 * 
-	 * @param baseURI
-	 * @param document
-	 * @return collection of errors
-	 */
-	public Collection<? extends SwaggerError> validate(URI baseURI, JsonNode document) {
-		return doValidate(baseURI, collector.collect(document));
-	}
+    /**
+     * Returns a collection containing all errors being invalid JSON references present in the JSON document.
+     * 
+     * @param baseURI
+     * @param document
+     * @return collection of errors
+     */
+    public Collection<? extends SwaggerError> validate(URI baseURI, JsonNode document) {
+        return doValidate(baseURI, collector.collect(document));
+    }
 
-	/**
-	 * Returns a collection containing all errors being invalid JSON references 
-	 * present in the YAML document. 
-	 * 
-	 * @param baseURI
-	 * @param document
-	 * @return collection of errors
-	 */
-	public Collection<? extends SwaggerError> validate(URI baseURI, Node document) {
-		return doValidate(baseURI, collector.collect(document));
-	}
+    /**
+     * Returns a collection containing all errors being invalid JSON references present in the YAML document.
+     * 
+     * @param baseURI
+     * @param document
+     * @return collection of errors
+     */
+    public Collection<? extends SwaggerError> validate(URI baseURI, Node document) {
+        return doValidate(baseURI, collector.collect(document));
+    }
 
-	protected Collection<? extends SwaggerError> doValidate(URI baseURI, Iterable<JsonReference> references) {
-		Set<SwaggerError> errors = Sets.newHashSet();
-		for (JsonReference reference: references) {
-			if (reference.isInvalid()) {
-				errors.add(createReferenceError(
-						IMarker.SEVERITY_ERROR, 
-						Messages.error_invalid_reference, 
-						reference));
-			} else if (reference.isMissing(baseURI)) {
-				errors.add(createReferenceError(
-						IMarker.SEVERITY_WARNING, 
-						Messages.error_missing_reference, 
-						reference));
-			}
-		}
-		return errors;
-	}
+    protected Collection<? extends SwaggerError> doValidate(URI baseURI, Iterable<JsonReference> references) {
+        Set<SwaggerError> errors = Sets.newHashSet();
+        for (JsonReference reference : references) {
+            if (reference.isInvalid()) {
+                errors.add(createReferenceError(IMarker.SEVERITY_ERROR, Messages.error_invalid_reference, reference));
+            } else if (reference.isMissing(baseURI)) {
+                errors.add(createReferenceError(IMarker.SEVERITY_WARNING, Messages.error_missing_reference, reference));
+            }
+        }
+        return errors;
+    }
 
-	protected SwaggerError createReferenceError(int severity, String message, JsonReference reference) {
-		Object source = reference.getSource();
-		int line;
-		if (source instanceof Node) {
-			line = ((Node) source).getStartMark().getLine() + 1;
-		} else {
-			line = 1;
-		}
+    protected SwaggerError createReferenceError(int severity, String message, JsonReference reference) {
+        Object source = reference.getSource();
+        int line;
+        if (source instanceof Node) {
+            line = ((Node) source).getStartMark().getLine() + 1;
+        } else {
+            line = 1;
+        }
 
-		return new SwaggerError(line, severity, message);
-	}
+        return new SwaggerError(line, severity, message);
+    }
 
 }

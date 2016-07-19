@@ -14,28 +14,29 @@ import org.eclipse.osgi.util.NLS;
 
 public class Messages extends NLS {
 
-	private static final String BUNDLE_NAME = "com.reprezen.swagedit.messages";
+    private static final String BUNDLE_NAME = "com.reprezen.swagedit.messages";
 
-	// UI
-	public static String swagedit_wizard_title;
-	public static String swagedit_wizard_description;
-	public static String content_assist_proposal_local;
-	public static String content_assist_proposal_project;
-	public static String content_assist_proposal_workspace;
+    // UI
+    public static String swagedit_wizard_title;
+    public static String swagedit_wizard_description;
+    public static String content_assist_proposal_local;
+    public static String content_assist_proposal_project;
+    public static String content_assist_proposal_workspace;
 
-	// errors
-	public static String error_typeNoMatch;
-	public static String error_notInEnum;
-	public static String error_additional_properties_not_allowed;
-	public static String error_required_properties;
-	public static String error_duplicate_keys;
-	public static String error_cannot_read_content;
-	public static String error_missing_reference;
-	public static String error_invalid_reference;
+    // errors
+    public static String error_typeNoMatch;
+    public static String error_notInEnum;
+    public static String error_additional_properties_not_allowed;
+    public static String error_required_properties;
+    public static String error_duplicate_keys;
+    public static String error_cannot_read_content;
+    public static String error_missing_reference;
+    public static String error_invalid_reference;
 
-	static {
-		NLS.initializeMessages(BUNDLE_NAME, Messages.class);
-	}
+    static {
+        NLS.initializeMessages(BUNDLE_NAME, Messages.class);
+    }
 
-	private Messages() {}
+    private Messages() {
+    }
 }

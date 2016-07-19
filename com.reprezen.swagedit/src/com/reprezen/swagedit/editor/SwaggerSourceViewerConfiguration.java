@@ -29,66 +29,62 @@ import com.reprezen.swagedit.editor.hyperlinks.PathParamHyperlinkDetector;
 
 public class SwaggerSourceViewerConfiguration extends YEditSourceViewerConfiguration {
 
-	private SwaggerEditor editor;
-	private YAMLScanner scanner;
+    private SwaggerEditor editor;
+    private YAMLScanner scanner;
 
-	public SwaggerSourceViewerConfiguration() {
-		super();
-	}
+    public SwaggerSourceViewerConfiguration() {
+        super();
+    }
 
-	@Override
-	public IContentAssistant getContentAssistant(ISourceViewer sourceViewer) {
-		ContentAssistant ca = new ContentAssistant();
-		SwaggerContentAssistProcessor processor = new SwaggerContentAssistProcessor(ca);
+    @Override
+    public IContentAssistant getContentAssistant(ISourceViewer sourceViewer) {
+        ContentAssistant ca = new ContentAssistant();
+        SwaggerContentAssistProcessor processor = new SwaggerContentAssistProcessor(ca);
 
-		ca.setContentAssistProcessor(processor, IDocument.DEFAULT_CONTENT_TYPE);
-		ca.setInformationControlCreator(getInformationControlCreator(sourceViewer));
+        ca.setContentAssistProcessor(processor, IDocument.DEFAULT_CONTENT_TYPE);
+        ca.setInformationControlCreator(getInformationControlCreator(sourceViewer));
 
-		ca.enableAutoInsert(false);
-		ca.enableAutoActivation(true);
-		ca.setAutoActivationDelay(100);
-		ca.enableColoredLabels(true);
-		ca.setShowEmptyList(true);
-		ca.setRepeatedInvocationMode(true);
-		ca.addCompletionListener(processor);
-		ca.setStatusLineVisible(true);
+        ca.enableAutoInsert(false);
+        ca.enableAutoActivation(true);
+        ca.setAutoActivationDelay(100);
+        ca.enableColoredLabels(true);
+        ca.setShowEmptyList(true);
+        ca.setRepeatedInvocationMode(true);
+        ca.addCompletionListener(processor);
+        ca.setStatusLineVisible(true);
 
-		return ca;
-	}
+        return ca;
+    }
 
-	@Override
-	protected YAMLScanner getScanner() {
-		if (scanner == null) {
-			scanner = new SwaggerScanner(colorManager, Activator.getDefault().getPreferenceStore());
-		}
-		return scanner;
-	}
+    @Override
+    protected YAMLScanner getScanner() {
+        if (scanner == null) {
+            scanner = new SwaggerScanner(colorManager, Activator.getDefault().getPreferenceStore());
+        }
+        return scanner;
+    }
 
-	@Override
-	public String[] getConfiguredContentTypes(ISourceViewer sourceViewer) {
-		return new String[] { IDocument.DEFAULT_CONTENT_TYPE };
-	}
+    @Override
+    public String[] getConfiguredContentTypes(ISourceViewer sourceViewer) {
+        return new String[] { IDocument.DEFAULT_CONTENT_TYPE };
+    }
 
-	@Override
-	public IReconciler getReconciler(ISourceViewer sourceViewer) {
-		SwaggerReconcilingStrategy strategy = new SwaggerReconcilingStrategy();
-		strategy.setEditor(editor);
-		MonoReconciler reconciler = new MonoReconciler(strategy, false);
-		return reconciler;
-	}
+    @Override
+    public IReconciler getReconciler(ISourceViewer sourceViewer) {
+        SwaggerReconcilingStrategy strategy = new SwaggerReconcilingStrategy();
+        strategy.setEditor(editor);
+        MonoReconciler reconciler = new MonoReconciler(strategy, false);
+        return reconciler;
+    }
 
-	@Override
-	public IHyperlinkDetector[] getHyperlinkDetectors(ISourceViewer sourceViewer) {
-		return new IHyperlinkDetector[] { 
-			new URLHyperlinkDetector(), 
-			new JsonReferenceHyperlinkDetector(),
-			new PathParamHyperlinkDetector(),
-			new DefinitionHyperlinkDetector()
-		};
-	}
+    @Override
+    public IHyperlinkDetector[] getHyperlinkDetectors(ISourceViewer sourceViewer) {
+        return new IHyperlinkDetector[] { new URLHyperlinkDetector(), new JsonReferenceHyperlinkDetector(),
+                new PathParamHyperlinkDetector(), new DefinitionHyperlinkDetector() };
+    }
 
-	public void setEditor(SwaggerEditor editor) {
-		this.editor = editor;
-	}
+    public void setEditor(SwaggerEditor editor) {
+        this.editor = editor;
+    }
 
 }

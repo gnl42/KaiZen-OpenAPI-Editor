@@ -25,51 +25,51 @@ import com.reprezen.swagedit.editor.SwaggerEditor;
 
 public class SwagEditNewWizard extends Wizard implements INewWizard {
 
-	private SwagEditNewWizardPage page;
-	private IStructuredSelection selection;
+    private SwagEditNewWizardPage page;
+    private IStructuredSelection selection;
 
-	/**
-	 * Constructor for SampleNewWizard.
-	 */
-	public SwagEditNewWizard() {
-		super();
-		setNeedsProgressMonitor(true);
-	}
+    /**
+     * Constructor for SampleNewWizard.
+     */
+    public SwagEditNewWizard() {
+        super();
+        setNeedsProgressMonitor(true);
+    }
 
-	/**
-	 * Adding the page to the wizard.
-	 */
-	public void addPages() {
-		page = new SwagEditNewWizardPage(selection);
-		addPage(page);
-	}
+    /**
+     * Adding the page to the wizard.
+     */
+    public void addPages() {
+        page = new SwagEditNewWizardPage(selection);
+        addPage(page);
+    }
 
-	@Override
-	public boolean performFinish() {
-		final IFile file = page.createNewFile();
-		if (file == null || !file.exists()) {
-			return false;
-		}
+    @Override
+    public boolean performFinish() {
+        final IFile file = page.createNewFile();
+        if (file == null || !file.exists()) {
+            return false;
+        }
 
-		getShell().getDisplay().asyncExec(new Runnable() {
-			public void run() {
-				IWorkbenchPage page = PlatformUI.getWorkbench().getActiveWorkbenchWindow().getActivePage();
-				try {
-					IDE.openEditor(page, file, SwaggerEditor.ID);
-				} catch (PartInitException e) {}
-			}
-		});
+        getShell().getDisplay().asyncExec(new Runnable() {
+            public void run() {
+                IWorkbenchPage page = PlatformUI.getWorkbench().getActiveWorkbenchWindow().getActivePage();
+                try {
+                    IDE.openEditor(page, file, SwaggerEditor.ID);
+                } catch (PartInitException e) {
+                }
+            }
+        });
 
-		return true;
-	}
+        return true;
+    }
 
-	/**
-	 * We will accept the selection in the workbench to see if we can initialize
-	 * from it.
-	 * 
-	 * @see IWorkbenchWizard#init(IWorkbench, IStructuredSelection)
-	 */
-	public void init(IWorkbench workbench, IStructuredSelection selection) {
-		this.selection = selection;
-	}
+    /**
+     * We will accept the selection in the workbench to see if we can initialize from it.
+     * 
+     * @see IWorkbenchWizard#init(IWorkbench, IStructuredSelection)
+     */
+    public void init(IWorkbench workbench, IStructuredSelection selection) {
+        this.selection = selection;
+    }
 }

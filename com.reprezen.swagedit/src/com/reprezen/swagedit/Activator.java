@@ -32,105 +32,99 @@ import com.reprezen.swagedit.templates.SwaggerContextType;
 
 public class Activator extends AbstractUIPlugin {
 
-	public static final String PLUGIN_ID = "com.reprezen.swagedit";
-	public static final String TEMPLATE_STORE_ID = PLUGIN_ID + ".templates";
+    public static final String PLUGIN_ID = "com.reprezen.swagedit";
+    public static final String TEMPLATE_STORE_ID = PLUGIN_ID + ".templates";
 
-	private static Activator plugin;
+    private static Activator plugin;
 
-	private ContributionTemplateStore templateStore;
+    private ContributionTemplateStore templateStore;
 
-	private ContributionContextTypeRegistry contextTypeRegistry;
+    private ContributionContextTypeRegistry contextTypeRegistry;
 
-	/**
-	 * Bundle icons
-	 * 
-	 * Enumeration of images that are registered in this bundle image registry
-	 * at startup.
-	 * 
-	 */
-	public enum Icons {
-		assist_item, 
-		template_item
-	}
+    /**
+     * Bundle icons
+     * 
+     * Enumeration of images that are registered in this bundle image registry at startup.
+     * 
+     */
+    public enum Icons {
+        assist_item, template_item
+    }
 
-	/*
-	 * (non-Javadoc)
-	 * 
-	 * @see org.eclipse.ui.plugin.AbstractUIPlugin#start(org.osgi.framework.
-	 * BundleContext)
-	 */
-	public void start(BundleContext context) throws Exception {
-		super.start(context);
-		plugin = this;
+    /*
+     * (non-Javadoc)
+     * 
+     * @see org.eclipse.ui.plugin.AbstractUIPlugin#start(org.osgi.framework. BundleContext)
+     */
+    public void start(BundleContext context) throws Exception {
+        super.start(context);
+        plugin = this;
 
-		if (Display.getCurrent() != null && PlatformUI.isWorkbenchRunning()) {
-			Bundle bundle = Platform.getBundle(PLUGIN_ID);
-			getImageRegistry().put(Icons.assist_item.name(), 
-					getImageDescriptor(bundle, "icons/assist_item_16.png"));
-			getImageRegistry().put(Icons.template_item.name(),
-					getImageDescriptor(bundle, "icons/template_item_16.png"));
-		}
-	}
+        if (Display.getCurrent() != null && PlatformUI.isWorkbenchRunning()) {
+            Bundle bundle = Platform.getBundle(PLUGIN_ID);
+            getImageRegistry().put(Icons.assist_item.name(), getImageDescriptor(bundle, "icons/assist_item_16.png"));
+            getImageRegistry()
+                    .put(Icons.template_item.name(), getImageDescriptor(bundle, "icons/template_item_16.png"));
+        }
+    }
 
-	/**
-	 * Returns image present in this bundle image registry under 
-	 * the icon's name.
-	 * 
-	 * @param icon
-	 * @return image
-	 */
-	public Image getImage(Icons icon) {
-		return getImageRegistry().get(icon.name());
-	}
+    /**
+     * Returns image present in this bundle image registry under the icon's name.
+     * 
+     * @param icon
+     * @return image
+     */
+    public Image getImage(Icons icon) {
+        return getImageRegistry().get(icon.name());
+    }
 
-	private ImageDescriptor getImageDescriptor(Bundle bundle, String pathName) {
-		Path path = new Path(pathName);
-		return ImageDescriptor.createFromURL(FileLocator.find(bundle, path, null));
-	}
+    private ImageDescriptor getImageDescriptor(Bundle bundle, String pathName) {
+        Path path = new Path(pathName);
+        return ImageDescriptor.createFromURL(FileLocator.find(bundle, path, null));
+    }
 
-	/*
-	 * (non-Javadoc)
-	 * 
-	 * @see org.eclipse.ui.plugin.AbstractUIPlugin#stop(org.osgi.framework.
-	 * BundleContext)
-	 */
-	public void stop(BundleContext context) throws Exception {
-		plugin = null;
-		super.stop(context);
-	}
+    /*
+     * (non-Javadoc)
+     * 
+     * @see org.eclipse.ui.plugin.AbstractUIPlugin#stop(org.osgi.framework. BundleContext)
+     */
+    public void stop(BundleContext context) throws Exception {
+        plugin = null;
+        super.stop(context);
+    }
 
-	/**
-	 * Returns the shared instance
-	 *
-	 * @return the shared instance
-	 */
-	public static Activator getDefault() {
-		return plugin;
-	}
+    /**
+     * Returns the shared instance
+     * 
+     * @return the shared instance
+     */
+    public static Activator getDefault() {
+        return plugin;
+    }
 
-	public TemplateStore getTemplateStore() {
-		if (templateStore == null) {
-			templateStore = new ContributionTemplateStore(getContextTypeRegistry(), getDefault().getPreferenceStore(),
-					TEMPLATE_STORE_ID);
+    public TemplateStore getTemplateStore() {
+        if (templateStore == null) {
+            templateStore = new ContributionTemplateStore(getContextTypeRegistry(), getDefault().getPreferenceStore(),
+                    TEMPLATE_STORE_ID);
 
-			try {
-				templateStore.load();
-			} catch (IOException e) {
-				
-				YEditLog.logException(e);
-			}
-		}
-		return templateStore;
-	}
+            try {
+                templateStore.load();
+            } catch (IOException e) {
 
-	public ContextTypeRegistry getContextTypeRegistry() {
-		if (contextTypeRegistry == null) {
-			contextTypeRegistry = new ContributionContextTypeRegistry();
-			for (String contextType : SwaggerContextType.allContextTypes()) {
-				contextTypeRegistry.addContextType(contextType);
-			}
-		}
-		return contextTypeRegistry;
-	}
+                YEditLog.logException(e);
+            }
+        }
+        return templateStore;
+    }
+
+    public ContextTypeRegistry getContextTypeRegistry() {
+        if (contextTypeRegistry == null) {
+            contextTypeRegistry = new ContributionContextTypeRegistry();
+            for (String contextType : SwaggerContextType.allContextTypes()) {
+                contextTypeRegistry.addContextType(contextType);
+            }
+        }
+        return contextTypeRegistry;
+    }
 
 }

@@ -23,131 +23,130 @@ import com.reprezen.swagedit.editor.SwaggerDocument;
 
 public abstract class AbstractSwaggerHyperlinkDetector extends AbstractHyperlinkDetector {
 
-	/**
-	 * Contains details about potential hyperlinks inside a Swagger document.
-	 */
-	protected static class HyperlinkInfo {
+    /**
+     * Contains details about potential hyperlinks inside a Swagger document.
+     */
+    protected static class HyperlinkInfo {
 
-		public final IRegion region;
-		public final String text;
-		public final int column;
+        public final IRegion region;
+        public final String text;
+        public final int column;
 
-		HyperlinkInfo(IRegion region, String text, int column) {
-			this.region = region;
-			this.text = text;
-			this.column = column;
-		}
+        HyperlinkInfo(IRegion region, String text, int column) {
+            this.region = region;
+            this.text = text;
+            this.column = column;
+        }
 
-		public int getOffset() {
-			return region.getOffset();
-		}
+        public int getOffset() {
+            return region.getOffset();
+        }
 
-		public int getLength() {
-			return region.getLength();
-		}
+        public int getLength() {
+            return region.getLength();
+        }
 
-		public String getText() {
-			return text;
-		}
+        public String getText() {
+            return text;
+        }
 
-		public String getUnquotedText() {
-			return text.replaceAll("'|\"", "");
-		}
-	}
+        public String getUnquotedText() {
+            return text.replaceAll("'|\"", "");
+        }
+    }
 
-	@Override
-	public IHyperlink[] detectHyperlinks(ITextViewer textViewer, IRegion region, boolean canShowMultipleHyperlinks) {
-		SwaggerDocument document = (SwaggerDocument) textViewer.getDocument();
+    @Override
+    public IHyperlink[] detectHyperlinks(ITextViewer textViewer, IRegion region, boolean canShowMultipleHyperlinks) {
+        SwaggerDocument document = (SwaggerDocument) textViewer.getDocument();
 
-		String basePath = document.getPath(region);
-		if (!canDetect(basePath)) {
-			return null;
-		}
+        String basePath = document.getPath(region);
+        if (!canDetect(basePath)) {
+            return null;
+        }
 
-		HyperlinkInfo info = getHyperlinkInfo(textViewer, region);
-		if (info == null) {
-			return null;
-		}
+        HyperlinkInfo info = getHyperlinkInfo(textViewer, region);
+        if (info == null) {
+            return null;
+        }
 
-		return doDetect(document, textViewer, info, basePath);
-	}
+        return doDetect(document, textViewer, info, basePath);
+    }
 
-	protected abstract boolean canDetect(String basePath);
+    protected abstract boolean canDetect(String basePath);
 
-	protected abstract IHyperlink[] doDetect(SwaggerDocument doc, ITextViewer viewer, HyperlinkInfo info,
-			String basePath);
+    protected abstract IHyperlink[] doDetect(SwaggerDocument doc, ITextViewer viewer, HyperlinkInfo info,
+            String basePath);
 
-	protected HyperlinkInfo getHyperlinkInfo(ITextViewer viewer, IRegion region) {
-		final SwaggerDocument document = (SwaggerDocument) viewer.getDocument();
-		IRegion line;
-		try {
-			line = document.getLineInformationOfOffset(region.getOffset());
-		} catch (BadLocationException e) {
-			return null;
-		}
+    protected HyperlinkInfo getHyperlinkInfo(ITextViewer viewer, IRegion region) {
+        final SwaggerDocument document = (SwaggerDocument) viewer.getDocument();
+        IRegion line;
+        try {
+            line = document.getLineInformationOfOffset(region.getOffset());
+        } catch (BadLocationException e) {
+            return null;
+        }
 
-		String lineContent;
-		try {
-			lineContent = document.get(line.getOffset(), line.getLength());
-		} catch (BadLocationException e) {
-			return null;
-		}
+        String lineContent;
+        try {
+            lineContent = document.get(line.getOffset(), line.getLength());
+        } catch (BadLocationException e) {
+            return null;
+        }
 
-		if (lineContent == null || emptyToNull(lineContent) == null) {
-			return null;
-		}
+        if (lineContent == null || emptyToNull(lineContent) == null) {
+            return null;
+        }
 
-		final int column = region.getOffset() - line.getOffset();
-		final IRegion selected = getSelectedRegion(line, lineContent, column);
-		String text;
-		try {
-			text = document.get(selected.getOffset(), selected.getLength());
-		} catch (BadLocationException e) {
-			return null;
-		}
+        final int column = region.getOffset() - line.getOffset();
+        final IRegion selected = getSelectedRegion(line, lineContent, column);
+        String text;
+        try {
+            text = document.get(selected.getOffset(), selected.getLength());
+        } catch (BadLocationException e) {
+            return null;
+        }
 
-		if (emptyToNull(text) == null) {
-			return null;
-		}
+        if (emptyToNull(text) == null) {
+            return null;
+        }
 
-		return new HyperlinkInfo(selected, text, column);
-	}
+        return new HyperlinkInfo(selected, text, column);
+    }
 
-	/**
-	 * Returns the region containing the word selected or under the user's
-	 * cursor.
-	 * 
-	 * @param region
-	 * @param content
-	 * @param column
-	 * @return Region
-	 */
-	protected Region getSelectedRegion(IRegion region, String content, int column) {
-		// find next space or if not
-		// after position is end of content.
-		int end = content.indexOf(" ", column);
-		if (end == -1) {
-			end = content.length();
-		}
+    /**
+     * Returns the region containing the word selected or under the user's cursor.
+     * 
+     * @param region
+     * @param content
+     * @param column
+     * @return Region
+     */
+    protected Region getSelectedRegion(IRegion region, String content, int column) {
+        // find next space or if not
+        // after position is end of content.
+        int end = content.indexOf(" ", column);
+        if (end == -1) {
+            end = content.length();
+        }
 
-		// find previous space
-		// if not, start is 0.
-		int start = 0;
-		int idx = 0;
-		do {
-			idx = content.indexOf(" ", idx);
-			if (idx != -1) {
-				idx++;
-				if (column >= idx) {
-					start = idx;
-				}
-			}
-		} while (start < column && idx != -1);
+        // find previous space
+        // if not, start is 0.
+        int start = 0;
+        int idx = 0;
+        do {
+            idx = content.indexOf(" ", idx);
+            if (idx != -1) {
+                idx++;
+                if (column >= idx) {
+                    start = idx;
+                }
+            }
+        } while (start < column && idx != -1);
 
-		int offset = region.getOffset() + start;
-		int length = end - start;
+        int offset = region.getOffset() + start;
+        int length = end - start;
 
-		return new Region(offset, length);
-	}
+        return new Region(offset, length);
+    }
 
 }

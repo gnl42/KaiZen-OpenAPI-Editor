@@ -26,31 +26,31 @@ import com.fasterxml.jackson.databind.ObjectMapper;
 
 public class ErrorProcessorTest {
 
-	private ErrorProcessor processor;
-	private ObjectMapper mapper = new ObjectMapper();
+    private ErrorProcessor processor;
+    private ObjectMapper mapper = new ObjectMapper();
 
-	@Before
-	public void setUp() {
-		Node document = null;
-		processor = new ErrorProcessor(document);
-	}
+    @Before
+    public void setUp() {
+        Node document = null;
+        processor = new ErrorProcessor(document);
+    }
 
-	@Test
-	public void testProcessNode_WithSingleError() throws Exception {
-		JsonNode fixture = mapper.readTree(Paths.get("resources", "error-1.json").toFile());
-		Set<SwaggerError> errors = processor.processMessageNode(fixture);
+    @Test
+    public void testProcessNode_WithSingleError() throws Exception {
+        JsonNode fixture = mapper.readTree(Paths.get("resources", "error-1.json").toFile());
+        Set<SwaggerError> errors = processor.processMessageNode(fixture);
 
-		assertEquals(1, errors.size());
-		assertTrue(getOnlyElement(errors) instanceof SwaggerError);
-	}
+        assertEquals(1, errors.size());
+        assertTrue(getOnlyElement(errors) instanceof SwaggerError);
+    }
 
-	@Test
-	public void testProcessNode_WithOneOfError() throws Exception {
-		JsonNode fixture = mapper.readTree(Paths.get("resources", "error-2.json").toFile());
-		Set<SwaggerError> errors = processor.processMessageNode(fixture);
+    @Test
+    public void testProcessNode_WithOneOfError() throws Exception {
+        JsonNode fixture = mapper.readTree(Paths.get("resources", "error-2.json").toFile());
+        Set<SwaggerError> errors = processor.processMessageNode(fixture);
 
-		assertEquals(1, errors.size());
-		assertTrue(getOnlyElement(errors) instanceof SwaggerError.MultipleSwaggerError);
-	}
+        assertEquals(1, errors.size());
+        assertTrue(getOnlyElement(errors) instanceof SwaggerError.MultipleSwaggerError);
+    }
 
 }

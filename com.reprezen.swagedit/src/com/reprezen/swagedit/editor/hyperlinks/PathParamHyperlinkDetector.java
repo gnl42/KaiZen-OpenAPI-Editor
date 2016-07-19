@@ -33,88 +33,88 @@ import io.swagger.models.HttpMethod;
 
 /**
  * Hyperlink detector that detects links from path parameters.
- *
+ * 
  */
 public class PathParamHyperlinkDetector extends AbstractSwaggerHyperlinkDetector {
 
-	protected static final Pattern PARAMETER_PATTERN = Pattern.compile("\\{(\\w+)\\}");
+    protected static final Pattern PARAMETER_PATTERN = Pattern.compile("\\{(\\w+)\\}");
 
-	@Override
-	protected boolean canDetect(String basePath) {
-		return emptyToNull(basePath) != null && basePath.startsWith(":paths:");
-	}
+    @Override
+    protected boolean canDetect(String basePath) {
+        return emptyToNull(basePath) != null && basePath.startsWith(":paths:");
+    }
 
-	@Override
-	protected IHyperlink[] doDetect(SwaggerDocument doc, ITextViewer viewer, HyperlinkInfo info, String basePath) {
-		// find selected parameter
-		Matcher matcher = PARAMETER_PATTERN.matcher(info.text);
-		String parameter = null;
-		int start = 0, end = 0;
-		while (matcher.find() && parameter == null) {
-			if (matcher.start() <= info.column && matcher.end() >= info.column) {
-				parameter = matcher.group(1);
-				start = matcher.start();
-				end = matcher.end();
-			}
-		}
+    @Override
+    protected IHyperlink[] doDetect(SwaggerDocument doc, ITextViewer viewer, HyperlinkInfo info, String basePath) {
+        // find selected parameter
+        Matcher matcher = PARAMETER_PATTERN.matcher(info.text);
+        String parameter = null;
+        int start = 0, end = 0;
+        while (matcher.find() && parameter == null) {
+            if (matcher.start() <= info.column && matcher.end() >= info.column) {
+                parameter = matcher.group(1);
+                start = matcher.start();
+                end = matcher.end();
+            }
+        }
 
-		// no parameter found
-		if (emptyToNull(parameter) == null) {
-			return null;
-		}
+        // no parameter found
+        if (emptyToNull(parameter) == null) {
+            return null;
+        }
 
-		Iterable<String> targetPaths = findParameterPath(doc, basePath, parameter);
-		IRegion linkRegion = new Region(info.getOffset() + start, end - start);
+        Iterable<String> targetPaths = findParameterPath(doc, basePath, parameter);
+        IRegion linkRegion = new Region(info.getOffset() + start, end - start);
 
-		List<IHyperlink> links = new ArrayList<>();
-		for (String path : targetPaths) {
-			IRegion target = doc.getRegion(path);
-			if (target != null) {
-				links.add(new SwaggerHyperlink(parameter, viewer, linkRegion, target));
-			}
-		}
+        List<IHyperlink> links = new ArrayList<>();
+        for (String path : targetPaths) {
+            IRegion target = doc.getRegion(path);
+            if (target != null) {
+                links.add(new SwaggerHyperlink(parameter, viewer, linkRegion, target));
+            }
+        }
 
-		return links.isEmpty() ? null : links.toArray(new IHyperlink[links.size()]);
-	}
+        return links.isEmpty() ? null : links.toArray(new IHyperlink[links.size()]);
+    }
 
-	private Iterable<String> findParameterPath(SwaggerDocument doc, String basePath, String parameter) {
-		JsonNode parent = doc.getNodeForPath(basePath);
+    private Iterable<String> findParameterPath(SwaggerDocument doc, String basePath, String parameter) {
+        JsonNode parent = doc.getNodeForPath(basePath);
 
-		if (parent == null || !parent.isObject())
-			return Lists.newArrayList();
+        if (parent == null || !parent.isObject())
+            return Lists.newArrayList();
 
-		List<String> paths = new ArrayList<>();
-		for (HttpMethod method : HttpMethod.values()) {
-			String mName = method.name().toLowerCase();
-			JsonNode parameters = parent.at("/" + mName + "/parameters");
+        List<String> paths = new ArrayList<>();
+        for (HttpMethod method : HttpMethod.values()) {
+            String mName = method.name().toLowerCase();
+            JsonNode parameters = parent.at("/" + mName + "/parameters");
 
-			if (parameters != null && parameters.isArray()) {
+            if (parameters != null && parameters.isArray()) {
 
-				for (int i = 0; i < parameters.size(); i++) {
-					JsonNode current = parameters.get(i);
+                for (int i = 0; i < parameters.size(); i++) {
+                    JsonNode current = parameters.get(i);
 
-					if (JsonReference.isReference(current)) {
+                    if (JsonReference.isReference(current)) {
 
-						JsonPointer ptr = JsonUtil.getPointer(current);
-						JsonNode resolved = doc.asJson().at(ptr);
+                        JsonPointer ptr = JsonUtil.getPointer(current);
+                        JsonNode resolved = doc.asJson().at(ptr);
 
-						if (resolved != null && resolved.isObject() && resolved.has("name")) {
-							if (parameter.equals(resolved.get("name").asText())) {
-								paths.add(ptr.toString().replaceAll("/", ":"));
-							}
-						}
+                        if (resolved != null && resolved.isObject() && resolved.has("name")) {
+                            if (parameter.equals(resolved.get("name").asText())) {
+                                paths.add(ptr.toString().replaceAll("/", ":"));
+                            }
+                        }
 
-					} else if (current.isObject() && current.has("name")) {
+                    } else if (current.isObject() && current.has("name")) {
 
-						if (parameter.equals(current.get("name").asText())) {
-							paths.add(basePath + ":" + mName + ":parameters:@" + i);
-						}
-					}
-				}
-			}
-		}
+                        if (parameter.equals(current.get("name").asText())) {
+                            paths.add(basePath + ":" + mName + ":parameters:@" + i);
+                        }
+                    }
+                }
+            }
+        }
 
-		return paths;
-	}
+        return paths;
+    }
 
 }
