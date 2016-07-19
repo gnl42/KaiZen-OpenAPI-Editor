@@ -26,70 +26,67 @@ import com.reprezen.swagedit.editor.SwaggerDocument;
 
 public class SwaggerFileHyperlink implements IHyperlink {
 
-	private final IRegion linkRegion;
-	private final String label;
-	private final IFile file;
-	private final String pointer;
+    private final IRegion linkRegion;
+    private final String label;
+    private final IFile file;
+    private final String pointer;
 
-	public SwaggerFileHyperlink(IRegion linkRegion, String label, IFile file, String pointer) {
-		this.linkRegion = linkRegion;
-		this.label = label;
-		this.file = file;
-		this.pointer = pointer;
-	}
+    public SwaggerFileHyperlink(IRegion linkRegion, String label, IFile file, String pointer) {
+        this.linkRegion = linkRegion;
+        this.label = label;
+        this.file = file;
+        this.pointer = pointer;
+    }
 
-	@Override
-	public IRegion getHyperlinkRegion() {
-		return linkRegion;
-	}
+    @Override
+    public IRegion getHyperlinkRegion() {
+        return linkRegion;
+    }
 
-	@Override
-	public String getTypeLabel() {
-		return label;
-	}
+    @Override
+    public String getTypeLabel() {
+        return label;
+    }
 
-	@Override
-	public String getHyperlinkText() {
-		return label;
-	}
+    @Override
+    public String getHyperlinkText() {
+        return label;
+    }
 
-	@Override
-	public void open() {
-		if (file == null || !file.exists()) {
-			return;
-		}
+    @Override
+    public void open() {
+        if (file == null || !file.exists()) {
+            return;
+        }
 
-		try {
-			final IWorkbenchPage page = PlatformUI
-					.getWorkbench()
-					.getActiveWorkbenchWindow()
-					.getActivePage();
+        try {
+            final IWorkbenchPage page = PlatformUI.getWorkbench().getActiveWorkbenchWindow().getActivePage();
 
-			IEditorPart editor;
-			try {
-				editor = IDE.openEditor(page, file);
-			} catch(PartInitException e) {
-				return;
-			}
+            IEditorPart editor;
+            try {
+                editor = IDE.openEditor(page, file);
+            } catch (PartInitException e) {
+                return;
+            }
 
-			if (editor instanceof ITextEditor) {
-				IRegion region = getTarget();
-				if (region != null) {
-					((ITextEditor) editor).selectAndReveal(region.getOffset(), region.getLength());
-				}
-			}
-		} catch (ClassCastException | CoreException e) {
-			// TODO
-		}
-	}
+            if (editor instanceof ITextEditor) {
+                IRegion region = getTarget();
+                if (region != null) {
+                    ((ITextEditor) editor).selectAndReveal(region.getOffset(), region.getLength());
+                }
+            }
+        } catch (ClassCastException | CoreException e) {
+            // TODO
+        }
+    }
 
-	private IRegion getTarget() throws CoreException {
-		SwaggerDocument doc = DocumentUtils.getDocument(file.getLocation());
-		if (doc == null) {
-			return null;
-		}
+    private IRegion getTarget() throws CoreException {
+        SwaggerDocument doc = DocumentUtils.getDocument(file.getLocation());
+        if (doc == null) {
+            return null;
+        }
 
-		return doc.getRegion(pointer);
-	}
+        return doc.getRegion(pointer);
+    }
 
 }

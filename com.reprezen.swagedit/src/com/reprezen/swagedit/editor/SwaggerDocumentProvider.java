@@ -23,23 +23,23 @@ import com.reprezen.swagedit.Activator;
 
 public class SwaggerDocumentProvider extends FileDocumentProvider {
 
-	@Override
-	protected IDocument createDocument(Object element) throws CoreException {
-		IDocument document = super.createDocument(element);
-		if (document != null) {
-			SwaggerScanner scanner = new SwaggerScanner(new ColorManager(), Activator.getDefault().getPreferenceStore());
-			Set<String> tokens = YAMLToken.VALID_TOKENS.keySet();
-			FastPartitioner partitioner = new FastPartitioner(scanner, tokens.toArray(new String[tokens.size()]));
-			document.setDocumentPartitioner(partitioner);
-			partitioner.connect(document);
-		}
+    @Override
+    protected IDocument createDocument(Object element) throws CoreException {
+        IDocument document = super.createDocument(element);
+        if (document != null) {
+            SwaggerScanner scanner = new SwaggerScanner(new ColorManager(), Activator.getDefault().getPreferenceStore());
+            Set<String> tokens = YAMLToken.VALID_TOKENS.keySet();
+            FastPartitioner partitioner = new FastPartitioner(scanner, tokens.toArray(new String[tokens.size()]));
+            document.setDocumentPartitioner(partitioner);
+            partitioner.connect(document);
+        }
 
-		return document;
-	}
+        return document;
+    }
 
-	@Override
-	protected IDocument createEmptyDocument() {
-		return new SwaggerDocument();
-	}
+    @Override
+    protected IDocument createEmptyDocument() {
+        return new SwaggerDocument();
+    }
 
 }

@@ -17,15 +17,12 @@ import org.eclipse.jface.text.templates.TemplateException;
 import org.eclipse.jface.text.templates.TemplateTranslator;
 
 /**
- * Modification of
- * {@link org.eclipse.xtext.ui.editor.templates.XtextTemplateContext} with
- * removed Xtext dependencies ({@link org.eclipse.xtext.scoping.IScopeProvider}
- * and {@link org.eclipse.xtext.ui.editor.contentassist.ContentAssistContext})
+ * Modification of {@link org.eclipse.xtext.ui.editor.templates.XtextTemplateContext} with removed Xtext dependencies (
+ * {@link org.eclipse.xtext.scoping.IScopeProvider} and
+ * {@link org.eclipse.xtext.ui.editor.contentassist.ContentAssistContext}) <br/>
  * <br/>
- * <br/>
- * Represents an extended version of class {@link DocumentTemplateContext} to
- * provide additional Xtext related information and services for resolving a
- * <code>Template</code>. Furthermore it fixes the indentation of the applied
+ * Represents an extended version of class {@link DocumentTemplateContext} to provide additional Xtext related
+ * information and services for resolving a <code>Template</code>. Furthermore it fixes the indentation of the applied
  * template.
  * 
  * @author Michael Clay - Initial contribution and API
@@ -33,88 +30,88 @@ import org.eclipse.jface.text.templates.TemplateTranslator;
  */
 public class SwaggerTemplateContext extends DocumentTemplateContext {
 
-	public SwaggerTemplateContext(DocumentTemplateContext context) {
-		super(context.getContextType(), context.getDocument(), context.getCompletionOffset(),
-				context.getCompletionLength());
-	}
+    public SwaggerTemplateContext(DocumentTemplateContext context) {
+        super(context.getContextType(), context.getDocument(), context.getCompletionOffset(), context
+                .getCompletionLength());
+    }
 
-	// Unmodified code from
-	// org.eclipse.xtext.ui.editor.templates.XtextTemplateContext below
+    // Unmodified code from
+    // org.eclipse.xtext.ui.editor.templates.XtextTemplateContext below
 
-	@Override
-	public TemplateBuffer evaluate(Template template) throws BadLocationException, TemplateException {
-		if (!canEvaluate(template))
-			return null;
+    @Override
+    public TemplateBuffer evaluate(Template template) throws BadLocationException, TemplateException {
+        if (!canEvaluate(template))
+            return null;
 
-		TemplateTranslator translator = createTemplateTranslator();
-		TemplateBuffer buffer = translator.translate(template);
+        TemplateTranslator translator = createTemplateTranslator();
+        TemplateBuffer buffer = translator.translate(template);
 
-		getContextType().resolve(buffer, this);
+        getContextType().resolve(buffer, this);
 
-		return buffer;
-	}
+        return buffer;
+    }
 
-	/**
-	 * @since 2.3
-	 */
-	public TemplateBuffer evaluateForDisplay(Template template) throws BadLocationException, TemplateException {
-		if (!canEvaluate(template))
-			return null;
+    /**
+     * @since 2.3
+     */
+    public TemplateBuffer evaluateForDisplay(Template template) throws BadLocationException, TemplateException {
+        if (!canEvaluate(template))
+            return null;
 
-		TemplateTranslator translator = new TemplateTranslator();
-		TemplateBuffer buffer = translator.translate(template);
+        TemplateTranslator translator = new TemplateTranslator();
+        TemplateBuffer buffer = translator.translate(template);
 
-		getContextType().resolve(buffer, this);
+        getContextType().resolve(buffer, this);
 
-		return buffer;
-	}
+        return buffer;
+    }
 
-	protected TemplateTranslator createTemplateTranslator() {
-		try {
-			int offset = getStart();
-			IRegion lineRegion = getDocument().getLineInformationOfOffset(offset);
-			String line = getDocument().get(lineRegion.getOffset(), lineRegion.getLength());
-			int i = 0;
-			// support for array items
-			StringBuilder indentation = new StringBuilder();
-			while (i < line.length()) {
-				char indentSymbol = line.charAt(i);
-				if (Character.isWhitespace(indentSymbol)) {
-					indentation.append(indentSymbol);
-					i++;
-				} else if ('-' == indentSymbol) {// array item
-					indentation.append(' ');
-					i++;
-				} else {
-					break;
-				}
-			}
-			if (i != 0)
-				return new IndentationAwareTemplateTranslator(indentation.toString());
-			return new TemplateTranslator();
-		} catch (BadLocationException ex) {
-			return new TemplateTranslator();
-		}
-	}
+    protected TemplateTranslator createTemplateTranslator() {
+        try {
+            int offset = getStart();
+            IRegion lineRegion = getDocument().getLineInformationOfOffset(offset);
+            String line = getDocument().get(lineRegion.getOffset(), lineRegion.getLength());
+            int i = 0;
+            // support for array items
+            StringBuilder indentation = new StringBuilder();
+            while (i < line.length()) {
+                char indentSymbol = line.charAt(i);
+                if (Character.isWhitespace(indentSymbol)) {
+                    indentation.append(indentSymbol);
+                    i++;
+                } else if ('-' == indentSymbol) {// array item
+                    indentation.append(' ');
+                    i++;
+                } else {
+                    break;
+                }
+            }
+            if (i != 0)
+                return new IndentationAwareTemplateTranslator(indentation.toString());
+            return new TemplateTranslator();
+        } catch (BadLocationException ex) {
+            return new TemplateTranslator();
+        }
+    }
 
-	public static class IndentationAwareTemplateTranslator extends TemplateTranslator {
+    public static class IndentationAwareTemplateTranslator extends TemplateTranslator {
 
-		private final String indentation;
+        private final String indentation;
 
-		public IndentationAwareTemplateTranslator(String indentation) {
-			this.indentation = indentation;
-		}
+        public IndentationAwareTemplateTranslator(String indentation) {
+            this.indentation = indentation;
+        }
 
-		@Override
-		public TemplateBuffer translate(Template template) throws TemplateException {
-			return translate(template.getPattern());
-		}
+        @Override
+        public TemplateBuffer translate(Template template) throws TemplateException {
+            return translate(template.getPattern());
+        }
 
-		@Override
-		public TemplateBuffer translate(String string) throws TemplateException {
-			String withIndentation = string.replaceAll("(\r\n?)|(\n)", "$0" + indentation);
-			return super.translate(withIndentation);
-		}
-	}
+        @Override
+        public TemplateBuffer translate(String string) throws TemplateException {
+            String withIndentation = string.replaceAll("(\r\n?)|(\n)", "$0" + indentation);
+            return super.translate(withIndentation);
+        }
+    }
 
 }

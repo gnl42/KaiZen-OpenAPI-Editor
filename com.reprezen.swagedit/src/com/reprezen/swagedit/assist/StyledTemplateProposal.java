@@ -20,16 +20,17 @@ import org.eclipse.swt.graphics.Image;
 
 public class StyledTemplateProposal extends TemplateProposal implements ICompletionProposalExtension6 {
 
-	private StyledString styledString;
+    private StyledString styledString;
 
-	public StyledTemplateProposal(Template template, TemplateContext context, IRegion region, Image image, StyledString styledString, int relevance) {
-		super(template, context, region, image, relevance);
-		this.styledString = styledString;
-	}
+    public StyledTemplateProposal(Template template, TemplateContext context, IRegion region, Image image,
+            StyledString styledString, int relevance) {
+        super(template, context, region, image, relevance);
+        this.styledString = styledString;
+    }
 
-	@Override
-	public StyledString getStyledDisplayString() {
-		return styledString;
-	}
+    @Override
+    public StyledString getStyledDisplayString() {
+        return styledString;
+    }
 
 }

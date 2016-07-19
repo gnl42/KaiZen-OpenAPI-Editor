@@ -20,59 +20,58 @@ import com.fasterxml.jackson.databind.JsonNode;
 import com.google.common.base.Strings;
 
 /**
- * JSON Reference Factory 
+ * JSON Reference Factory
  * 
  * This class should be used to instantiate JSONReferences.
- *
+ * 
  */
 public class JsonReferenceFactory {
 
-	public JsonReference create(JsonNode node) {
-		if (node == null || node.isMissingNode()) {
-			return new JsonReference(null, null, false, false, node);
-		}
+    public JsonReference create(JsonNode node) {
+        if (node == null || node.isMissingNode()) {
+            return new JsonReference(null, null, false, false, node);
+        }
 
-		String text = node.isTextual() ? node.asText() :
-			node.get("$ref").asText();
+        String text = node.isTextual() ? node.asText() : node.get("$ref").asText();
 
-		return doCreate(text, node);
-	}
+        return doCreate(text, node);
+    }
 
-	public JsonReference create(ScalarNode node) {
-		if (node == null) {
-			return new JsonReference(null, null, false, false, node);
-		}
+    public JsonReference create(ScalarNode node) {
+        if (node == null) {
+            return new JsonReference(null, null, false, false, node);
+        }
 
-		return doCreate(node.getValue(), node);
-	}
+        return doCreate(node.getValue(), node);
+    }
 
-	protected JsonReference doCreate(String value, Object source) {
-		String notNull = Strings.nullToEmpty(value);
+    protected JsonReference doCreate(String value, Object source) {
+        String notNull = Strings.nullToEmpty(value);
 
-		URI uri;		
-		if (notNull.startsWith("#")) {
-			try {
-				uri = new URI(null, null, notNull.substring(1));
-			} catch (URISyntaxException e) {
-				return new JsonReference(null, null, false, false, source);
-			}
-		} else {
-			try {
-				uri = URI.create(notNull);
-			} catch(NullPointerException | IllegalArgumentException e) {
-				// invalid reference
-				return new JsonReference(null, null, false, false, source);
-			}
-		}
+        URI uri;
+        if (notNull.startsWith("#")) {
+            try {
+                uri = new URI(null, null, notNull.substring(1));
+            } catch (URISyntaxException e) {
+                return new JsonReference(null, null, false, false, source);
+            }
+        } else {
+            try {
+                uri = URI.create(notNull);
+            } catch (NullPointerException | IllegalArgumentException e) {
+                // invalid reference
+                return new JsonReference(null, null, false, false, source);
+            }
+        }
 
-		String fragment = uri.getFragment();
-		JsonPointer pointer = JsonPointer.compile(Strings.emptyToNull(fragment));
+        String fragment = uri.getFragment();
+        JsonPointer pointer = JsonPointer.compile(Strings.emptyToNull(fragment));
 
-		uri = uri.normalize();
-		boolean absolute = uri.isAbsolute();
-		boolean local = !absolute && uri.getPath().isEmpty();
+        uri = uri.normalize();
+        boolean absolute = uri.isAbsolute();
+        boolean local = !absolute && uri.getPath().isEmpty();
 
-		return new JsonReference(uri, pointer, absolute, local, source);
-	}
+        return new JsonReference(uri, pointer, absolute, local, source);
+    }
 
 }

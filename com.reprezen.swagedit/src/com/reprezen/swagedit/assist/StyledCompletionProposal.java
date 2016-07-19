@@ -24,57 +24,57 @@ import com.reprezen.swagedit.Activator.Icons;
 
 public class StyledCompletionProposal implements ICompletionProposal, ICompletionProposalExtension6 {
 
-	private final int replacementOffset;
-	private final int replacementLength;
-	private final String replacementString;
-	private final StyledString label;
-	private final int cursorPosition;
+    private final int replacementOffset;
+    private final int replacementLength;
+    private final String replacementString;
+    private final StyledString label;
+    private final int cursorPosition;
 
-	public StyledCompletionProposal(String replacement, StyledString label, int offset, int lenght, int position) {
-		this.replacementString = replacement;
-		this.label = label;
-		this.replacementOffset = offset;
-		this.replacementLength = lenght;
-		this.cursorPosition = position;
-	}
+    public StyledCompletionProposal(String replacement, StyledString label, int offset, int lenght, int position) {
+        this.replacementString = replacement;
+        this.label = label;
+        this.replacementOffset = offset;
+        this.replacementLength = lenght;
+        this.cursorPosition = position;
+    }
 
-	@Override
-	public StyledString getStyledDisplayString() {
-		return label;
-	}
+    @Override
+    public StyledString getStyledDisplayString() {
+        return label;
+    }
 
-	@Override
-	public void apply(IDocument document) {
-		try {
-			document.replace(replacementOffset, replacementLength, replacementString);
-		} catch (BadLocationException x) {
-			// ignore
-		}
-	}
+    @Override
+    public void apply(IDocument document) {
+        try {
+            document.replace(replacementOffset, replacementLength, replacementString);
+        } catch (BadLocationException x) {
+            // ignore
+        }
+    }
 
-	@Override
-	public Point getSelection(IDocument document) {
-		return new Point(replacementOffset + cursorPosition, 0);
-	}
+    @Override
+    public Point getSelection(IDocument document) {
+        return new Point(replacementOffset + cursorPosition, 0);
+    }
 
-	@Override
-	public String getAdditionalProposalInfo() {
-		return null;
-	}
+    @Override
+    public String getAdditionalProposalInfo() {
+        return null;
+    }
 
-	@Override
-	public String getDisplayString() {
-		return null;
-	}
+    @Override
+    public String getDisplayString() {
+        return null;
+    }
 
-	@Override
-	public Image getImage() {
-		return Activator.getDefault().getImage(Icons.assist_item);
-	}
+    @Override
+    public Image getImage() {
+        return Activator.getDefault().getImage(Icons.assist_item);
+    }
 
-	@Override
-	public IContextInformation getContextInformation() {
-		return null;
-	}
-	
+    @Override
+    public IContextInformation getContextInformation() {
+        return null;
+    }
+
 }
