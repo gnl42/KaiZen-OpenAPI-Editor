@@ -10,27 +10,46 @@
  *******************************************************************************/
 package com.reprezen.swagedit.editor;
 
+import java.util.ArrayList;
+import java.util.List;
+
 import org.dadacoalition.yedit.editor.YEditSourceViewerConfiguration;
 import org.dadacoalition.yedit.editor.scanner.YAMLScanner;
 import org.eclipse.jface.text.IDocument;
+import org.eclipse.jface.text.IInformationControl;
+import org.eclipse.jface.text.IInformationControlCreator;
+import org.eclipse.jface.text.IRegion;
+import org.eclipse.jface.text.ITextViewer;
+import org.eclipse.jface.text.Region;
 import org.eclipse.jface.text.contentassist.ContentAssistant;
 import org.eclipse.jface.text.contentassist.IContentAssistant;
 import org.eclipse.jface.text.hyperlink.IHyperlinkDetector;
 import org.eclipse.jface.text.hyperlink.URLHyperlinkDetector;
+import org.eclipse.jface.text.information.IInformationPresenter;
+import org.eclipse.jface.text.information.IInformationProvider;
+import org.eclipse.jface.text.information.IInformationProviderExtension;
+import org.eclipse.jface.text.information.IInformationProviderExtension2;
+import org.eclipse.jface.text.information.InformationPresenter;
 import org.eclipse.jface.text.reconciler.IReconciler;
 import org.eclipse.jface.text.reconciler.MonoReconciler;
 import org.eclipse.jface.text.source.ISourceViewer;
+import org.eclipse.swt.widgets.Shell;
+import org.eclipse.ui.part.IShowInTarget;
 
 import com.reprezen.swagedit.Activator;
 import com.reprezen.swagedit.assist.SwaggerContentAssistProcessor;
 import com.reprezen.swagedit.editor.hyperlinks.DefinitionHyperlinkDetector;
 import com.reprezen.swagedit.editor.hyperlinks.JsonReferenceHyperlinkDetector;
 import com.reprezen.swagedit.editor.hyperlinks.PathParamHyperlinkDetector;
+import com.reprezen.swagedit.editor.outline.OutlineElement;
+import com.reprezen.swagedit.editor.outline.QuickOutline;
 
 public class SwaggerSourceViewerConfiguration extends YEditSourceViewerConfiguration {
 
     private SwaggerEditor editor;
     private YAMLScanner scanner;
+    private IShowInTarget showInTarget;
+    private InformationPresenter informationPresenter;
 
     public SwaggerSourceViewerConfiguration() {
         super();
@@ -83,8 +102,86 @@ public class SwaggerSourceViewerConfiguration extends YEditSourceViewerConfigura
                 new PathParamHyperlinkDetector(), new DefinitionHyperlinkDetector() };
     }
 
+    @Override
+    public IInformationPresenter getInformationPresenter(ISourceViewer sourceViewer) {
+        // TODO Auto-generated method stub
+        return super.getInformationPresenter(sourceViewer);
+    }
+
     public void setEditor(SwaggerEditor editor) {
         this.editor = editor;
     }
 
+    public SwaggerEditor getEditor() {
+        return editor;
+    }
+
+    public IInformationPresenter getOutlinePresenter(ISourceViewer sourceViewer) {
+        if (informationPresenter == null) {
+            IInformationControlCreator controlCreator = getOutlineInformationControlCreator();
+            informationPresenter = new InformationPresenter(controlCreator);
+            informationPresenter.setDocumentPartitioning(getConfiguredDocumentPartitioning(sourceViewer));
+
+            // Register information provider
+            IInformationProvider provider = new InformationProvider(controlCreator);
+            String[] contentTypes = getConfiguredContentTypes(sourceViewer);
+            for (String contentType : contentTypes) {
+                informationPresenter.setInformationProvider(provider, contentType);
+            }
+
+            informationPresenter.setSizeConstraints(120, 40, true, true);
+        }
+        return informationPresenter;
+    }
+
+    private IInformationControlCreator getOutlineInformationControlCreator() {
+        return new IInformationControlCreator() {
+            public IInformationControl createInformationControl(Shell parent) {
+                QuickOutline dialog = new QuickOutline(parent, showInTarget);
+                return dialog;
+            }
+        };
+    }
+
+    public void setShowInTarget(IShowInTarget showInTarget) {
+        this.showInTarget = showInTarget;
+    }
+
+    private class InformationProvider
+            implements IInformationProvider, IInformationProviderExtension, IInformationProviderExtension2 {
+
+        private final IInformationControlCreator controlCreator;
+
+        public InformationProvider(IInformationControlCreator controlCreator) {
+            this.controlCreator = controlCreator;
+        }
+
+        @Deprecated
+        public String getInformation(ITextViewer textViewer, IRegion subject) {
+            return getInformation2(textViewer, subject).toString();
+        }
+
+        public Object getInformation2(ITextViewer textViewer, IRegion subject) {
+            IDocument document = textViewer.getDocument();
+
+            if (document instanceof SwaggerDocument) {
+                SwaggerDocument doc = (SwaggerDocument) document;
+
+                List<OutlineElement> nodes = new ArrayList<>();
+                nodes.add(new OutlineElement(doc.getYaml(), doc));
+
+                return nodes;
+            }
+
+            return null;
+        }
+
+        public IRegion getSubject(ITextViewer textViewer, int offset) {
+            return new Region(offset, 0);
+        }
+
+        public IInformationControlCreator getInformationPresenterControlCreator() {
+            return controlCreator;
+        }
+    }
 }
