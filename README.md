@@ -16,7 +16,7 @@ This will show a dialog box from where you can select the location of the update
 Use the update site from [http://products.modelsolv.com/swagedit/0.1.0/latest/](http://products.modelsolv.com/swagedit/0.1.0/latest/) as URL.
 
 ### Eclipse Marketplace
-SwagEdit is not on Marketplace yet, but we are working on it, see [issue 65](https://github.com/RepreZen/SwagEdit/issues/65
+SwagEdit is not on Marketplace yet, but we are working on it, see [issue 65](https://github.com/RepreZen/SwagEdit/issues/65)
 
 ## User Documentation
 Read more about SwagEdit features on http://www.reprezen.com/swagger-tools
