@@ -85,5 +85,4 @@ public class OutlineStyledLabelProvider extends StyledCellLabelProvider {
             return activator.getImage(Icons.outline_scalar);
         }
     }
-
 }

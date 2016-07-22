@@ -51,6 +51,7 @@ public class QuickOutline extends PopupDialog
 
     private TreeViewer treeViewer;
     private IShowInTarget showInTarget;
+
     private Text filterText;
 
     public QuickOutline(Shell parent, IShowInTarget showInTarget) {
@@ -149,6 +150,7 @@ public class QuickOutline extends PopupDialog
                 if (e.button != 1) {
                     return;
                 }
+
                 if (tree.equals(e.getSource())) {
                     Object o = tree.getItem(new Point(e.x, e.y));
                     TreeItem selection = tree.getSelection()[0];
