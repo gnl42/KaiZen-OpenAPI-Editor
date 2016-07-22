@@ -7,7 +7,9 @@ SwagEdit was developed for [RepreZen API Studio](http://reprezen.com/swagger-too
 We welcome your suggestions and contributions!
 
 ## Watch a short video about SwagEdit
-[![Editing Swagger-OpenAPI in RepreZen API Studio](http://img.youtube.com/vi/KX_tHp_KQkE/0.jpg)](https://www.youtube.com/watch?v=KX_tHp_KQkE)
+<iframe width="420" height="315"
+src="https://www.youtube.com/embed/KX_tHp_KQkE">
+</iframe>
 
 ## Install SwagEdit
 ### Via an update site 
