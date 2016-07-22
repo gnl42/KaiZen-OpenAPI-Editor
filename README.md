@@ -13,7 +13,7 @@ We welcome your suggestions and contributions!
 ### Use a published update site 
 You can now install SwagEdit into your Eclipse by clicking on `Help > Install New Software... > Add...`
 This will show a dialog box from where you can select the location of the update site.
-Use the newest update site from "http://products.modelsolv.com/swagedit/mars2/" as URL, e.g. "http://products.modelsolv.com/swagedit/mars2/0.1.0.201607082009/".
+Use the update site from [http://products.modelsolv.com/swagedit/0.1.0/latest/](http://products.modelsolv.com/swagedit/0.1.0/latest/) as URL.
 
 ## User Documentation
 Read more about SwagEdit features on http://www.reprezen.com/swagger-tools
