@@ -7,3 +7,6 @@ This is a [known issue](https://github.com/oyse/yedit/issues/15) of YEdit, the Y
 3. Select the command from the YEdit category.
 4. Click the "Unbind Command" button.
 5. Confirm by selecting "OK".
+
+## Handling special (non-UTF) characters
+JSON does not support non UTF encoding, so for now we recommend avoid using special characters, e.g. accented letters, in your Swagger specification. See [issue 158](https://github.com/RepreZen/SwagEdit/issues/158) for details
