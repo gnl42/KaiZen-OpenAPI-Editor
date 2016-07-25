@@ -22,19 +22,19 @@ import com.google.common.io.CharStreams;
 
 public class SwaggerContentDescriber implements IContentDescriber {
 
-	@Override
-	public int describe(InputStream contents, IContentDescription description) throws IOException {
-		String content = CharStreams.toString(new InputStreamReader(contents));
-		if (content.trim().isEmpty()) {
-			return INDETERMINATE;
-		}
+    @Override
+    public int describe(InputStream contents, IContentDescription description) throws IOException {
+        String content = CharStreams.toString(new InputStreamReader(contents));
+        if (content.trim().isEmpty()) {
+            return INDETERMINATE;
+        }
 
-		return content.contains("swagger: \"2.0\"") || content.contains("swagger: '2.0'") ? VALID : INVALID;
-	}
+        return content.contains("swagger: \"2.0\"") || content.contains("swagger: '2.0'") ? VALID : INVALID;
+    }
 
-	@Override
-	public QualifiedName[] getSupportedOptions() {
-		return null;
-	}
+    @Override
+    public QualifiedName[] getSupportedOptions() {
+        return null;
+    }
 
 }

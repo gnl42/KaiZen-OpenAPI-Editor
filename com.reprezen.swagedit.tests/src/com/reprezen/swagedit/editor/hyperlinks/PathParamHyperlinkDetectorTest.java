@@ -34,66 +34,58 @@ import com.reprezen.swagedit.editor.hyperlinks.SwaggerHyperlink;
 
 public class PathParamHyperlinkDetectorTest {
 
-	private PathParamHyperlinkDetector detector = new PathParamHyperlinkDetector();
-	private ITextViewer viewer;
+    private PathParamHyperlinkDetector detector = new PathParamHyperlinkDetector();
+    private ITextViewer viewer;
 
-	@Before
-	public void setUp() {
-		viewer = mock(ITextViewer.class);
-	}
+    @Before
+    public void setUp() {
+        viewer = mock(ITextViewer.class);
+    }
 
-	@Test
-	public void testShouldCreateHyperLink_FromPathParameter_ToParameterDefinition() throws Exception {
-		SwaggerDocument document = new SwaggerDocument();
-		when(viewer.getDocument()).thenReturn(document);
+    @Test
+    public void testShouldCreateHyperLink_FromPathParameter_ToParameterDefinition() throws Exception {
+        SwaggerDocument document = new SwaggerDocument();
+        when(viewer.getDocument()).thenReturn(document);
 
-		String text = 
-				"paths:\n" +
-				"  /{id}:\n" +
-				"    get:\n" +
-				"      parameters:\n" +
-				"        - name: id\n" +
-				"          type: number\n"+
-				"          required: true\n" +
-				"          in: path\n";
+        String text = "paths:\n" + "  /{id}:\n" + "    get:\n" + "      parameters:\n" + "        - name: id\n"
+                + "          type: number\n" + "          required: true\n" + "          in: path\n";
 
-		document.set(text);
-		// region that includes `/{id}:`
-		IRegion region = new Region("paths:\n  /{i".length(), 1);
-		IHyperlink[] hyperlinks = detector.detectHyperlinks(viewer, region, false);
+        document.set(text);
+        // region that includes `/{id}:`
+        IRegion region = new Region("paths:\n  /{i".length(), 1);
+        IHyperlink[] hyperlinks = detector.detectHyperlinks(viewer, region, false);
 
-		// expected region
-		IRegion linkRegion = new Region(document.getLineOffset(1) + "  /".length(), "{id}".length());
-		IRegion targetRegion = new Region(document.getLineOffset(4), 86);
+        // expected region
+        IRegion linkRegion = new Region(document.getLineOffset(1) + "  /".length(), "{id}".length());
+        IRegion targetRegion = new Region(document.getLineOffset(4), 86);
 
-		assertThat(Arrays.asList(hyperlinks), 
-				hasItem(new SwaggerHyperlink("id", viewer, linkRegion, targetRegion)));
-	}
+        assertThat(Arrays.asList(hyperlinks), hasItem(new SwaggerHyperlink("id", viewer, linkRegion, targetRegion)));
+    }
 
-	@Test
-	public void test_match_paramter() {
-		String text = "/path/{id}";
+    @Test
+    public void test_match_paramter() {
+        String text = "/path/{id}";
 
-		Matcher matcher = PathParamHyperlinkDetector.PARAMETER_PATTERN.matcher(text);
-		Set<String> groups = new HashSet<>();
-		while(matcher.find()) {
-			groups.add(matcher.group(1));
-		}
+        Matcher matcher = PathParamHyperlinkDetector.PARAMETER_PATTERN.matcher(text);
+        Set<String> groups = new HashSet<>();
+        while (matcher.find()) {
+            groups.add(matcher.group(1));
+        }
 
-		assertThat(groups, hasItems("id"));
-	}
+        assertThat(groups, hasItems("id"));
+    }
 
-	@Test
-	public void test_match_second_paramter() {
-		String text = "/path/{id}/other/{foo}";
+    @Test
+    public void test_match_second_paramter() {
+        String text = "/path/{id}/other/{foo}";
 
-		Matcher matcher = PathParamHyperlinkDetector.PARAMETER_PATTERN.matcher(text);
-		Set<String> groups = new HashSet<>();
-		while(matcher.find()) {
-			groups.add(matcher.group(1));
-		}
+        Matcher matcher = PathParamHyperlinkDetector.PARAMETER_PATTERN.matcher(text);
+        Set<String> groups = new HashSet<>();
+        while (matcher.find()) {
+            groups.add(matcher.group(1));
+        }
 
-		assertThat(groups, hasItems("id", "foo"));
-	}
+        assertThat(groups, hasItems("id", "foo"));
+    }
 
 }

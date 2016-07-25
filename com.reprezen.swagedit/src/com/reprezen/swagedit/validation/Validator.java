@@ -46,130 +46,126 @@ import com.reprezen.swagedit.json.references.JsonReferenceValidator;
  */
 public class Validator {
 
-	private static final JsonSchemaManager schemaManager = new JsonSchemaManager();
+    private static final JsonSchemaManager schemaManager = new JsonSchemaManager();
 
-	private final JsonReferenceValidator referenceValidator;
+    private final JsonReferenceValidator referenceValidator;
 
-	public Validator(JsonReferenceValidator referenceValidator) {
-		this.referenceValidator = referenceValidator;
-	}
-	
-	public Validator() {
-		this.referenceValidator = new JsonReferenceValidator(new JsonReferenceFactory());
-	}
+    public Validator(JsonReferenceValidator referenceValidator) {
+        this.referenceValidator = referenceValidator;
+    }
 
-	/**
-	 * Returns a list or errors if validation fails.
-	 * 
-	 * This method accepts as input a swagger YAML document and validates it
-	 * against the swagger JSON Schema.
-	 * 
-	 * @param content
-	 * @param editorInput current input
-	 * @return list or errors
-	 * @throws IOException
-	 * @throws ParserException
-	 */
-	public Set<SwaggerError> validate(SwaggerDocument document, IFileEditorInput editorInput) {
-		Set<SwaggerError> errors = Sets.newHashSet();
+    public Validator() {
+        this.referenceValidator = new JsonReferenceValidator(new JsonReferenceFactory());
+    }
 
-		JsonNode jsonContent = null;
-		try {
-			jsonContent = document.asJson();
-		} catch (Exception e) {
-			YEditLog.logException(e);
-		}
+    /**
+     * Returns a list or errors if validation fails.
+     * 
+     * This method accepts as input a swagger YAML document and validates it against the swagger JSON Schema.
+     * 
+     * @param content
+     * @param editorInput
+     *            current input
+     * @return list or errors
+     * @throws IOException
+     * @throws ParserException
+     */
+    public Set<SwaggerError> validate(SwaggerDocument document, IFileEditorInput editorInput) {
+        Set<SwaggerError> errors = Sets.newHashSet();
 
-		if (jsonContent != null) {
-			Node yaml = document.getYaml();
-			if (yaml != null) {
-				errors.addAll(validateAgainstSchema(new ErrorProcessor(yaml), jsonContent));
-				errors.addAll(checkDuplicateKeys(yaml));
-				errors.addAll(referenceValidator.validate(editorInput != null ? editorInput.getFile().getLocationURI() : null, yaml));
-			}
-		}
+        JsonNode jsonContent = null;
+        try {
+            jsonContent = document.asJson();
+        } catch (Exception e) {
+            YEditLog.logException(e);
+        }
 
-		return errors;
-	}
+        if (jsonContent != null) {
+            Node yaml = document.getYaml();
+            if (yaml != null) {
+                errors.addAll(validateAgainstSchema(new ErrorProcessor(yaml), jsonContent));
+                errors.addAll(checkDuplicateKeys(yaml));
+                errors.addAll(referenceValidator.validate(editorInput != null ? editorInput.getFile().getLocationURI()
+                        : null, yaml));
+            }
+        }
 
-	/*
-	 * Validates the YAML document against the Swagger schema
-	 */
-	protected Set<SwaggerError> validateAgainstSchema(ErrorProcessor processor, JsonNode jsonContent) {
-		final Set<SwaggerError> errors = Sets.newHashSet();
+        return errors;
+    }
 
-		try {
-			ProcessingReport report = schemaManager.getSwaggerSchema().getSchema().validate(jsonContent, true);
+    /*
+     * Validates the YAML document against the Swagger schema
+     */
+    protected Set<SwaggerError> validateAgainstSchema(ErrorProcessor processor, JsonNode jsonContent) {
+        final Set<SwaggerError> errors = Sets.newHashSet();
 
-			errors.addAll(processor.processReport(report));
-		} catch (ProcessingException e) {
-			errors.addAll(processor.processMessage(e.getProcessingMessage()));
-		}
+        try {
+            ProcessingReport report = schemaManager.getSwaggerSchema().getSchema().validate(jsonContent, true);
 
-		return errors;
-	}
+            errors.addAll(processor.processReport(report));
+        } catch (ProcessingException e) {
+            errors.addAll(processor.processMessage(e.getProcessingMessage()));
+        }
 
-	/*
-	 * Finds all duplicate keys in all objects present in the YAML document.
-	 */
-	protected Set<SwaggerError> checkDuplicateKeys(Node document) {
-		HashMultimap<Pair<Node, String>, Node> acc = 
-				HashMultimap.<Pair<Node, String>, Node>create();
+        return errors;
+    }
 
-		collectDuplicates(document, acc);
+    /*
+     * Finds all duplicate keys in all objects present in the YAML document.
+     */
+    protected Set<SwaggerError> checkDuplicateKeys(Node document) {
+        HashMultimap<Pair<Node, String>, Node> acc = HashMultimap.<Pair<Node, String>, Node> create();
 
-		Set<SwaggerError> errors = Sets.newHashSet();
-		for (Pair<Node, String> key: acc.keys()) {
-			Set<Node> duplicates = acc.get(key);
+        collectDuplicates(document, acc);
 
-			if (duplicates.size() > 1) {
-				for (Node duplicate : duplicates) {
-					errors.add(createDuplicateError(key.getValue(), duplicate));
-				}
-			}
-		}
+        Set<SwaggerError> errors = Sets.newHashSet();
+        for (Pair<Node, String> key : acc.keys()) {
+            Set<Node> duplicates = acc.get(key);
 
-		return errors;
-	}
+            if (duplicates.size() > 1) {
+                for (Node duplicate : duplicates) {
+                    errors.add(createDuplicateError(key.getValue(), duplicate));
+                }
+            }
+        }
 
-	/*
-	 * This method iterates through the YAML tree to collect the pairs of Node x String 
-	 * representing an object and one of it's keys. Each pair is associated to a Set of 
-	 * Nodes which contains all nodes being a key to the pair's Node and having for value 
-	 * the pair's key.
-	 * Once the iteration is done, the resulting map should be traversed. Each pair having 
-	 * more than one element in its associated Set are duplicate keys. 
-	 */
-	protected void collectDuplicates(Node parent, Multimap<Pair<Node, String>, Node> acc) {
-		switch (parent.getNodeId()) {
-		case mapping: {
-			for (NodeTuple value: ((MappingNode) parent).getValue()) {
-				Node keyNode = value.getKeyNode();
+        return errors;
+    }
 
-				if (keyNode.getNodeId() == NodeId.scalar) {
-					acc.put(Pair.of(parent, ((ScalarNode) keyNode).getValue()), keyNode);
-				}
+    /*
+     * This method iterates through the YAML tree to collect the pairs of Node x String representing an object and one
+     * of it's keys. Each pair is associated to a Set of Nodes which contains all nodes being a key to the pair's Node
+     * and having for value the pair's key. Once the iteration is done, the resulting map should be traversed. Each pair
+     * having more than one element in its associated Set are duplicate keys.
+     */
+    protected void collectDuplicates(Node parent, Multimap<Pair<Node, String>, Node> acc) {
+        switch (parent.getNodeId()) {
+        case mapping: {
+            for (NodeTuple value : ((MappingNode) parent).getValue()) {
+                Node keyNode = value.getKeyNode();
 
-				collectDuplicates(value.getValueNode(), acc);
-			}
-		}
-			break;
-		case sequence: {
-			for (Node value: ((SequenceNode) parent).getValue()) {
-				collectDuplicates(value, acc);
-			}
-		}
-			break;
-		default:
-			break;
-		}
-	}
+                if (keyNode.getNodeId() == NodeId.scalar) {
+                    acc.put(Pair.of(parent, ((ScalarNode) keyNode).getValue()), keyNode);
+                }
 
-	protected SwaggerError createDuplicateError(String key, Node node) {
-		return new SwaggerError(
-				node.getStartMark().getLine() + 1, 
-				IMarker.SEVERITY_WARNING,
-				String.format(Messages.error_duplicate_keys, key));
-	}
+                collectDuplicates(value.getValueNode(), acc);
+            }
+        }
+            break;
+        case sequence: {
+            for (Node value : ((SequenceNode) parent).getValue()) {
+                collectDuplicates(value, acc);
+            }
+        }
+            break;
+        default:
+            break;
+        }
+    }
+
+    protected SwaggerError createDuplicateError(String key, Node node) {
+        return new SwaggerError(node.getStartMark().getLine() + 1, IMarker.SEVERITY_WARNING, String.format(
+                Messages.error_duplicate_keys, key));
+    }
 
 }

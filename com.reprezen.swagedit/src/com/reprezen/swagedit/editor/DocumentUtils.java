@@ -22,86 +22,81 @@ import com.google.common.io.CharStreams;
 
 public class DocumentUtils {
 
-	public static FileEditorInput getActiveEditorInput() {
-		IEditorInput input = PlatformUI.getWorkbench()
-				.getActiveWorkbenchWindow()
-				.getActivePage()
-				.getActiveEditor()
-				.getEditorInput();
+    public static FileEditorInput getActiveEditorInput() {
+        IEditorInput input = PlatformUI.getWorkbench().getActiveWorkbenchWindow().getActivePage().getActiveEditor()
+                .getEditorInput();
 
-		return input instanceof FileEditorInput ? (FileEditorInput) input : null;
-	}
+        return input instanceof FileEditorInput ? (FileEditorInput) input : null;
+    }
 
-	public static SwaggerDocument getDocument(IPath path) {
-		if (path == null || !path.getFileExtension().matches("ya?ml")) {
-			return null;
-		}
+    public static SwaggerDocument getDocument(IPath path) {
+        if (path == null || !path.getFileExtension().matches("ya?ml")) {
+            return null;
+        }
 
-		InputStream content = null;
-		IFile file = getWorkspaceFile(path);
-		if (file == null) {
-			IFileStore store = getExternalFile(path);
-			if (store != null) {
-				try {
-					content = store.openInputStream(EFS.NONE, null);
-				} catch (CoreException e) {
-					content = null;
-				}
-			}
-		} else if (file.exists()) {
-			try {
-				content = file.getContents();
-			} catch (CoreException e) {
-				content = null;
-			}
-		}
+        InputStream content = null;
+        IFile file = getWorkspaceFile(path);
+        if (file == null) {
+            IFileStore store = getExternalFile(path);
+            if (store != null) {
+                try {
+                    content = store.openInputStream(EFS.NONE, null);
+                } catch (CoreException e) {
+                    content = null;
+                }
+            }
+        } else if (file.exists()) {
+            try {
+                content = file.getContents();
+            } catch (CoreException e) {
+                content = null;
+            }
+        }
 
-		if (content == null) {
-			return null;
-		}
+        if (content == null) {
+            return null;
+        }
 
-		SwaggerDocument doc = new SwaggerDocument();
-		try {
-			doc.set(CharStreams.toString(new InputStreamReader(content)));
-		} catch (IOException e) {
-			return null;
-		}
+        SwaggerDocument doc = new SwaggerDocument();
+        try {
+            doc.set(CharStreams.toString(new InputStreamReader(content)));
+        } catch (IOException e) {
+            return null;
+        }
 
-		return doc;
-	}
+        return doc;
+    }
 
     /**
-     * @param uri - URI, representing an absolute path
+     * @param uri
+     *            - URI, representing an absolute path
      * @return
      */
     public static IFile getWorkspaceFile(URI uri) {
         return getWorkspaceFile(new Path(uri.getPath()));
     }
 
-	/**
-	 * @param path - absolute path to the element
-	 * @return
-	 */
-	public static IFile getWorkspaceFile(IPath path) {
-		IWorkspaceRoot root = ResourcesPlugin
-				.getWorkspace()
-				.getRoot();
+    /**
+     * @param path
+     *            - absolute path to the element
+     * @return
+     */
+    public static IFile getWorkspaceFile(IPath path) {
+        IWorkspaceRoot root = ResourcesPlugin.getWorkspace().getRoot();
 
-		try {
-			return root.getFileForLocation(path);
-		} catch (Exception e) {
-			return null;
-		}
-	}
+        try {
+            return root.getFileForLocation(path);
+        } catch (Exception e) {
+            return null;
+        }
+    }
 
-	public static IFileStore getExternalFile(IPath path) {
-		IFileStore fileStore = EFS
-				.getLocalFileSystem()
-				.getStore(path);
+    public static IFileStore getExternalFile(IPath path) {
+        IFileStore fileStore = EFS.getLocalFileSystem().getStore(path);
 
-		IFileInfo fileInfo = fileStore.fetchInfo();
+        IFileInfo fileInfo = fileStore.fetchInfo();
 
-		return fileInfo != null && fileInfo.exists() ? fileStore : null;
-	}
+        return fileInfo != null && fileInfo.exists() ? fileStore : null;
+    }
 
 }

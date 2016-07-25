@@ -23,160 +23,155 @@ import com.reprezen.swagedit.json.JsonSchemaManager.JSONSchema;
 //
 public class SchemaDefinitionProvider {
 
-	private final JsonSchemaManager schemaManager = new JsonSchemaManager();
+    private final JsonSchemaManager schemaManager = new JsonSchemaManager();
 
-	public Set<SchemaDefinition> getDefinitions(String path) {
-		if (path.startsWith(":")) {
-			path = path.substring(1);
-		}
+    public Set<SchemaDefinition> getDefinitions(String path) {
+        if (path.startsWith(":")) {
+            path = path.substring(1);
+        }
 
-		final String[] segments = path.split(":");
-		Set<SchemaDefinition> definitions = Collections.emptySet();
-		final JSONSchema swagger = schemaManager.getSchema("swagger");
-		Set<SchemaDefinition> toTraverse = Collections.singleton(
-				new SchemaDefinition(swagger.asJson(), swagger.asJson())
-		);
+        final String[] segments = path.split(":");
+        Set<SchemaDefinition> definitions = Collections.emptySet();
+        final JSONSchema swagger = schemaManager.getSchema("swagger");
+        Set<SchemaDefinition> toTraverse = Collections.singleton(new SchemaDefinition(swagger.asJson(), swagger
+                .asJson()));
 
-		// we iterate over all segments that form the path, 
-		// each segment is use to traverse the schema, until
-		// we find the definitions that correspond to the latest segment
-		for (String segment: segments) {
-			// we reset the definitions we found until now
-			// only the latest are of interest.
-			definitions = new HashSet<>();
-			for (SchemaDefinition traverse: toTraverse) {
-				definitions.addAll( traverse(traverse, segment) );
-			}
-			// we keep the definitions we will 
-			// need to process in the next iteration
-			toTraverse = definitions;
-		}
+        // we iterate over all segments that form the path,
+        // each segment is use to traverse the schema, until
+        // we find the definitions that correspond to the latest segment
+        for (String segment : segments) {
+            // we reset the definitions we found until now
+            // only the latest are of interest.
+            definitions = new HashSet<>();
+            for (SchemaDefinition traverse : toTraverse) {
+                definitions.addAll(traverse(traverse, segment));
+            }
+            // we keep the definitions we will
+            // need to process in the next iteration
+            toTraverse = definitions;
+        }
 
-		return definitions;
-	}
+        return definitions;
+    }
 
-	/*
-	 * This method takes for parameter the current JSON object, and the segment of 
-	 * a path that should be use to traverse the current JSON object.
-	 * 
-	 * Returns the set of nodes that matches the current segment, after applying 
-	 * the segment to the current node.
-	 */
-	private Set<SchemaDefinition> traverse(SchemaDefinition current, String segment) {
-		final Set<SchemaDefinition> definitions = new HashSet<>();
+    /*
+     * This method takes for parameter the current JSON object, and the segment of a path that should be use to traverse
+     * the current JSON object.
+     * 
+     * Returns the set of nodes that matches the current segment, after applying the segment to the current node.
+     */
+    private Set<SchemaDefinition> traverse(SchemaDefinition current, String segment) {
+        final Set<SchemaDefinition> definitions = new HashSet<>();
 
-		// make sure the current node is not a ref.
-		current = JsonUtil.getReference(current.schema, current.definition);
+        // make sure the current node is not a ref.
+        current = JsonUtil.getReference(current.schema, current.definition);
 
-		if (segment.isEmpty()) {
-			return Collections.singleton(current);
-		}
+        if (segment.isEmpty()) {
+            return Collections.singleton(current);
+        }
 
-		// if it's an array, collect definitions 
-		// from the property items.
-		if (isArray(current.definition, segment)) {
-			definitions.add( JsonUtil.getReference(current.schema, current.definition.get("items")) );
-		}
+        // if it's an array, collect definitions
+        // from the property items.
+        if (isArray(current.definition, segment)) {
+            definitions.add(JsonUtil.getReference(current.schema, current.definition.get("items")));
+        }
 
-		// if the node has properties, lookup for properties that
-		// matches the segment
-		if (current.definition.has("properties") && current.definition.get("properties").has(segment)) {
-			definitions.add( 
-					JsonUtil.getReference(current.schema, current.definition.get("properties").get(segment)) 
-			);
-		}
+        // if the node has properties, lookup for properties that
+        // matches the segment
+        if (current.definition.has("properties") && current.definition.get("properties").has(segment)) {
+            definitions.add(JsonUtil.getReference(current.schema, current.definition.get("properties").get(segment)));
+        }
 
-		// if nothing found yet, collect pattern properties 
-		// that match with the segment
-		if (definitions.isEmpty() && current.definition.has("patternProperties")) {
-			definitions.addAll( traversePatternProperties(current, segment) );
-		}
+        // if nothing found yet, collect pattern properties
+        // that match with the segment
+        if (definitions.isEmpty() && current.definition.has("patternProperties")) {
+            definitions.addAll(traversePatternProperties(current, segment));
+        }
 
-		// same with additional properties
-		if (definitions.isEmpty() && current.definition.has("additionalProperties")) {
-			definitions.addAll( traverseAdditionalProperties(current, segment) );
-		}
+        // same with additional properties
+        if (definitions.isEmpty() && current.definition.has("additionalProperties")) {
+            definitions.addAll(traverseAdditionalProperties(current, segment));
+        }
 
-		// if the node is of type oneOf, traverse and collect
-		// all definitions from the oneOf
-		if (definitions.isEmpty() && current.definition.has("oneOf")) {
-			definitions.addAll( traverseOneOf(current, segment) );
-		}
+        // if the node is of type oneOf, traverse and collect
+        // all definitions from the oneOf
+        if (definitions.isEmpty() && current.definition.has("oneOf")) {
+            definitions.addAll(traverseOneOf(current, segment));
+        }
 
-		// if the node is of type anyOf, traverse and collect
-		// all definitions from the anyOf
-		if (definitions.isEmpty() && current.definition.has("anyOf")) {
-			definitions.addAll( traverseAnyOf(current, segment) );
-		}
+        // if the node is of type anyOf, traverse and collect
+        // all definitions from the anyOf
+        if (definitions.isEmpty() && current.definition.has("anyOf")) {
+            definitions.addAll(traverseAnyOf(current, segment));
+        }
 
-		return definitions;
-	}
+        return definitions;
+    }
 
-	/*
-	 * Returns true if the segment matches a position in an array and 
-	 * the current node is itself an array.
-	 */
-	private boolean isArray(JsonNode current, String segment) {
-		return segment.startsWith("@") && JsonType.ARRAY == JsonType.valueOf(current);
-	}
+    /*
+     * Returns true if the segment matches a position in an array and the current node is itself an array.
+     */
+    private boolean isArray(JsonNode current, String segment) {
+        return segment.startsWith("@") && JsonType.ARRAY == JsonType.valueOf(current);
+    }
 
-	private Set<SchemaDefinition> traversePatternProperties(SchemaDefinition current, String segment) {
-		final Set<SchemaDefinition> definitions = new HashSet<>();
-		final JsonNode properties = current.definition.get("patternProperties");
-		final Iterator<String> it = properties.fieldNames();
+    private Set<SchemaDefinition> traversePatternProperties(SchemaDefinition current, String segment) {
+        final Set<SchemaDefinition> definitions = new HashSet<>();
+        final JsonNode properties = current.definition.get("patternProperties");
+        final Iterator<String> it = properties.fieldNames();
 
-		while (it.hasNext()) {
-			String key = it.next();
-			if (key.startsWith("^")) {
-				if (segment.startsWith(key.substring(1))) {
-					if (properties.has(key)) {						
-						definitions.add( JsonUtil.getReference(current.schema, properties.get(key)) );
-					}
-				}
-			}
+        while (it.hasNext()) {
+            String key = it.next();
+            if (key.startsWith("^")) {
+                if (segment.startsWith(key.substring(1))) {
+                    if (properties.has(key)) {
+                        definitions.add(JsonUtil.getReference(current.schema, properties.get(key)));
+                    }
+                }
+            }
 
-			if (segment.matches(key) && properties.has(key)) {
-				definitions.add( JsonUtil.getReference(current.schema, properties.get(key)) );
-			}
-		}
+            if (segment.matches(key) && properties.has(key)) {
+                definitions.add(JsonUtil.getReference(current.schema, properties.get(key)));
+            }
+        }
 
-		return definitions;
-	}
+        return definitions;
+    }
 
-	private Set<SchemaDefinition> traverseAdditionalProperties(SchemaDefinition current, String segment) {
-		final JsonNode properties = current.definition.get("additionalProperties");
+    private Set<SchemaDefinition> traverseAdditionalProperties(SchemaDefinition current, String segment) {
+        final JsonNode properties = current.definition.get("additionalProperties");
 
-		if (properties.isObject()) {
-			return Collections.singleton( JsonUtil.getReference(current.schema, properties) );
-		}
+        if (properties.isObject()) {
+            return Collections.singleton(JsonUtil.getReference(current.schema, properties));
+        }
 
-		return Collections.emptySet();
-	}
+        return Collections.emptySet();
+    }
 
-	private Set<SchemaDefinition> traverseOneOf(SchemaDefinition current, String segment) {
-		final Iterator<JsonNode> it = current.definition.get("oneOf").elements();
-		final Set<SchemaDefinition> definitions = new HashSet<>();
+    private Set<SchemaDefinition> traverseOneOf(SchemaDefinition current, String segment) {
+        final Iterator<JsonNode> it = current.definition.get("oneOf").elements();
+        final Set<SchemaDefinition> definitions = new HashSet<>();
 
-		while (it.hasNext()) {
-			JsonNode next = it.next();
-			Set<SchemaDefinition> found = traverse(JsonUtil.getReference(current.schema, next), segment);
-			definitions.addAll(found);
-		}
+        while (it.hasNext()) {
+            JsonNode next = it.next();
+            Set<SchemaDefinition> found = traverse(JsonUtil.getReference(current.schema, next), segment);
+            definitions.addAll(found);
+        }
 
-		return definitions;
-	}
+        return definitions;
+    }
 
-	private Set<SchemaDefinition> traverseAnyOf(SchemaDefinition current, String segment) {
-		final Iterator<JsonNode> it = current.definition.get("anyOf").elements();
-		final Set<SchemaDefinition> definitions = new HashSet<>();
-		
-		while (it.hasNext()) {
-			JsonNode next = it.next();
-			Set<SchemaDefinition> found = traverse(JsonUtil.getReference(current.schema, next), segment);
-			definitions.addAll(found);
-		}
+    private Set<SchemaDefinition> traverseAnyOf(SchemaDefinition current, String segment) {
+        final Iterator<JsonNode> it = current.definition.get("anyOf").elements();
+        final Set<SchemaDefinition> definitions = new HashSet<>();
 
-		return definitions;
-	}
+        while (it.hasNext()) {
+            JsonNode next = it.next();
+            Set<SchemaDefinition> found = traverse(JsonUtil.getReference(current.schema, next), segment);
+            definitions.addAll(found);
+        }
+
+        return definitions;
+    }
 
 }

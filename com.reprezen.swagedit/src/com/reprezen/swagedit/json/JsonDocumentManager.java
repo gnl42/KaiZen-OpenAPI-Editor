@@ -30,82 +30,83 @@ import com.reprezen.swagedit.editor.DocumentUtils;
  */
 public class JsonDocumentManager {
 
-	private static final JsonDocumentManager INSTANCE = new JsonDocumentManager();
+    private static final JsonDocumentManager INSTANCE = new JsonDocumentManager();
 
-	public static JsonDocumentManager getInstance() {
-		return INSTANCE;
-	}
+    public static JsonDocumentManager getInstance() {
+        return INSTANCE;
+    }
 
-	// for tests
-	public JsonDocumentManager() {}
+    // for tests
+    public JsonDocumentManager() {
+    }
 
-	private final ObjectMapper mapper = new ObjectMapper();
-	private final ObjectMapper yamlMapper = new ObjectMapper(new YAMLFactory());
+    private final ObjectMapper mapper = new ObjectMapper();
+    private final ObjectMapper yamlMapper = new ObjectMapper(new YAMLFactory());
 
-	private final Map<URL, JsonNode> documents = Collections.synchronizedMap(new WeakHashMap<URL, JsonNode>());	
+    private final Map<URL, JsonNode> documents = Collections.synchronizedMap(new WeakHashMap<URL, JsonNode>());
 
-	/**
-	 * Returns the JSON representation of the document located at the given URL. If the 
-	 * document is not found or the document is not a valid JSON nor a valid YAML document, 
-	 * this method returns null.
-	 * 
-	 * @param url of the document
-	 * @return JSON tree
-	 */
-	public JsonNode getDocument(URL url) {
-		if (documents.containsKey(url)) {
-			return documents.get(url);
-		}
+    /**
+     * Returns the JSON representation of the document located at the given URL. If the document is not found or the
+     * document is not a valid JSON nor a valid YAML document, this method returns null.
+     * 
+     * @param url
+     *            of the document
+     * @return JSON tree
+     */
+    public JsonNode getDocument(URL url) {
+        if (documents.containsKey(url)) {
+            return documents.get(url);
+        }
 
-		JsonNode document;
-		if (url.getFile().endsWith("json")) {
-			try {
-				document = mapper.readTree(url);
-			} catch (Exception e) {
-				document = null;
-			}
-		} else if (url.getFile().endsWith("yaml") || url.getFile().endsWith("yml")) {
-			try {
-				document = yamlMapper.readTree(url);
-			} catch (IOException e) {
-				document = null;
-			}
-		} else {
-			// cannot decide which format, so we try both parsers
-			try {
-				document = mapper.readTree(url);
-			} catch (Exception e) {
-				try {
-					document = yamlMapper.readTree(url);
-				} catch (IOException ee) {
-					document = null;
-				}
-			}
-		}
+        JsonNode document;
+        if (url.getFile().endsWith("json")) {
+            try {
+                document = mapper.readTree(url);
+            } catch (Exception e) {
+                document = null;
+            }
+        } else if (url.getFile().endsWith("yaml") || url.getFile().endsWith("yml")) {
+            try {
+                document = yamlMapper.readTree(url);
+            } catch (IOException e) {
+                document = null;
+            }
+        } else {
+            // cannot decide which format, so we try both parsers
+            try {
+                document = mapper.readTree(url);
+            } catch (Exception e) {
+                try {
+                    document = yamlMapper.readTree(url);
+                } catch (IOException ee) {
+                    document = null;
+                }
+            }
+        }
 
-		if (document != null) {
-			documents.put(url, document);
-		}
-		return document;
-	}
+        if (document != null) {
+            documents.put(url, document);
+        }
+        return document;
+    }
 
-	public JsonNode getDocument(URI uri) {
-		try {
-			return getDocument(uri.toURL());
-		} catch (MalformedURLException e) {
-			return null;
-		}
-	}
+    public JsonNode getDocument(URI uri) {
+        try {
+            return getDocument(uri.toURL());
+        } catch (MalformedURLException e) {
+            return null;
+        }
+    }
 
-	/**
-	 * Returns the file located at the given URI if present 
-	 * in the workspace. Returns null otherwise.
-	 * 
-	 * @param uri - workspace file URI
-	 * @return file
-	 */
-	public IFile getFile(URI uri) {
-		return DocumentUtils.getWorkspaceFile(uri);
-	}
+    /**
+     * Returns the file located at the given URI if present in the workspace. Returns null otherwise.
+     * 
+     * @param uri
+     *            - workspace file URI
+     * @return file
+     */
+    public IFile getFile(URI uri) {
+        return DocumentUtils.getWorkspaceFile(uri);
+    }
 
 }

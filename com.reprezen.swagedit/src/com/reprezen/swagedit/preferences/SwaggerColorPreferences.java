@@ -21,11 +21,11 @@ import com.reprezen.swagedit.Activator;
  */
 public class SwaggerColorPreferences extends ColorPreferences {
 
-	public SwaggerColorPreferences() {
-		super();
+    public SwaggerColorPreferences() {
+        super();
 
         setPreferenceStore(Activator.getDefault().getPreferenceStore());
         setDescription("Swagger Color Preferences for syntax highlighting");
-	}
+    }
 
 }

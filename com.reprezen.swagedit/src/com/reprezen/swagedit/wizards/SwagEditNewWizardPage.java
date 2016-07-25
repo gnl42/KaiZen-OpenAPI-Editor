@@ -21,28 +21,28 @@ import com.reprezen.swagedit.Messages;
 
 public class SwagEditNewWizardPage extends WizardNewFileCreationPage {
 
-	private final String extension = "yaml";
+    private final String extension = "yaml";
 
-	/**
-	 * Constructor for SwagEditNewWizardPage.
-	 * 
-	 * @param selection
-	 */
-	public SwagEditNewWizardPage(IStructuredSelection selection) {
-		super("SwagEditNewWizardPage", selection);
-		setTitle(Messages.swagedit_wizard_title);
-		setDescription(Messages.swagedit_wizard_description);
-		setImageDescriptor(Activator.imageDescriptorFromPlugin(Activator.PLUGIN_ID, "icons/swagger_64.png"));
-		setFileExtension(extension);
-	}
+    /**
+     * Constructor for SwagEditNewWizardPage.
+     * 
+     * @param selection
+     */
+    public SwagEditNewWizardPage(IStructuredSelection selection) {
+        super("SwagEditNewWizardPage", selection);
+        setTitle(Messages.swagedit_wizard_title);
+        setDescription(Messages.swagedit_wizard_description);
+        setImageDescriptor(Activator.imageDescriptorFromPlugin(Activator.PLUGIN_ID, "icons/swagger_64.png"));
+        setFileExtension(extension);
+    }
 
-	@Override
-	protected InputStream getInitialContents() {
-		try {
-			return Activator.getDefault().getBundle().getEntry("/resources/default.yaml").openStream();
-		} catch (IOException e) {
-			return null;
-		}
-	}
+    @Override
+    protected InputStream getInitialContents() {
+        try {
+            return Activator.getDefault().getBundle().getEntry("/resources/default.yaml").openStream();
+        } catch (IOException e) {
+            return null;
+        }
+    }
 
 }

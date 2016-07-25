@@ -28,67 +28,67 @@ import com.reprezen.swagedit.json.references.JsonReferenceFactory;
 
 /**
  * Hyperlink detector that detects links from JSON references.
- *
+ * 
  */
 public class JsonReferenceHyperlinkDetector extends AbstractSwaggerHyperlinkDetector {
 
-	protected final JsonReferenceFactory factory = new JsonReferenceFactory();
+    protected final JsonReferenceFactory factory = new JsonReferenceFactory();
 
-	@Override
-	protected boolean canDetect(String basePath) {
-		return emptyToNull(basePath) != null && basePath.endsWith("$ref");
-	}
+    @Override
+    protected boolean canDetect(String basePath) {
+        return emptyToNull(basePath) != null && basePath.endsWith("$ref");
+    }
 
-	@Override
-	protected IHyperlink[] doDetect(SwaggerDocument doc, ITextViewer viewer, HyperlinkInfo info, String basePath) {
-		URI baseURI = getBaseURI();
+    @Override
+    protected IHyperlink[] doDetect(SwaggerDocument doc, ITextViewer viewer, HyperlinkInfo info, String basePath) {
+        URI baseURI = getBaseURI();
 
-		JsonReference reference = getFactory().create(doc.getNodeForPath(basePath));
-		if (reference.isInvalid() || reference.isMissing(getBaseURI())) {
-			return null;
-		}
+        JsonReference reference = getFactory().create(doc.getNodeForPath(basePath));
+        if (reference.isInvalid() || reference.isMissing(getBaseURI())) {
+            return null;
+        }
 
-		if (reference.isLocal()) {
-			IRegion target = doc.getRegion(pointer(reference.getPointer()));
-			if (target == null) {
-				return null;
-			}
-			return new IHyperlink[] {
-					new SwaggerHyperlink(reference.getPointer().toString(), viewer, info.region, target) };
-		} else {
-			URI resolved;
-			try {
-				resolved = baseURI.resolve(reference.getUri());
-			} catch (IllegalArgumentException e) { 
-				// the given string violates RFC 2396
-				return null;
-			}
-			IFile file = DocumentUtils.getWorkspaceFile(resolved);
-			if (file != null && file.exists()) {
-				return new IHyperlink[] {
-						new SwaggerFileHyperlink(info.region, info.text, file, pointer(reference.getPointer())) };
-			}
-		}
+        if (reference.isLocal()) {
+            IRegion target = doc.getRegion(pointer(reference.getPointer()));
+            if (target == null) {
+                return null;
+            }
+            return new IHyperlink[] { new SwaggerHyperlink(reference.getPointer().toString(), viewer, info.region,
+                    target) };
+        } else {
+            URI resolved;
+            try {
+                resolved = baseURI.resolve(reference.getUri());
+            } catch (IllegalArgumentException e) {
+                // the given string violates RFC 2396
+                return null;
+            }
+            IFile file = DocumentUtils.getWorkspaceFile(resolved);
+            if (file != null && file.exists()) {
+                return new IHyperlink[] { new SwaggerFileHyperlink(info.region, info.text, file,
+                        pointer(reference.getPointer())) };
+            }
+        }
 
-		return null;
-	}
+        return null;
+    }
 
-	protected FileEditorInput getActiveEditor() {
-		return DocumentUtils.getActiveEditorInput();
-	}
+    protected FileEditorInput getActiveEditor() {
+        return DocumentUtils.getActiveEditorInput();
+    }
 
-	protected URI getBaseURI() {
-		FileEditorInput editor = getActiveEditor();
+    protected URI getBaseURI() {
+        FileEditorInput editor = getActiveEditor();
 
-		return editor != null ? editor.getURI() : null;
-	}
+        return editor != null ? editor.getURI() : null;
+    }
 
-	protected JsonReferenceFactory getFactory() {
-		return factory;
-	}
+    protected JsonReferenceFactory getFactory() {
+        return factory;
+    }
 
-	protected String pointer(JsonPointer pointer) {
-		return pointer.toString().replaceAll("/", ":").replaceAll("~1", "/");
-	}
+    protected String pointer(JsonPointer pointer) {
+        return pointer.toString().replaceAll("/", ":").replaceAll("~1", "/");
+    }
 
 }

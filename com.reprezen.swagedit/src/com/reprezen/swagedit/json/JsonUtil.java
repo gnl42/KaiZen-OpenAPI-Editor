@@ -18,76 +18,74 @@ import com.reprezen.swagedit.json.references.JsonReference;
 
 public class JsonUtil {
 
-	private static final JsonSchemaManager schemaManager = new JsonSchemaManager();
+    private static final JsonSchemaManager schemaManager = new JsonSchemaManager();
 
-	/**
-	 * Returns the node that is referenced by the refNode.
-	 * 
-	 * @param document
-	 * @param refNode
-	 * @return referenced node
-	 */
-	public static SchemaDefinition getReference(JsonNode document, JsonNode refNode) {
-		if (!JsonReference.isReference(refNode) || document == null) {
-			return new SchemaDefinition(document, refNode);
-		}
+    /**
+     * Returns the node that is referenced by the refNode.
+     * 
+     * @param document
+     * @param refNode
+     * @return referenced node
+     */
+    public static SchemaDefinition getReference(JsonNode document, JsonNode refNode) {
+        if (!JsonReference.isReference(refNode) || document == null) {
+            return new SchemaDefinition(document, refNode);
+        }
 
-		// TODO Make use of JSONReference
-		String ref = refNode.get("$ref").asText();
-		if (ref.startsWith("http") || ref.startsWith("https")) {
-			JSONSchema schema = schemaManager.getSchema(ref);
-			if (schema != null) {
-				document = schema.asJson();
-			}
-			ref = ref.substring(ref.indexOf("#"));
-		}
+        // TODO Make use of JSONReference
+        String ref = refNode.get("$ref").asText();
+        if (ref.startsWith("http") || ref.startsWith("https")) {
+            JSONSchema schema = schemaManager.getSchema(ref);
+            if (schema != null) {
+                document = schema.asJson();
+            }
+            ref = ref.substring(ref.indexOf("#"));
+        }
 
-		JsonPointer pointer = asPointer(ref);
-		JsonNode found = document.at(pointer);
-		String ptr = pointer.toString();
-		String description = ptr.substring(
-				ptr.lastIndexOf("/") + 1, 
-				ptr.length());
+        JsonPointer pointer = asPointer(ref);
+        JsonNode found = document.at(pointer);
+        String ptr = pointer.toString();
+        String description = ptr.substring(ptr.lastIndexOf("/") + 1, ptr.length());
 
-		return new SchemaDefinition(document, !found.isMissingNode() ? found : refNode, description);
-	}
+        return new SchemaDefinition(document, !found.isMissingNode() ? found : refNode, description);
+    }
 
-	public static boolean isPointer(String ptr) {
-		String sanitized = sanitize(ptr);
-		if (sanitized == null) {
-			return false;
-		}
-		return sanitized.startsWith("#");
-	}
+    public static boolean isPointer(String ptr) {
+        String sanitized = sanitize(ptr);
+        if (sanitized == null) {
+            return false;
+        }
+        return sanitized.startsWith("#");
+    }
 
-	public static JsonPointer asPointer(String ptr) {
-		String sanitized = sanitize(ptr);
-		if (sanitized == null) {
-			return JsonPointer.compile("");
-		}
-		if (sanitized.startsWith("#")) {
-			sanitized = sanitized.substring(1);
-		}
-		return JsonPointer.compile(sanitized);
-	}
+    public static JsonPointer asPointer(String ptr) {
+        String sanitized = sanitize(ptr);
+        if (sanitized == null) {
+            return JsonPointer.compile("");
+        }
+        if (sanitized.startsWith("#")) {
+            sanitized = sanitized.substring(1);
+        }
+        return JsonPointer.compile(sanitized);
+    }
 
-	public static JsonPointer getPointer(JsonNode ref) {
-		String asText = ref.get("$ref").asText();
-		if (asText.startsWith("#")) {
-			asText = asText.substring(1);
-		}
+    public static JsonPointer getPointer(JsonNode ref) {
+        String asText = ref.get("$ref").asText();
+        if (asText.startsWith("#")) {
+            asText = asText.substring(1);
+        }
 
-		return JsonPointer.compile(asText);
-	}
+        return JsonPointer.compile(asText);
+    }
 
-	/*
-	 * remove quotes
-	 */
-	protected static String sanitize(String s) {
-		if (Strings.emptyToNull(s) == null) {
-			return null;
-		}
-		return s.trim().replaceAll("'|\"", "");
-	}
+    /*
+     * remove quotes
+     */
+    protected static String sanitize(String s) {
+        if (Strings.emptyToNull(s) == null) {
+            return null;
+        }
+        return s.trim().replaceAll("'|\"", "");
+    }
 
 }
