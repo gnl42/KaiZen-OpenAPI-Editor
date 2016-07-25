@@ -285,16 +285,16 @@ public class SwaggerEditor extends YEdit {
 
     @Override
     public void doSave(IProgressMonitor monitor) {
+        // batch all marker changes into a single delta for ZEN-2736 Refresh live views on swagedit error changes
         new WorkspaceJob("Do save") {
             @Override
             public IStatus runInWorkspace(final IProgressMonitor jobMonitor) throws CoreException {
+                // need to run it in UI thread because AbstractTextEditor.doSave needs it in TextViewer.setEditable()
                 Shell shell = getSite().getShell();
                 if (shell != null && !shell.isDisposed()) {
                     shell.getDisplay().syncExec(new Runnable() {
                         @Override
                         public void run() {
-                            // need to run it in UI thread because AbstractTextEditor.doSave needs it in
-                            // TextViewer.setEditable
                             SwaggerEditor.super.doSave(jobMonitor);
                         }
                     });
@@ -307,17 +307,16 @@ public class SwaggerEditor extends YEdit {
 
     @Override
     public void doSaveAs() {
+        // batch all marker changes into a single delta for ZEN-2736 Refresh live views on swagedit error changes
         new WorkspaceJob("Do save as") {
             @Override
             public IStatus runInWorkspace(IProgressMonitor monitor) throws CoreException {
-                // AbstractDecoratedTextEditor.performSaveAs needs to be executed in SWT thread
+                // AbstractDecoratedTextEditor.performSaveAs() invoked by doSaveAs() needs to be executed in SWT thread
                 Shell shell = getSite().getShell();
                 if (shell != null && !shell.isDisposed()) {
                     shell.getDisplay().syncExec(new Runnable() {
                         @Override
                         public void run() {
-                            // need to run it in UI thread because AbstractTextEditor.doSave needs it in
-                            // TextViewer.setEditable
                             SwaggerEditor.super.doSaveAs();
                         }
                     });
