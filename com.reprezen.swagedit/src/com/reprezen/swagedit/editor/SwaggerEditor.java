@@ -321,10 +321,10 @@ public class SwaggerEditor extends YEdit {
                         }
                     });
                 }
+                validate();
                 return Status.OK_STATUS;
             }
         }.schedule();
-        validate();
     }
 
     protected void validate() {
