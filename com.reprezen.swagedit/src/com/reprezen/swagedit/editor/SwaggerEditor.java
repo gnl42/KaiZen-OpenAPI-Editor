@@ -43,6 +43,7 @@ import org.eclipse.jface.text.source.projection.ProjectionSupport;
 import org.eclipse.jface.text.source.projection.ProjectionViewer;
 import org.eclipse.jface.util.IPropertyChangeListener;
 import org.eclipse.jface.util.PropertyChangeEvent;
+import org.eclipse.jface.viewers.TreeViewer;
 import org.eclipse.swt.SWT;
 import org.eclipse.swt.custom.StackLayout;
 import org.eclipse.swt.layout.FillLayout;
@@ -50,6 +51,7 @@ import org.eclipse.swt.layout.GridData;
 import org.eclipse.swt.layout.GridLayout;
 import org.eclipse.swt.widgets.Composite;
 import org.eclipse.swt.widgets.Display;
+import org.eclipse.swt.widgets.Shell;
 import org.eclipse.ui.IEditorInput;
 import org.eclipse.ui.IFileEditorInput;
 import org.yaml.snakeyaml.error.YAMLException;
@@ -88,7 +90,7 @@ public class SwaggerEditor extends YEdit {
                     @Override
                     public void run() {
                         document.onChange();
-                        validate();
+                        runValidate(false);
                     }
                 });
             }
@@ -187,7 +189,7 @@ public class SwaggerEditor extends YEdit {
             if (document != null) {
                 document.addDocumentListener(changeListener);
                 // validate content before editor opens
-                validate(true);
+                runValidate(true);
             }
         }
     }
@@ -256,7 +258,8 @@ public class SwaggerEditor extends YEdit {
      * <ul>
      * <li>it is not visible by default</li>
      * <li>it has a {@link StackLayout} and expect single composite to be created per contribution</li>
-     * <li>if there are more than one contributors, it is their responsibility to manage {@link StackLayout#topControl}</li>
+     * <li>if there are more than one contributors, it is their responsibility to manage {@link StackLayout#topControl}
+     * </li>
      * </ul>
      */
     public Composite getTopPanel() {
@@ -264,7 +267,8 @@ public class SwaggerEditor extends YEdit {
     }
 
     protected ISourceViewer doCreateSourceViewer(Composite parent, IVerticalRuler ruler, int styles) {
-        ISourceViewer viewer = new ProjectionViewer(parent, ruler, getOverviewRuler(), isOverviewRulerVisible(), styles);
+        ISourceViewer viewer = new ProjectionViewer(parent, ruler, getOverviewRuler(), isOverviewRulerVisible(),
+                styles);
         getSourceViewerDecorationSupport(viewer);
         return viewer;
     }
@@ -281,21 +285,64 @@ public class SwaggerEditor extends YEdit {
 
     @Override
     public void doSave(IProgressMonitor monitor) {
-        super.doSave(monitor);
-        validate();
+        // batch all marker changes into a single delta for ZEN-2736 Refresh live views on swagedit error changes
+        new WorkspaceJob("Do save") {
+            @Override
+            public IStatus runInWorkspace(final IProgressMonitor jobMonitor) throws CoreException {
+                // need to run it in UI thread because AbstractTextEditor.doSave needs it in TextViewer.setEditable()
+                Shell shell = getSite().getShell();
+                if (shell != null && !shell.isDisposed()) {
+                    shell.getDisplay().syncExec(new Runnable() {
+                        @Override
+                        public void run() {
+                            SwaggerEditor.super.doSave(jobMonitor);
+                        }
+                    });
+                }
+                validate();
+                return Status.OK_STATUS;
+            }
+        }.schedule();
     }
 
     @Override
     public void doSaveAs() {
-        super.doSaveAs();
-        validate();
+        // batch all marker changes into a single delta for ZEN-2736 Refresh live views on swagedit error changes
+        new WorkspaceJob("Do save as") {
+            @Override
+            public IStatus runInWorkspace(IProgressMonitor monitor) throws CoreException {
+                // AbstractDecoratedTextEditor.performSaveAs() invoked by doSaveAs() needs to be executed in SWT thread
+                Shell shell = getSite().getShell();
+                if (shell != null && !shell.isDisposed()) {
+                    shell.getDisplay().syncExec(new Runnable() {
+                        @Override
+                        public void run() {
+                            SwaggerEditor.super.doSaveAs();
+                        }
+                    });
+                }
+                validate();
+                return Status.OK_STATUS;
+            }
+        }.schedule();
     }
 
     protected void validate() {
         validate(false);
     }
 
-    protected void validate(boolean onOpen) {
+    protected void runValidate(final boolean onOpen) {
+        new WorkspaceJob("Update SwagEdit validation markers") {
+
+            @Override
+            public IStatus runInWorkspace(IProgressMonitor monitor) throws CoreException {
+                validate(onOpen);
+                return Status.OK_STATUS;
+            }
+        }.schedule();
+    }
+
+    private void validate(boolean onOpen) {
         IEditorInput editorInput = getEditorInput();
         final IDocument document = getDocumentProvider().getDocument(getEditorInput());
 
@@ -317,16 +364,9 @@ public class SwaggerEditor extends YEdit {
                 // force parsing of yaml to init parsing errors
                 ((SwaggerDocument) document).onChange();
             }
-            new WorkspaceJob("Update SwagEdit validation markers") {
-
-                @Override
-                public IStatus runInWorkspace(IProgressMonitor monitor) throws CoreException {
-                    clearMarkers(file);
-                    validateYaml(file, (SwaggerDocument) document);
-                    validateSwagger(file, (SwaggerDocument) document, fileEditorInput);
-                    return Status.OK_STATUS;
-                }
-            }.schedule();
+            clearMarkers(file);
+            validateYaml(file, (SwaggerDocument) document);
+            validateSwagger(file, (SwaggerDocument) document, fileEditorInput);
         }
     }
 
