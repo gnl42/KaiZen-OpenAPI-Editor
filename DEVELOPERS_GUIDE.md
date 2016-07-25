@@ -1,24 +1,25 @@
 #Developer's Guide
 
 # Building SwagEdit from sources
-
 Development of SwagEdit should be done with Eclipse. This project uses Maven/Tycho so you should have the Eclipse maven plugin `m2e` already installed.
 
+## 1. Get sources
 To start developing SwagEdit, clone the repository with the following command:
 
 ```
 git clone git@github.com:ModelSolv/SwagEdit.git
 ``` 
 
+## 2. Import to Eclipse IDE
 Open Eclipse and select `File > Import... > Maven > Existing Maven Project` and select the folder SwagEdit.
 This will put the project SwagEdit into your current workspace. 
 
-## Launch from development Eclipse as Eclipse Application
+## 3. Launch: From development Eclipse as Eclipse Application
 From your Eclipse IDE with SwagEdit sources, open the "Launch configurations..." dialog, then right-click on the "Eclipse Application" located in the left side and choose "New". 
 
 Make sure that SwagEdit plugins are included to the configuration, for example, you can select the "All workspace and enabled target plag-ins" in the "Plug-ins" tab:
 
-## Build a local update site from sources
+## 3. Launch: using a local update site built from sources
 
 From inside your SwagEdit folder, run the following command:
 
