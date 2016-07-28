@@ -65,7 +65,12 @@ public class JsonReferenceFactory {
         }
 
         String fragment = uri.getFragment();
-        JsonPointer pointer = JsonPointer.compile(Strings.emptyToNull(fragment));
+        JsonPointer pointer = null;
+        try {
+            pointer = JsonPointer.compile(Strings.emptyToNull(fragment));
+        } catch (IllegalArgumentException e) {
+            // let the pointer be null
+        }
 
         uri = uri.normalize();
         boolean absolute = uri.isAbsolute();
