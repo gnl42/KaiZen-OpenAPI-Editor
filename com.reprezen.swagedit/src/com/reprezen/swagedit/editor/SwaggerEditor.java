@@ -301,6 +301,7 @@ public class SwaggerEditor extends YEdit implements IShowInSource, IShowInTarget
     }
 
     protected ISourceViewer doCreateSourceViewer(Composite parent, IVerticalRuler ruler, int styles) {
+
         ISourceViewer viewer = new ProjectionViewer(parent, ruler, getOverviewRuler(), isOverviewRulerVisible(),
                 styles) {
 
