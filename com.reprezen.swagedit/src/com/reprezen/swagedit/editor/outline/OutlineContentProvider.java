@@ -1,3 +1,13 @@
+/*******************************************************************************
+ * Copyright (c) 2016 ModelSolv, Inc. and others.
+ * All rights reserved. This program and the accompanying materials
+ * are made available under the terms of the Eclipse Public License v1.0
+ * which accompanies this distribution, and is available at
+ * http://www.eclipse.org/legal/epl-v10.html
+ *
+ * Contributors:
+ *    ModelSolv, Inc. - initial API and implementation and/or initial documentation
+ *******************************************************************************/
 package com.reprezen.swagedit.editor.outline;
 
 import java.util.List;
@@ -11,35 +21,29 @@ public class OutlineContentProvider implements ITreeContentProvider {
 
     @Override
     public void dispose() {
-        // ignore
-        System.out.println("dispose");
-        // nodes = null;
+        nodes = null;
     }
 
     @SuppressWarnings("unchecked")
     @Override
     public void inputChanged(Viewer viewer, Object oldInput, Object newInput) {
-        // ignore
-        System.out.println("change " + newInput);
         if (newInput != null) {
-            System.out.println("change type " + newInput.getClass());
             this.nodes = (List<OutlineElement>) newInput;
         }
     }
 
     @Override
     public Object[] getElements(Object inputElement) {
-        if (nodes == null)
+        if (nodes == null) {
             return null;
+        }
 
         return nodes.toArray();
     }
 
     @Override
     public Object[] getChildren(Object parentElement) {
-        // ignore
         if (parentElement instanceof OutlineElement) {
-            System.out.println(((OutlineElement) parentElement).getChildren());
             return ((OutlineElement) parentElement).getChildren().toArray();
         }
         return null;
@@ -47,7 +51,6 @@ public class OutlineContentProvider implements ITreeContentProvider {
 
     @Override
     public Object getParent(Object element) {
-        // ignore
         if (element instanceof OutlineElement) {
             OutlineElement parent = ((OutlineElement) element).getParent();
 
@@ -60,7 +63,6 @@ public class OutlineContentProvider implements ITreeContentProvider {
 
     @Override
     public boolean hasChildren(Object element) {
-        // ignore
         if (element instanceof OutlineElement) {
             return !((OutlineElement) element).getChildren().isEmpty();
         }
