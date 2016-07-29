@@ -51,7 +51,6 @@ public class QuickOutline extends PopupDialog
 
     private TreeViewer treeViewer;
     private IShowInTarget showInTarget;
-
     private Text filterText;
 
     public QuickOutline(Shell parent, IShowInTarget showInTarget) {

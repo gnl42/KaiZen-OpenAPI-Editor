@@ -30,7 +30,6 @@ public class OutlineElement {
     private final String text;
     private final String key;
 
-
     private final List<OutlineElement> children;
 
     public OutlineElement(Node node) {
