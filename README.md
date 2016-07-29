@@ -25,7 +25,8 @@ Read more about SwagEdit features on http://www.reprezen.com/swagger-tools
 See [Troubleshooting](https://github.com/RepreZen/SwagEdit/blob/master/TROUBLESHOOTING.md)
 
 ## Contributing to SwagEdit
-Please see [Development Page](https://github.com/RepreZen/SwagEdit/blob/master/DEVELOPERS_GUIDE.md)
+We welcome contributions - documentation, bug reports or bug fixes.
+If you are interested in contributing to SwagEdit please see [Development Page](https://github.com/RepreZen/SwagEdit/blob/master/DEVELOPERS_GUIDE.md), we created a list of [good first bugs](https://github.com/RepreZen/SwagEdit/labels/Good%20First%20Bug) that are relatively easy to fix.
 
 ## License
 SwagEdit is provided under the Eclipse Public License (https://www.eclipse.org/legal/epl-v10.html)

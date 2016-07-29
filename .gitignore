@@ -13,3 +13,6 @@ hs_err_pid*
 
 # maven build results
 target/
+
+# Xtend Gen folder
+xtend-gen/
