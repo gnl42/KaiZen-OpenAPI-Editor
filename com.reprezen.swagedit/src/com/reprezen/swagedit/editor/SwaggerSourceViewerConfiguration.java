@@ -35,6 +35,10 @@ import org.eclipse.jface.text.reconciler.MonoReconciler;
 import org.eclipse.jface.text.source.ISourceViewer;
 import org.eclipse.swt.widgets.Shell;
 import org.eclipse.ui.part.IShowInTarget;
+import org.yaml.snakeyaml.nodes.MappingNode;
+import org.yaml.snakeyaml.nodes.Node;
+import org.yaml.snakeyaml.nodes.NodeTuple;
+import org.yaml.snakeyaml.nodes.ScalarNode;
 
 import com.reprezen.swagedit.Activator;
 import com.reprezen.swagedit.assist.SwaggerContentAssistProcessor;
@@ -129,7 +133,7 @@ public class SwaggerSourceViewerConfiguration extends YEditSourceViewerConfigura
                 informationPresenter.setInformationProvider(provider, contentType);
             }
 
-            informationPresenter.setSizeConstraints(120, 40, true, true);
+            informationPresenter.setSizeConstraints(60, 20, true, true);
         }
         return informationPresenter;
     }
@@ -168,7 +172,18 @@ public class SwaggerSourceViewerConfiguration extends YEditSourceViewerConfigura
                 SwaggerDocument doc = (SwaggerDocument) document;
 
                 List<OutlineElement> nodes = new ArrayList<>();
-                nodes.add(new OutlineElement(doc.getYaml(), doc));
+                Node root = doc.getYaml();
+                if (root instanceof MappingNode) {
+                    OutlineElement parent = new OutlineElement(root);
+
+                    String key;
+                    for (NodeTuple tuple : ((MappingNode) root).getValue()) {
+                        if (tuple.getKeyNode() instanceof ScalarNode) {
+                            key = ((ScalarNode) tuple.getKeyNode()).getValue();
+                            nodes.add(new OutlineElement(tuple.getValueNode(), parent, key));
+                        }
+                    }
+                }
 
                 return nodes;
             }

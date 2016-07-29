@@ -1,3 +1,13 @@
+/*******************************************************************************
+ * Copyright (c) 2016 ModelSolv, Inc. and others.
+ * All rights reserved. This program and the accompanying materials
+ * are made available under the terms of the Eclipse Public License v1.0
+ * which accompanies this distribution, and is available at
+ * http://www.eclipse.org/legal/epl-v10.html
+ *
+ * Contributors:
+ *    ModelSolv, Inc. - initial API and implementation and/or initial documentation
+ *******************************************************************************/
 package com.reprezen.swagedit.editor.outline;
 
 import org.eclipse.jface.dialogs.Dialog;
@@ -32,15 +42,20 @@ import org.eclipse.swt.widgets.Text;
 import org.eclipse.swt.widgets.Tree;
 import org.eclipse.swt.widgets.TreeItem;
 import org.eclipse.ui.part.IShowInTarget;
+import org.eclipse.ui.part.ShowInContext;
+
+import com.google.common.base.Strings;
 
 public class QuickOutline extends PopupDialog
         implements IInformationControl, IInformationControlExtension, IInformationControlExtension2 {
 
     private TreeViewer treeViewer;
+    private IShowInTarget showInTarget;
     private Text filterText;
 
     public QuickOutline(Shell parent, IShowInTarget showInTarget) {
         super(parent, PopupDialog.INFOPOPUPRESIZE_SHELLSTYLE, true, true, true, true, true, null, null);
+        this.showInTarget = showInTarget;
         create();
     }
 
@@ -57,7 +72,8 @@ public class QuickOutline extends PopupDialog
         filterText.addKeyListener(new KeyListener() {
             public void keyPressed(KeyEvent e) {
                 if (e.keyCode == SWT.CR) {
-                    gotoSelectedElement();
+                    handleSelection();
+                    QuickOutline.this.close();
                 }
                 if (e.keyCode == SWT.ARROW_DOWN) {
                     treeViewer.getTree().setFocus();
@@ -77,91 +93,21 @@ public class QuickOutline extends PopupDialog
 
         filterText.addModifyListener(new ModifyListener() {
             public void modifyText(ModifyEvent e) {
-                // refresh viewer to re-filter
+                // refresh tree to apply filter
                 treeViewer.getControl().setRedraw(false);
                 treeViewer.refresh();
                 treeViewer.expandAll();
-                selectFirstMatch();
+                TreeItem[] items = treeViewer.getTree().getItems();
+                if (items != null && items.length > 0) {
+                    treeViewer.getTree().setSelection(items[0]);
+                    treeViewer.getTree().showItem(items[0]);
+                } else {
+                    treeViewer.setSelection(StructuredSelection.EMPTY);
+                }
                 treeViewer.getControl().setRedraw(true);
             }
         });
         return filterText;
-    }
-
-    protected void selectFirstMatch() {
-        final Tree tree = treeViewer.getTree();
-        TreeItem element = findElement(tree.getItems());
-
-        if (element != null) {
-            tree.setSelection(element);
-            tree.showItem(element);
-        } else {
-            treeViewer.setSelection(StructuredSelection.EMPTY);
-        }
-    }
-
-    private TreeItem findElement(TreeItem[] items) {
-        return findElement(items, null, true);
-    }
-
-    private TreeItem findElement(TreeItem[] items, TreeItem[] toBeSkipped, boolean allowToGoUp) {
-        // First search at same level
-        for (int i = 0; i < items.length; i++) {
-            final TreeItem item = items[i];
-            OutlineElement element = (OutlineElement) item.getData();
-            if (element != null) {
-                if (matchesFilter(element))
-                    return item;
-            }
-        }
-
-        // Go one level down for each item
-        for (int i = 0; i < items.length; i++) {
-            final TreeItem item = items[i];
-            TreeItem foundItem = findElement(selectItems(item.getItems(), toBeSkipped), null, false);
-            if (foundItem != null)
-                return foundItem;
-        }
-
-        if (!allowToGoUp || items.length == 0)
-            return null;
-
-        // Go one level up (parent is the same for all items)
-        TreeItem parentItem = items[0].getParentItem();
-        if (parentItem != null)
-            return findElement(new TreeItem[] { parentItem }, items, true);
-
-        // Check root elements
-        return findElement(selectItems(items[0].getParent().getItems(), items), null, false);
-    }
-
-    private TreeItem[] selectItems(TreeItem[] items, TreeItem[] toBeSkipped) {
-        if (toBeSkipped == null || toBeSkipped.length == 0)
-            return items;
-
-        int j = 0;
-        for (int i = 0; i < items.length; i++) {
-            TreeItem item = items[i];
-            if (!canSkip(item, toBeSkipped))
-                items[j++] = item;
-        }
-        if (j == items.length)
-            return items;
-
-        TreeItem[] result = new TreeItem[j];
-        System.arraycopy(items, 0, result, 0, j);
-        return result;
-    }
-
-    private boolean canSkip(TreeItem item, TreeItem[] toBeSkipped) {
-        if (toBeSkipped == null)
-            return false;
-
-        for (int i = 0; i < toBeSkipped.length; i++) {
-            if (toBeSkipped[i] == item)
-                return true;
-        }
-        return false;
     }
 
     protected TreeViewer createTreeViewer(Composite parent) {
@@ -176,20 +122,38 @@ public class QuickOutline extends PopupDialog
         treeViewer.addFilter(new NamePatternFilter());
         treeViewer.setAutoExpandLevel(AbstractTreeViewer.ALL_LEVELS);
 
+        tree.addKeyListener(new KeyListener() {
+            @Override
+            public void keyReleased(KeyEvent e) {
+                // TODO Auto-generated method stub
+            }
+
+            @Override
+            public void keyPressed(KeyEvent e) {
+                if (e.keyCode == SWT.CR) {
+                    handleSelection();
+                    QuickOutline.this.close();
+                }
+            }
+        });
         tree.addMouseListener(new MouseAdapter() {
+            @Override
+            public void mouseDown(MouseEvent e) {
+                super.mouseDown(e);
+            }
+
             public void mouseUp(MouseEvent e) {
-
-                if (tree.getSelectionCount() < 1)
+                if (tree.getSelectionCount() < 1) {
                     return;
-
-                if (e.button != 1)
+                }
+                if (e.button != 1) {
                     return;
-
+                }
                 if (tree.equals(e.getSource())) {
                     Object o = tree.getItem(new Point(e.x, e.y));
                     TreeItem selection = tree.getSelection()[0];
                     if (selection.equals(o)) {
-                        gotoSelectedElement();
+                        handleSelection();
                     }
                 }
             }
@@ -198,19 +162,11 @@ public class QuickOutline extends PopupDialog
         return treeViewer;
     }
 
-    protected void gotoSelectedElement() {
+    protected void handleSelection() {
         ITreeSelection selection = (ITreeSelection) treeViewer.getSelection();
-        Object firstElement = selection.getFirstElement();
-        if (firstElement instanceof OutlineElement) {
-            OutlineElement element = (OutlineElement) firstElement;
-            // TODO
-            // IDocument document = editor.getDocumentProvider().getDocument(editor.getEditorInput());
-            // IRegion region = element.getRegion(editor);
 
-            // if (region != null) {
-            // editor.selectAndReveal(region.getOffset(), region.getLength());
-            // close();
-            // }
+        if (selection != null) {
+            showInTarget.show(new ShowInContext(selection.getFirstElement(), selection));
         }
     }
 
@@ -237,7 +193,7 @@ public class QuickOutline extends PopupDialog
             }
 
             public void widgetDefaultSelected(SelectionEvent e) {
-                // gotoSelectedElement();
+                handleSelection();
             }
         });
         return treeViewer.getControl();
@@ -262,6 +218,7 @@ public class QuickOutline extends PopupDialog
 
     @Override
     public void setSizeConstraints(int maxWidth, int maxHeight) {
+        getShell().setSize(maxWidth, maxHeight);
     }
 
     @Override
@@ -338,21 +295,23 @@ public class QuickOutline extends PopupDialog
     }
 
     private boolean matchesFilter(Object element) {
-        if (treeViewer == null)
+        if (treeViewer == null) {
             return true;
+        }
 
         if (element instanceof OutlineElement) {
             String matchName = ((OutlineElement) element).getText();
             String text = filterText.getText();
 
+            if (Strings.emptyToNull(text) == null) {
+                return true;
+            }
+
             if (matchName != null) {
-                if (text.startsWith("*")) {
-                    return matchName.contains(text.substring(1));
-                } else {
-                    return matchName.startsWith(text);
-                }
+                return matchName.contains(text);
             }
         }
+
         return false;
     }
 
@@ -360,7 +319,25 @@ public class QuickOutline extends PopupDialog
 
         @Override
         public boolean select(Viewer viewer, Object parentElement, Object element) {
-            return matchesFilter(element);
+            if (viewer == null || matchesFilter(element)) {
+                return true;
+            }
+
+            return hasUnfilteredChild((TreeViewer) viewer, element);
+        }
+
+        /*
+         * Returns true if one of it's children is a filter element.
+         */
+        private boolean hasUnfilteredChild(TreeViewer viewer, Object element) {
+            Object[] children = ((OutlineContentProvider) viewer.getContentProvider()).getChildren(element);
+            for (Object o : children) {
+                if (select(viewer, element, o)) {
+                    return true;
+                }
+            }
+            return false;
         }
     }
+
 }
