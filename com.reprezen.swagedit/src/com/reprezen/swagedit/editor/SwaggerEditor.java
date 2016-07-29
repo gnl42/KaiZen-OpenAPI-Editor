@@ -70,6 +70,7 @@ import org.yaml.snakeyaml.error.YAMLException;
 
 import com.fasterxml.jackson.core.JsonParseException;
 import com.reprezen.swagedit.Activator;
+import com.reprezen.swagedit.editor.outline.OutlineElement;
 import com.reprezen.swagedit.handlers.OpenQuickOutlineHandler;
 import com.reprezen.swagedit.validation.SwaggerError;
 import com.reprezen.swagedit.validation.Validator;
@@ -518,7 +519,14 @@ public class SwaggerEditor extends YEdit implements IShowInSource, IShowInTarget
 
     @Override
     public boolean show(ShowInContext context) {
-        // TODO Auto-generated method stub
+        Object element = context.getInput();
+
+        if (element instanceof OutlineElement) {
+            Position position = ((OutlineElement) element).getPosition(getSourceViewer().getDocument());
+            selectAndReveal(position.getOffset(), position.getLength());
+            return true;
+        }
+
         return false;
     }
 
