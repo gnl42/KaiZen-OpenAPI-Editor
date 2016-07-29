@@ -58,7 +58,7 @@ public class JsonReference {
      * @return true if is invalid URI.
      */
     public boolean isInvalid() {
-        return uri == null;
+        return uri == null || pointer == null;
     }
 
     /**
@@ -95,7 +95,11 @@ public class JsonReference {
             }
             final JsonNode doc = manager.getDocument(resolvedURI);
             if (doc != null) {
-                resolved = doc.at(pointer);
+                try {
+                    resolved = doc.at(pointer);
+                } catch (Exception e) {
+                    // ignore, the value will be null
+                }
             }
         }
 

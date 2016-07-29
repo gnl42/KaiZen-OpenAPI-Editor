@@ -286,10 +286,12 @@ public class SwaggerEditor extends YEdit {
     @Override
     public void doSave(IProgressMonitor monitor) {
         // batch all marker changes into a single delta for ZEN-2736 Refresh live views on swagedit error changes
-        new WorkspaceJob("Do save") {
+        new SafeWorkspaceJob("Do save") {
             @Override
-            public IStatus runInWorkspace(final IProgressMonitor jobMonitor) throws CoreException {
-                // need to run it in UI thread because AbstractTextEditor.doSave needs it in TextViewer.setEditable()
+            public IStatus doRunInWorkspace(final IProgressMonitor jobMonitor) throws CoreException {
+
+                // need to run it in UI thread because AbstractTextEditor.doSave needs it in
+                // TextViewer.setEditable()
                 Shell shell = getSite().getShell();
                 if (shell != null && !shell.isDisposed()) {
                     shell.getDisplay().syncExec(new Runnable() {
@@ -308,9 +310,9 @@ public class SwaggerEditor extends YEdit {
     @Override
     public void doSaveAs() {
         // batch all marker changes into a single delta for ZEN-2736 Refresh live views on swagedit error changes
-        new WorkspaceJob("Do save as") {
+        new SafeWorkspaceJob("Do save as") {
             @Override
-            public IStatus runInWorkspace(IProgressMonitor monitor) throws CoreException {
+            public IStatus doRunInWorkspace(IProgressMonitor monitor) throws CoreException {
                 // AbstractDecoratedTextEditor.performSaveAs() invoked by doSaveAs() needs to be executed in SWT thread
                 Shell shell = getSite().getShell();
                 if (shell != null && !shell.isDisposed()) {
@@ -332,10 +334,10 @@ public class SwaggerEditor extends YEdit {
     }
 
     protected void runValidate(final boolean onOpen) {
-        new WorkspaceJob("Update SwagEdit validation markers") {
+        new SafeWorkspaceJob("Update SwagEdit validation markers") {
 
             @Override
-            public IStatus runInWorkspace(IProgressMonitor monitor) throws CoreException {
+            public IStatus doRunInWorkspace(IProgressMonitor monitor) throws CoreException {
                 validate(onOpen);
                 return Status.OK_STATUS;
             }
@@ -425,6 +427,35 @@ public class SwaggerEditor extends YEdit {
     @Override
     public void addDocumentIdleListener(IDocumentIdleListener listener) {
         super.addDocumentIdleListener(listener);
+    }
+
+    /**
+     * 
+     * WorkspaceJob which does not show an error dialog in case of an exception, but reports it to the error log
+     */
+    protected abstract class SafeWorkspaceJob extends WorkspaceJob {
+
+        public SafeWorkspaceJob(String name) {
+            super(name);
+        }
+
+        @Override
+        public IStatus runInWorkspace(IProgressMonitor monitor) throws CoreException {
+            try {
+                return doRunInWorkspace(monitor);
+            } catch (Exception e) {
+                // in case of an exception the Worker treats it with
+                // an ERROR status in org.eclipse.core.internal.jobs.Worker.handleException(InternalJob, Throwable)
+                // and shows a modal dialog by WorkbenchStatusDialogManagerImpl
+                YEditLog.logException(e);
+                return Status.CANCEL_STATUS;
+            } finally {
+                monitor.done();
+            }
+        }
+
+        protected abstract IStatus doRunInWorkspace(IProgressMonitor monitor) throws CoreException;
+
     }
 
 }
