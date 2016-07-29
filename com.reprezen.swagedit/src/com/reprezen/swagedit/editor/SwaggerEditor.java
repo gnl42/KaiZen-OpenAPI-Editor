@@ -43,7 +43,6 @@ import org.eclipse.jface.text.source.projection.ProjectionSupport;
 import org.eclipse.jface.text.source.projection.ProjectionViewer;
 import org.eclipse.jface.util.IPropertyChangeListener;
 import org.eclipse.jface.util.PropertyChangeEvent;
-import org.eclipse.jface.viewers.TreeViewer;
 import org.eclipse.swt.SWT;
 import org.eclipse.swt.custom.StackLayout;
 import org.eclipse.swt.layout.FillLayout;
@@ -56,7 +55,7 @@ import org.eclipse.ui.IEditorInput;
 import org.eclipse.ui.IFileEditorInput;
 import org.yaml.snakeyaml.error.YAMLException;
 
-import com.fasterxml.jackson.core.JsonParseException;
+import com.fasterxml.jackson.core.JsonProcessingException;
 import com.reprezen.swagedit.Activator;
 import com.reprezen.swagedit.validation.SwaggerError;
 import com.reprezen.swagedit.validation.Validator;
@@ -386,8 +385,8 @@ public class SwaggerEditor extends YEdit {
         if (document.getYamlError() instanceof YAMLException) {
             addMarker(new SwaggerError((YAMLException) document.getYamlError()), file, document);
         }
-        if (document.getJsonError() instanceof JsonParseException) {
-            addMarker(new SwaggerError((JsonParseException) document.getJsonError()), file, document);
+        if (document.getJsonError() instanceof JsonProcessingException) {
+            addMarker(new SwaggerError((JsonProcessingException) document.getJsonError()), file, document);
         }
     }
 
