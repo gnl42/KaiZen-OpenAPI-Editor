@@ -33,19 +33,25 @@ import org.eclipse.jface.text.DocumentEvent;
 import org.eclipse.jface.text.IDocument;
 import org.eclipse.jface.text.IDocumentListener;
 import org.eclipse.jface.text.Position;
+import org.eclipse.jface.text.information.IInformationPresenter;
 import org.eclipse.jface.text.source.Annotation;
 import org.eclipse.jface.text.source.ISourceViewer;
 import org.eclipse.jface.text.source.IVerticalRuler;
 import org.eclipse.jface.text.source.SourceViewer;
+import org.eclipse.jface.text.source.SourceViewerConfiguration;
 import org.eclipse.jface.text.source.projection.ProjectionAnnotation;
 import org.eclipse.jface.text.source.projection.ProjectionAnnotationModel;
 import org.eclipse.jface.text.source.projection.ProjectionSupport;
 import org.eclipse.jface.text.source.projection.ProjectionViewer;
 import org.eclipse.jface.util.IPropertyChangeListener;
 import org.eclipse.jface.util.PropertyChangeEvent;
-import org.eclipse.jface.viewers.TreeViewer;
+import org.eclipse.jface.viewers.ISelection;
+import org.eclipse.jface.viewers.IStructuredSelection;
+import org.eclipse.jface.viewers.StructuredSelection;
 import org.eclipse.swt.SWT;
 import org.eclipse.swt.custom.StackLayout;
+import org.eclipse.swt.events.SelectionAdapter;
+import org.eclipse.swt.events.SelectionEvent;
 import org.eclipse.swt.layout.FillLayout;
 import org.eclipse.swt.layout.GridData;
 import org.eclipse.swt.layout.GridLayout;
@@ -53,11 +59,21 @@ import org.eclipse.swt.widgets.Composite;
 import org.eclipse.swt.widgets.Display;
 import org.eclipse.swt.widgets.Shell;
 import org.eclipse.ui.IEditorInput;
+import org.eclipse.ui.IEditorSite;
 import org.eclipse.ui.IFileEditorInput;
+import org.eclipse.ui.PartInitException;
+import org.eclipse.ui.PlatformUI;
+import org.eclipse.ui.contexts.IContextService;
+import org.eclipse.ui.part.IShowInSource;
+import org.eclipse.ui.part.IShowInTarget;
+import org.eclipse.ui.part.ShowInContext;
+import org.eclipse.ui.swt.IFocusService;
 import org.yaml.snakeyaml.error.YAMLException;
 
-import com.fasterxml.jackson.core.JsonParseException;
+import com.fasterxml.jackson.core.JsonProcessingException;
 import com.reprezen.swagedit.Activator;
+import com.reprezen.swagedit.editor.outline.OutlineElement;
+import com.reprezen.swagedit.handlers.OpenQuickOutlineHandler;
 import com.reprezen.swagedit.validation.SwaggerError;
 import com.reprezen.swagedit.validation.Validator;
 
@@ -65,9 +81,10 @@ import com.reprezen.swagedit.validation.Validator;
  * SwagEdit editor.
  * 
  */
-public class SwaggerEditor extends YEdit {
+public class SwaggerEditor extends YEdit implements IShowInSource, IShowInTarget {
 
     public static final String ID = "com.reprezen.swagedit.editor";
+    public static final String CONTEXT = "com.reprezen.swagedit.context";
 
     private final Validator validator = new Validator();
     private ProjectionSupport projectionSupport;
@@ -171,6 +188,21 @@ public class SwaggerEditor extends YEdit {
     public SwaggerEditor() {
         super();
         setDocumentProvider(new SwaggerDocumentProvider());
+        sourceViewerConfiguration.setShowInTarget(this);
+    }
+
+    @Override
+    public void init(IEditorSite site, IEditorInput input) throws PartInitException {
+        super.init(site, input);
+        IContextService contextService = (IContextService) site.getService(IContextService.class);
+        contextService.activateContext(CONTEXT);
+    }
+
+    @Override
+    protected void initializeEditor() {
+        super.initializeEditor();
+        setHelpContextId(CONTEXT);
+        setSourceViewerConfiguration(createSourceViewerConfiguration());
     }
 
     @Override
@@ -192,6 +224,12 @@ public class SwaggerEditor extends YEdit {
                 runValidate(true);
             }
         }
+    }
+
+    @Override
+    @SuppressWarnings("rawtypes")
+    public Object getAdapter(Class required) {
+        return super.getAdapter(required);
     }
 
     public ProjectionViewer getProjectionViewer() {
@@ -247,7 +285,6 @@ public class SwaggerEditor extends YEdit {
         ISourceViewer result = doCreateSourceViewer(editorComposite, ruler, styles);
 
         return result;
-
     }
 
     /**
@@ -267,9 +304,59 @@ public class SwaggerEditor extends YEdit {
     }
 
     protected ISourceViewer doCreateSourceViewer(Composite parent, IVerticalRuler ruler, int styles) {
-        ISourceViewer viewer = new ProjectionViewer(parent, ruler, getOverviewRuler(), isOverviewRulerVisible(),
-                styles);
+        ProjectionViewer viewer = new ProjectionViewer(parent, ruler, getOverviewRuler(), isOverviewRulerVisible(),
+                styles) {
+
+            private IInformationPresenter outlinePresenter;
+
+            @Override
+            public void doOperation(int operation) {
+                if (operation == OpenQuickOutlineHandler.QUICK_OUTLINE && outlinePresenter != null) {
+                    outlinePresenter.showInformation();
+                    return;
+                }
+                super.doOperation(operation);
+            }
+
+            @Override
+            public boolean canDoOperation(int operation) {
+                if (operation == OpenQuickOutlineHandler.QUICK_OUTLINE && outlinePresenter != null) {
+                    return true;
+                }
+                return super.canDoOperation(operation);
+            }
+
+            @Override
+            public void configure(SourceViewerConfiguration configuration) {
+                super.configure(configuration);
+
+                if (configuration instanceof SwaggerSourceViewerConfiguration) {
+                    SwaggerSourceViewerConfiguration c = (SwaggerSourceViewerConfiguration) configuration;
+                    outlinePresenter = c.getOutlinePresenter(this);
+
+                    if (outlinePresenter != null) {
+                        outlinePresenter.install(this);
+                    }
+                }
+            }
+        };
+
+        IFocusService focusService = (IFocusService) PlatformUI.getWorkbench().getService(IFocusService.class);
+        if (focusService != null) {
+            focusService.addFocusTracker(viewer.getTextWidget(), "com.reprezen.swagedit.editor.sourceViewer");
+        }
+
+        viewer.getTextWidget().addSelectionListener(new SelectionAdapter() {
+            @Override
+            public void widgetSelected(SelectionEvent e) {
+                // detectOutlineLocationChanged();
+            }
+        });
+
+        viewer.getTextWidget().setData(ISourceViewer.class.getName(), viewer);
+
         getSourceViewerDecorationSupport(viewer);
+
         return viewer;
     }
 
@@ -386,8 +473,8 @@ public class SwaggerEditor extends YEdit {
         if (document.getYamlError() instanceof YAMLException) {
             addMarker(new SwaggerError((YAMLException) document.getYamlError()), file, document);
         }
-        if (document.getJsonError() instanceof JsonParseException) {
-            addMarker(new SwaggerError((JsonParseException) document.getJsonError()), file, document);
+        if (document.getJsonError() instanceof JsonProcessingException) {
+            addMarker(new SwaggerError((JsonProcessingException) document.getJsonError()), file, document);
         }
     }
 
@@ -455,7 +542,33 @@ public class SwaggerEditor extends YEdit {
         }
 
         protected abstract IStatus doRunInWorkspace(IProgressMonitor monitor) throws CoreException;
+    }
 
+    @Override
+    protected void initializeKeyBindingScopes() {
+        setKeyBindingScopes(new String[] { CONTEXT });
+    }
+
+    @Override
+    public boolean show(ShowInContext context) {
+        ISelection selection = context.getSelection();
+
+        if (selection instanceof IStructuredSelection) {
+            Object selected = ((IStructuredSelection) selection).getFirstElement();
+
+            if (selected instanceof OutlineElement) {
+                Position position = ((OutlineElement) selected).getPosition(getSourceViewer().getDocument());
+                selectAndReveal(position.getOffset(), position.getLength());
+                return true;
+            }
+        }
+
+        return false;
+    }
+
+    @Override
+    public ShowInContext getShowInContext() {
+        return new ShowInContext(getEditorInput(), new StructuredSelection());
     }
 
 }

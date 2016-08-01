@@ -22,7 +22,7 @@ import org.eclipse.core.resources.IMarker;
 import org.yaml.snakeyaml.error.MarkedYAMLException;
 import org.yaml.snakeyaml.error.YAMLException;
 
-import com.fasterxml.jackson.core.JsonParseException;
+import com.fasterxml.jackson.core.JsonProcessingException;
 import com.fasterxml.jackson.databind.JsonNode;
 import com.google.common.base.Strings;
 import com.google.common.collect.Lists;
@@ -62,7 +62,7 @@ public class SwaggerError {
         }
     }
 
-    public SwaggerError(JsonParseException exception) {
+    public SwaggerError(JsonProcessingException exception) {
         this.level = IMarker.SEVERITY_ERROR;
         this.message = exception.getMessage();
 
