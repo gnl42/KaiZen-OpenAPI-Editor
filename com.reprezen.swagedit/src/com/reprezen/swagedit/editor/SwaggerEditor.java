@@ -70,7 +70,7 @@ import org.eclipse.ui.part.ShowInContext;
 import org.eclipse.ui.swt.IFocusService;
 import org.yaml.snakeyaml.error.YAMLException;
 
-import com.fasterxml.jackson.core.JsonParseException;
+import com.fasterxml.jackson.core.JsonProcessingException;
 import com.reprezen.swagedit.Activator;
 import com.reprezen.swagedit.editor.outline.OutlineElement;
 import com.reprezen.swagedit.handlers.OpenQuickOutlineHandler;
@@ -473,8 +473,8 @@ public class SwaggerEditor extends YEdit implements IShowInSource, IShowInTarget
         if (document.getYamlError() instanceof YAMLException) {
             addMarker(new SwaggerError((YAMLException) document.getYamlError()), file, document);
         }
-        if (document.getJsonError() instanceof JsonParseException) {
-            addMarker(new SwaggerError((JsonParseException) document.getJsonError()), file, document);
+        if (document.getJsonError() instanceof JsonProcessingException) {
+            addMarker(new SwaggerError((JsonProcessingException) document.getJsonError()), file, document);
         }
     }
 
