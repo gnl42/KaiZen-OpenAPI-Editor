@@ -48,7 +48,7 @@ public class Activator extends AbstractUIPlugin {
      * 
      */
     public enum Icons {
-        assist_item, template_item
+        assist_item, template_item, outline_document, outline_scalar, outline_mapping, outline_sequence, outline_mapping_scalar
     }
 
     /*
@@ -62,9 +62,23 @@ public class Activator extends AbstractUIPlugin {
 
         if (Display.getCurrent() != null && PlatformUI.isWorkbenchRunning()) {
             Bundle bundle = Platform.getBundle(PLUGIN_ID);
-            getImageRegistry().put(Icons.assist_item.name(), getImageDescriptor(bundle, "icons/assist_item_16.png"));
-            getImageRegistry()
-                    .put(Icons.template_item.name(), getImageDescriptor(bundle, "icons/template_item_16.png"));
+            addImage(bundle, Icons.assist_item.name(), "icons/assist_item_16.png");
+            addImage(bundle, Icons.template_item.name(), "icons/template_item_16.png");
+
+            // for quick outline, add icons from YEdit
+            bundle = Platform.getBundle(org.dadacoalition.yedit.Activator.PLUGIN_ID);
+            addImage(bundle, Icons.outline_document.name(), "icons/outline_document.gif");
+            addImage(bundle, Icons.outline_mapping.name(), "icons/outline_mapping.gif");
+            addImage(bundle, Icons.outline_scalar.name(), "icons/outline_scalar.gif");
+            addImage(bundle, Icons.outline_mapping_scalar.name(), "icons/outline_mappingscalar.gif");
+            addImage(bundle, Icons.outline_sequence.name(), "icons/outline_sequence.png");
+        }
+    }
+
+    protected void addImage(Bundle bundle, String key, String path) {
+        ImageDescriptor imageDescriptor = getImageDescriptor(bundle, path);
+        if (imageDescriptor != null) {
+            getImageRegistry().put(key, imageDescriptor);
         }
     }
 
