@@ -1,15 +1,12 @@
 package com.reprezen.swagedit.editor.outline
 
 import java.io.StringReader
-import org.eclipse.swt.graphics.Color
-import org.eclipse.swt.graphics.Device
 import org.eclipse.swt.graphics.RGB
 import org.junit.Before
 import org.junit.Test
 import org.yaml.snakeyaml.Yaml
 
 import static org.junit.Assert.*
-import static org.mockito.Mockito.mock
 
 class OutlineStyledLabelProviderTest {
 
@@ -18,11 +15,9 @@ class OutlineStyledLabelProviderTest {
 
 	@Before
 	def void setUp() {
-		val color = mock(Device)
-
 		provider = new OutlineStyledLabelProvider {
 			override protected getColor(RGB rgb) {
-				new Color(color, rgb)
+				null
 			}
 		}
 	}

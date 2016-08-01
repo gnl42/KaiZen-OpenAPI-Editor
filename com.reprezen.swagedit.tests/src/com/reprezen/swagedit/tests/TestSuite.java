@@ -18,6 +18,8 @@ import com.reprezen.swagedit.assist.JsonReferenceProposalProviderTest;
 import com.reprezen.swagedit.editor.hyperlinks.DefinitionHyperlinkDetectorTest;
 import com.reprezen.swagedit.editor.hyperlinks.JsonReferenceHyperlinkDetectorTest;
 import com.reprezen.swagedit.editor.hyperlinks.PathParamHyperlinkDetectorTest;
+import com.reprezen.swagedit.editor.outline.OutlineElementTest;
+import com.reprezen.swagedit.editor.outline.OutlineStyledLabelProviderTest;
 import com.reprezen.swagedit.json.references.JsonReferenceFactoryTest;
 import com.reprezen.swagedit.validation.ErrorProcessorTest;
 import com.reprezen.swagedit.validation.MultipleSwaggerErrorMessageTest;
@@ -39,6 +41,8 @@ import com.reprezen.swagedit.validation.ValidatorTest;
         ErrorProcessorTest.class,//
         MultipleSwaggerErrorMessageTest.class,//
         ReferenceValidatorTest.class,//
-        JsonReferenceProposalProviderTest.class })
+        JsonReferenceProposalProviderTest.class,//
+        OutlineElementTest.class,//
+        OutlineStyledLabelProviderTest.class })
 public class TestSuite {
 }
