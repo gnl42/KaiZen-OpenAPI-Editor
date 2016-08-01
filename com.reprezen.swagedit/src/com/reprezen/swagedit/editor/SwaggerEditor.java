@@ -45,6 +45,8 @@ import org.eclipse.jface.text.source.projection.ProjectionSupport;
 import org.eclipse.jface.text.source.projection.ProjectionViewer;
 import org.eclipse.jface.util.IPropertyChangeListener;
 import org.eclipse.jface.util.PropertyChangeEvent;
+import org.eclipse.jface.viewers.ISelection;
+import org.eclipse.jface.viewers.IStructuredSelection;
 import org.eclipse.jface.viewers.StructuredSelection;
 import org.eclipse.swt.SWT;
 import org.eclipse.swt.custom.StackLayout;
@@ -549,12 +551,16 @@ public class SwaggerEditor extends YEdit implements IShowInSource, IShowInTarget
 
     @Override
     public boolean show(ShowInContext context) {
-        Object element = context.getInput();
+        ISelection selection = context.getSelection();
 
-        if (element instanceof OutlineElement) {
-            Position position = ((OutlineElement) element).getPosition(getSourceViewer().getDocument());
-            selectAndReveal(position.getOffset(), position.getLength());
-            return true;
+        if (selection instanceof IStructuredSelection) {
+            Object selected = ((IStructuredSelection) selection).getFirstElement();
+
+            if (selected instanceof OutlineElement) {
+                Position position = ((OutlineElement) selected).getPosition(getSourceViewer().getDocument());
+                selectAndReveal(position.getOffset(), position.getLength());
+                return true;
+            }
         }
 
         return false;

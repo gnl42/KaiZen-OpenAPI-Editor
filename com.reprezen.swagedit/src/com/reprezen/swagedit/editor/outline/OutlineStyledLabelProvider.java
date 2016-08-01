@@ -29,12 +29,12 @@ public class OutlineStyledLabelProvider extends StyledCellLabelProvider {
     private final Styler TAG_STYLER;
     private final Styler TEXT_STYLER;
 
-    public OutlineStyledLabelProvider() {
-        final Color c = new Color(Display.getCurrent(), new RGB(149, 125, 71));
+    private final Activator activator = Activator.getDefault();
 
+    public OutlineStyledLabelProvider() {
         TAG_STYLER = new Styler() {
             public void applyStyles(TextStyle textStyle) {
-                textStyle.foreground = c;
+                textStyle.foreground = getColor(new RGB(149, 125, 71));
             }
         };
 
@@ -45,44 +45,61 @@ public class OutlineStyledLabelProvider extends StyledCellLabelProvider {
         };
     }
 
+    public Styler getTagStyler() {
+        return TAG_STYLER;
+    }
+
+    public Styler getTextStyler() {
+        return TEXT_STYLER;
+    }
+
     @Override
     public void update(ViewerCell cell) {
         Object element = cell.getElement();
         if (element instanceof OutlineElement) {
-            update(cell, (OutlineElement) element);
+            StyledString styledString = getSyledString((OutlineElement) element);
+
+            cell.setText(styledString.toString());
+            cell.setStyleRanges(styledString.getStyleRanges());
+            cell.setImage(getImage(getIcon((OutlineElement) element)));
         }
     }
 
-    protected void update(ViewerCell cell, OutlineElement element) {
-        StyledString styledString = new StyledString(element.getText(), TEXT_STYLER);
-        styledString.append(" " + element.getNode().getNodeId(), TAG_STYLER);
+    protected StyledString getSyledString(OutlineElement element) {
+        StyledString styledString = new StyledString(element.getText(), getTextStyler());
+        // styledString.append(" ");
+        // styledString.append(element.getNode().getNodeId().name(), getTagStyler());
 
-        cell.setText(styledString.toString());
-        cell.setStyleRanges(styledString.getStyleRanges());
-        cell.setImage(getImage(element));
+        return styledString;
     }
 
-    protected Image getImage(OutlineElement element) {
-        Activator activator = Activator.getDefault();
+    protected Icons getIcon(OutlineElement element) {
         OutlineElement parent = element.getParent();
+
         if (parent.getNode().getNodeId() == NodeId.mapping) {
-
             if (element.getChildren().isEmpty()) {
-                return activator.getImage(Icons.outline_mapping_scalar);
+                return Icons.outline_mapping_scalar;
             } else {
-                return activator.getImage(Icons.outline_mapping);
+                return Icons.outline_mapping;
             }
-
         } else if (parent.getNode().getNodeId() == NodeId.sequence) {
 
             if (element.getChildren().isEmpty()) {
-                return activator.getImage(Icons.outline_scalar);
+                return Icons.outline_scalar;
             } else {
-                return activator.getImage(Icons.outline_sequence);
+                return Icons.outline_sequence;
             }
-
         } else {
-            return activator.getImage(Icons.outline_scalar);
+            return Icons.outline_scalar;
         }
     }
+
+    protected Color getColor(RGB rgb) {
+        return new Color(Display.getCurrent(), rgb);
+    }
+
+    protected Image getImage(Icons icon) {
+        return activator.getImage(icon);
+    }
+
 }

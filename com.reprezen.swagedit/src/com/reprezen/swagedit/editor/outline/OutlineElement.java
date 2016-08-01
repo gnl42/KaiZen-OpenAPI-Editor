@@ -164,4 +164,21 @@ public class OutlineElement {
         return builder.toString();
     }
 
+    public static List<OutlineElement> create(Node yaml) {
+        List<OutlineElement> nodes = new ArrayList<>();
+
+        if (yaml instanceof MappingNode) {
+            OutlineElement parent = new OutlineElement(yaml);
+
+            String key;
+            for (NodeTuple tuple : ((MappingNode) yaml).getValue()) {
+                if (tuple.getKeyNode() instanceof ScalarNode) {
+                    key = ((ScalarNode) tuple.getKeyNode()).getValue();
+                    nodes.add(new OutlineElement(tuple.getValueNode(), parent, key));
+                }
+            }
+        }
+        return nodes;
+    }
+
 }

@@ -10,9 +10,6 @@
  *******************************************************************************/
 package com.reprezen.swagedit.editor;
 
-import java.util.ArrayList;
-import java.util.List;
-
 import org.dadacoalition.yedit.editor.YEditSourceViewerConfiguration;
 import org.dadacoalition.yedit.editor.scanner.YAMLScanner;
 import org.eclipse.jface.text.IDocument;
@@ -35,10 +32,6 @@ import org.eclipse.jface.text.reconciler.MonoReconciler;
 import org.eclipse.jface.text.source.ISourceViewer;
 import org.eclipse.swt.widgets.Shell;
 import org.eclipse.ui.part.IShowInTarget;
-import org.yaml.snakeyaml.nodes.MappingNode;
-import org.yaml.snakeyaml.nodes.Node;
-import org.yaml.snakeyaml.nodes.NodeTuple;
-import org.yaml.snakeyaml.nodes.ScalarNode;
 
 import com.reprezen.swagedit.Activator;
 import com.reprezen.swagedit.assist.SwaggerContentAssistProcessor;
@@ -171,21 +164,7 @@ public class SwaggerSourceViewerConfiguration extends YEditSourceViewerConfigura
             if (document instanceof SwaggerDocument) {
                 SwaggerDocument doc = (SwaggerDocument) document;
 
-                List<OutlineElement> nodes = new ArrayList<>();
-                Node root = doc.getYaml();
-                if (root instanceof MappingNode) {
-                    OutlineElement parent = new OutlineElement(root);
-
-                    String key;
-                    for (NodeTuple tuple : ((MappingNode) root).getValue()) {
-                        if (tuple.getKeyNode() instanceof ScalarNode) {
-                            key = ((ScalarNode) tuple.getKeyNode()).getValue();
-                            nodes.add(new OutlineElement(tuple.getValueNode(), parent, key));
-                        }
-                    }
-                }
-
-                return nodes;
+                return OutlineElement.create(doc.getYaml());
             }
 
             return null;

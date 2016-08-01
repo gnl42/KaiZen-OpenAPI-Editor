@@ -15,7 +15,6 @@ import org.eclipse.jface.dialogs.PopupDialog;
 import org.eclipse.jface.text.IInformationControl;
 import org.eclipse.jface.text.IInformationControlExtension;
 import org.eclipse.jface.text.IInformationControlExtension2;
-import org.eclipse.jface.viewers.AbstractTreeViewer;
 import org.eclipse.jface.viewers.ITreeSelection;
 import org.eclipse.jface.viewers.StructuredSelection;
 import org.eclipse.jface.viewers.TreeViewer;
@@ -120,7 +119,8 @@ public class QuickOutline extends PopupDialog
         treeViewer.setContentProvider(new OutlineContentProvider());
         treeViewer.setLabelProvider(new OutlineStyledLabelProvider());
         treeViewer.addFilter(new NamePatternFilter());
-        treeViewer.setAutoExpandLevel(AbstractTreeViewer.ALL_LEVELS);
+        // Using ALL_LEVELS will cause editor to hang on large specs
+        treeViewer.setAutoExpandLevel(2);
 
         tree.addKeyListener(new KeyListener() {
             @Override
