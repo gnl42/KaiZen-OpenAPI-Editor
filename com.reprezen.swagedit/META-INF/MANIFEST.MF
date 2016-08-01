@@ -47,7 +47,6 @@ Bundle-ClassPath: lib/cal10n.api_0.7.4.jar,
  lib/org.yaml.snakeyaml_1.12.0.jar,
  lib/slf4j.api_1.6.3.jar,
  lib/slf4j.ext_1.6.3.jar,
- lib/snakeyaml-1.13.jar,
  .
 Bundle-Activator: com.reprezen.swagedit.Activator
 Export-Package: com.reprezen.swagedit,
