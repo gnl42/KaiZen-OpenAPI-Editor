@@ -58,4 +58,48 @@ class OutlineStyledLabelProviderTest {
 		assertEquals(https.text, provider.getSyledString(https).toString)
 	}
 
+	@Test
+	def void should_Display_Name_And_Type_For_Single_Valued_Objects() {
+		val text = '''
+			object:
+			  name: hello
+			  value: world
+		'''
+
+		val els = OutlineElement.create(yaml.compose(new StringReader(text)))
+		assertEquals("object", els.get(0).text)
+		
+		// TODO
+	}
+
+	@Test
+	def void should_Display_Type_For_Arrays_Of_Objects() {
+		val text = '''
+			objects:
+			  - name: hello
+			    value: world
+			  - name: hello
+			    value: world
+		'''
+		
+		val els = OutlineElement.create(yaml.compose(new StringReader(text)))
+		assertEquals("objects", els.get(0).text)
+		
+		// TODO
+	}
+
+	@Test
+	def void should_Display_Name_And_Type_For_Object_Elements() {
+		val text = '''
+			object:
+			  name: hello
+			  value: world
+		'''
+		
+		val els = OutlineElement.create(yaml.compose(new StringReader(text)))
+		assertEquals("object", els.get(0).text)
+		
+		// TODO
+	}
+
 }

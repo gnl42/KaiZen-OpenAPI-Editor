@@ -11,7 +11,6 @@
 package com.reprezen.swagedit.editor.outline;
 
 import java.util.ArrayList;
-import java.util.Collections;
 import java.util.List;
 
 import org.eclipse.jface.text.BadLocationException;
@@ -95,25 +94,16 @@ public class OutlineElement {
         }
 
         int startLine = node.getStartMark().getLine();
-        int startColumn = node.getStartMark().getColumn();
-        int endLine = node.getEndMark().getLine();
-        int endColumn = node.getEndMark().getColumn();
 
-        int startOffset = 0;
+        int offset = 0;
         try {
-            startOffset = document.getLineOffset(startLine) + startColumn;
+            offset = document.getLineOffset(startLine);
+            offset += document.getLineLength(startLine) - 1;
         } catch (BadLocationException e) {
             return position;
         }
 
-        int endOffset;
-        try {
-            endOffset = document.getLineOffset(endLine) + endColumn;
-        } catch (BadLocationException e) {
-            endOffset = 0;
-        }
-
-        return new Position(Math.max(0, startOffset), Math.max(0, endOffset - startOffset));
+        return new Position(Math.max(0, offset), 0);
     }
 
     public List<OutlineElement> getChildren() {
@@ -125,12 +115,11 @@ public class OutlineElement {
     }
 
     protected List<OutlineElement> computeChildren() {
-        List<OutlineElement> children = new ArrayList<>();
+        final List<OutlineElement> children = new ArrayList<>();
 
         switch (node.getNodeId()) {
         case mapping:
             MappingNode mn = (MappingNode) node;
-            children = new ArrayList<>();
             for (NodeTuple tn : mn.getValue()) {
                 String key = null;
                 if (tn.getKeyNode() instanceof ScalarNode) {
@@ -142,13 +131,11 @@ public class OutlineElement {
             break;
         case sequence:
             SequenceNode sq = (SequenceNode) node;
-            children = new ArrayList<>();
             for (Node n : sq.getValue()) {
                 children.add(new OutlineElement(n, this));
             }
             break;
         default:
-            children = Collections.emptyList();
             break;
         }
 

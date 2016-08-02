@@ -167,7 +167,7 @@ public class QuickOutline extends PopupDialog
         ITreeSelection selection = (ITreeSelection) treeViewer.getSelection();
 
         if (selection != null) {
-            showInTarget.show(new ShowInContext(selection.getFirstElement(), selection));
+            showInTarget.show(new ShowInContext(null, selection));
         }
     }
 
@@ -203,6 +203,7 @@ public class QuickOutline extends PopupDialog
     @Override
     public void setInput(Object input) {
         treeViewer.setInput(input);
+        treeViewer.setSelection(null, true);
     }
 
     @Override
