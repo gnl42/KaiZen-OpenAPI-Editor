@@ -6,8 +6,12 @@ SwagEdit was developed for [RepreZen API Studio](http://reprezen.com/swagger-too
 
 We welcome your suggestions and contributions!
 
-## Watch a short video about SwagEdit
+## Video: SwagEdit in RepreZen API Studio
 [![Editing Swagger-OpenAPI in RepreZen API Studio](http://img.youtube.com/vi/KX_tHp_KQkE/0.jpg)](https://www.youtube.com/watch?v=KX_tHp_KQkE)
+
+_**Note:** SwagEdit includes code assist, real-time validation, syntax highlighting, and outline view.<br/>
+[Eclipse Color Theme](https://marketplace.eclipse.org/content/eclipse-color-theme) and [EditBox](http://marketplace.eclipse.org/content/nodeclipse-editbox-background-colors-themes-highlight-code-blocks-c-java-javascript-python) are available as separate plugins.<br/>
+[RepreZen API Studio](http://reprezen.com/swagger-tools) includes the mock service, live Swagger-UI & other features that are not part of SwagEdit._
 
 ## Install SwagEdit
 ### Via an update site 
