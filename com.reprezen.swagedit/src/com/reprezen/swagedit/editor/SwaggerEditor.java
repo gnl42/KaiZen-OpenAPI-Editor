@@ -72,8 +72,8 @@ import org.yaml.snakeyaml.error.YAMLException;
 
 import com.fasterxml.jackson.core.JsonProcessingException;
 import com.reprezen.swagedit.Activator;
-import com.reprezen.swagedit.editor.outline.OutlineElement;
 import com.reprezen.swagedit.handlers.OpenQuickOutlineHandler;
+import com.reprezen.swagedit.model.AbstractNode;
 import com.reprezen.swagedit.validation.SwaggerError;
 import com.reprezen.swagedit.validation.Validator;
 
@@ -556,8 +556,8 @@ public class SwaggerEditor extends YEdit implements IShowInSource, IShowInTarget
         if (selection instanceof IStructuredSelection) {
             Object selected = ((IStructuredSelection) selection).getFirstElement();
 
-            if (selected instanceof OutlineElement) {
-                Position position = ((OutlineElement) selected).getPosition(getSourceViewer().getDocument());
+            if (selected instanceof AbstractNode) {
+                Position position = ((AbstractNode) selected).getPosition(getSourceViewer().getDocument());
                 selectAndReveal(position.getOffset(), position.getLength());
                 return true;
             }

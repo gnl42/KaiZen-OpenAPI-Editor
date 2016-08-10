@@ -112,7 +112,7 @@ public class SchemaDefinitionProvider {
      * Returns true if the segment matches a position in an array and the current node is itself an array.
      */
     private boolean isArray(JsonNode current, String segment) {
-        return segment.startsWith("@") && JsonType.ARRAY == JsonType.valueOf(current);
+        return JsonType.ARRAY == JsonType.valueOf(current);
     }
 
     private Set<SchemaDefinition> traversePatternProperties(SchemaDefinition current, String segment) {

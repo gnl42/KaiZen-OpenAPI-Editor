@@ -10,61 +10,58 @@
  *******************************************************************************/
 package com.reprezen.swagedit.editor.outline;
 
-import java.util.List;
-
 import org.eclipse.jface.viewers.ITreeContentProvider;
 import org.eclipse.jface.viewers.Viewer;
 
+import com.google.common.collect.Iterables;
+import com.reprezen.swagedit.model.AbstractNode;
+import com.reprezen.swagedit.model.Model;
+
 public class OutlineContentProvider implements ITreeContentProvider {
 
-    private List<OutlineElement> nodes;
+    private Model model;
 
     @Override
     public void dispose() {
-        nodes = null;
+        model = null;
     }
 
-    @SuppressWarnings("unchecked")
     @Override
     public void inputChanged(Viewer viewer, Object oldInput, Object newInput) {
-        if (newInput != null) {
-            this.nodes = (List<OutlineElement>) newInput;
+        if (newInput instanceof Model) {
+            this.model = (Model) newInput;
         }
     }
 
     @Override
     public Object[] getElements(Object inputElement) {
-        if (nodes == null) {
+        if (model == null) {
             return null;
         }
 
-        return nodes.toArray();
+        return new Object[] { model.getRoot() };
     }
 
     @Override
     public Object[] getChildren(Object parentElement) {
-        if (parentElement instanceof OutlineElement) {
-            return ((OutlineElement) parentElement).getChildren().toArray();
+        if (parentElement instanceof AbstractNode) {
+            return Iterables.toArray(((AbstractNode) parentElement).elements(), AbstractNode.class);
         }
         return null;
     }
 
     @Override
     public Object getParent(Object element) {
-        if (element instanceof OutlineElement) {
-            OutlineElement parent = ((OutlineElement) element).getParent();
-
-            if (parent != element) {
-                return parent;
-            }
+        if (element instanceof AbstractNode) {
+            return ((AbstractNode) element).getParent();
         }
         return null;
     }
 
     @Override
     public boolean hasChildren(Object element) {
-        if (element instanceof OutlineElement) {
-            return !((OutlineElement) element).getChildren().isEmpty();
+        if (element instanceof AbstractNode) {
+            return !Iterables.isEmpty(((AbstractNode) element).elements());
         }
         return false;
     }

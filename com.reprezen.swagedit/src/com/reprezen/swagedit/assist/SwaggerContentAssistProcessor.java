@@ -47,6 +47,7 @@ import com.google.common.collect.Lists;
 import com.reprezen.swagedit.Activator;
 import com.reprezen.swagedit.Activator.Icons;
 import com.reprezen.swagedit.Messages;
+import com.reprezen.swagedit.assist.AbstractProposalProvider.State;
 import com.reprezen.swagedit.assist.JsonReferenceProposalProvider.ContextType;
 import com.reprezen.swagedit.editor.SwaggerDocument;
 import com.reprezen.swagedit.templates.SwaggerContextType;
@@ -55,8 +56,8 @@ import com.reprezen.swagedit.templates.SwaggerTemplateContext;
 /**
  * This class provides basic content assist based on keywords used by the swagger schema.
  */
-public class SwaggerContentAssistProcessor extends TemplateCompletionProcessor implements IContentAssistProcessor,
-        ICompletionListener {
+public class SwaggerContentAssistProcessor extends TemplateCompletionProcessor
+        implements IContentAssistProcessor, ICompletionListener {
 
     private final SwaggerProposalProvider proposalProvider = new SwaggerProposalProvider();
     private final JsonReferenceProposalProvider referenceProposalProvider = new JsonReferenceProposalProvider();
@@ -136,6 +137,13 @@ public class SwaggerContentAssistProcessor extends TemplateCompletionProcessor i
 
         final List<ICompletionProposal> proposals = new ArrayList<>();
 
+        State state = new State();
+        state.document = document;
+        state.path = currentPath;
+        state.prefix = prefix;
+        state.cycle = cyclePosition;
+        state.documentOffset = documentOffset;
+
         isRefCompletion = currentPath != null && currentPath.endsWith("$ref");
         if (isRefCompletion) {
 
@@ -146,12 +154,11 @@ public class SwaggerContentAssistProcessor extends TemplateCompletionProcessor i
                 contentAssistant.setStatusMessage(textMessages[cyclePosition]);
             }
 
-            proposals.addAll(referenceProposalProvider.getCompletionProposals(currentPath, document, prefix,
-                    documentOffset, cyclePosition));
+            proposals.addAll(referenceProposalProvider.getCompletionProposals(state));
         } else {
             // compute template proposals
             final ICompletionProposal[] templateProposals = super.computeCompletionProposals(viewer, documentOffset);
-            proposals.addAll(proposalProvider.getCompletionProposals(currentPath, document, prefix, documentOffset, 0));
+            proposals.addAll(proposalProvider.getCompletionProposals(state));
 
             if (templateProposals != null && templateProposals.length > 0) {
                 proposals.addAll(Lists.newArrayList(templateProposals));
@@ -255,8 +262,8 @@ public class SwaggerContentAssistProcessor extends TemplateCompletionProcessor i
             }
         };
 
-        return new StyledString(template.getName(), nameStyle).append(": ", descriptionStyle).append(
-                template.getDescription(), descriptionStyle);
+        return new StyledString(template.getName(), nameStyle).append(": ", descriptionStyle)
+                .append(template.getDescription(), descriptionStyle);
     }
 
     @Override

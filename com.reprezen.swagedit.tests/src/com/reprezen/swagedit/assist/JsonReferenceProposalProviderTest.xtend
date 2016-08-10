@@ -57,7 +57,13 @@ class JsonReferenceProposalProviderTest {
 		val document = new SwaggerDocument
 		document.set(text)
 
-		val proposals = provider.createProposals(":paths:/foo:get:responses:200:schema:$ref", document, 0)
+		val state = new AbstractProposalProvider.State
+		state.path = ":paths:/foo:get:responses:200:schema:$ref"
+		state.document = document
+		state.documentOffset = -1
+		state.cycle = 0
+
+		val proposals = provider.createProposals(state)
 
 		assertThat(proposals, hasItems(
 			mapper.createObjectNode
@@ -87,7 +93,13 @@ class JsonReferenceProposalProviderTest {
 		val document = new SwaggerDocument
 		document.set(text)
 
-		val proposals = provider.createProposals(":definitions:Bar:properties:foo:$ref", document, 0)
+		val state = new AbstractProposalProvider.State
+		state.path = ":definitions:Bar:properties:foo:$ref"
+		state.document = document
+		state.documentOffset = -1
+		state.cycle = 0
+
+		val proposals = provider.createProposals(state)
 
 		assertThat(proposals, hasItems(
 			mapper.createObjectNode

@@ -28,6 +28,14 @@ public abstract class AbstractProposalProvider {
         }
     };
 
+    public static class State {
+        public int documentOffset;
+        public String prefix;
+        public int cycle;
+        public SwaggerDocument document;
+        public String path;
+    }
+
     /**
      * Returns a list of completion proposals that are created from a single proposal object.
      * 
@@ -43,13 +51,12 @@ public abstract class AbstractProposalProvider {
      *            - current position in list of proposals
      * @return list of completion proposals
      */
-    public Collection<? extends ICompletionProposal> getCompletionProposals(String path, SwaggerDocument document,
-            String prefix, int documentOffset, int cycle) {
+    public Collection<? extends ICompletionProposal> getCompletionProposals(State state) {
 
         final List<ICompletionProposal> result = new ArrayList<>();
-        final Iterable<JsonNode> proposals = createProposals(path, document, cycle);
+        final Iterable<JsonNode> proposals = createProposals(state);
 
-        prefix = Strings.emptyToNull(prefix);
+        final String prefix = Strings.emptyToNull(state.prefix);
 
         for (JsonNode proposal : proposals) {
             String value = proposal.get("value").asText();
@@ -64,16 +71,17 @@ public abstract class AbstractProposalProvider {
             if (prefix != null) {
                 if (value.startsWith(prefix)) {
                     value = value.substring(prefix.length(), value.length());
-                    result.add(new StyledCompletionProposal(value, styledString, documentOffset, 0, value.length()));
+                    result.add(
+                            new StyledCompletionProposal(value, styledString, state.documentOffset, 0, value.length()));
                 }
             } else {
-                result.add(new StyledCompletionProposal(value, styledString, documentOffset, 0, value.length()));
+                result.add(new StyledCompletionProposal(value, styledString, state.documentOffset, 0, value.length()));
             }
         }
 
         return result;
     }
 
-    protected abstract Iterable<JsonNode> createProposals(String path, SwaggerDocument document, int cycle);
+    protected abstract Iterable<JsonNode> createProposals(State state);
 
 }
