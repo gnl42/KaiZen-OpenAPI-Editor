@@ -39,6 +39,25 @@ public class SwaggerProposalProvider extends AbstractProposalProvider {
     }
 
     /**
+     * Returns a list of proposals for the given data and set of schema definition.
+     * 
+     * @param data
+     * @param definitions
+     * @return proposals
+     */
+    public Set<JsonNode> createProposals(JsonNode data, Set<SchemaDefinition> definitions) {
+        Set<JsonNode> proposals = new HashSet<>();
+        for (SchemaDefinition definition : definitions) {
+            Set<JsonNode> pp = createProposals(data, definition);
+            if (!pp.isEmpty()) {
+                proposals.addAll(pp);
+            }
+        }
+
+        return proposals;
+    }
+
+    /**
      * Returns a list of proposals for the given data and schema definition.
      * 
      * A proposal is a JSON object of the following format: <code>
@@ -78,25 +97,6 @@ public class SwaggerProposalProvider extends AbstractProposalProvider {
         default:
             return Sets.newHashSet();
         }
-    }
-
-    /**
-     * Returns a list of proposals for the given data and set of schema definition.
-     * 
-     * @param data
-     * @param definitions
-     * @return proposals
-     */
-    public Set<JsonNode> createProposals(JsonNode data, Set<SchemaDefinition> definitions) {
-        Set<JsonNode> proposals = new HashSet<>();
-        for (SchemaDefinition definition : definitions) {
-            Set<JsonNode> pp = createProposals(data, definition);
-            if (!pp.isEmpty()) {
-                proposals.addAll(pp);
-            }
-        }
-
-        return proposals;
     }
 
     private Set<JsonNode> createArrayProposal(JsonNode data, SchemaDefinition definition) {
@@ -217,13 +217,9 @@ public class SwaggerProposalProvider extends AbstractProposalProvider {
         final SchemaDefinition resolvedDefinition = JsonUtil.getReference(definition.schema, value);
         final JsonType type = resolvedDefinition.type;
 
-        return mapper
-                .createObjectNode()
-                .put("value", key + ":")
-                .put("label", key)
-                .put("type",
-                        type == JsonType.UNDEFINED && resolvedDefinition.descriptor != null ? resolvedDefinition.descriptor
-                                : type.getValue());
+        return mapper.createObjectNode().put("value", key + ":").put("label", key).put("type",
+                type == JsonType.UNDEFINED && resolvedDefinition.descriptor != null ? resolvedDefinition.descriptor
+                        : type.getValue());
     }
 
 }
