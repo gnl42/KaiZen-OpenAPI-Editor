@@ -38,7 +38,6 @@ import com.reprezen.swagedit.assist.SwaggerContentAssistProcessor;
 import com.reprezen.swagedit.editor.hyperlinks.DefinitionHyperlinkDetector;
 import com.reprezen.swagedit.editor.hyperlinks.JsonReferenceHyperlinkDetector;
 import com.reprezen.swagedit.editor.hyperlinks.PathParamHyperlinkDetector;
-import com.reprezen.swagedit.editor.outline.OutlineElement;
 import com.reprezen.swagedit.editor.outline.QuickOutline;
 
 public class SwaggerSourceViewerConfiguration extends YEditSourceViewerConfiguration {
@@ -162,9 +161,7 @@ public class SwaggerSourceViewerConfiguration extends YEditSourceViewerConfigura
             IDocument document = textViewer.getDocument();
 
             if (document instanceof SwaggerDocument) {
-                SwaggerDocument doc = (SwaggerDocument) document;
-
-                return OutlineElement.create(doc.getYaml());
+                return ((SwaggerDocument) document).getModel();
             }
 
             return null;

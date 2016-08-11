@@ -57,9 +57,10 @@ public class JsonReferenceProposalProvider extends AbstractProposalProvider {
         final List<JsonNode> proposals = Lists.newArrayList();
         final IFile currentFile = getActiveFile();
         final IPath basePath = currentFile.getParent().getFullPath();
+        final JsonNode doc = document.asJson();
 
         if (scope == Scope.LOCAL) {
-            proposals.addAll(collectProposals(document.asJson(), type.value(), null));
+            proposals.addAll(collectProposals(doc, type.value(), null));
         } else {
             IContainer parent;
             if (scope == Scope.PROJECT) {
@@ -71,9 +72,7 @@ public class JsonReferenceProposalProvider extends AbstractProposalProvider {
             Iterable<IFile> files = collectFiles(parent);
             for (IFile file : files) {
                 IPath relative = file.equals(currentFile) ? null : file.getFullPath().makeRelativeTo(basePath);
-
-                JsonNode content = file.equals(currentFile) ? document.asJson() : manager.getDocument(file
-                        .getLocationURI());
+                JsonNode content = file.equals(currentFile) ? doc : manager.getDocument(file.getLocationURI());
 
                 proposals.addAll(collectProposals(content, type.value(), relative));
             }

@@ -44,6 +44,7 @@ import org.eclipse.ui.part.IShowInTarget;
 import org.eclipse.ui.part.ShowInContext;
 
 import com.google.common.base.Strings;
+import com.reprezen.swagedit.model.AbstractNode;
 
 public class QuickOutline extends PopupDialog
         implements IInformationControl, IInformationControlExtension, IInformationControlExtension2 {
@@ -121,6 +122,7 @@ public class QuickOutline extends PopupDialog
         treeViewer.addFilter(new NamePatternFilter());
         // Using ALL_LEVELS will cause editor to hang on large specs
         treeViewer.setAutoExpandLevel(2);
+        treeViewer.setUseHashlookup(true);
 
         tree.addKeyListener(new KeyListener() {
             @Override
@@ -301,8 +303,8 @@ public class QuickOutline extends PopupDialog
             return true;
         }
 
-        if (element instanceof OutlineElement) {
-            String matchName = ((OutlineElement) element).getText();
+        if (element instanceof AbstractNode) {
+            String matchName = ((AbstractNode) element).getText();
             String text = filterText.getText();
 
             if (Strings.emptyToNull(text) == null) {
