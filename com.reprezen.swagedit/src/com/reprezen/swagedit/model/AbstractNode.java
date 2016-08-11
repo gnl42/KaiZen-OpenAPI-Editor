@@ -119,14 +119,15 @@ public abstract class AbstractNode {
 
             int startLine = location.getLineNr() - 1;
             int offset = 0;
+            int length = 0;
             try {
-                offset = document.getLineOffset(startLine) + location.getColumnNr()
-                        + Strings.nullToEmpty(getProperty()).length();
+                offset = document.getLineOffset(startLine);
+                length = document.getLineOffset(startLine + 1) - offset;
             } catch (BadLocationException e) {
                 return new Position(0);
             }
 
-            return new Position(Math.max(0, offset), 0);
+            return new Position(Math.max(0, offset), length);
         }
         return new Position(0);
     }
