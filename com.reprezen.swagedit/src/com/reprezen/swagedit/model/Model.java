@@ -1,10 +1,10 @@
 package com.reprezen.swagedit.model;
 
 import java.io.IOException;
+import java.util.Iterator;
 import java.util.LinkedHashMap;
 import java.util.Map;
 
-import com.fasterxml.jackson.core.JsonLocation;
 import com.fasterxml.jackson.core.JsonPointer;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import com.fasterxml.jackson.databind.module.SimpleModule;
@@ -52,38 +52,102 @@ public class Model {
         return nodes.get(JsonPointer.compile(""));
     }
 
-    public AbstractNode getNode(final int line, int column) {
-        int i = 0;
-        AbstractNode found = null;
-        // find elements before line
-        Object[] pointers = nodes.keySet().toArray();
-        for (; i < pointers.length; i++) {
-            AbstractNode node = nodes.get(pointers[i]);
-            JsonLocation location = node.getStart() != null ? node.getStart() : node.getLocation();
+    public String getPath(int line, int column) {
+        AbstractNode node = getNode(line, column);
+        if (node != null) {
+            return node.getPointer().toString();
+        }
+        return "";
+    }
 
-            int nodeLine = location.getLineNr() - 1;
-            if (nodeLine > line) {
-                break;
+    public AbstractNode getNode(int line, int column) {
+        if (column == 0) {
+            return getRoot();
+        }
+
+        AbstractNode found = forLine(line);
+        if (found != null) {
+
+            int c = startColumn(found) + Strings.nullToEmpty(found.getProperty()).length();
+            if (column >= c) {
+                return found;
+            } else {
+                return found.getParent();
+            }
+
+        } else {
+            found = findBeforeLine(line, column);
+
+            if (found != null) {
+                if (startColumn(found) <= column) {
+                    return found;
+                } else {
+                    return found.getParent();
+                }
             }
         }
 
-        int j = 0;
-        for (; j < i; j++) {
-            AbstractNode node = nodes.get(pointers[j]);
-            // the last one
-            if (j + 1 >= i) {
+        return null;
+    }
+
+    protected AbstractNode forLine(int line) {
+        final AbstractNode root = getRoot();
+        for (AbstractNode node : nodes.values()) {
+            if (node != root && startLine(node) == line) {
                 return node;
             }
+        }
+        return null;
+    }
 
-            JsonLocation location = node.getLocation();
-            int nodeLine = location.getLineNr() - 1;
-            int nodeColumn = location.getColumnNr() - 1;
+    protected AbstractNode findBeforeLine(int line, int column) {
+        AbstractNode root = getRoot();
+        AbstractNode found = null, before = null;
+        Iterator<AbstractNode> it = nodes.values().iterator();
 
-            if (nodeLine == line && nodeColumn >= column) {
-                return node;
+        while (found == null && it.hasNext()) {
+            AbstractNode current = it.next();
+            if (root == current) {
+                continue;
             }
+
+            if (startLine(current) < line) {
+                if (contentColumn(current) <= column) {
+                    before = current;
+                }
+            } else {
+                found = before;
+            }
+        }
+
+        if (found == null && before != null) {
+            found = before;
         }
 
         return found;
+    }
+
+    protected int startLine(AbstractNode n) {
+        return n.getStart().getLineNr() - 1;
+    }
+
+    protected int startColumn(AbstractNode n) {
+        return n.getStart().getColumnNr() - 1;
+    }
+
+    protected int endLine(AbstractNode n) {
+        return n.getEnd().getLineNr() - 1;
+    }
+
+    protected int endColumn(AbstractNode n) {
+        return n.getEnd().getColumnNr() - 1;
+    }
+
+    protected int contentLine(AbstractNode n) {
+        return n.getLocation().getLineNr() - 1;
+    }
+
+    protected int contentColumn(AbstractNode n) {
+        return n.getLocation().getColumnNr() - 1;
     }
 }

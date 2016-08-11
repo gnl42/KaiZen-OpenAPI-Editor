@@ -51,12 +51,13 @@ public abstract class AbstractProposalProvider {
      *            - current position in list of proposals
      * @return list of completion proposals
      */
-    public Collection<? extends ICompletionProposal> getCompletionProposals(State state) {
+    public Collection<? extends ICompletionProposal> getCompletionProposals(String path, SwaggerDocument document,
+            String prefix, int documentOffset, int cycle) {
 
         final List<ICompletionProposal> result = new ArrayList<>();
-        final Iterable<JsonNode> proposals = createProposals(state);
+        final Iterable<JsonNode> proposals = createProposals(path, document, cycle);
 
-        final String prefix = Strings.emptyToNull(state.prefix);
+        prefix = Strings.emptyToNull(prefix);
 
         for (JsonNode proposal : proposals) {
             String value = proposal.get("value").asText();
@@ -72,16 +73,16 @@ public abstract class AbstractProposalProvider {
                 if (value.startsWith(prefix)) {
                     value = value.substring(prefix.length(), value.length());
                     result.add(
-                            new StyledCompletionProposal(value, styledString, state.documentOffset, 0, value.length()));
+                            new StyledCompletionProposal(value, styledString, documentOffset, 0, value.length()));
                 }
             } else {
-                result.add(new StyledCompletionProposal(value, styledString, state.documentOffset, 0, value.length()));
+                result.add(new StyledCompletionProposal(value, styledString, documentOffset, 0, value.length()));
             }
         }
 
         return result;
     }
 
-    protected abstract Iterable<JsonNode> createProposals(State state);
+    protected abstract Iterable<JsonNode> createProposals(String path, SwaggerDocument document, int cycle);
 
 }

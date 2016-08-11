@@ -24,27 +24,18 @@ import com.reprezen.swagedit.editor.SwaggerDocument;
 import com.reprezen.swagedit.json.JsonType;
 import com.reprezen.swagedit.json.JsonUtil;
 import com.reprezen.swagedit.json.SchemaDefinition;
-import com.reprezen.swagedit.model.AbstractNode;
-import com.reprezen.swagedit.model.Model;
+import com.reprezen.swagedit.json.SchemaDefinitionProvider;
 
 /**
  * Provider of completion proposals.
  */
 public class SwaggerProposalProvider extends AbstractProposalProvider {
 
+    private final SchemaDefinitionProvider walker = new SchemaDefinitionProvider();
+
     @Override
-    protected Iterable<JsonNode> createProposals(State state) {
-        SwaggerDocument document = state.document;
-        Model model = document.getModel(state.documentOffset - state.prefix.length());
-        if (model == null)
-            return Collections.emptyList();
-
-        AbstractNode element = model.find(state.path);
-
-        if (element == null)
-            return Collections.emptyList();
-
-        return createProposals(document.getNodeForPath(state.path), element.definitions);
+    protected Iterable<JsonNode> createProposals(String path, SwaggerDocument document, int cycle) {
+        return createProposals(document.getNodeForPath(path), walker.getDefinitions(path));
     }
 
     /**

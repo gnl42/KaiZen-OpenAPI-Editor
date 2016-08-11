@@ -13,11 +13,14 @@ import com.fasterxml.jackson.databind.JsonDeserializer;
 public class NodeDeserializer extends JsonDeserializer<AbstractNode> {
 
     @Override
-    public AbstractNode deserialize(JsonParser p, DeserializationContext context) throws IOException, JsonProcessingException {
+    public AbstractNode deserialize(JsonParser p, DeserializationContext context)
+            throws IOException, JsonProcessingException {
+
         final Model model = (Model) context.getAttribute("model");
         final AbstractNode parent = (AbstractNode) context.getAttribute("parent");
         final JsonPointer ptr = (JsonPointer) context.getAttribute("pointer");
 
+        JsonLocation startLocation = p.getTokenLocation();
         if (p.getCurrentToken() == JsonToken.FIELD_NAME) {
             p.nextToken();
         }
@@ -25,6 +28,7 @@ public class NodeDeserializer extends JsonDeserializer<AbstractNode> {
         if (p.getCurrentToken() == JsonToken.START_OBJECT) {
 
             ObjectNode node = new ObjectNode(parent, ptr, p.getCurrentLocation());
+            node.setStartLocation(startLocation);
             model.add(node);
 
             while (p.nextToken() != JsonToken.END_OBJECT) {
@@ -35,14 +39,12 @@ public class NodeDeserializer extends JsonDeserializer<AbstractNode> {
                 context.setAttribute("parent", node);
                 context.setAttribute("pointer", pp);
 
-                JsonLocation start = p.getCurrentLocation();
-
                 AbstractNode v = deserialize(p, context);
-                v.setStartLocation(start);
                 v.setProperty(name);
-
                 node.put(name, v);
             }
+
+            node.setEndLocation(p.getCurrentLocation());
             return node;
 
         } else if (p.getCurrentToken() == JsonToken.START_ARRAY) {
@@ -60,6 +62,9 @@ public class NodeDeserializer extends JsonDeserializer<AbstractNode> {
                 node.add(v);
                 i++;
             }
+
+            node.setStartLocation(startLocation);
+            node.setEndLocation(p.getCurrentLocation());
             return node;
 
         } else {
@@ -68,8 +73,11 @@ public class NodeDeserializer extends JsonDeserializer<AbstractNode> {
             Object v = context.readValue(p, Object.class);
 
             ValueNode node = new ValueNode(parent, ptr, v, location);
+            node.setStartLocation(startLocation);
+            node.setEndLocation(p.getCurrentLocation());
             model.add(node);
             return node;
+
         }
     }
 

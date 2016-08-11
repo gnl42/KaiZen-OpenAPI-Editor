@@ -30,6 +30,7 @@ import com.fasterxml.jackson.databind.ObjectMapper;
 import com.google.common.base.Strings;
 import com.google.common.collect.Lists;
 import com.reprezen.swagedit.editor.DocumentUtils;
+import com.reprezen.swagedit.editor.SwaggerDocument;
 import com.reprezen.swagedit.json.JsonDocumentManager;
 
 /**
@@ -50,13 +51,13 @@ public class JsonReferenceProposalProvider extends AbstractProposalProvider {
     }
 
     @Override
-    public Iterable<JsonNode> createProposals(State state) {
-        final Scope scope = Scope.get(state.cycle);
-        final ContextType type = ContextType.get(state.path);
+    public Iterable<JsonNode> createProposals(String path, SwaggerDocument document, int cycle) {
+        final Scope scope = Scope.get(cycle);
+        final ContextType type = ContextType.get(path);
         final List<JsonNode> proposals = Lists.newArrayList();
         final IFile currentFile = getActiveFile();
         final IPath basePath = currentFile.getParent().getFullPath();
-        final JsonNode doc = state.document.asJson();
+        final JsonNode doc = document.asJson();
 
         if (scope == Scope.LOCAL) {
             proposals.addAll(collectProposals(doc, type.value(), null));

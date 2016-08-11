@@ -47,7 +47,6 @@ import com.google.common.collect.Lists;
 import com.reprezen.swagedit.Activator;
 import com.reprezen.swagedit.Activator.Icons;
 import com.reprezen.swagedit.Messages;
-import com.reprezen.swagedit.assist.AbstractProposalProvider.State;
 import com.reprezen.swagedit.assist.JsonReferenceProposalProvider.ContextType;
 import com.reprezen.swagedit.editor.SwaggerDocument;
 import com.reprezen.swagedit.templates.SwaggerContextType;
@@ -137,13 +136,6 @@ public class SwaggerContentAssistProcessor extends TemplateCompletionProcessor
 
         final List<ICompletionProposal> proposals = new ArrayList<>();
 
-        State state = new State();
-        state.document = document;
-        state.path = currentPath;
-        state.prefix = prefix;
-        state.cycle = cyclePosition;
-        state.documentOffset = documentOffset;
-
         isRefCompletion = currentPath != null && currentPath.endsWith("$ref");
         if (isRefCompletion) {
 
@@ -154,11 +146,13 @@ public class SwaggerContentAssistProcessor extends TemplateCompletionProcessor
                 contentAssistant.setStatusMessage(textMessages[cyclePosition]);
             }
 
-            proposals.addAll(referenceProposalProvider.getCompletionProposals(state));
+            proposals.addAll(referenceProposalProvider.getCompletionProposals(currentPath, document, prefix,
+                    documentOffset, cyclePosition));
         } else {
             // compute template proposals
             final ICompletionProposal[] templateProposals = super.computeCompletionProposals(viewer, documentOffset);
-            proposals.addAll(proposalProvider.getCompletionProposals(state));
+            proposals.addAll(proposalProvider.getCompletionProposals(currentPath, document, prefix, documentOffset,
+                    cyclePosition));
 
             if (templateProposals != null && templateProposals.length > 0) {
                 proposals.addAll(Lists.newArrayList(templateProposals));

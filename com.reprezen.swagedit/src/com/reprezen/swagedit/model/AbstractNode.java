@@ -10,6 +10,7 @@ import org.eclipse.jface.text.Position;
 import com.fasterxml.jackson.core.JsonLocation;
 import com.fasterxml.jackson.core.JsonPointer;
 import com.fasterxml.jackson.databind.JsonNode;
+import com.google.common.base.Strings;
 import com.google.common.collect.Iterables;
 import com.reprezen.swagedit.json.JsonType;
 import com.reprezen.swagedit.json.SchemaDefinition;
@@ -30,6 +31,8 @@ public abstract class AbstractNode {
     private JsonLocation location;
 
     private JsonLocation start;
+
+    private JsonLocation end;
 
     AbstractNode(AbstractNode parent, JsonPointer ptr) {
         this(parent, ptr, null);
@@ -84,6 +87,14 @@ public abstract class AbstractNode {
         return type;
     }
 
+    public JsonNode getSchema() {
+        return schema;
+    }
+
+    public Set<SchemaDefinition> getDefinitions() {
+        return definitions;
+    }
+
     public AbstractNode getParent() {
         return parent;
     }
@@ -103,12 +114,14 @@ public abstract class AbstractNode {
     public abstract String getText();
 
     public Position getPosition(IDocument document) {
+        JsonLocation location = getStart() != null ? getStart() : getLocation();
         if (location != null) {
-            int startLine = getLocation().getLineNr() - 1;
 
+            int startLine = location.getLineNr() - 1;
             int offset = 0;
             try {
-                offset = (document.getLineOffset(startLine) + getLocation().getColumnNr()) - 1;
+                offset = document.getLineOffset(startLine) + location.getColumnNr()
+                        + Strings.nullToEmpty(getProperty()).length();
             } catch (BadLocationException e) {
                 return new Position(0);
             }
@@ -122,7 +135,16 @@ public abstract class AbstractNode {
         this.start = start;
     }
 
+    public void setEndLocation(JsonLocation location) {
+        this.end = location;
+    }
+
     public JsonLocation getStart() {
         return start;
     }
+
+    public JsonLocation getEnd() {
+        return end;
+    }
+
 }
