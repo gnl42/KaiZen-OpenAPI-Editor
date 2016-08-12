@@ -67,8 +67,8 @@ class AbstractNodeTest {
 
 		val position = el.getPosition(doc)
 		// end of first line
-		assertEquals(4, position.offset)
-		assertEquals(0, position.length)
+		assertEquals(0, position.offset)
+		assertEquals(9, position.length)
 
 		// position is first line
 		assertEquals(0, doc.getLineOfOffset(position.offset))
@@ -183,8 +183,8 @@ class AbstractNodeTest {
 
 		val position = el.getPosition(doc)
 		// after foo:
-		assertEquals(4, position.offset)
-		assertEquals(0, position.length)
+		assertEquals(0, position.offset)
+		assertEquals(5, position.length)
 
 		// should be first line
 		assertEquals(0, doc.getLineOfOffset(position.offset))
@@ -212,8 +212,8 @@ class AbstractNodeTest {
 
 		val position = el.getPosition(doc)
 		// after foo:
-		assertEquals(4, position.offset)
-		assertEquals(0, position.length)
+		assertEquals(0, position.offset)
+		assertEquals(6, position.length)
 
 		// should be first line
 		assertEquals(0, doc.getLineOfOffset(position.offset))
