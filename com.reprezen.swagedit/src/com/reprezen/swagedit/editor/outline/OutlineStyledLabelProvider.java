@@ -19,10 +19,13 @@ import org.eclipse.swt.graphics.Image;
 import org.eclipse.swt.graphics.RGB;
 import org.eclipse.swt.graphics.TextStyle;
 import org.eclipse.swt.widgets.Display;
-import org.yaml.snakeyaml.nodes.NodeId;
 
+import com.google.common.collect.Iterables;
 import com.reprezen.swagedit.Activator;
 import com.reprezen.swagedit.Activator.Icons;
+import com.reprezen.swagedit.json.JsonType;
+import com.reprezen.swagedit.json.SchemaDefinition;
+import com.reprezen.swagedit.model.AbstractNode;
 
 public class OutlineStyledLabelProvider extends StyledCellLabelProvider {
 
@@ -56,35 +59,65 @@ public class OutlineStyledLabelProvider extends StyledCellLabelProvider {
     @Override
     public void update(ViewerCell cell) {
         Object element = cell.getElement();
-        if (element instanceof OutlineElement) {
-            StyledString styledString = getSyledString((OutlineElement) element);
+
+        if (element instanceof AbstractNode) {
+            StyledString styledString = getSyledString((AbstractNode) element);
 
             cell.setText(styledString.toString());
             cell.setStyleRanges(styledString.getStyleRanges());
-            cell.setImage(getImage(getIcon((OutlineElement) element)));
+            cell.setImage(getImage(getIcon((AbstractNode) element)));
         }
     }
 
-    protected StyledString getSyledString(OutlineElement element) {
+    protected StyledString getSyledString(AbstractNode element) {
         StyledString styledString = new StyledString(element.getText(), getTextStyler());
-        // styledString.append(" ");
-        // styledString.append(element.getNode().getNodeId().name(), getTagStyler());
+        if (element.isObject() || element.isArray()) {
+            if (element.getType() != null) {
+
+                if (element.getParent() != null) {
+
+                    String type = null;
+
+                    // if schema definition has a title, we use it as type
+                    if (element.getSchema().has("title")) {
+                        type = element.getSchema().get("title").asText();
+                    } else {
+                        // otherwise we try to find the property holding the
+                        // schema definition
+                        SchemaDefinition definition = Iterables.getFirst(element.getDefinitions(), null);
+                        if (definition != null && definition.descriptor != null) {
+                            type = definition.descriptor;
+                        } else if (element.getType() != JsonType.ARRAY) {
+                            type = element.getType().getValue();
+                        }
+                    }
+
+                    if (type != null) {
+                        styledString.append(" ");
+                        styledString.append(type, getTagStyler());
+                    }
+                }
+            }
+        }
 
         return styledString;
     }
 
-    protected Icons getIcon(OutlineElement element) {
-        OutlineElement parent = element.getParent();
+    protected Icons getIcon(AbstractNode element) {
+        AbstractNode parent = element.getParent();
 
-        if (parent.getNode().getNodeId() == NodeId.mapping) {
-            if (element.getChildren().isEmpty()) {
+        if (parent == null) {
+            return Icons.outline_document;
+        }
+
+        if (parent.isObject()) {
+            if (Iterables.isEmpty(element.elements())) {
                 return Icons.outline_mapping_scalar;
             } else {
                 return Icons.outline_mapping;
             }
-        } else if (parent.getNode().getNodeId() == NodeId.sequence) {
-
-            if (element.getChildren().isEmpty()) {
+        } else if (parent.isArray()) {
+            if (Iterables.isEmpty(element.elements())) {
                 return Icons.outline_scalar;
             } else {
                 return Icons.outline_sequence;

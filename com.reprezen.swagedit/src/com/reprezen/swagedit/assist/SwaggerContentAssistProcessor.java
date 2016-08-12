@@ -55,8 +55,8 @@ import com.reprezen.swagedit.templates.SwaggerTemplateContext;
 /**
  * This class provides basic content assist based on keywords used by the swagger schema.
  */
-public class SwaggerContentAssistProcessor extends TemplateCompletionProcessor implements IContentAssistProcessor,
-        ICompletionListener {
+public class SwaggerContentAssistProcessor extends TemplateCompletionProcessor
+        implements IContentAssistProcessor, ICompletionListener {
 
     private final SwaggerProposalProvider proposalProvider = new SwaggerProposalProvider();
     private final JsonReferenceProposalProvider referenceProposalProvider = new JsonReferenceProposalProvider();
@@ -151,7 +151,8 @@ public class SwaggerContentAssistProcessor extends TemplateCompletionProcessor i
         } else {
             // compute template proposals
             final ICompletionProposal[] templateProposals = super.computeCompletionProposals(viewer, documentOffset);
-            proposals.addAll(proposalProvider.getCompletionProposals(currentPath, document, prefix, documentOffset, 0));
+            proposals.addAll(proposalProvider.getCompletionProposals(currentPath, document, prefix, documentOffset,
+                    cyclePosition));
 
             if (templateProposals != null && templateProposals.length > 0) {
                 proposals.addAll(Lists.newArrayList(templateProposals));
@@ -255,8 +256,8 @@ public class SwaggerContentAssistProcessor extends TemplateCompletionProcessor i
             }
         };
 
-        return new StyledString(template.getName(), nameStyle).append(": ", descriptionStyle).append(
-                template.getDescription(), descriptionStyle);
+        return new StyledString(template.getName(), nameStyle).append(": ", descriptionStyle)
+                .append(template.getDescription(), descriptionStyle);
     }
 
     @Override

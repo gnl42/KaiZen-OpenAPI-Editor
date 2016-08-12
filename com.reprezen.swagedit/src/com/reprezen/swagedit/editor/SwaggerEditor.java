@@ -68,12 +68,14 @@ import org.eclipse.ui.part.IShowInSource;
 import org.eclipse.ui.part.IShowInTarget;
 import org.eclipse.ui.part.ShowInContext;
 import org.eclipse.ui.swt.IFocusService;
+import org.eclipse.ui.views.contentoutline.IContentOutlinePage;
 import org.yaml.snakeyaml.error.YAMLException;
 
 import com.fasterxml.jackson.core.JsonProcessingException;
 import com.reprezen.swagedit.Activator;
-import com.reprezen.swagedit.editor.outline.OutlineElement;
+import com.reprezen.swagedit.editor.outline.SwaggerContentOutlinePage;
 import com.reprezen.swagedit.handlers.OpenQuickOutlineHandler;
+import com.reprezen.swagedit.model.AbstractNode;
 import com.reprezen.swagedit.validation.SwaggerError;
 import com.reprezen.swagedit.validation.Validator;
 
@@ -107,6 +109,7 @@ public class SwaggerEditor extends YEdit implements IShowInSource, IShowInTarget
                     @Override
                     public void run() {
                         document.onChange();
+                        contentOutline.setInput(getEditorInput());
                         runValidate(false);
                     }
                 });
@@ -185,6 +188,8 @@ public class SwaggerEditor extends YEdit implements IShowInSource, IShowInTarget
         }
     };
 
+    private SwaggerContentOutlinePage contentOutline;
+
     public SwaggerEditor() {
         super();
         setDocumentProvider(new SwaggerDocumentProvider());
@@ -229,7 +234,18 @@ public class SwaggerEditor extends YEdit implements IShowInSource, IShowInTarget
     @Override
     @SuppressWarnings("rawtypes")
     public Object getAdapter(Class required) {
-        return super.getAdapter(required);
+        Object adapter = super.getAdapter(required);
+
+        if (IContentOutlinePage.class.equals(required)) {
+            if (contentOutline == null) {
+                contentOutline = new SwaggerContentOutlinePage(getDocumentProvider(), this);
+                if (getEditorInput() != null)
+                    contentOutline.setInput(getEditorInput());
+            }
+            adapter = contentOutline;
+        }
+
+        return adapter;
     }
 
     public ProjectionViewer getProjectionViewer() {
@@ -556,8 +572,8 @@ public class SwaggerEditor extends YEdit implements IShowInSource, IShowInTarget
         if (selection instanceof IStructuredSelection) {
             Object selected = ((IStructuredSelection) selection).getFirstElement();
 
-            if (selected instanceof OutlineElement) {
-                Position position = ((OutlineElement) selected).getPosition(getSourceViewer().getDocument());
+            if (selected instanceof AbstractNode) {
+                Position position = ((AbstractNode) selected).getPosition(getSourceViewer().getDocument());
                 selectAndReveal(position.getOffset(), position.getLength());
                 return true;
             }

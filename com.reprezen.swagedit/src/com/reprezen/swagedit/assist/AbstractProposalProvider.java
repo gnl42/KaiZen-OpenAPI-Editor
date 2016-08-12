@@ -28,6 +28,14 @@ public abstract class AbstractProposalProvider {
         }
     };
 
+    public static class State {
+        public int documentOffset;
+        public String prefix;
+        public int cycle;
+        public SwaggerDocument document;
+        public String path;
+    }
+
     /**
      * Returns a list of completion proposals that are created from a single proposal object.
      * 
@@ -64,7 +72,8 @@ public abstract class AbstractProposalProvider {
             if (prefix != null) {
                 if (value.startsWith(prefix)) {
                     value = value.substring(prefix.length(), value.length());
-                    result.add(new StyledCompletionProposal(value, styledString, documentOffset, 0, value.length()));
+                    result.add(
+                            new StyledCompletionProposal(value, styledString, documentOffset, 0, value.length()));
                 }
             } else {
                 result.add(new StyledCompletionProposal(value, styledString, documentOffset, 0, value.length()));
