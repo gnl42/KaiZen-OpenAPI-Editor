@@ -398,7 +398,7 @@ public class SwaggerDocument extends Document {
     private void parseJson(String content) {
         try {
             Object expandedYamlObject = new com.fasterxml.jackson.dataformat.yaml.snakeyaml.Yaml().load(content);
-            jsonContent = mapper.readTree(mapper.writeValueAsString(expandedYamlObject));
+            jsonContent = mapper.valueToTree(expandedYamlObject);
             jsonError = null;
         } catch (Exception e) {
             jsonContent = null;
