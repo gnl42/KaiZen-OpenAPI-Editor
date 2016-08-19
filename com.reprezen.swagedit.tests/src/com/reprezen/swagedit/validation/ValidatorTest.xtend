@@ -16,7 +16,6 @@ import java.io.IOException
 import org.eclipse.core.resources.IMarker
 import org.junit.Test
 
-import static org.hamcrest.core.IsCollectionContaining.*
 import static org.hamcrest.CoreMatchers.*
 import static org.junit.Assert.*
 
