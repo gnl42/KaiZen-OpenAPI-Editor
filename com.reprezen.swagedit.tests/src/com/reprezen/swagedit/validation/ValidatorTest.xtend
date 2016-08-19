@@ -17,6 +17,7 @@ import org.eclipse.core.resources.IMarker
 import org.junit.Test
 
 import static org.hamcrest.core.IsCollectionContaining.*
+import static org.hamcrest.CoreMatchers.*
 import static org.junit.Assert.*
 
 class ValidatorTest {
@@ -26,6 +27,7 @@ class ValidatorTest {
 
 	@Test
 	def shouldNotReturnErrorsIfDocumentIsValid() throws IOException {
+
 		// valid document
 		val content = '''
 			swagger: '2.0'
@@ -47,12 +49,13 @@ class ValidatorTest {
 
 	@Test
 	def shouldReturnSingleErrorIfMissingRootProperty() throws IOException {
+
 		// missing property paths
 		val content = '''
-		  swagger: '2.0'
-		  info:
-		    version: 0.0.0
-		    title: Simple API
+			swagger: '2.0'
+			info:
+			  version: 0.0.0
+			  title: Simple API
 		'''
 
 		document.set(content)
@@ -66,13 +69,14 @@ class ValidatorTest {
 
 	@Test
 	def shouldReturnSingleErrorIfTypeOfPropertyIsIncorrect() throws IOException {
+
 		// incorrect value type for property paths
 		val content = '''
-		swagger: '2.0'
-		info:
-		  version: 0.0.0
-		  title: Simple API
-		paths: 'Hello'
+			swagger: '2.0'
+			info:
+			  version: 0.0.0
+			  title: Simple API
+			paths: 'Hello'
 		'''
 
 		document.set(content)
@@ -86,16 +90,17 @@ class ValidatorTest {
 
 	@Test
 	def shouldReturnSingleErrorIfTypeOfDeepPropertyIsIncorrect() throws IOException {
+
 		// invalid responses type
 		val content = '''
-		swagger: '2.0'
-		info:
-		  version: 0.0.0
-		  title: Simple API
-		paths:
-		  /:
-		    get:
-		      responses: 'Hello'
+			swagger: '2.0'
+			info:
+			  version: 0.0.0
+			  title: Simple API
+			paths:
+			  /:
+			    get:
+			      responses: 'Hello'
 		'''
 
 		document.set(content)
@@ -109,18 +114,19 @@ class ValidatorTest {
 
 	@Test
 	def shouldReturnSingleErrorIfInvalidResponseCode() throws IOException {
+
 		// invalid response code
 		val content = '''
-		swagger: '2.0'
-		info:
-		  version: 0.0.0
-		  title: Simple API
-		paths:
-		  /:
-		    get:
-		      responses:
-		        '0':
-		          description: OK
+			swagger: '2.0'
+			info:
+			  version: 0.0.0
+			  title: Simple API
+			paths:
+			  /:
+			    get:
+			      responses:
+			        '0':
+			          description: OK
 		'''
 
 		document.set(content)
@@ -134,21 +140,22 @@ class ValidatorTest {
 
 	@Test
 	def shouldReturnErrorForInvalidScheme() throws IOException {
+
 		// invalid scheme foo
 		val content = '''
-		swagger: '2.0'
-		info:
-		  version: 0.0.0
-		  title: Simple API
-		schemes:
-		  - http
-		  - foo
-		paths:
-		  /:
-		    get:
-		      responses:
-		        '200':
-		          description: OK
+			swagger: '2.0'
+			info:
+			  version: 0.0.0
+			  title: Simple API
+			schemes:
+			  - http
+			  - foo
+			paths:
+			  /:
+			    get:
+			      responses:
+			        '200':
+			          description: OK
 		'''
 
 		document.set(content)
@@ -162,19 +169,20 @@ class ValidatorTest {
 
 	@Test
 	def void shouldReturnCorrectErrorPositionOnPathWithHierarchy() throws IOException {
+
 		// invalid property schema
 		val content = '''
-		swagger: '2.0'
-		info:
-		  version: 0.0.0
-		  title: Simple API
-		paths:
-		  /foo/{bar}:
-		    get:
-		      responses:
-		        '200':
-		          description: OK
-		          schema:
+			swagger: '2.0'
+			info:
+			  version: 0.0.0
+			  title: Simple API
+			paths:
+			  /foo/{bar}:
+			    get:
+			      responses:
+			        '200':
+			          description: OK
+			          schema:
 		'''
 
 		document.set(content)
@@ -182,7 +190,7 @@ class ValidatorTest {
 
 		assertEquals(1, errors.size())
 
-		errors.forEach[
+		errors.forEach [
 			assertTrue(it.line == 10 || it.line == 11)
 			assertEquals(IMarker.SEVERITY_ERROR, it.level)
 		]
@@ -208,10 +216,11 @@ class ValidatorTest {
 		val errors = validator.validate(document, null)
 
 		assertEquals(2, errors.size())
-		assertThat(errors, hasItems(
-			new SwaggerError(1, IMarker.SEVERITY_WARNING, String.format(Messages.error_duplicate_keys, "swagger")),
-			new SwaggerError(2, IMarker.SEVERITY_WARNING, String.format(Messages.error_duplicate_keys, "swagger"))
-		))
+		assertThat(errors,
+			hasItems(
+				new SwaggerError(1, IMarker.SEVERITY_WARNING, String.format(Messages.error_duplicate_keys, "swagger")),
+				new SwaggerError(2, IMarker.SEVERITY_WARNING, String.format(Messages.error_duplicate_keys, "swagger"))
+			))
 	}
 
 	@Test
@@ -259,10 +268,11 @@ class ValidatorTest {
 		val errors = validator.validate(document, null)
 
 		assertEquals(2, errors.size())
-		assertThat(errors, hasItems(
-			new SwaggerError(3, IMarker.SEVERITY_WARNING, String.format(Messages.error_duplicate_keys, "version")),
-			new SwaggerError(4, IMarker.SEVERITY_WARNING, String.format(Messages.error_duplicate_keys, "version"))
-		))
+		assertThat(errors,
+			hasItems(
+				new SwaggerError(3, IMarker.SEVERITY_WARNING, String.format(Messages.error_duplicate_keys, "version")),
+				new SwaggerError(4, IMarker.SEVERITY_WARNING, String.format(Messages.error_duplicate_keys, "version"))
+			))
 	}
 
 	@Test
@@ -290,10 +300,11 @@ class ValidatorTest {
 		val errors = validator.validate(document, null)
 
 		assertEquals(2, errors.size())
-		assertThat(errors, hasItems(
-			new SwaggerError(10, IMarker.SEVERITY_WARNING, String.format(Messages.error_duplicate_keys, "in")),
-			new SwaggerError(11, IMarker.SEVERITY_WARNING, String.format(Messages.error_duplicate_keys, "in"))
-		))
+		assertThat(errors,
+			hasItems(
+				new SwaggerError(10, IMarker.SEVERITY_WARNING, String.format(Messages.error_duplicate_keys, "in")),
+				new SwaggerError(11, IMarker.SEVERITY_WARNING, String.format(Messages.error_duplicate_keys, "in"))
+			))
 	}
 
 	@Test
@@ -318,11 +329,144 @@ class ValidatorTest {
 		val errors = validator.validate(document, null)
 
 		assertEquals(2, errors.size())
-		assertThat(errors, hasItems(
-			new SwaggerError(8, IMarker.SEVERITY_WARNING, String.format(Messages.error_duplicate_keys, "responses")),
-			new SwaggerError(11, IMarker.SEVERITY_WARNING, String.format(Messages.error_duplicate_keys, "responses"))
-		))
+		assertThat(errors,
+			hasItems(
+				new SwaggerError(8, IMarker.SEVERITY_WARNING, String.format(Messages.error_duplicate_keys, "responses")),
+				new SwaggerError(11, IMarker.SEVERITY_WARNING, String.format(Messages.error_duplicate_keys, "responses"))
+			))
+	}
+
+	@Test
+	def void correctAliasAfterAnchor() {
+		val content = '''
+			swagger: "2.0"
+			info:
+			  version: 1.0.0
+			  title: Uber parameters
+			
+			paths: {}
+			
+			parameters:  
+			
+			  law:
+			    name: law_applicability
+			    in: query
+			    description: scope of a law
+			    required: false
+			    type: string
+			    enum: &scope_values
+			    - GLOBAL
+			    - REGIONAL
+			    - LOCAL
+			
+			  brand:
+			    name: brand_reach
+			    in: query
+			    description: where a brand name is used
+			    type: string
+			    enum: *scope_values
+		'''
+
+		document.set(content)
+		document.onChange()
+
+		assertThat(document.yamlError, nullValue)
+		assertThat(document.jsonError, nullValue)
+
+		val errors = validator.validate(document, null)
+		assertEquals(0, errors.size())
+	}
+
+	@Test
+	def void correctAliasBeforeAnchor() {
+		val content = '''
+			swagger: "2.0"
+			info:
+			  version: 1.0.0
+			  title: Uber parameters
+			
+			paths: {}
+			
+			parameters:  
+			
+			  brand:
+			    name: brand_reach
+			    in: query
+			    description: where a brand name is used
+			    type: string
+			    enum: *scope_values
+			
+			law:
+			    name: law_applicability
+			    in: query
+			    description: scope of a law
+			    required: false
+			    type: string
+			    enum: &scope_values
+			    - GLOBAL
+			    - REGIONAL
+			    - LOCAL
+			
+		'''
+
+		document.set(content)
+		document.onChange()
+
+		assertThat(document.yamlError, notNullValue)
+		assertThat(document.yamlError.message,
+			equalTo(
+				"null; found undefined alias scope_values;  in 'reader', line 15, column 11:\n        enum: *scope_values\n              ^"))
+
+		assertThat(document.jsonError, nullValue)
+
+		val errors = validator.validate(document, null)
+		assertEquals(0, errors.size())
+	}
+
+	@Test
+	def void invlaidAlias() {
+		val content = '''
+			swagger: "2.0"
+			info:
+			  version: 1.0.0
+			  title: Uber parameters
+			
+			paths: {}
+			
+			parameters:  
+			
+			  law:
+			    name: law_applicability
+			    in: query
+			    description: scope of a law
+			    required: false
+			    type: string
+			    enum: &scope_values
+			    - GLOBAL
+			    - REGIONAL
+			    - LOCAL
+			
+			  brand:
+			    name: brand_reach
+			    in: query
+			    description: where a brand name is used
+			    type: string
+			    enum: *scope_values_BROKEN
+		'''
+
+		document.set(content)
+		document.onChange()
+
+		assertThat(document.yamlError, notNullValue)
+		assertThat(document.yamlError.message,
+			equalTo(
+				"null; found undefined alias scope_values_BROKEN;  in 'reader', line 26, column 11:\n        enum: *scope_values_BROKEN\n              ^"))
+
+		assertThat(document.jsonError, nullValue)
+
+		val errors = validator.validate(document, null)
+		assertEquals(0, errors.size())
+
 	}
 
 }
-
