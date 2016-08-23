@@ -1,6 +1,7 @@
 package com.reprezen.swagedit.model;
 
 import java.util.Collections;
+import java.util.Objects;
 import java.util.Set;
 
 import org.eclipse.jface.text.BadLocationException;
@@ -10,7 +11,6 @@ import org.eclipse.jface.text.Position;
 import com.fasterxml.jackson.core.JsonLocation;
 import com.fasterxml.jackson.core.JsonPointer;
 import com.fasterxml.jackson.databind.JsonNode;
-import com.google.common.base.Strings;
 import com.google.common.collect.Iterables;
 import com.reprezen.swagedit.json.JsonType;
 import com.reprezen.swagedit.json.SchemaDefinition;
@@ -146,6 +146,27 @@ public abstract class AbstractNode {
 
     public JsonLocation getEnd() {
         return end;
+    }
+
+    @Override
+    public int hashCode() {
+        final int prime = 31;
+        int result = 1;
+        result = prime * result + ((parent == null) ? 0 : parent.hashCode());
+        result = prime * result + ((pointer == null) ? 0 : pointer.hashCode());
+        return result;
+    }
+
+    @Override
+    public boolean equals(Object obj) {
+        if (this == obj)
+            return true;
+        if (obj == null)
+            return false;
+        if (getClass() != obj.getClass())
+            return false;
+        AbstractNode other = (AbstractNode) obj;
+        return Objects.equals(getPointer(), other.getPointer());
     }
 
 }

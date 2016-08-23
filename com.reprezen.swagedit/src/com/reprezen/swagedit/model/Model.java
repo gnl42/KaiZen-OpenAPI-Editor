@@ -150,4 +150,8 @@ public class Model {
     protected int contentColumn(AbstractNode n) {
         return n.getLocation().getColumnNr() - 1;
     }
+
+    public Iterable<AbstractNode> allNodes() {
+        return nodes.values();
+    }
 }
