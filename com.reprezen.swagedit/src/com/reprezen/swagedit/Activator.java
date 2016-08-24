@@ -48,7 +48,27 @@ public class Activator extends AbstractUIPlugin {
      * 
      */
     public enum Icons {
-        assist_item, template_item, outline_document, outline_scalar, outline_mapping, outline_sequence, outline_mapping_scalar
+        assist_item, //
+        template_item, //
+
+        outline_document, //
+        outline_scalar, //
+        outline_mapping, //
+        outline_sequence, //
+        outline_mapping_scalar, //
+
+        outline_collection_resource, //
+        outline_resource, //
+        outline_resource_representation, //
+        outline_response, //
+        outline_response_success, //
+        outline_response_serverError, //
+        outline_response_clientError, //
+        outline_response_redirection, //
+        outline_response_informational, //
+        outline_dataType, //
+        outline_method, //
+        outline_request_parameter
     }
 
     /*
@@ -64,6 +84,22 @@ public class Activator extends AbstractUIPlugin {
             Bundle bundle = Platform.getBundle(PLUGIN_ID);
             addImage(bundle, Icons.assist_item.name(), "icons/assist_item_16.png");
             addImage(bundle, Icons.template_item.name(), "icons/template_item_16.png");
+            // resources
+            addImage(bundle, Icons.outline_collection_resource.name(), "icons/outline/collectionResource.png");
+            addImage(bundle, Icons.outline_resource.name(), "icons/outline/resource.png");
+            // responses
+            addImage(bundle, Icons.outline_response.name(), "icons/outline/response.png");
+            // responses codes
+            addImage(bundle, Icons.outline_response_informational.name(), "icons/outline/response_informational.png");
+            addImage(bundle, Icons.outline_response_success.name(), "icons/outline/response_success.png");
+            addImage(bundle, Icons.outline_response_redirection.name(), "icons/outline/response_redirection.png");
+            addImage(bundle, Icons.outline_response_clientError.name(), "icons/outline/response_clientError.png");
+            addImage(bundle, Icons.outline_response_serverError.name(), "icons/outline/response_serverError.png");
+
+            addImage(bundle, Icons.outline_dataType.name(), "icons/outline/dataType.png");
+            addImage(bundle, Icons.outline_method.name(), "icons/outline/method.png");
+
+            addImage(bundle, Icons.outline_request_parameter.name(), "icons/outline/requestParameter.png");
 
             // for quick outline, add icons from YEdit
             bundle = Platform.getBundle(org.dadacoalition.yedit.Activator.PLUGIN_ID);
