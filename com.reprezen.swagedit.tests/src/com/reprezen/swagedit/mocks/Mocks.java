@@ -9,6 +9,7 @@ import java.util.Map;
 import org.eclipse.core.resources.IContainer;
 import org.eclipse.core.resources.IFile;
 import org.eclipse.core.runtime.IPath;
+import org.eclipse.jface.text.ITextViewer;
 import org.mockito.Mockito;
 
 import com.fasterxml.jackson.databind.JsonNode;
@@ -83,6 +84,11 @@ public class Mocks {
         IPath mock = mock(IPath.class);
         when(mock.toString()).thenReturn(path);
         return mock;
+    }
+
+    public static ITextViewer mockTextViewer() {
+        ITextViewer viewer = mock(ITextViewer.class);
+        return viewer;
     }
 
 }

@@ -77,4 +77,7 @@ public class StyledCompletionProposal implements ICompletionProposal, ICompletio
         return null;
     }
 
+    public String getReplacementString() {
+        return replacementString;
+    }
 }
