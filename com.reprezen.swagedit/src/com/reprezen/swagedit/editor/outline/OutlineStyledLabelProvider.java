@@ -114,8 +114,12 @@ public class OutlineStyledLabelProvider extends StyledCellLabelProvider {
             return Icons.outline_document;
         }
 
-        if (element.getPointer() != null && element.getPointer().toString().endsWith("$ref")) {
-            return Icons.outline_reference_link;
+        if (element.getPointer() != null) {
+            if (element.getPointer().toString().endsWith("$ref")) {
+                return Icons.outline_reference_link;
+            } else if (element.getPointer().toString().endsWith("schema")) {
+                return Icons.outline_dataType;
+            }
         }
 
         SchemaDefinition elementDef = getFirst(element.getDefinitions(), null);
@@ -123,6 +127,8 @@ public class OutlineStyledLabelProvider extends StyledCellLabelProvider {
             switch (elementDef.descriptor) {
             case "pathItem":
                 return Icons.outline_resource;
+            case "responses":
+                return Icons.outline_response;
             case "responseValue":
                 return getResponseIcon(element);
             case "operation":
