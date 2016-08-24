@@ -68,7 +68,8 @@ public class Activator extends AbstractUIPlugin {
         outline_response_informational, //
         outline_dataType, //
         outline_method, //
-        outline_request_parameter
+        outline_request_parameter, //
+        outline_reference_link
     }
 
     /*
@@ -100,6 +101,7 @@ public class Activator extends AbstractUIPlugin {
             addImage(bundle, Icons.outline_method.name(), "icons/outline/method.png");
 
             addImage(bundle, Icons.outline_request_parameter.name(), "icons/outline/requestParameter.png");
+            addImage(bundle, Icons.outline_reference_link.name(), "icons/outline/referenceLink.png");
 
             // for quick outline, add icons from YEdit
             bundle = Platform.getBundle(org.dadacoalition.yedit.Activator.PLUGIN_ID);

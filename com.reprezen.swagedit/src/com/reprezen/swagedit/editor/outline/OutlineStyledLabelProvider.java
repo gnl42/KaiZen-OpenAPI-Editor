@@ -10,6 +10,8 @@
  *******************************************************************************/
 package com.reprezen.swagedit.editor.outline;
 
+import static com.google.common.collect.Iterables.getFirst;
+
 import org.eclipse.jface.viewers.StyledCellLabelProvider;
 import org.eclipse.jface.viewers.StyledString;
 import org.eclipse.jface.viewers.StyledString.Styler;
@@ -88,7 +90,8 @@ public class OutlineStyledLabelProvider extends StyledCellLabelProvider {
                         SchemaDefinition definition = Iterables.getFirst(element.getDefinitions(), null);
                         if (definition != null && definition.descriptor != null) {
                             type = definition.descriptor;
-                        } else if (element.getType() != JsonType.ARRAY) {
+                        } else if (element.getType() != JsonType.ARRAY && element.getType() != JsonType.ONE_OF
+                                && element.getType() != JsonType.ANY_OF && element.getType() != JsonType.ALL_OF) {
                             type = element.getType().getValue();
                         }
                     }
@@ -111,23 +114,25 @@ public class OutlineStyledLabelProvider extends StyledCellLabelProvider {
             return Icons.outline_document;
         }
 
-        SchemaDefinition parentDef = Iterables.getFirst(parent.getDefinitions(), null);
-        if (parentDef != null && parentDef.descriptor != null) {
-            if (parentDef.descriptor.equals("paths")) {
-                return Icons.outline_resource;
-            } else if (parentDef.descriptor.equals("responses")) {
-                return getResponseIcon(element);
-            } else if (parentDef.descriptor.equals("definitions")) {
-                return Icons.outline_dataType;
-            }
+        if (element.getPointer() != null && element.getPointer().toString().endsWith("$ref")) {
+            return Icons.outline_reference_link;
         }
 
-        SchemaDefinition elementDef = Iterables.getFirst(element.getDefinitions(), null);
+        SchemaDefinition elementDef = getFirst(element.getDefinitions(), null);
         if (elementDef != null && elementDef.descriptor != null) {
-            if (elementDef.descriptor.equals("operation")) {
+            switch (elementDef.descriptor) {
+            case "pathItem":
+                return Icons.outline_resource;
+            case "responseValue":
+                return getResponseIcon(element);
+            case "operation":
                 return Icons.outline_method;
-            } else if (elementDef.descriptor.equals("parametersList")) {
+            case "schema":
+                return Icons.outline_dataType;
+            case "parametersList":
                 return Icons.outline_request_parameter;
+            default:
+                break;
             }
         }
 
