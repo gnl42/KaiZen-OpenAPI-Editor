@@ -8,7 +8,7 @@
  * Contributors:
  *    ModelSolv, Inc. - initial API and implementation and/or initial documentation
  *******************************************************************************/
-package com.reprezen.swagedit.tests;
+package com.reprezen.swagedit.assist;
 
 import static org.junit.Assert.assertEquals;
 import static org.mockito.Mockito.mock;

@@ -8,7 +8,7 @@
  *  Contributors:
  *     ModelSolv, Inc. - initial API and implementation and/or initial documentation
  *******************************************************************************/
-package com.reprezen.swagedit.tests
+package com.reprezen.swagedit.editor
 
 import com.reprezen.swagedit.editor.SwaggerDocument
 import org.junit.Test

@@ -8,7 +8,7 @@
  *  Contributors:
  *     ModelSolv, Inc. - initial API and implementation and/or initial documentation
  *******************************************************************************/
-package com.reprezen.swagedit.tests
+package com.reprezen.swagedit.assist
 
 import com.fasterxml.jackson.databind.ObjectMapper
 import com.reprezen.swagedit.assist.SwaggerProposalProvider
