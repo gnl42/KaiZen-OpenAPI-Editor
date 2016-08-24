@@ -15,15 +15,21 @@ import org.junit.runners.Suite;
 import org.junit.runners.Suite.SuiteClasses;
 
 import com.reprezen.swagedit.assist.JsonReferenceProposalProviderTest;
+import com.reprezen.swagedit.assist.SwaggerContentAssistProcessorTest;
+import com.reprezen.swagedit.assist.SwaggerProposalProviderTest;
+import com.reprezen.swagedit.editor.SwaggerDocumentTest;
 import com.reprezen.swagedit.editor.hyperlinks.DefinitionHyperlinkDetectorTest;
 import com.reprezen.swagedit.editor.hyperlinks.JsonReferenceHyperlinkDetectorTest;
 import com.reprezen.swagedit.editor.hyperlinks.PathParamHyperlinkDetectorTest;
 import com.reprezen.swagedit.editor.outline.AbstractNodeTest;
 import com.reprezen.swagedit.editor.outline.OutlineStyledLabelProviderTest;
+import com.reprezen.swagedit.json.SwaggerSchemaTest;
 import com.reprezen.swagedit.json.references.JsonReferenceFactoryTest;
+import com.reprezen.swagedit.templates.CodeTemplateContextTest;
 import com.reprezen.swagedit.validation.ErrorProcessorTest;
 import com.reprezen.swagedit.validation.MultipleSwaggerErrorMessageTest;
 import com.reprezen.swagedit.validation.ReferenceValidatorTest;
+import com.reprezen.swagedit.validation.ValidationMessageTest;
 import com.reprezen.swagedit.validation.ValidatorTest;
 
 @RunWith(Suite.class)

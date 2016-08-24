@@ -8,7 +8,7 @@
  * Contributors:
  *    ModelSolv, Inc. - initial API and implementation and/or initial documentation
  *******************************************************************************/
-package com.reprezen.swagedit.tests;
+package com.reprezen.swagedit.templates;
 
 import static org.junit.Assert.*;
 import static org.hamcrest.CoreMatchers.*;
