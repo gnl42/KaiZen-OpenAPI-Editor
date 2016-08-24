@@ -10,10 +10,9 @@
  *******************************************************************************/
 package com.reprezen.swagedit.editor
 
-import com.reprezen.swagedit.editor.SwaggerDocument
 import org.junit.Test
 
-import static org.junit.Assert.*
+import static com.reprezen.swagedit.tests.utils.Cursors.*
 
 class SwaggerDocumentTest {
 
@@ -21,108 +20,99 @@ class SwaggerDocumentTest {
 
 	@Test
 	def void testGetPaths() {
-		val yaml = '''
-		info:
-		  description: ""
-		  version: "1.0.0"
-		tags:
-		  - foo: ""
-		  - bar: ""
-		'''
+		val test = setUpPathTest('''
+			{1}info:
+			  description{2}: ""
+			  version{3}: "1.0.0"
+			ta{4}gs:
+			  - foo{5}: ""
+			  - bar{6}: ""
+		''', document)
 
-		document.set(yaml)
-		assertEquals(":info", document.getPath(0, 1))
-		assertEquals(":info:description", document.getPath(1, 13))
-		assertEquals(":info:version", document.getPath(2, 9))
-		assertEquals(":tags", document.getPath(3, 2))
-
-		assertEquals(":tags:@0:foo", document.getPath(4, 7))
-		assertEquals(":tags:@1:bar", document.getPath(5, 7))
+		test.apply(":info", "1")
+		test.apply(":info:description", "2")
+		test.apply(":info:version", "3")
+		test.apply(":tags", "4")
+		test.apply(":tags:@0:foo", "5")
+		test.apply(":tags:@1:bar", "6")
 	}
 
 	@Test
 	def void testGetPathOnEmptyLine() {
-		val yaml = '''
-		info:
-		  description: ""
-		  
-		  version: "1.0.0"
-		'''
+		val test = setUpPathTest('''
+			info:
+			  description{1}: ""
+			  {2}
+			  version{3}: "1.0.0"
+		''', document)
 
-		document.set(yaml)
-		assertEquals(":info:description", document.getPath(1, 13))
-		assertEquals(":info", document.getPath(2, 2))
-		assertEquals(":info:version", document.getPath(3, 9))
+		test.apply(":info:description", "1")
+		println(document.getPath(2, 25))
+		test.apply(":info", "2")
+		test.apply(":info:version", "3")
 	}
 
 	@Test
 	def void testGetPathOnEmptyLineAfter() {
-		val yaml = '''
-		info:
-		  description: ""
-		  version: "1.0.0"
-		  
-		'''
+		val test = setUpPathTest('''
+			info:
+			  description:{1} ""
+			  version:{2} "1.0.0"
+			  {3}
+		''', document)
 
-		document.set(yaml)
-		assertEquals(":info:description", document.getPath(1, 14))
-		assertEquals(":info:version", document.getPath(2, 9))
-		assertEquals(":info", document.getPath(3, 2))
+		test.apply(":info:description", "1")
+		test.apply(":info:version", "2")
+		test.apply(":info", "3")
 	}
 
 	@Test
 	def void testGetPathOnPaths() {
-		val yaml = '''
-		paths:
-		  /:
-		    get:
-		      responses:
-		        '200':
-		'''
+		val test = setUpPathTest('''
+			{1}paths:
+			  /{2}:
+			    get{3}:
+			      responses{4}:
+			        '200'{5}:
+		''', document)
 
-		document.set(yaml)
-
-		assertEquals(":paths", document.getPath(0, 1));
-		assertEquals(":paths:/", document.getPath(1, 3));
-		assertEquals(":paths:/:get", document.getPath(2, 7));
-		assertEquals(":paths:/:get:responses", document.getPath(3, 14));
-		assertEquals(":paths:/:get:responses:200", document.getPath(4, 10));
+		test.apply(":paths", "1");
+		test.apply(":paths:/", "2");
+		test.apply(":paths:/:get", "3");
+		test.apply(":paths:/:get:responses", "4");
+		test.apply(":paths:/:get:responses:200", "5");
 	}
 
 	@Test
 	def void testGetPathOnPathsAfter() {
-		val yaml = '''
-		paths:
-		  /:
-		    
-		'''
+		val test = setUpPathTest('''
+			{1}p{2}aths{3}:
+			  /{4}:
+			    
+		''', document)
 
-		document.set(yaml)
-
-		assertEquals(":paths", document.getPath(0, 1));
-		assertEquals(":paths:", document.getPath(1, 1));
-		assertEquals(":paths:/", document.getPath(1, 3));
-		assertEquals(":paths:/", document.getPath(2, 3));
+		test.apply(":paths", "1");
+		test.apply(":paths:", "2");
+		test.apply(":paths:/", "3");
+		test.apply(":paths:/", "4");
 	}
 
 	@Test
 	def void testGetPath() {
-		val yaml = '''
-		paths:
-		  /:
-		    get:
-		      responses:
-		        '200':
-		          description: OK
-		    
-		parameters:
-		  foo:
-		    name: foo
-		'''
-		
-		document.set(yaml)
-		
-		assertEquals(":paths:/", document.getPath(6, 3))
+		val test = setUpPathTest('''
+			paths:
+			  /:
+			    get:
+			      responses:
+			        '200':
+			          description: OK
+			   {1} 
+			parameters:
+			  foo:
+			    name: foo
+		''', document)
+
+		test.apply(":paths:/", "1")
 	}
 
 }
