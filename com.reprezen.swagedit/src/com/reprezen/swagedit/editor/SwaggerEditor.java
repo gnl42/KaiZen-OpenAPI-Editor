@@ -109,7 +109,9 @@ public class SwaggerEditor extends YEdit implements IShowInSource, IShowInTarget
                     @Override
                     public void run() {
                         document.onChange();
-                        contentOutline.setInput(getEditorInput());
+                        if (contentOutline != null) {
+                            contentOutline.setInput(getEditorInput());
+                        }
                         runValidate(false);
                     }
                 });

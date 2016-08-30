@@ -124,8 +124,12 @@ public class ErrorProcessor {
     }
 
     protected String rewriteError(JsonNode error) {
-        if (error == null || !error.has("keyword")) {
+        if (error == null) {
             return "";
+        }
+
+        if (!error.has("keyword")) {
+            return error.has("message") ? error.get("message").asText() : "";
         }
 
         switch (error.get("keyword").asText()) {
