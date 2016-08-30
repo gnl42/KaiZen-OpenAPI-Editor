@@ -46,4 +46,9 @@ public class ArrayNode extends AbstractNode {
     public String getText() {
         return getProperty() == null ? "" : getProperty();
     }
+
+    @Override
+    public String toString() {
+        return "[ " + elements + " ]";
+    }
 }

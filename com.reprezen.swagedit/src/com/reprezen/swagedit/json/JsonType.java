@@ -16,8 +16,17 @@ import com.fasterxml.jackson.databind.JsonNode;
  * Enumeration of JSON types found in a JSON schema.
  */
 public enum JsonType {
-    OBJECT("object"), ARRAY("array"), STRING("string"), NUMBER("number"), INTEGER("integer"), BOOLEAN("boolean"), ONE_OF(
-            "oneOf"), ENUM("enum"), ANY_OF("anyOf"), ALL_OF("allOf"), UNDEFINED("undefined");
+    OBJECT("object"), //
+    ARRAY("array"), //
+    STRING("string"), //
+    NUMBER("number"), //
+    INTEGER("integer"), //
+    BOOLEAN("boolean"), //
+    ONE_OF("oneOf"), //
+    ENUM("enum"), //
+    ANY_OF("anyOf"), //
+    ALL_OF("allOf"), //
+    UNDEFINED("undefined");
 
     private final String value;
 
@@ -53,6 +62,10 @@ public enum JsonType {
         }
 
         return JsonType.UNDEFINED;
+    }
+
+    public boolean isValueType() {
+        return this == INTEGER || this == JsonType.STRING || this == JsonType.BOOLEAN || this == JsonType.NUMBER;
     }
 
 }
