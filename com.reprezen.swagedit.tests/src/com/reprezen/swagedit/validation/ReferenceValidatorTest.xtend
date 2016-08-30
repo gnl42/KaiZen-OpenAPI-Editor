@@ -77,9 +77,34 @@ class ReferenceValidatorTest {
 			new SwaggerError(9, IMarker.SEVERITY_WARNING, Messages.error_missing_reference)
 		))
 	}
-	
+
 	@Test
 	def void shouldValidateReference_To_ValidPath() {
+		val content = '''
+			swagger: '2.0'
+			info:
+			  version: 0.0.0
+			  title: Simple API
+			paths:
+			  /foo/{bar}:
+			    get:
+			      parameters:
+			        - $ref: '#/paths/~1foo~1%7Bbar%7D'
+			      responses:
+			        '200':
+			          description: OK
+		'''
+
+		document.set(content)
+		val baseURI = new URI(null, null, null)
+		val resolvedURI = new URI(null, null, "/paths/~1foo~1{bar}")
+		val errors = validator(#{resolvedURI -> document.asJson}).validate(baseURI, document.yaml)
+
+		assertEquals(0, errors.size())
+	}
+
+	@Test
+	def void shouldWarnOnInvalidCharacters() {
 		val content = '''
 			swagger: '2.0'
 			info:
@@ -100,7 +125,8 @@ class ReferenceValidatorTest {
 		val resolvedURI = new URI(null, null, "/paths/~1foo~1{bar}")
 		val errors = validator(#{resolvedURI -> document.asJson}).validate(baseURI, document.yaml)
 
-		assertEquals(0, errors.size())
+		assertEquals(1, errors.size())
+		assertTrue(errors.contains(new SwaggerError(9, IMarker.SEVERITY_WARNING, Messages.error_invalid_reference)))
 	}
 
 	@Test
@@ -130,7 +156,7 @@ class ReferenceValidatorTest {
 			new SwaggerError(9, IMarker.SEVERITY_WARNING, Messages.error_missing_reference)
 		))
 	}
-	
+
 	@Test
 	def void shouldValidateReference_To_ExternalFile() {
 		val other = '''
@@ -278,7 +304,7 @@ class ReferenceValidatorTest {
 
 		assertEquals(1, errors.size())
 		assertTrue(errors.contains(
-			new SwaggerError(9, IMarker.SEVERITY_ERROR, Messages.error_invalid_reference)
+			new SwaggerError(9, IMarker.SEVERITY_WARNING, Messages.error_missing_reference)
 		))
 	}
 

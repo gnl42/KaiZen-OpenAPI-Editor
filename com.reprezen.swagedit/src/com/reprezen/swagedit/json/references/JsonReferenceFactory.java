@@ -11,13 +11,13 @@
 package com.reprezen.swagedit.json.references;
 
 import java.net.URI;
-import java.net.URISyntaxException;
 
 import org.yaml.snakeyaml.nodes.ScalarNode;
 
 import com.fasterxml.jackson.core.JsonPointer;
 import com.fasterxml.jackson.databind.JsonNode;
 import com.google.common.base.Strings;
+import com.reprezen.swagedit.utils.URLUtils;
 
 /**
  * JSON Reference Factory
@@ -29,7 +29,7 @@ public class JsonReferenceFactory {
 
     public JsonReference create(JsonNode node) {
         if (node == null || node.isMissingNode()) {
-            return new JsonReference(null, null, false, false, node);
+            return new JsonReference(null, null, false, false, false, node);
         }
 
         String text = node.isTextual() ? node.asText() : node.get("$ref").asText();
@@ -39,7 +39,7 @@ public class JsonReferenceFactory {
 
     public JsonReference create(ScalarNode node) {
         if (node == null) {
-            return new JsonReference(null, null, false, false, node);
+            return new JsonReference(null, null, false, false, false, node);
         }
 
         return doCreate(node.getValue(), node);
@@ -49,18 +49,14 @@ public class JsonReferenceFactory {
         String notNull = Strings.nullToEmpty(value);
 
         URI uri;
-        if (notNull.startsWith("#")) {
+        try {
+            uri = URI.create(notNull);
+        } catch (NullPointerException | IllegalArgumentException e) {
+            // try to encode illegal characters, e.g. curly braces
             try {
-                uri = new URI(null, null, notNull.substring(1));
-            } catch (URISyntaxException e) {
-                return new JsonReference(null, null, false, false, source);
-            }
-        } else {
-            try {
-                uri = URI.create(notNull);
-            } catch (NullPointerException | IllegalArgumentException e) {
-                // invalid reference
-                return new JsonReference(null, null, false, false, source);
+                uri = URI.create(URLUtils.encodeURL(notNull));
+            } catch (NullPointerException | IllegalArgumentException e2) {
+                return new JsonReference(null, null, false, false, false, source);
             }
         }
 
@@ -76,7 +72,7 @@ public class JsonReferenceFactory {
         boolean absolute = uri.isAbsolute();
         boolean local = !absolute && uri.getPath().isEmpty();
 
-        return new JsonReference(uri, pointer, absolute, local, source);
+        return new JsonReference(uri, pointer, absolute, local, !notNull.equals(uri.toString()), source);
     }
 
 }
