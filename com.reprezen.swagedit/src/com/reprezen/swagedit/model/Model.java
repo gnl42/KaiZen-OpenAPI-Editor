@@ -1,5 +1,9 @@
 package com.reprezen.swagedit.model;
 
+import static com.reprezen.swagedit.model.NodeDeserializer.ATTRIBUTE_MODEL;
+import static com.reprezen.swagedit.model.NodeDeserializer.ATTRIBUTE_PARENT;
+import static com.reprezen.swagedit.model.NodeDeserializer.ATTRIBUTE_POINTER;
+
 import java.io.IOException;
 import java.util.Iterator;
 import java.util.LinkedHashMap;
@@ -10,6 +14,9 @@ import com.fasterxml.jackson.databind.ObjectMapper;
 import com.fasterxml.jackson.databind.module.SimpleModule;
 import com.fasterxml.jackson.dataformat.yaml.YAMLFactory;
 import com.google.common.base.Strings;
+import com.reprezen.swagedit.json.JsonSchemaManager;
+import com.reprezen.swagedit.json.JsonType2;
+import com.reprezen.swagedit.json.JsonType2.ObjectType;
 
 public class Model {
 
@@ -23,13 +30,37 @@ public class Model {
 
         Model model = new Model();
         mapper.reader() //
-                .withAttribute("model", model) //
-                .withAttribute("parent", null) //
-                .withAttribute("pointer", JsonPointer.compile("")) //
+                .withAttribute(ATTRIBUTE_MODEL, model) //
+                .withAttribute(ATTRIBUTE_PARENT, null) //
+                .withAttribute(ATTRIBUTE_POINTER, JsonPointer.compile("")) //
                 .withType(AbstractNode.class) //
                 .readValue(text);
 
-        return model;
+        return model.resolveTypes();
+    }
+
+    protected Model resolveTypes() {
+        ObjectType baseType = new ObjectType();
+        baseType.schema = new JsonSchemaManager().getSwaggerSchema();
+        baseType.containingProperty = null;
+        baseType.definition = baseType.schema.asJson();
+        baseType.parent = null;
+
+        AbstractNode root = getRoot();
+        root.type2 = baseType;
+
+        resolveType(root, baseType);
+
+        return this;
+    }
+
+    protected void resolveType(AbstractNode element, JsonType2 baseType) {
+        JsonType2 type = JsonType2.findType(element, element.getPointer(), baseType);
+        element.type2 = type;
+
+        for (AbstractNode el : element.elements()) {
+            resolveType(el, baseType);
+        }
     }
 
     public AbstractNode find(String path) {

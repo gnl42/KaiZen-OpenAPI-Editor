@@ -13,6 +13,7 @@ import com.fasterxml.jackson.core.JsonPointer;
 import com.fasterxml.jackson.databind.JsonNode;
 import com.google.common.collect.Iterables;
 import com.reprezen.swagedit.json.JsonType;
+import com.reprezen.swagedit.json.JsonType2;
 import com.reprezen.swagedit.json.SchemaDefinition;
 import com.reprezen.swagedit.json.SchemaDefinitionProvider;
 
@@ -25,6 +26,8 @@ public abstract class AbstractNode {
     private AbstractNode parent;
     private JsonType type;
     private JsonNode schema;
+
+    public JsonType2 type2;
 
     public final Set<SchemaDefinition> definitions;
 

@@ -38,4 +38,9 @@ public class ValueNode extends AbstractNode {
         String text = getProperty() != null ? getProperty() + ": " : "";
         return text + (value != null ? getValue().toString() : "");
     }
+
+    @Override
+    public String toString() {
+        return value != null ? value.toString() : null;
+    }
 }

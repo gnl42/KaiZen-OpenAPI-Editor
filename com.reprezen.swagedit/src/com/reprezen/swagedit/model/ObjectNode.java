@@ -9,7 +9,7 @@ import com.google.common.collect.Iterables;
 
 public class ObjectNode extends AbstractNode {
 
-    public final Map<String, AbstractNode> elements = new LinkedHashMap<>();
+    private final Map<String, AbstractNode> elements = new LinkedHashMap<>();
 
     public ObjectNode(AbstractNode parent, JsonPointer ptr) {
         super(parent, ptr);
@@ -52,5 +52,10 @@ public class ObjectNode extends AbstractNode {
     @Override
     public String getText() {
         return getProperty() == null ? "" : getProperty();
+    }
+
+    @Override
+    public String toString() {
+        return elements.toString();
     }
 }
