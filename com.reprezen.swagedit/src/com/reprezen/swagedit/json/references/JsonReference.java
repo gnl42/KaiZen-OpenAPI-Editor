@@ -36,16 +36,19 @@ public class JsonReference {
     private final boolean absolute;
     private final boolean local;
     private final Object source;
+    private final boolean containsWarning;
 
     private JsonNode resolved;
     private JsonDocumentManager manager = JsonDocumentManager.getInstance();
 
-    JsonReference(URI uri, JsonPointer pointer, boolean absolute, boolean local, Object source) {
+    JsonReference(URI uri, JsonPointer pointer, boolean absolute, boolean local, boolean containsWarning,
+            Object source) {
         this.uri = uri;
         this.pointer = pointer;
         this.absolute = absolute;
         this.local = local;
         this.source = source;
+        this.containsWarning = containsWarning;
     }
 
     public void setDocumentManager(JsonDocumentManager manager) {
@@ -132,6 +135,10 @@ public class JsonReference {
 
     public boolean isAbsolute() {
         return absolute;
+    }
+
+    public boolean containsWarning() {
+        return containsWarning;
     }
 
     public Object getSource() {

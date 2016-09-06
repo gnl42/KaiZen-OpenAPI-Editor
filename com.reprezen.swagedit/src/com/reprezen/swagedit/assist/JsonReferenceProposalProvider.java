@@ -10,8 +10,6 @@
  *******************************************************************************/
 package com.reprezen.swagedit.assist;
 
-import java.io.UnsupportedEncodingException;
-import java.net.URLEncoder;
 import java.util.ArrayList;
 import java.util.Collection;
 import java.util.Iterator;
@@ -32,6 +30,7 @@ import com.google.common.collect.Lists;
 import com.reprezen.swagedit.editor.DocumentUtils;
 import com.reprezen.swagedit.editor.SwaggerDocument;
 import com.reprezen.swagedit.json.JsonDocumentManager;
+import com.reprezen.swagedit.utils.URLUtils;
 
 /**
  * Completion proposal provider for JSON references.
@@ -187,31 +186,13 @@ public class JsonReferenceProposalProvider extends AbstractProposalProvider {
         for (Iterator<String> it = parameters.fieldNames(); it.hasNext();) {
             String key = it.next();
             String value = basePath + key.replaceAll("/", "~1");
-            String encoded = encodeURL(value);
+            String encoded = URLUtils.encodeURL(value);
 
-            results.add(mapper.createObjectNode().put("value", "\"" + encoded + "\"").put("label", key)
-                    .put("type", value));
+            results.add(
+                    mapper.createObjectNode().put("value", "\"" + encoded + "\"").put("label", key).put("type", value));
         }
 
         return results;
-    }
-
-    /*
-     * Encodes that path string so that it does not include illegal characters in respect to URL encoding. (see
-     * http://stackoverflow
-     * .com/questions/607176/java-equivalent-to-javascripts-encodeuricomponent-that-produces-identical-outpu)
-     */
-    protected String encodeURL(String path) {
-        try {
-            return URLEncoder
-                    .encode(path, "UTF-8")
-                    // decode characters that don't
-                    // need to be encoded.
-                    .replaceAll("\\+", "%20").replaceAll("\\%21", "!").replaceAll("\\%2F", "/")
-                    .replaceAll("\\%23", "#").replaceAll("\\%27", "'").replaceAll("\\%7E", "~");
-        } catch (UnsupportedEncodingException e) {
-            return path;
-        }
     }
 
     private static class FileVisitor implements IResourceProxyVisitor {
