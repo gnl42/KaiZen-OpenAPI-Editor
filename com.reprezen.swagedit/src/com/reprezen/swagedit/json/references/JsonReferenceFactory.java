@@ -71,8 +71,10 @@ public class JsonReferenceFactory {
         uri = uri.normalize();
         boolean absolute = uri.isAbsolute();
         boolean local = !absolute && uri.getPath().isEmpty();
+        // should warn when using curly braces
+        boolean warnings = notNull.contains("{") || uri.toString().contains("}");
 
-        return new JsonReference(uri, pointer, absolute, local, !notNull.equals(uri.toString()), source);
+        return new JsonReference(uri, pointer, absolute, local, warnings, source);
     }
 
 }
