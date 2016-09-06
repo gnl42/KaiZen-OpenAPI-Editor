@@ -62,6 +62,8 @@ public class JsonReferenceValidator {
                 errors.add(createReferenceError(IMarker.SEVERITY_ERROR, Messages.error_invalid_reference, reference));
             } else if (reference.isMissing(baseURI)) {
                 errors.add(createReferenceError(IMarker.SEVERITY_WARNING, Messages.error_missing_reference, reference));
+            } else if (reference.containsWarning()) {
+                errors.add(createReferenceError(IMarker.SEVERITY_WARNING, Messages.error_invalid_reference, reference));
             }
         }
         return errors;
