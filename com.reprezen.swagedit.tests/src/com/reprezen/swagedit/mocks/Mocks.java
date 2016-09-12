@@ -17,6 +17,7 @@ import com.reprezen.swagedit.editor.hyperlinks.JsonReferenceHyperlinkDetector;
 import com.reprezen.swagedit.json.JsonDocumentManager;
 import com.reprezen.swagedit.json.references.JsonReference;
 import com.reprezen.swagedit.json.references.JsonReferenceFactory;
+import com.reprezen.swagedit.model.AbstractNode;
 
 public class Mocks {
 
@@ -36,6 +37,14 @@ public class Mocks {
 
             protected JsonReferenceFactory getFactory() {
                 return new JsonReferenceFactory() {
+                    @Override
+                    public JsonReference create(AbstractNode node) {
+                        JsonReference ref = super.create(node);
+                        ref.setDocumentManager(manager);
+                        return ref;
+                    }
+
+                    @Override
                     public JsonReference create(JsonNode node) {
                         JsonReference ref = super.create(node);
                         ref.setDocumentManager(manager);

@@ -10,9 +10,11 @@
  *******************************************************************************/
 package com.reprezen.swagedit.assist;
 
+import org.eclipse.core.runtime.IProgressMonitor;
 import org.eclipse.jface.text.BadLocationException;
 import org.eclipse.jface.text.IDocument;
 import org.eclipse.jface.text.contentassist.ICompletionProposal;
+import org.eclipse.jface.text.contentassist.ICompletionProposalExtension5;
 import org.eclipse.jface.text.contentassist.ICompletionProposalExtension6;
 import org.eclipse.jface.text.contentassist.IContextInformation;
 import org.eclipse.jface.viewers.StyledString;
@@ -22,7 +24,8 @@ import org.eclipse.swt.graphics.Point;
 import com.reprezen.swagedit.Activator;
 import com.reprezen.swagedit.Activator.Icons;
 
-public class StyledCompletionProposal implements ICompletionProposal, ICompletionProposalExtension6 {
+public class StyledCompletionProposal
+        implements ICompletionProposal, ICompletionProposalExtension5, ICompletionProposalExtension6 {
 
     private final int replacementOffset;
     private final int replacementLength;
@@ -79,5 +82,11 @@ public class StyledCompletionProposal implements ICompletionProposal, ICompletio
 
     public String getReplacementString() {
         return replacementString;
+    }
+
+    @Override
+    public Object getAdditionalProposalInfo(IProgressMonitor monitor) {
+        // TODO Auto-generated method stub
+        return null;
     }
 }

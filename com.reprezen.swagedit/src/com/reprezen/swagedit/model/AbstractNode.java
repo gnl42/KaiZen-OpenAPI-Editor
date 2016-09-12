@@ -2,7 +2,6 @@ package com.reprezen.swagedit.model;
 
 import java.util.Collections;
 import java.util.Objects;
-import java.util.Set;
 
 import org.eclipse.jface.text.BadLocationException;
 import org.eclipse.jface.text.IDocument;
@@ -12,24 +11,14 @@ import com.fasterxml.jackson.core.JsonLocation;
 import com.fasterxml.jackson.core.JsonPointer;
 import com.fasterxml.jackson.databind.JsonNode;
 import com.google.common.collect.Iterables;
-import com.reprezen.swagedit.json.JsonType;
 import com.reprezen.swagedit.json.JsonType2;
-import com.reprezen.swagedit.json.SchemaDefinition;
-import com.reprezen.swagedit.json.SchemaDefinitionProvider;
 
 public abstract class AbstractNode {
-
-    private static SchemaDefinitionProvider provider = new SchemaDefinitionProvider();
 
     private final JsonPointer pointer;
     private String property;
     private AbstractNode parent;
-    private JsonType type;
-    private JsonNode schema;
-
-    public JsonType2 type2;
-
-    public final Set<SchemaDefinition> definitions;
+    private JsonType2 type;
 
     private JsonLocation location;
 
@@ -45,9 +34,6 @@ public abstract class AbstractNode {
         this.parent = parent;
         this.pointer = ptr;
         this.location = location;
-        this.definitions = provider.getDefinitions(pointer(ptr));
-        this.schema = definitions.isEmpty() ? null : Iterables.getFirst(definitions, null).definition;
-        this.type = schema != null ? JsonType.valueOf(this.schema) : null;
     }
 
     public AbstractNode get(int pos) {
@@ -86,16 +72,12 @@ public abstract class AbstractNode {
         return pointer;
     }
 
-    public JsonType getType() {
+    public void setType(JsonType2 type) {
+        this.type = type;
+    }
+
+    public JsonType2 getType() {
         return type;
-    }
-
-    public JsonNode getSchema() {
-        return schema;
-    }
-
-    public Set<SchemaDefinition> getDefinitions() {
-        return definitions;
     }
 
     public AbstractNode getParent() {
@@ -112,6 +94,10 @@ public abstract class AbstractNode {
 
     public Iterable<AbstractNode> elements() {
         return Collections.emptyList();
+    }
+
+    public Iterable<JsonNode> getProposals() {
+        return getType().getProposals(this);
     }
 
     public abstract String getText();
@@ -170,6 +156,10 @@ public abstract class AbstractNode {
             return false;
         AbstractNode other = (AbstractNode) obj;
         return Objects.equals(getPointer(), other.getPointer());
+    }
+
+    public int size() {
+        return Iterables.size(elements());
     }
 
 }

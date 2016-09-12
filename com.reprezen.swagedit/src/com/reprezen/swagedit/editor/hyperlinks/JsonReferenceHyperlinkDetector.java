@@ -10,8 +10,6 @@
  *******************************************************************************/
 package com.reprezen.swagedit.editor.hyperlinks;
 
-import static com.google.common.base.Strings.emptyToNull;
-
 import java.net.URI;
 
 import org.eclipse.core.resources.IFile;
@@ -35,21 +33,21 @@ public class JsonReferenceHyperlinkDetector extends AbstractSwaggerHyperlinkDete
     protected final JsonReferenceFactory factory = new JsonReferenceFactory();
 
     @Override
-    protected boolean canDetect(String basePath) {
-        return emptyToNull(basePath) != null && basePath.endsWith("$ref");
+    protected boolean canDetect(JsonPointer pointer) {
+        return pointer != null && pointer.toString().endsWith("$ref");
     }
 
     @Override
-    protected IHyperlink[] doDetect(SwaggerDocument doc, ITextViewer viewer, HyperlinkInfo info, String basePath) {
+    protected IHyperlink[] doDetect(SwaggerDocument doc, ITextViewer viewer, HyperlinkInfo info, JsonPointer pointer) {
         URI baseURI = getBaseURI();
 
-        JsonReference reference = getFactory().create(doc.getNodeForPath(basePath));
+        JsonReference reference = getFactory().create(doc.getModel().find(pointer));
         if (reference.isInvalid() || reference.isMissing(getBaseURI())) {
             return null;
         }
 
         if (reference.isLocal()) {
-            IRegion target = doc.getRegion(pointer(reference.getPointer()));
+            IRegion target = doc.getRegion(reference.getPointer());
             if (target == null) {
                 return null;
             }
@@ -66,7 +64,7 @@ public class JsonReferenceHyperlinkDetector extends AbstractSwaggerHyperlinkDete
             IFile file = DocumentUtils.getWorkspaceFile(resolved);
             if (file != null && file.exists()) {
                 return new IHyperlink[] { new SwaggerFileHyperlink(info.region, info.text, file,
-                        pointer(reference.getPointer())) };
+                        reference.getPointer()) };
             }
         }
 

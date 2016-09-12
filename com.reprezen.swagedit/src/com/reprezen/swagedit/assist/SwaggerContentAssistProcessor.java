@@ -43,12 +43,14 @@ import org.eclipse.ui.IWorkbenchCommandConstants;
 import org.eclipse.ui.PlatformUI;
 import org.eclipse.ui.keys.IBindingService;
 
+import com.fasterxml.jackson.core.JsonPointer;
 import com.google.common.collect.Lists;
 import com.reprezen.swagedit.Activator;
 import com.reprezen.swagedit.Activator.Icons;
 import com.reprezen.swagedit.Messages;
 import com.reprezen.swagedit.assist.JsonReferenceProposalProvider.ContextType;
 import com.reprezen.swagedit.editor.SwaggerDocument;
+import com.reprezen.swagedit.model.Model;
 import com.reprezen.swagedit.templates.SwaggerContextType;
 import com.reprezen.swagedit.templates.SwaggerTemplateContext;
 
@@ -63,10 +65,10 @@ public class SwaggerContentAssistProcessor extends TemplateCompletionProcessor
     private final ContentAssistant contentAssistant;
 
     /**
-     * This string contains the pointer that helps us locate the current position of the cursor inside the document.
+     * The pointer that helps us locate the current position of the cursor inside the document.
      * 
      */
-    private String currentPath = null;
+    private JsonPointer currentPath = null;
 
     /**
      * Current position in the list of proposals. Use for JSON Reference proposals.
@@ -97,7 +99,7 @@ public class SwaggerContentAssistProcessor extends TemplateCompletionProcessor
         String bindingKey = bindingService
                 .getBestActiveBindingFormattedFor(IWorkbenchCommandConstants.EDIT_CONTENT_ASSIST);
 
-        String context = ContextType.get(currentPath).label();
+        String context = ContextType.get(currentPath.toString()).label();
 
         return new String[] { String.format(Messages.content_assist_proposal_project, bindingKey, context),
                 String.format(Messages.content_assist_proposal_workspace, bindingKey, context),
@@ -132,11 +134,12 @@ public class SwaggerContentAssistProcessor extends TemplateCompletionProcessor
             column -= prefix.length();
         }
 
-        currentPath = document.getPath(line, column);
+        Model model = document.getModel();
+        currentPath = model.getPath(line, column);
 
         final List<ICompletionProposal> proposals = new ArrayList<>();
 
-        isRefCompletion = currentPath != null && currentPath.endsWith("$ref");
+        isRefCompletion = currentPath != null && currentPath.toString().endsWith("$ref");
         if (isRefCompletion) {
 
             if (contentAssistant != null) {
@@ -225,7 +228,7 @@ public class SwaggerContentAssistProcessor extends TemplateCompletionProcessor
 
     @Override
     protected TemplateContextType getContextType(ITextViewer viewer, IRegion region) {
-        String contextType = SwaggerContextType.getContextType(currentPath);
+        String contextType = SwaggerContextType.getContextType(currentPath.toString());
         ContextTypeRegistry registry = getContextTypeRegistry();
         if (registry != null) {
             return registry.getContextType(contextType);

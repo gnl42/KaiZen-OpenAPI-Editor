@@ -1,29 +1,121 @@
 package com.reprezen.swagedit.json;
 
-import static com.google.common.collect.Iterators.find;
+import static com.google.common.collect.Iterators.transform;
 
+import java.util.HashMap;
 import java.util.Iterator;
+import java.util.LinkedHashSet;
+import java.util.Map;
+import java.util.Map.Entry;
+import java.util.Set;
+
+import org.apache.commons.lang3.math.NumberUtils;
 
 import com.fasterxml.jackson.core.JsonPointer;
 import com.fasterxml.jackson.databind.JsonNode;
-import com.google.common.base.Predicate;
-import com.reprezen.swagedit.json.JsonSchemaManager.JSONSchema;
+import com.fasterxml.jackson.databind.ObjectMapper;
+import com.google.common.base.Function;
+import com.google.common.collect.Sets;
 import com.reprezen.swagedit.model.AbstractNode;
 
 public class JsonType2 {
 
-    public JsonNode definition;
-    public JsonType2 parent;
-    public String containingProperty;
-    public JsonSchemaManager.JSONSchema schema;
+    protected final ObjectMapper mapper = new ObjectMapper();
+
+    protected JsonNode schema;
+    protected JsonNode definition;
+    protected JsonType2 parent;
+
+    public Map<String, JsonType2> properties = new HashMap<>();
+
+    protected String containingProperty;
+
+    public JsonNode getDefinition() {
+        return definition;
+    }
+
+    public JsonNode getSchema() {
+        return schema;
+    }
+
+    public JsonType2 getParent() {
+        return parent;
+    }
+
+    public String getContainingProperty() {
+        return containingProperty;
+    }
+
+    public static class ComplexType extends JsonType2 {
+        public ComplexType(JsonNode schema, JsonNode definition) {
+            super(schema, definition);
+            // TODO Auto-generated constructor stub
+        }
+
+        @Override
+        public Set<JsonNode> getProposals(AbstractNode node) {
+            JsonType t = JsonType.valueOf(definition);
+
+            if (t == JsonType.ONE_OF) {
+                return Sets.newHashSet(
+                        transform(transform(definition.get("oneOf").elements(), new Function<JsonNode, JsonNode>() {
+                            @Override
+                            public JsonNode apply(JsonNode n) {
+                                return resolve(schema, n);
+                            }
+                        }), new Function<JsonNode, JsonNode>() {
+                            @Override
+                            public JsonNode apply(JsonNode n) {
+                                System.out.println(n);
+                                return n;
+                            }
+                        }));
+            }
+
+            return super.getProposals(node);
+        }
+    }
 
     public static class ObjectType extends JsonType2 {
+
+        public Map<String, JsonType2> patternProperties = new HashMap<>();
+
+        public ObjectType(JsonNode schema, JsonNode definition) {
+            super(schema, definition);
+            // TODO Auto-generated constructor stub
+        }
+
+        @Override
+        public Set<JsonNode> getProposals(AbstractNode element) {
+            return createObjectProposal(definition, element);
+        }
 
     }
 
     public static class ArrayType extends JsonType2 {
+        public ArrayType(JsonNode schema, JsonNode definition) {
+            super(schema, definition);
+            // TODO Auto-generated constructor stub
+        }
+
         public JsonNode items;
         public JsonType itemsType;
+
+        @Override
+        public Set<JsonNode> getProposals(AbstractNode node) {
+            final Set<JsonNode> proposals = new LinkedHashSet<>();
+            proposals.add(mapper.createObjectNode() //
+                    .put("value", "-") //
+                    .put("label", "-") //
+                    .put("type", "array item"));
+
+            return proposals;
+        }
+    }
+
+    public JsonType2(JsonNode schema, JsonNode definition) {
+        this.schema = schema;
+        this.definition = definition;
     }
 
     @Override
@@ -31,151 +123,143 @@ public class JsonType2 {
         return definition.toString();
     }
 
-    /**
-     * Returns the type of the current node by resolving it from the swagger schema.
-     * 
-     * @param node
-     * @param pointer
-     * @param baseType
-     * @return the node's type
-     */
-    public static JsonType2 findType(AbstractNode node, JsonPointer pointer, JsonType2 baseType) {
-        if (node == null)
-            return null;
+    protected JsonNode createPropertyProposal(String key, JsonNode value) {
+        final JsonNode resolved = resolve(schema, value);
+        final JsonType type = JsonType.valueOf(resolved);
+        System.out.println(resolved);
 
-        AbstractNode parent = node.getParent();
-        if (parent == null) {
-            return baseType;
-        }
+        String description = resolved.has("description") ? resolved.get("description").asText() : "";
 
-        JsonType2 parentType = parent.type2;
-        String property = getProperty(pointer);
+        // String des = type == JsonType.UNDEFINED && resolvedDefinition.descriptor != null
+        // ? resolvedDefinition.descriptor : type.getValue();
 
-        if (parentType instanceof ArrayType) {
-            JsonType itemsType = ((ArrayType) parentType).itemsType;
-            JsonNode items = ((ArrayType) parentType).items;
+        return mapper.createObjectNode() //
+                .put("value", key + ":") //
+                .put("label", key) //
+                .put("description", description) //
+                .put("type", type.getValue());
+    }
 
-            if (itemsType.isValueType() || itemsType == JsonType.ENUM) {
-                JsonType2 type = new JsonType2();
-                type.schema = parentType.schema;
-                type.containingProperty = property;
-                type.definition = items;
-                type.parent = parentType;
+    protected Set<JsonNode> createObjectProposal(JsonNode definition, AbstractNode element) {
+        Set<JsonNode> proposals = new LinkedHashSet<>();
 
-                return type;
-            } else {
-                JsonNode correctType = oneOf(parentType.schema, items, node);
-                if (correctType != null) {
-                    JsonType2 type = new JsonType2();
-                    type.schema = parentType.schema;
-                    type.containingProperty = property;
-                    type.parent = parentType;
-                    type.definition = correctType;
+        if (definition.has("properties")) {
+            final JsonNode properties = definition.get("properties");
 
-                    return type;
+            for (Iterator<String> it = properties.fieldNames(); it.hasNext();) {
+                final String key = it.next();
+
+                if (element.get(key) == null) {
+                    proposals.add(createPropertyProposal(key, properties.get(key)));
                 }
             }
         }
 
-        JsonNode definition = findDefinition(parentType, property);
+        if (definition.has("patternProperties")) {
+            final JsonNode properties = definition.get("patternProperties");
 
-        if (JsonType.valueOf(definition) == JsonType.ARRAY) {
-            JsonNode items = resolve(parentType.schema, definition.get("items"));
+            for (Iterator<String> it = properties.fieldNames(); it.hasNext();) {
+                String key = it.next();
+                final JsonNode value = properties.get(key);
 
-            ArrayType type = new ArrayType();
-            type.schema = parentType.schema;
-            type.containingProperty = property;
-            type.definition = definition;
-            type.parent = parentType;
-            type.itemsType = JsonType.valueOf(items);
-            type.items = items;
+                if (key.startsWith("^")) {
+                    key = key.substring(1);
+                }
 
-            return type;
-        } else if (JsonType.valueOf(definition) == JsonType.ONE_OF || JsonType.valueOf(definition) == JsonType.ALL_OF
-                || JsonType.valueOf(definition) == JsonType.ANY_OF) {
-
-            // TODO
-            return null;
-        } else if (JsonType.valueOf(definition) == JsonType.OBJECT) {
-
-            ObjectType type = new ObjectType();
-            type.schema = parentType.schema;
-            type.containingProperty = property;
-            type.definition = definition;
-            type.parent = parentType;
-
-            return type;
-        } else {
-
-            JsonType2 type = new JsonType2();
-            type.schema = parentType.schema;
-            type.containingProperty = property;
-            type.definition = definition;
-            type.parent = parentType;
-
-            return type;
-        }
-    }
-
-    private static JsonNode findDefinition(JsonType2 parentType, final String property) {
-        JsonNode parentDefinition = parentType.definition;
-        JsonNode definition = null;
-        if (parentDefinition.has("properties")) {
-            definition = parentType.definition.get("properties").get(property);
-        }
-
-        if (definition == null && parentDefinition.has("patternProperties")) {
-            Iterator<String> patterns = parentDefinition.get("patternProperties").fieldNames();
-
-            definition = parentType.definition.get("patternProperties").get(find(patterns, //
-                    new Predicate<String>() {
-                        @Override
-                        public boolean apply(String s) {
-                            return property.matches(s);
-                        }
-                    }, null));
-        }
-
-        if (definition != null) {
-            definition = resolve(parentType.schema, definition);
-        }
-
-        return definition;
-    }
-
-    protected static JsonNode oneOf(JSONSchema schema, JsonNode node, AbstractNode actual) {
-        Iterator<JsonNode> it = node.get("oneOf").elements();
-        JsonNode found = null;
-        while (it.hasNext() && found == null) {
-            JsonNode current = resolve(schema, it.next());
-            JsonType tt = JsonType.valueOf(current);
-
-            if (tt == JsonType.ONE_OF) {
-                found = oneOf(schema, current, actual);
-            } else {
-                found = objectOf(schema, current, actual);
+                proposals.add(createPropertyProposal(key, value));
             }
         }
 
-        return found;
+        if (proposals.isEmpty()) {
+            proposals.add(mapper.createObjectNode() //
+                    .put("value", "_key_" + ":") //
+                    .put("label", "_key_"));
+        }
+
+        return proposals;
     }
 
-    private static JsonNode objectOf(JSONSchema schema, JsonNode current, AbstractNode actual) {
-        // TODO
-        // better resolution of type, it cannot be done by looking only
-        // on first property present, see parameters for example where multiple
-        // types have same properties
-        if (current.has("properties")) {
-            for (Iterator<String> it = current.get("properties").fieldNames(); it.hasNext();) {
-                String property = it.next();
-                if (actual.isObject()) {
-                    if (actual.asObject().get(property) != null) {
-                        return current;
+    public Set<JsonNode> getProposals(AbstractNode node) {
+        Set<JsonNode> proposals = new LinkedHashSet<>();
+        JsonType type = JsonType.valueOf(definition);
+        System.out.println(definition);
+        if (type == JsonType.STRING || type == JsonType.INTEGER) {
+
+            proposals.add(mapper.createObjectNode().put("value", "") //
+                    .put("label", "") //
+                    .put("type", "string"));
+
+        } else if (type == JsonType.BOOLEAN) {
+            proposals.add(mapper.createObjectNode().put("value", "true").put("label", "true"));
+            proposals.add(mapper.createObjectNode().put("value", "false").put("label", "false"));
+
+        } else if (type == JsonType.ENUM) {
+            final String subType = definition.has("type") ? definition.get("type").asText() : null;
+            for (JsonNode literal : definition.get("enum")) {
+                String value = literal.asText();
+
+                // if the type of array is string and
+                // current value is a number, it should be put
+                // into quotes to avoid validation issues
+                if (NumberUtils.isNumber(value) && "string".equals(subType)) {
+                    value = "\"" + value + "\"";
+                }
+
+                proposals.add(mapper.createObjectNode() //
+                        .put("value", value) //
+                        .put("label", literal.asText()));
+            }
+        }
+
+        return proposals;
+    }
+
+    public static JsonType2 create(JsonNode schema, JsonPointer pointer) {
+        JsonNode definition = schema.at(pointer);
+        JsonType type = JsonType.valueOf(definition);
+
+        if (type == JsonType.OBJECT) {
+
+            ObjectType t = new ObjectType(schema, definition);
+            if (definition.has("properties")) {
+                for (Iterator<Entry<String, JsonNode>> it = definition.get("properties").fields(); it.hasNext();) {
+                    Entry<String, JsonNode> e = it.next();
+                    JsonNode node = e.getValue();
+
+                    String p;
+                    if (node.isObject() && node.has("$ref")) {
+                        p = node.get("$ref").asText().substring(1);
+                    } else {
+                        p = "/properties/" + e.getKey();
                     }
+
+                    t.properties.put(e.getKey(), JsonType2.create(schema, JsonPointer.compile(p)));
                 }
             }
+
+            if (definition.has("patternProperties")) {
+                for (Iterator<Entry<String, JsonNode>> it = definition.get("patternProperties").fields(); it
+                        .hasNext();) {
+                    Entry<String, JsonNode> e = it.next();
+                    JsonNode node = e.getValue();
+
+                    String p;
+                    if (node.isObject() && node.has("$ref")) {
+                        p = node.get("$ref").asText().substring(1);
+                    } else {
+                        p = "/patternProperties/" + e.getKey();
+                    }
+
+                    t.patternProperties.put(e.getKey(), JsonType2.create(schema, JsonPointer.compile(p)));
+                }
+            }
+
+            return t;
+        } else if (type == JsonType.ARRAY) {
+            return new ArrayType(schema, definition);
+        } else {
+            return new JsonType2(schema, definition);
         }
-        return null;
     }
 
     protected static String getProperty(JsonPointer pointer) {
@@ -183,11 +267,12 @@ public class JsonType2 {
         return s.substring(s.lastIndexOf("/") + 1).replaceAll("~1", "/");
     }
 
-    protected static JsonNode resolve(JSONSchema schema, JsonNode node) {
+    protected static JsonNode resolve(JsonNode schema, JsonNode node) {
         if (node.isObject() && node.has("$ref")) {
             JsonPointer p = JsonPointer.compile(node.get("$ref").asText().substring(1));
-            return schema.asJson().at(p);
+            return schema.at(p);
         }
+
         return node;
     }
 

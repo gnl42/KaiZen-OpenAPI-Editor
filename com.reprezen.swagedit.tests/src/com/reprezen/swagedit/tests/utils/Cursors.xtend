@@ -17,16 +17,19 @@ import org.eclipse.xtext.xbase.lib.Procedures.Procedure2
 import static org.junit.Assert.*
 import static org.mockito.Mockito.mock
 import static org.mockito.Mockito.when
+import com.fasterxml.jackson.core.JsonPointer
 
 class Cursors {
 
 	static def (String, String)=>void setUpPathTest(String yaml, SwaggerDocument doc) {
 		val groups = groupMarkers(yaml)
+		println(groups)
 		doc.set(removeMarkers(yaml))
+		println(doc.get)
 
 		new Procedure2<String, String>() {
 			override apply(String path, String marker) {
-				assertEquals(path, doc.getPath(groups.get(marker)))
+				assertEquals(JsonPointer.compile(path), doc.getPath(groups.get(marker)))
 			}
 		}
 	}
@@ -64,11 +67,11 @@ class Cursors {
 		for (var i = 0; i < t.length; i++) {
 			var b = t.get(i)
 
-			if (CharMatcher.is('{').matches(b)) {
+			if (CharMatcher.is('<').matches(b)) {
 				start = true
 				current = new String()
 			} else if (start) {
-				if (CharMatcher.is('}').matches(b)) {
+				if (CharMatcher.is('>').matches(b)) {
 					start = false
 					groups.put(current, new Region(offset, 1))
 					current = null
@@ -83,7 +86,7 @@ class Cursors {
 	}
 
 	protected static def removeMarkers(String content) {
-		content.replaceAll("\\{\\d+\\}", "")
+		content.replaceAll("<\\d+>", "")
 	}
 
 }

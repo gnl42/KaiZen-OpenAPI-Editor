@@ -23,8 +23,6 @@ import org.eclipse.swt.widgets.Display;
 import com.google.common.collect.Iterables;
 import com.reprezen.swagedit.Activator;
 import com.reprezen.swagedit.Activator.Icons;
-import com.reprezen.swagedit.json.JsonType;
-import com.reprezen.swagedit.json.SchemaDefinition;
 import com.reprezen.swagedit.model.AbstractNode;
 
 public class OutlineStyledLabelProvider extends StyledCellLabelProvider {
@@ -72,32 +70,33 @@ public class OutlineStyledLabelProvider extends StyledCellLabelProvider {
     protected StyledString getSyledString(AbstractNode element) {
         StyledString styledString = new StyledString(element.getText(), getTextStyler());
         if (element.isObject() || element.isArray()) {
-            if (element.getType() != null) {
-
-                if (element.getParent() != null) {
-
-                    String type = null;
-
-                    // if schema definition has a title, we use it as type
-                    if (element.getSchema().has("title")) {
-                        type = element.getSchema().get("title").asText();
-                    } else {
-                        // otherwise we try to find the property holding the
-                        // schema definition
-                        SchemaDefinition definition = Iterables.getFirst(element.getDefinitions(), null);
-                        if (definition != null && definition.descriptor != null) {
-                            type = definition.descriptor;
-                        } else if (element.getType() != JsonType.ARRAY) {
-                            type = element.getType().getValue();
-                        }
-                    }
-
-                    if (type != null) {
-                        styledString.append(" ");
-                        styledString.append(type, getTagStyler());
-                    }
-                }
-            }
+            // TODO
+            // if (element.getType() != null) {
+            //
+            // if (element.getParent() != null) {
+            //
+            // String type = null;
+            //
+            // // if schema definition has a title, we use it as type
+            // if (element.getSchema().has("title")) {
+            // type = element.getSchema().get("title").asText();
+            // } else {
+            // // otherwise we try to find the property holding the
+            // // schema definition
+            // SchemaDefinition definition = Iterables.getFirst(element.getDefinitions(), null);
+            // if (definition != null && definition.descriptor != null) {
+            // type = definition.descriptor;
+            // } else if (element.getType() != JsonType.ARRAY) {
+            // type = element.getType().getValue();
+            // }
+            // }
+            //
+            // if (type != null) {
+            // styledString.append(" ");
+            // styledString.append(type, getTagStyler());
+            // }
+            // }
+            // }
         }
 
         return styledString;
