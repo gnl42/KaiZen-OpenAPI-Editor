@@ -312,7 +312,7 @@ public class QuickOutline extends PopupDialog
             }
 
             if (matchName != null) {
-                return matchName.contains(text);
+                return matchName.toLowerCase().contains(text.toLowerCase());
             }
         }
 
