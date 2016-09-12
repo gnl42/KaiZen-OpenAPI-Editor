@@ -13,14 +13,16 @@ import com.fasterxml.jackson.core.JsonPointer;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import com.fasterxml.jackson.databind.module.SimpleModule;
 import com.fasterxml.jackson.dataformat.yaml.YAMLFactory;
-import com.google.common.base.Strings;
-import com.reprezen.swagedit.json.JsonSchemaManager;
-import com.reprezen.swagedit.json.JsonType2;
-import com.reprezen.swagedit.json.JsonType2.ObjectType;
+import com.reprezen.swagedit.json.SwaggerSchema;
 
 public class Model {
 
     private final Map<JsonPointer, AbstractNode> nodes = new LinkedHashMap<>();
+    private final SwaggerSchema schema;
+
+    Model() {
+        this.schema = new SwaggerSchema();
+    }
 
     public static Model parseYaml(String text) throws IOException {
         final ObjectMapper mapper = new ObjectMapper(new YAMLFactory());
@@ -36,44 +38,28 @@ public class Model {
                 .withType(AbstractNode.class) //
                 .readValue(text);
 
-        return model.resolveTypes();
+        return model;
     }
 
-    protected Model resolveTypes() {
-        ObjectType baseType = new ObjectType();
-        baseType.schema = new JsonSchemaManager().getSwaggerSchema();
-        baseType.containingProperty = null;
-        baseType.definition = baseType.schema.asJson();
-        baseType.parent = null;
-
-        AbstractNode root = getRoot();
-        root.type2 = baseType;
-
-        resolveType(root, baseType);
-
-        return this;
+    public SwaggerSchema getSchema() {
+        return schema;
     }
 
-    protected void resolveType(AbstractNode element, JsonType2 baseType) {
-        JsonType2 type = JsonType2.findType(element, element.getPointer(), baseType);
-        element.type2 = type;
-
-        for (AbstractNode el : element.elements()) {
-            resolveType(el, baseType);
-        }
+    public AbstractNode find(JsonPointer pointer) {
+        return nodes.get(pointer);
     }
 
-    public AbstractNode find(String path) {
-        if (Strings.emptyToNull(path) == null || path.equals(":")) {
-            return getRoot();
-        }
-
-        return nodes.get(pointer(path));
-    }
-
-    protected JsonPointer pointer(String pointer) {
-        return JsonPointer.compile(pointer.replaceAll("/", "~1").replaceAll(":", "/"));
-    }
+    // public AbstractNode find(String path) {
+    // if (Strings.emptyToNull(path) == null || path.equals(":")) {
+    // return getRoot();
+    // }
+    //
+    // return nodes.get(pointer(path));
+    // }
+    //
+    // protected JsonPointer pointer(String pointer) {
+    // return JsonPointer.compile(pointer.replaceAll("/", "~1").replaceAll(":", "/"));
+    // }
 
     public void add(AbstractNode node) {
         nodes.put(node.getPointer(), node);
@@ -83,12 +69,12 @@ public class Model {
         return nodes.get(JsonPointer.compile(""));
     }
 
-    public String getPath(int line, int column) {
+    public JsonPointer getPath(int line, int column) {
         AbstractNode node = getNode(line, column);
         if (node != null) {
-            return node.getPointer().toString();
+            return node.getPointer();
         }
-        return "";
+        return JsonPointer.compile("");
     }
 
     public AbstractNode getNode(int line, int column) {
@@ -99,7 +85,7 @@ public class Model {
         AbstractNode found = forLine(line);
         if (found != null) {
 
-            int c = startColumn(found) + Strings.nullToEmpty(found.getProperty()).length();
+            int c = startColumn(found);// + Strings.nullToEmpty(found.getProperty()).length();
             if (column >= c) {
                 return found;
             } else {
@@ -185,4 +171,5 @@ public class Model {
     public Iterable<AbstractNode> allNodes() {
         return nodes.values();
     }
+
 }

@@ -19,8 +19,11 @@ import org.junit.Test
 
 import static org.hamcrest.core.IsCollectionContaining.*
 import static org.junit.Assert.*
+import com.reprezen.swagedit.tests.utils.PointerHelpers
 
 class JsonReferenceProposalProviderTest {
+
+	extension PointerHelpers = new PointerHelpers
 
 	val mapper = new ObjectMapper
 	var JsonReferenceProposalProvider provider
@@ -57,7 +60,7 @@ class JsonReferenceProposalProviderTest {
 		val document = new SwaggerDocument
 		document.set(text)
 
-		val proposals = provider.createProposals(":paths:/foo:get:responses:200:schema:$ref", document, 0)
+		val proposals = provider.createProposals("/paths/~1foo/get/responses/200/schema/$ref".ptr, document, 0)
 
 		assertThat(proposals, hasItems(
 			mapper.createObjectNode
@@ -87,7 +90,7 @@ class JsonReferenceProposalProviderTest {
 		val document = new SwaggerDocument
 		document.set(text)
 
-		val proposals = provider.createProposals(":definitions:Bar:properties:foo:$ref", document, 0)
+		val proposals = provider.createProposals("/definitions/Bar/properties/foo/$ref".ptr, document, 0)
 
 		assertThat(proposals, hasItems(
 			mapper.createObjectNode
@@ -130,17 +133,17 @@ class JsonReferenceProposalProviderTest {
 	@Test
 	def void testContextTypes() {
 		// schema definitions
-		assertTrue(":definitions:Foo:properties:bar:$ref".matches(JsonReferenceProposalProvider.SCHEMA_DEFINITION_REGEX))
-		assertTrue(":paths:/foo:get:responses:200:schema:$ref".matches(JsonReferenceProposalProvider.SCHEMA_DEFINITION_REGEX))
-		assertTrue(":paths:/foo:get:responses:200:schema:items:$ref".matches(JsonReferenceProposalProvider.SCHEMA_DEFINITION_REGEX))
+		assertTrue("/definitions/Foo/properties/bar/$ref".matches(JsonReferenceProposalProvider.SCHEMA_DEFINITION_REGEX))
+		assertTrue("/paths/~1foo/get/responses/200/schema/$ref".matches(JsonReferenceProposalProvider.SCHEMA_DEFINITION_REGEX))
+		assertTrue("/paths/~1foo/get/responses/200/schema/items/$ref".matches(JsonReferenceProposalProvider.SCHEMA_DEFINITION_REGEX))
 		
 		// responses
-		assertTrue(":paths:/foo:get:responses:200:$ref".matches(JsonReferenceProposalProvider.RESPONSE_REGEX))
+		assertTrue("/paths/~1foo/get/responses/200/$ref".matches(JsonReferenceProposalProvider.RESPONSE_REGEX))
 		
 		// parameters
-		assertTrue(":paths:/:get:parameters:@0:$ref".matches(JsonReferenceProposalProvider.PARAMETER_REGEX))
+		assertTrue("/paths/~1/get/parameters/0/$ref".matches(JsonReferenceProposalProvider.PARAMETER_REGEX))
 
 		// path items
-		assertTrue(":paths:/pets/{id}:$ref".matches(JsonReferenceProposalProvider.PATH_ITEM_REGEX))
+		assertTrue("/paths/~1pets~1{id}/$ref".matches(JsonReferenceProposalProvider.PATH_ITEM_REGEX))
 	}
 }	

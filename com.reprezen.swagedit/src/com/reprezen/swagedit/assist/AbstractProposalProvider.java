@@ -12,6 +12,7 @@ import org.eclipse.swt.graphics.RGB;
 import org.eclipse.swt.graphics.TextStyle;
 import org.eclipse.swt.widgets.Display;
 
+import com.fasterxml.jackson.core.JsonPointer;
 import com.fasterxml.jackson.databind.JsonNode;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import com.google.common.base.Strings;
@@ -39,8 +40,8 @@ public abstract class AbstractProposalProvider {
     /**
      * Returns a list of completion proposals that are created from a single proposal object.
      * 
-     * @param path
-     *            - path under current cursor
+     * @param pointer
+     *            - pointer under current cursor
      * @param document
      *            - current swagger document
      * @param prefix
@@ -51,11 +52,12 @@ public abstract class AbstractProposalProvider {
      *            - current position in list of proposals
      * @return list of completion proposals
      */
-    public Collection<? extends ICompletionProposal> getCompletionProposals(String path, SwaggerDocument document,
+    public Collection<? extends ICompletionProposal> getCompletionProposals(JsonPointer pointer,
+            SwaggerDocument document,
             String prefix, int documentOffset, int cycle) {
 
         final List<ICompletionProposal> result = new ArrayList<>();
-        final Iterable<JsonNode> proposals = createProposals(path, document, cycle);
+        final Iterable<JsonNode> proposals = createProposals(pointer, document, cycle);
 
         prefix = Strings.emptyToNull(prefix);
 
@@ -83,6 +85,6 @@ public abstract class AbstractProposalProvider {
         return result;
     }
 
-    protected abstract Iterable<JsonNode> createProposals(String path, SwaggerDocument document, int cycle);
+    protected abstract Iterable<JsonNode> createProposals(JsonPointer pointer, SwaggerDocument document, int cycle);
 
 }

@@ -28,12 +28,13 @@ import org.yaml.snakeyaml.parser.ParserException;
 import com.fasterxml.jackson.databind.JsonNode;
 import com.github.fge.jsonschema.core.exceptions.ProcessingException;
 import com.github.fge.jsonschema.core.report.ProcessingReport;
+import com.github.fge.jsonschema.main.JsonSchema;
+import com.github.fge.jsonschema.main.JsonSchemaFactory;
 import com.google.common.collect.HashMultimap;
 import com.google.common.collect.Multimap;
 import com.google.common.collect.Sets;
 import com.reprezen.swagedit.Messages;
 import com.reprezen.swagedit.editor.SwaggerDocument;
-import com.reprezen.swagedit.json.JsonSchemaManager;
 import com.reprezen.swagedit.json.references.JsonReferenceFactory;
 import com.reprezen.swagedit.json.references.JsonReferenceValidator;
 
@@ -45,8 +46,6 @@ import com.reprezen.swagedit.json.references.JsonReferenceValidator;
  * @see SwaggerError
  */
 public class Validator {
-
-    private static final JsonSchemaManager schemaManager = new JsonSchemaManager();
 
     private final JsonReferenceValidator referenceValidator;
 
@@ -83,7 +82,7 @@ public class Validator {
         if (jsonContent != null) {
             Node yaml = document.getYaml();
             if (yaml != null) {
-                errors.addAll(validateAgainstSchema(new ErrorProcessor(yaml), jsonContent));
+                errors.addAll(validateAgainstSchema(new ErrorProcessor(yaml), document));
                 errors.addAll(checkDuplicateKeys(yaml));
                 errors.addAll(referenceValidator.validate(editorInput != null ? editorInput.getFile().getLocationURI()
                         : null, yaml));
@@ -96,11 +95,20 @@ public class Validator {
     /*
      * Validates the YAML document against the Swagger schema
      */
-    protected Set<SwaggerError> validateAgainstSchema(ErrorProcessor processor, JsonNode jsonContent) {
+    protected Set<SwaggerError> validateAgainstSchema(ErrorProcessor processor, SwaggerDocument document) {
+        final JsonSchemaFactory factory = JsonSchemaFactory.byDefault();
         final Set<SwaggerError> errors = Sets.newHashSet();
 
+        JsonSchema schema = null;
         try {
-            ProcessingReport report = schemaManager.getSwaggerSchema().getSchema().validate(jsonContent, true);
+            schema = factory.getJsonSchema(document.getModel().getSchema().asJson());
+        } catch (ProcessingException e) {
+            YEditLog.logException(e);
+            return errors;
+        }
+
+        try {
+            ProcessingReport report = schema.validate(document.asJson(), true);
 
             errors.addAll(processor.processReport(report));
         } catch (ProcessingException e) {

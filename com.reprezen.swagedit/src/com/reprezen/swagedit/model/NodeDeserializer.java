@@ -51,7 +51,6 @@ public class NodeDeserializer extends JsonDeserializer<AbstractNode> {
             String name = p.getCurrentName();
 
             JsonPointer pp = JsonPointer.compile(ptr.toString() + "/" + name.replaceAll("/", "~1"));
-
             context.setAttribute(ATTRIBUTE_PARENT, node);
             context.setAttribute(ATTRIBUTE_POINTER, pp);
 

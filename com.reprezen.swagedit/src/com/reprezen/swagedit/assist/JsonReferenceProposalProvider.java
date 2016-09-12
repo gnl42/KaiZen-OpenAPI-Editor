@@ -25,6 +25,7 @@ import org.eclipse.core.resources.IResourceProxyVisitor;
 import org.eclipse.core.runtime.CoreException;
 import org.eclipse.core.runtime.IPath;
 
+import com.fasterxml.jackson.core.JsonPointer;
 import com.fasterxml.jackson.databind.JsonNode;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import com.google.common.base.Strings;
@@ -38,10 +39,10 @@ import com.reprezen.swagedit.json.JsonDocumentManager;
  */
 public class JsonReferenceProposalProvider extends AbstractProposalProvider {
 
-    protected static final String SCHEMA_DEFINITION_REGEX = "^:definitions:(\\w+:)+\\$ref|.*schema:(\\w+:)?\\$ref";
-    protected static final String RESPONSE_REGEX = ".*responses:\\d+:\\$ref";
-    protected static final String PARAMETER_REGEX = ".*:parameters:@\\d+:\\$ref";
-    protected static final String PATH_ITEM_REGEX = ":paths:/[^:]+:\\$ref";
+    protected static final String SCHEMA_DEFINITION_REGEX = "^/definitions/(\\w+/)+\\$ref|.*schema/(\\w+/)?\\$ref";
+    protected static final String RESPONSE_REGEX = ".*responses/\\d+/\\$ref";
+    protected static final String PARAMETER_REGEX = ".*/parameters/\\d+/\\$ref";
+    protected static final String PATH_ITEM_REGEX = "/paths/~1[^/]+/\\$ref";
 
     private final ObjectMapper mapper = new ObjectMapper();
     private final JsonDocumentManager manager = JsonDocumentManager.getInstance();
@@ -51,9 +52,9 @@ public class JsonReferenceProposalProvider extends AbstractProposalProvider {
     }
 
     @Override
-    public Iterable<JsonNode> createProposals(String path, SwaggerDocument document, int cycle) {
+    public Iterable<JsonNode> createProposals(JsonPointer pointer, SwaggerDocument document, int cycle) {
         final Scope scope = Scope.get(cycle);
-        final ContextType type = ContextType.get(path);
+        final ContextType type = ContextType.get(pointer.toString());
         final List<JsonNode> proposals = Lists.newArrayList();
         final IFile currentFile = getActiveFile();
         final IPath basePath = currentFile.getParent().getFullPath();
@@ -129,8 +130,11 @@ public class JsonReferenceProposalProvider extends AbstractProposalProvider {
      * The context type is determined by the pointer (path) on which the completion proposal has been activated.
      */
     protected enum ContextType {
-        SCHEMA_DEFINITION("definitions", "schemas"), PATH_ITEM("paths", "path items"), PATH_PARAMETER("parameters",
-                "parameters"), PATH_RESPONSE("responses", "responses"), UNKNOWN(null, "");
+        SCHEMA_DEFINITION("definitions", "schemas"), //
+        PATH_ITEM("paths", "path items"), //
+        PATH_PARAMETER("parameters", "parameters"), //
+        PATH_RESPONSE("responses", "responses"), //
+        UNKNOWN(null, "");
 
         private final String value;
         private final String label;

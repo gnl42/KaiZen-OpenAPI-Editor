@@ -18,6 +18,7 @@ import org.yaml.snakeyaml.nodes.ScalarNode;
 import com.fasterxml.jackson.core.JsonPointer;
 import com.fasterxml.jackson.databind.JsonNode;
 import com.google.common.base.Strings;
+import com.reprezen.swagedit.model.AbstractNode;
 
 /**
  * JSON Reference Factory
@@ -26,6 +27,18 @@ import com.google.common.base.Strings;
  * 
  */
 public class JsonReferenceFactory {
+
+    public JsonReference create(AbstractNode node) {
+        if (node == null) {
+            return new JsonReference(null, null, false, false, node);
+        }
+
+        if (node.isObject() && node.get("$ref") != null) {
+            node = node.get("$ref");
+        }
+
+        return doCreate((String) node.asValue().getValue(), node);
+    }
 
     public JsonReference create(JsonNode node) {
         if (node == null || node.isMissingNode()) {

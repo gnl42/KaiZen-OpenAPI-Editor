@@ -26,7 +26,6 @@ import com.fasterxml.jackson.core.JsonProcessingException;
 import com.fasterxml.jackson.databind.JsonNode;
 import com.google.common.base.Strings;
 import com.google.common.collect.Lists;
-import com.reprezen.swagedit.json.JsonSchemaManager;
 
 public class SwaggerError {
 
@@ -39,7 +38,6 @@ public class SwaggerError {
     public int level;
     public int line;
     public int indent = 0;
-    private static final JsonNode swaggerSchema = new JsonSchemaManager().getSwaggerSchema().asJson();;
 
     public SwaggerError(int line, int level, String message) {
         this.line = line;
@@ -216,7 +214,9 @@ public class SwaggerError {
         }
 
         protected JsonNode findNode(String path) {
-            JsonNode result = findNode(Lists.newLinkedList(Arrays.asList(path.split("/"))), swaggerSchema);
+            // TODO
+            // JsonNode result = findNode(Lists.newLinkedList(Arrays.asList(path.split("/"))), swaggerSchema);
+            JsonNode result = findNode(Lists.newLinkedList(Arrays.asList(path.split("/"))), null);
             return result;
         }
 

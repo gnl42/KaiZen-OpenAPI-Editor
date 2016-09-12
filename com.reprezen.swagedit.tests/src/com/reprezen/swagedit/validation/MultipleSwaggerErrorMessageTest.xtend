@@ -4,12 +4,12 @@ import com.fasterxml.jackson.databind.JsonNode
 import com.fasterxml.jackson.databind.node.ArrayNode
 import com.google.common.base.Strings
 import com.google.common.collect.Lists
-import com.reprezen.swagedit.json.JsonSchemaManager
+import com.reprezen.swagedit.json.SwaggerSchema
+import io.swagger.util.Json
 import java.util.List
 import org.junit.Test
 
 import static org.junit.Assert.*
-import io.swagger.util.Json
 
 class MultipleSwaggerErrorMessageTest {
 
@@ -82,7 +82,7 @@ class MultipleSwaggerErrorMessageTest {
 	}
 
 	def void testCombinedSchemas(String propertyName) throws Exception {
-		val JsonNode swaggerSchema = new JsonSchemaManager().getSwaggerSchema().asJson();
+		val JsonNode swaggerSchema = new SwaggerSchema().asJson
 		val swaggerError = new SwaggerError.MultipleSwaggerError(0, 0);
 		val List<JsonNode> combinedSchemas = newArrayList();
 		// oneOf and anyOf are usually ArrayNodes
