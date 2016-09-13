@@ -24,6 +24,7 @@ class Cursors {
 	static def (String, String)=>void setUpPathTest(String yaml, SwaggerDocument doc) {
 		val groups = groupMarkers(yaml)
 		doc.set(removeMarkers(yaml))
+		doc.onChange
 
 		new Procedure2<String, String>() {
 			override apply(String path, String marker) {
@@ -50,6 +51,7 @@ class Cursors {
 			override ICompletionProposal[] apply(IContentAssistProcessor processor, String marker) {
 				val offset = groups.get(marker).offset
 				when(selection.getOffset()).thenReturn(offset)
+				println(offset)
 				processor.computeCompletionProposals(viewer, offset)
 			}
 		}
@@ -62,17 +64,20 @@ class Cursors {
 		var offset = 0
 
 		val t = text.toCharArray
+		var Region region = null
 		for (var i = 0; i < t.length; i++) {
 			var b = t.get(i)
 
 			if (CharMatcher.is('<').matches(b)) {
 				start = true
 				current = new String()
+				region = new Region(if (offset > 0) offset - 1 else offset, 1)
 			} else if (start) {
 				if (CharMatcher.is('>').matches(b)) {
 					start = false
-					groups.put(current, new Region(offset, 1))
+					groups.put(current, region)
 					current = null
+					region = null
 				} else {
 					current += b
 				}

@@ -23,7 +23,7 @@ class ModelTest {
 			  title: Simple API
 		'''
 
-		val model = Model.parseYaml(text)
+		val model = Model.parseYaml(schema, text)
 		val root = model.root
 
 		assertTrue(root.type instanceof ObjectTypeDefinition)
@@ -54,7 +54,7 @@ class ModelTest {
 			  - https
 		'''
 
-		val model = Model.parseYaml(text)
+		val model = Model.parseYaml(schema, text)
 		val root = model.root
 
 		val schemes = root.get("schemes").type
@@ -76,7 +76,7 @@ class ModelTest {
 			  - text/xml
 		'''
 
-		val model = Model.parseYaml(text)
+		val model = Model.parseYaml(schema, text)
 		val root = model.root
 
 		val consumes = root.get("consumes").type
@@ -106,7 +106,7 @@ class ModelTest {
 			          maximum: 10000
 		'''
 
-		val model = Model.parseYaml(text)
+		val model = Model.parseYaml(schema, text)
 		val root = model.root
 
 		val paths = root.get("paths").type

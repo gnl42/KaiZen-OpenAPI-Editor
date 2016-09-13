@@ -66,6 +66,20 @@ class SwaggerDocumentTest {
 	}
 
 	@Test
+	def void testGetPathInfoLicense() {
+		val test = setUpPathTest('''
+			swagger: "2.0"
+			info:
+			  version: 1.0.0
+			  title: Swagger Petstore
+			  license:
+			    <1>
+		''', document)
+		
+		test.apply("/info/license", "1")
+	}
+
+	@Test
 	def void testGetPathOnPaths() {
 		val test = setUpPathTest('''
 			paths<1>:
@@ -105,7 +119,7 @@ class SwaggerDocumentTest {
 			      responses:
 			        '200':
 			          description: OK
-			   <1> 
+			    <1>
 			parameters:
 			  foo:
 			    name: foo

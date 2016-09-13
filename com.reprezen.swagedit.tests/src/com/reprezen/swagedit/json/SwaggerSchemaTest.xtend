@@ -7,12 +7,12 @@ import static org.junit.Assert.*
 
 class SwaggerSchemaTest {
 
+	val schema = new SwaggerSchema
+
 	@Test
 	def void test() {
-		val schema = new SwaggerSchema
-		
 		assertNotNull(schema.rootType)
-		
+
 		println(schema.rootType.properties.get("swagger"))
 		println(schema.rootType.properties.get("paths"))
 	}
@@ -20,15 +20,15 @@ class SwaggerSchemaTest {
 	@Test
 	def void test2() {
 		val yaml = '''
-		  swagger: 2.0
+			swagger: 2.0
 		'''
 
-		val root = Model.parseYaml(yaml).root
-		
+		val root = Model.parseYaml(schema, yaml).root
+
 		val schema = new SwaggerSchema
 		val rootType = schema.getType(root)
 		val swaggerType = schema.getType(root.get("swagger"))
-		
+
 		println(rootType)
 		println(swaggerType)
 	}
@@ -36,18 +36,18 @@ class SwaggerSchemaTest {
 	@Test
 	def void test3() {
 		val yaml = '''
-		  info:
-		    title: a
-		    description: b
+			info:
+			  title: a
+			  description: b
 		'''
 
-		val root = Model.parseYaml(yaml).root
-		
+		val root = Model.parseYaml(schema, yaml).root
+
 		val schema = new SwaggerSchema
 		val rootType = schema.getType(root)
 		val infoType = schema.getType(root.get("info"))
 		val titleType = schema.getType(root.get("info").get("title"))
-		
+
 		assertTrue(rootType instanceof ObjectTypeDefinition)
 		assertTrue(infoType instanceof ObjectTypeDefinition)
 		assertTrue(titleType instanceof TypeDefinition)
@@ -56,18 +56,18 @@ class SwaggerSchemaTest {
 	@Test
 	def void test4() {
 		val yaml = '''
-		  info:
-		    title: a
-		    description: b
+			info:
+			  title: a
+			  description: b
 		'''
 
-		val root = Model.parseYaml(yaml).root
-		
+		val root = Model.parseYaml(schema, yaml).root
+
 		val schema = new SwaggerSchema
 		val rootType = schema.getType(root)
 		val infoType = schema.getType(root.get("info"))
 		val titleType = schema.getType(root.get("info").get("title"))
-		
+
 		assertTrue(rootType instanceof ObjectTypeDefinition)
 		assertTrue(infoType instanceof ObjectTypeDefinition)
 		assertTrue(titleType instanceof TypeDefinition)
@@ -81,6 +81,5 @@ class SwaggerSchemaTest {
 			    get:
 		'''
 
-		
 	}
 }

@@ -99,7 +99,8 @@ public class SwaggerContentAssistProcessor extends TemplateCompletionProcessor
         String bindingKey = bindingService
                 .getBestActiveBindingFormattedFor(IWorkbenchCommandConstants.EDIT_CONTENT_ASSIST);
 
-        String context = ContextType.get(currentPath.toString()).label();
+        ContextType contextType = ContextType.get(currentPath != null ? currentPath.toString() : "");
+        String context = contextType != null ? contextType.label() : "";
 
         return new String[] { String.format(Messages.content_assist_proposal_project, bindingKey, context),
                 String.format(Messages.content_assist_proposal_workspace, bindingKey, context),
@@ -134,8 +135,10 @@ public class SwaggerContentAssistProcessor extends TemplateCompletionProcessor
             column -= prefix.length();
         }
 
-        Model model = document.getModel();
+        Model model = document.getModel(documentOffset - prefix.length());
+        System.out.println(model.allNodes());
         currentPath = model.getPath(line, column);
+        System.out.println(currentPath);
 
         final List<ICompletionProposal> proposals = new ArrayList<>();
 
@@ -149,12 +152,13 @@ public class SwaggerContentAssistProcessor extends TemplateCompletionProcessor
                 contentAssistant.setStatusMessage(textMessages[cyclePosition]);
             }
 
-            proposals.addAll(referenceProposalProvider.getCompletionProposals(currentPath, document, prefix,
+            proposals.addAll(referenceProposalProvider.getCompletionProposals(currentPath, model, prefix,
                     documentOffset, cyclePosition));
         } else {
             // compute template proposals
             final ICompletionProposal[] templateProposals = super.computeCompletionProposals(viewer, documentOffset);
-            proposals.addAll(proposalProvider.getCompletionProposals(currentPath, document, prefix, documentOffset,
+            proposals.addAll(
+                    proposalProvider.getCompletionProposals(currentPath, model, prefix, documentOffset,
                     cyclePosition));
 
             if (templateProposals != null && templateProposals.length > 0) {

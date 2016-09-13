@@ -31,8 +31,8 @@ import com.fasterxml.jackson.databind.ObjectMapper;
 import com.google.common.base.Strings;
 import com.google.common.collect.Lists;
 import com.reprezen.swagedit.editor.DocumentUtils;
-import com.reprezen.swagedit.editor.SwaggerDocument;
 import com.reprezen.swagedit.json.JsonDocumentManager;
+import com.reprezen.swagedit.model.Model;
 
 /**
  * Completion proposal provider for JSON references.
@@ -52,16 +52,15 @@ public class JsonReferenceProposalProvider extends AbstractProposalProvider {
     }
 
     @Override
-    public Iterable<JsonNode> createProposals(JsonPointer pointer, SwaggerDocument document, int cycle) {
+    public Iterable<JsonNode> createProposals(JsonPointer pointer, Model model, int cycle) {
         final Scope scope = Scope.get(cycle);
         final ContextType type = ContextType.get(pointer.toString());
         final List<JsonNode> proposals = Lists.newArrayList();
         final IFile currentFile = getActiveFile();
         final IPath basePath = currentFile.getParent().getFullPath();
-        final JsonNode doc = document.asJson();
 
         if (scope == Scope.LOCAL) {
-            proposals.addAll(collectProposals(doc, type.value(), null));
+            // proposals.addAll(collectProposals(model, type.value(), null));
         } else {
             IContainer parent;
             if (scope == Scope.PROJECT) {
@@ -73,9 +72,8 @@ public class JsonReferenceProposalProvider extends AbstractProposalProvider {
             Iterable<IFile> files = collectFiles(parent);
             for (IFile file : files) {
                 IPath relative = file.equals(currentFile) ? null : file.getFullPath().makeRelativeTo(basePath);
-                JsonNode content = file.equals(currentFile) ? doc : manager.getDocument(file.getLocationURI());
-
-                proposals.addAll(collectProposals(content, type.value(), relative));
+                // JsonNode content = file.equals(currentFile) ? doc : manager.getDocument(file.getLocationURI());
+                // proposals.addAll(collectProposals(content, type.value(), relative));
             }
         }
 

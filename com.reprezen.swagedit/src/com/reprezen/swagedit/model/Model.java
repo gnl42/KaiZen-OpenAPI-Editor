@@ -21,8 +21,8 @@ public class Model {
     private final Map<JsonPointer, AbstractNode> nodes = new LinkedHashMap<>();
     private final SwaggerSchema schema;
 
-    Model() {
-        this.schema = new SwaggerSchema();
+    Model(SwaggerSchema schema) {
+        this.schema = schema;
     }
 
     /**
@@ -31,8 +31,8 @@ public class Model {
      * @param text
      * @return model
      */
-    public static Model parseYaml(String text) {
-        Model model = new Model();
+    public static Model parseYaml(SwaggerSchema schema, String text) {
+        Model model = new Model(schema);
 
         if (Strings.emptyToNull(text) == null) {
             model.add(new ObjectNode(null, JsonPointer.compile("")));
@@ -98,7 +98,7 @@ public class Model {
         AbstractNode found = forLine(line);
         if (found != null) {
 
-            int c = startColumn(found);// + Strings.nullToEmpty(found.getProperty()).length();
+            int c = startColumn(found);
             if (column >= c) {
                 return found;
             } else {
@@ -107,22 +107,25 @@ public class Model {
 
         } else {
             found = findBeforeLine(line, column);
-
             if (found != null) {
-                if (startColumn(found) <= column) {
-                    return found;
-                } else {
-                    return found.getParent();
-                }
+                return findCorrectNode(found, column);
             }
         }
 
-        return null;
+        return found;
+    }
+
+    protected AbstractNode findCorrectNode(AbstractNode current, int column) {
+        if (startColumn(current) < column) {
+            return current;
+        } else {
+            return findCorrectNode(current.getParent(), column);
+        }
     }
 
     protected AbstractNode forLine(int line) {
         final AbstractNode root = getRoot();
-        for (AbstractNode node : nodes.values()) {
+        for (AbstractNode node : allNodes()) {
             if (node != root && startLine(node) == line) {
                 return node;
             }
@@ -133,7 +136,7 @@ public class Model {
     protected AbstractNode findBeforeLine(int line, int column) {
         AbstractNode root = getRoot();
         AbstractNode found = null, before = null;
-        Iterator<AbstractNode> it = nodes.values().iterator();
+        Iterator<AbstractNode> it = allNodes().iterator();
 
         while (found == null && it.hasNext()) {
             AbstractNode current = it.next();
@@ -142,9 +145,7 @@ public class Model {
             }
 
             if (startLine(current) < line) {
-                if (contentColumn(current) <= column) {
-                    before = current;
-                }
+                before = current;
             } else {
                 found = before;
             }
