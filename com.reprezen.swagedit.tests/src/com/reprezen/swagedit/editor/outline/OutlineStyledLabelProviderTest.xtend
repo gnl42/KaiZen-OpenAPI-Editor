@@ -6,9 +6,11 @@ import org.junit.Before
 import org.junit.Test
 
 import static org.junit.Assert.*
+import com.reprezen.swagedit.json.SwaggerSchema
 
 class OutlineStyledLabelProviderTest {
 
+	val schema = new SwaggerSchema
 	OutlineStyledLabelProvider provider
 
 	@Before
@@ -27,7 +29,7 @@ class OutlineStyledLabelProviderTest {
 			  key: value
 		'''
 
-		val root = Model.parseYaml(text).root		
+		val root = Model.parseYaml(schema, text).root
 		val el = root.elements.get(0).elements.get(0)
 
 		assertEquals("key: value", el.text)
@@ -42,15 +44,15 @@ class OutlineStyledLabelProviderTest {
 			  - https
 		'''
 
-		val els = Model.parseYaml(text).root
+		val els = Model.parseYaml(schema, text).root
 
 		assertEquals("schemes", els.get(0).text)
 		assertEquals("schemes schemesList", provider.getSyledString(els.get(0)).toString)
-		
+
 		val http = els.get(0).elements.get(0)
 		assertEquals("http", http.text)
 		assertEquals("http", provider.getSyledString(http).toString)
-		
+
 		val https = els.get(0).elements.get(1)
 		assertEquals("https", https.text)
 		assertEquals("https", provider.getSyledString(https).toString)
@@ -64,10 +66,10 @@ class OutlineStyledLabelProviderTest {
 			  value: world
 		'''
 
-		val els = Model.parseYaml(text).root
+		val els = Model.parseYaml(schema, text).root
 		assertEquals("object", els.get(0).text)
 
-		// TODO
+	// TODO
 	}
 
 	@Test
@@ -79,11 +81,11 @@ class OutlineStyledLabelProviderTest {
 			  - name: hello
 			    value: world
 		'''
-		
-		val els = Model.parseYaml(text).root
+
+		val els = Model.parseYaml(schema, text).root
 		assertEquals("objects", els.get(0).text)
-		
-		// TODO
+
+	// TODO
 	}
 
 	@Test
@@ -93,11 +95,11 @@ class OutlineStyledLabelProviderTest {
 			  name: hello
 			  value: world
 		'''
-		
-		val els = Model.parseYaml(text).root
+
+		val els = Model.parseYaml(schema, text).root
 		assertEquals("object", els.get(0).text)
-		
-		// TODO
+
+	// TODO
 	}
 
 }

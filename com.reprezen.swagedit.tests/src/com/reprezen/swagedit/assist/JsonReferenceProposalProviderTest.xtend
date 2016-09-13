@@ -60,7 +60,7 @@ class JsonReferenceProposalProviderTest {
 		val document = new SwaggerDocument
 		document.set(text)
 
-		val proposals = provider.createProposals("/paths/~1foo/get/responses/200/schema/$ref".ptr, document, 0)
+		val proposals = provider.createProposals("/paths/~1foo/get/responses/200/schema/$ref".ptr, document.model, 0)
 
 		assertThat(proposals, hasItems(
 			mapper.createObjectNode
@@ -90,7 +90,7 @@ class JsonReferenceProposalProviderTest {
 		val document = new SwaggerDocument
 		document.set(text)
 
-		val proposals = provider.createProposals("/definitions/Bar/properties/foo/$ref".ptr, document, 0)
+		val proposals = provider.createProposals("/definitions/Bar/properties/foo/$ref".ptr, document.model, 0)
 
 		assertThat(proposals, hasItems(
 			mapper.createObjectNode

@@ -76,4 +76,19 @@ class SwaggerContentAssistProcessorTest {
 		assertEquals("swagger:", document.get())
 	}
 
+	@Test
+	def void test() {
+		val document = new SwaggerDocument
+		val test = setUpContentAssistTest('''
+			swagger: "2.0"
+			info:
+			  version: 1.0.0
+			  title: Swagger Petstore
+			  license:
+			    <1>
+		''', document, viewer)
+		
+		val proposals = test.apply(processor, "1")
+		println(proposals.map[(it as StyledCompletionProposal).replacementString])
+	}
 }

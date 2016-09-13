@@ -17,6 +17,7 @@ import com.fasterxml.jackson.databind.JsonNode;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import com.google.common.base.Strings;
 import com.reprezen.swagedit.editor.SwaggerDocument;
+import com.reprezen.swagedit.model.Model;
 
 public abstract class AbstractProposalProvider {
 
@@ -52,12 +53,11 @@ public abstract class AbstractProposalProvider {
      *            - current position in list of proposals
      * @return list of completion proposals
      */
-    public Collection<? extends ICompletionProposal> getCompletionProposals(JsonPointer pointer,
-            SwaggerDocument document,
+    public Collection<? extends ICompletionProposal> getCompletionProposals(JsonPointer pointer, Model model,
             String prefix, int documentOffset, int cycle) {
 
         final List<ICompletionProposal> result = new ArrayList<>();
-        final Iterable<JsonNode> proposals = createProposals(pointer, document, cycle);
+        final Iterable<JsonNode> proposals = createProposals(pointer, model, cycle);
 
         prefix = Strings.emptyToNull(prefix);
 
@@ -85,6 +85,6 @@ public abstract class AbstractProposalProvider {
         return result;
     }
 
-    protected abstract Iterable<JsonNode> createProposals(JsonPointer pointer, SwaggerDocument document, int cycle);
+    protected abstract Iterable<JsonNode> createProposals(JsonPointer pointer, Model model, int cycle);
 
 }

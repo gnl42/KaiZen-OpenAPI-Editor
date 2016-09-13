@@ -24,6 +24,7 @@ import org.yaml.snakeyaml.parser.ParserException;
 import com.fasterxml.jackson.core.JsonPointer;
 import com.fasterxml.jackson.databind.JsonNode;
 import com.fasterxml.jackson.databind.ObjectMapper;
+import com.reprezen.swagedit.json.SwaggerSchema;
 import com.reprezen.swagedit.model.AbstractNode;
 import com.reprezen.swagedit.model.Model;
 
@@ -42,8 +43,10 @@ public class SwaggerDocument extends Document {
     private Exception yamlError;
     private Exception jsonError;
     private Model model;
+    private SwaggerSchema schema;
 
     public SwaggerDocument() {
+        this.schema = new SwaggerSchema();
     }
 
     public Exception getYamlError() {
@@ -117,7 +120,7 @@ public class SwaggerDocument extends Document {
     public void onChange() {
         final String content = get();
 
-        getModel();
+        parseModel();
         parseYaml(content);
 
         // not need to parse json if
@@ -150,19 +153,22 @@ public class SwaggerDocument extends Document {
         }
     }
 
-    public Model getModel() {
+    private void parseModel() {
         try {
-            model = Model.parseYaml(get());
+            model = Model.parseYaml(schema, get());
         } catch (Exception e) {
-            e.printStackTrace();
+            // e.printStackTrace();
             model = null;
         }
+    }
+
+    public Model getModel() {
         return model;
     }
 
     public Model getModel(int offset) {
         try {
-            return Model.parseYaml(offset > 0 ? get(0, offset) : get());
+            return Model.parseYaml(schema, offset > 0 ? get(0, offset) : get());
         } catch (BadLocationException e) {
             return null;
         }

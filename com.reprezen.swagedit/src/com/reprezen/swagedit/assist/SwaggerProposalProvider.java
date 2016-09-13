@@ -12,8 +12,8 @@ package com.reprezen.swagedit.assist;
 
 import com.fasterxml.jackson.core.JsonPointer;
 import com.fasterxml.jackson.databind.JsonNode;
-import com.reprezen.swagedit.editor.SwaggerDocument;
 import com.reprezen.swagedit.model.AbstractNode;
+import com.reprezen.swagedit.model.Model;
 
 /**
  * Provider of completion proposals.
@@ -21,8 +21,9 @@ import com.reprezen.swagedit.model.AbstractNode;
 public class SwaggerProposalProvider extends AbstractProposalProvider {
 
     @Override
-    protected Iterable<JsonNode> createProposals(JsonPointer path, SwaggerDocument document, int cycle) {
-        AbstractNode node = document.getModel().find(path);
+    protected Iterable<JsonNode> createProposals(JsonPointer path, Model model, int cycle) {
+        System.out.println(path);
+        AbstractNode node = model.find(path);
 
         return node.getProposals();
     }
