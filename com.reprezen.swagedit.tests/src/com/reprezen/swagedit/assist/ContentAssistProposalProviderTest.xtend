@@ -1,7 +1,6 @@
 package com.reprezen.swagedit.assist
 
 import com.fasterxml.jackson.core.JsonPointer
-import com.reprezen.swagedit.json.JsonType2
 import com.reprezen.swagedit.json.SwaggerSchema
 import com.reprezen.swagedit.model.ArrayNode
 import com.reprezen.swagedit.model.ObjectNode
@@ -10,6 +9,7 @@ import org.junit.Test
 
 import static org.hamcrest.core.IsCollectionContaining.*
 import static org.junit.Assert.*
+import com.reprezen.swagedit.json.TypeDefinition
 
 class ContentAssistProposalProviderTest {
 
@@ -18,7 +18,7 @@ class ContentAssistProposalProviderTest {
 	@Test
 	def void testGetProposals_RootObject() {
 		val node = new ObjectNode(null, JsonPointer.compile(""))
-		val type = JsonType2.create(schema.asJson, JsonPointer.compile(""))
+		val type = TypeDefinition.create(schema.asJson, JsonPointer.compile(""))
 		node.type = type
 
 		assertThat(type.getProposals(node).map[get("value").asText], hasItems(#[
@@ -44,7 +44,7 @@ class ContentAssistProposalProviderTest {
 	@Test
 	def void testGetProposals_SwaggerEnum() {
 		val node = new ValueNode(null, JsonPointer.compile("/swagger"), null)
-		val type = JsonType2.create(schema.asJson, JsonPointer.compile("/properties/swagger"))
+		val type = TypeDefinition.create(schema.asJson, JsonPointer.compile("/properties/swagger"))
 		node.type = type
 
 		assertThat(type.getProposals(node).map [
@@ -55,7 +55,7 @@ class ContentAssistProposalProviderTest {
 	@Test
 	def void testGetProposals_InfoObject() {
 		val node = new ObjectNode(null, JsonPointer.compile("/info"), null)
-		val type = JsonType2.create(schema.asJson, JsonPointer.compile("/definitions/info"))
+		val type = TypeDefinition.create(schema.asJson, JsonPointer.compile("/definitions/info"))
 		node.type = type
 
 		assertThat(type.getProposals(node).map [
@@ -73,7 +73,7 @@ class ContentAssistProposalProviderTest {
 	@Test
 	def void testGetProposals_SchemesArray() {
 		val node = new ArrayNode(null, JsonPointer.compile("/info"), null)
-		val type = JsonType2.create(schema.asJson, JsonPointer.compile("/definitions/schemesList"))
+		val type = TypeDefinition.create(schema.asJson, JsonPointer.compile("/definitions/schemesList"))
 		node.type = type
 
 		assertThat(type.getProposals(node).map [
@@ -89,7 +89,7 @@ class ContentAssistProposalProviderTest {
 	@Test
 	def void testGetProposals_PathsObject() {
 		val node = new ObjectNode(null, JsonPointer.compile("/paths"), null)
-		val type = JsonType2.create(schema.asJson, JsonPointer.compile("/definitions/paths"))
+		val type = TypeDefinition.create(schema.asJson, JsonPointer.compile("/definitions/paths"))
 		node.type = type
 
 		assertThat(type.getProposals(node).map [
@@ -103,7 +103,7 @@ class ContentAssistProposalProviderTest {
 	@Test
 	def void testGetProposals_DefinitionsObject() {
 		val node = new ObjectNode(null, JsonPointer.compile("/definitions"), null)
-		val type = JsonType2.create(schema.asJson, JsonPointer.compile("/definitions/definitions"))
+		val type = TypeDefinition.create(schema.asJson, JsonPointer.compile("/definitions/definitions"))
 		node.type = type
 
 		assertThat(type.getProposals(node).map [
@@ -116,7 +116,7 @@ class ContentAssistProposalProviderTest {
 	@Test
 	def void testPathGetProposals() {
 		val node = new ObjectNode(null, JsonPointer.compile("/paths/~1/get"), null)
-		val type = JsonType2.create(schema.asJson, JsonPointer.compile("/definitions/operation"))
+		val type = TypeDefinition.create(schema.asJson, JsonPointer.compile("/definitions/operation"))
 		node.type = type
 
 		assertThat(type.getProposals(node).map [
@@ -141,12 +141,8 @@ class ContentAssistProposalProviderTest {
 	@Test
 	def void testGetOneOfProposals() {
 		val node = new ObjectNode(null, JsonPointer.compile("/paths/~1/get/responses/200"), null)
-		val type = JsonType2.create(schema.asJson, JsonPointer.compile("/definitions/responseValue"))
+		val type = TypeDefinition.create(schema.asJson, JsonPointer.compile("/definitions/responseValue"))
 		node.type = type
-
-		println(type.getProposals(node).map [
-			get("value").asText
-		])
 
 		assertThat(type.getProposals(node).map [
 			get("value").asText

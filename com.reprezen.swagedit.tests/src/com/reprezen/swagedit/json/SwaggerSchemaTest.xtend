@@ -1,6 +1,5 @@
 package com.reprezen.swagedit.json
 
-import com.reprezen.swagedit.json.JsonType2.ObjectType
 import com.reprezen.swagedit.model.Model
 import org.junit.Test
 
@@ -49,9 +48,9 @@ class SwaggerSchemaTest {
 		val infoType = schema.getType(root.get("info"))
 		val titleType = schema.getType(root.get("info").get("title"))
 		
-		assertTrue(rootType instanceof ObjectType)
-		assertTrue(infoType instanceof ObjectType)
-		assertTrue(titleType instanceof JsonType2)
+		assertTrue(rootType instanceof ObjectTypeDefinition)
+		assertTrue(infoType instanceof ObjectTypeDefinition)
+		assertTrue(titleType instanceof TypeDefinition)
 	}
 
 	@Test
@@ -69,9 +68,19 @@ class SwaggerSchemaTest {
 		val infoType = schema.getType(root.get("info"))
 		val titleType = schema.getType(root.get("info").get("title"))
 		
-		assertTrue(rootType instanceof ObjectType)
-		assertTrue(infoType instanceof ObjectType)
-		assertTrue(titleType instanceof JsonType2)
+		assertTrue(rootType instanceof ObjectTypeDefinition)
+		assertTrue(infoType instanceof ObjectTypeDefinition)
+		assertTrue(titleType instanceof TypeDefinition)
 	}
 
+	@Test
+	def void testTypeGetPath2() {
+		val yaml = '''
+			paths:
+			  /foo:
+			    get:
+		'''
+
+		
+	}
 }

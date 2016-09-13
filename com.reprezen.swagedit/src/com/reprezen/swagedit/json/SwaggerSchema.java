@@ -11,7 +11,7 @@ public class SwaggerSchema {
 
     private ObjectMapper mapper = new ObjectMapper();
     protected JsonNode content;
-    protected JsonType2 rootType;
+    protected TypeDefinition rootType;
 
     public SwaggerSchema() {
         init();
@@ -25,14 +25,14 @@ public class SwaggerSchema {
         }
 
         JsonNode schema = content;
-        rootType = JsonType2.create(schema, JsonPointer.compile(""));
+        rootType = TypeDefinition.create(schema, JsonPointer.compile(""));
     }
 
     public JsonNode asJson() {
         return content;
     }
 
-    public JsonType2 getType(AbstractNode node) {
+    public TypeDefinition getType(AbstractNode node) {
         JsonPointer pointer = node.getPointer();
 
         if (JsonPointer.compile("").equals(pointer)) {
@@ -40,11 +40,28 @@ public class SwaggerSchema {
         }
 
         String[] paths = pointer.toString().substring(1).split("/");
-        JsonType2 current = rootType;
+        TypeDefinition current = rootType;
 
-        for (String path : paths) {
-            System.out.println(path + " " + current.properties);
-            current = current.properties.get(path);
+        if (current != null) {
+            for (String path : paths) {
+
+                TypeDefinition next = null;
+                if (current instanceof ArrayTypeDefinition) {
+                    next = ((ArrayTypeDefinition) current).itemsType;
+                } else if (current instanceof ObjectTypeDefinition) {
+                    next = current.properties.get(path);
+
+                    if (next == null) {
+                        next = ((ObjectTypeDefinition) current).findMatchingPattern(path);
+                    }
+                }
+
+                // not found, we stop here
+                if (next == null) {
+                    break;
+                }
+                current = next;
+            }
         }
 
         return current;

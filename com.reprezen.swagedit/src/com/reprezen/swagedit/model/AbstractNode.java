@@ -11,14 +11,14 @@ import com.fasterxml.jackson.core.JsonLocation;
 import com.fasterxml.jackson.core.JsonPointer;
 import com.fasterxml.jackson.databind.JsonNode;
 import com.google.common.collect.Iterables;
-import com.reprezen.swagedit.json.JsonType2;
+import com.reprezen.swagedit.json.TypeDefinition;
 
 public abstract class AbstractNode {
 
     private final JsonPointer pointer;
     private String property;
     private AbstractNode parent;
-    private JsonType2 type;
+    private TypeDefinition type;
 
     private JsonLocation location;
 
@@ -64,19 +64,15 @@ public abstract class AbstractNode {
         return location;
     }
 
-    protected static String pointer(JsonPointer pointer) {
-        return pointer.toString().replaceAll("/", ":").replaceAll("~1", "/");
-    }
-
     public JsonPointer getPointer() {
         return pointer;
     }
 
-    public void setType(JsonType2 type) {
+    public void setType(TypeDefinition type) {
         this.type = type;
     }
 
-    public JsonType2 getType() {
+    public TypeDefinition getType() {
         return type;
     }
 

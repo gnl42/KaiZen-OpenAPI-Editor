@@ -13,7 +13,6 @@ import com.fasterxml.jackson.databind.JsonDeserializer;
 public class NodeDeserializer extends JsonDeserializer<AbstractNode> {
 
     public static final String ATTRIBUTE_MODEL = "model";
-    // public static final String ATTRIBUTE_TYPE = "type";
     public static final String ATTRIBUTE_PARENT = "parent";
     public static final String ATTRIBUTE_POINTER = "pointer";
 
@@ -80,9 +79,6 @@ public class NodeDeserializer extends JsonDeserializer<AbstractNode> {
             context.setAttribute(ATTRIBUTE_POINTER, pp);
 
             AbstractNode v = deserialize(p, context);
-
-            // System.out.println(name + " " + findType(parentType, name));
-            // v.type2 = findType(parentType, name);
 
             node.add(v);
             i++;
