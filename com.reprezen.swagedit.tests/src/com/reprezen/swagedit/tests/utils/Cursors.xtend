@@ -23,9 +23,7 @@ class Cursors {
 
 	static def (String, String)=>void setUpPathTest(String yaml, SwaggerDocument doc) {
 		val groups = groupMarkers(yaml)
-		println(groups)
 		doc.set(removeMarkers(yaml))
-		println(doc.get)
 
 		new Procedure2<String, String>() {
 			override apply(String path, String marker) {

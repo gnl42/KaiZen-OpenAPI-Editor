@@ -16,38 +16,6 @@ import com.google.common.base.Strings;
 
 public class JsonUtil {
 
-    // private static final JsonSchemaManager schemaManager = new JsonSchemaManager();
-
-    // /**
-    // * Returns the node that is referenced by the refNode.
-    // *
-    // * @param document
-    // * @param refNode
-    // * @return referenced node
-    // */
-    // public static SchemaDefinition getReference(JsonNode document, JsonNode refNode) {
-    // if (!JsonReference.isReference(refNode) || document == null) {
-    // return new SchemaDefinition(document, refNode);
-    // }
-    //
-    // // TODO Make use of JSONReference
-    // String ref = refNode.get("$ref").asText();
-    // if (ref.startsWith("http") || ref.startsWith("https")) {
-    // JSONSchema schema = schemaManager.getSchema(ref);
-    // if (schema != null) {
-    // document = schema.asJson();
-    // }
-    // ref = ref.substring(ref.indexOf("#"));
-    // }
-    //
-    // JsonPointer pointer = asPointer(ref);
-    // JsonNode found = document.at(pointer);
-    // String ptr = pointer.toString();
-    // String description = ptr.substring(ptr.lastIndexOf("/") + 1, ptr.length());
-    //
-    // return new SchemaDefinition(document, !found.isMissingNode() ? found : refNode, description);
-    // }
-
     public static boolean isPointer(String ptr) {
         String sanitized = sanitize(ptr);
         if (sanitized == null) {

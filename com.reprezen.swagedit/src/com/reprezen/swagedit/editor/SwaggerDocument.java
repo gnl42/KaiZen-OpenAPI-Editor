@@ -154,6 +154,7 @@ public class SwaggerDocument extends Document {
         try {
             model = Model.parseYaml(get());
         } catch (Exception e) {
+            e.printStackTrace();
             model = null;
         }
         return model;
@@ -162,7 +163,7 @@ public class SwaggerDocument extends Document {
     public Model getModel(int offset) {
         try {
             return Model.parseYaml(offset > 0 ? get(0, offset) : get());
-        } catch (IOException | BadLocationException e) {
+        } catch (BadLocationException e) {
             return null;
         }
     }

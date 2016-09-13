@@ -42,7 +42,6 @@ public abstract class SwaggerContextType extends TemplateContextType {
     }
 
     public static String getContextType(String path) {
-        // System.out.println("Context Type " + path);
         if (path != null && path.endsWith(":")) {
             path = path.substring(0, path.length() - 1);
         }

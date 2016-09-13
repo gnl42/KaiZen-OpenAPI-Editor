@@ -13,6 +13,7 @@ import com.fasterxml.jackson.core.JsonPointer;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import com.fasterxml.jackson.databind.module.SimpleModule;
 import com.fasterxml.jackson.dataformat.yaml.YAMLFactory;
+import com.google.common.base.Strings;
 import com.reprezen.swagedit.json.SwaggerSchema;
 
 public class Model {
@@ -24,21 +25,43 @@ public class Model {
         this.schema = new SwaggerSchema();
     }
 
-    public static Model parseYaml(String text) throws IOException {
+    /**
+     * 
+     * 
+     * @param text
+     * @return model
+     */
+    public static Model parseYaml(String text) {
+        Model model = new Model();
+
+        if (Strings.emptyToNull(text) == null) {
+            model.add(new ObjectNode(null, JsonPointer.compile("")));
+        } else {
+            try {
+                createMapper().reader() //
+                        .withAttribute(ATTRIBUTE_MODEL, model) //
+                        .withAttribute(ATTRIBUTE_PARENT, null) //
+                        .withAttribute(ATTRIBUTE_POINTER, JsonPointer.compile("")) //
+                        .withType(AbstractNode.class) //
+                        .readValue(text);
+            } catch (IllegalArgumentException | IOException e) {
+                // model.addError(e);
+            }
+        }
+
+        for (AbstractNode node : model.allNodes()) {
+            node.setType(model.schema.getType(node));
+        }
+
+        return model;
+    }
+
+    public static ObjectMapper createMapper() {
         final ObjectMapper mapper = new ObjectMapper(new YAMLFactory());
         final SimpleModule module = new SimpleModule();
         module.addDeserializer(AbstractNode.class, new NodeDeserializer());
         mapper.registerModule(module);
-
-        Model model = new Model();
-        mapper.reader() //
-                .withAttribute(ATTRIBUTE_MODEL, model) //
-                .withAttribute(ATTRIBUTE_PARENT, null) //
-                .withAttribute(ATTRIBUTE_POINTER, JsonPointer.compile("")) //
-                .withType(AbstractNode.class) //
-                .readValue(text);
-
-        return model;
+        return mapper;
     }
 
     public SwaggerSchema getSchema() {
@@ -49,20 +72,10 @@ public class Model {
         return nodes.get(pointer);
     }
 
-    // public AbstractNode find(String path) {
-    // if (Strings.emptyToNull(path) == null || path.equals(":")) {
-    // return getRoot();
-    // }
-    //
-    // return nodes.get(pointer(path));
-    // }
-    //
-    // protected JsonPointer pointer(String pointer) {
-    // return JsonPointer.compile(pointer.replaceAll("/", "~1").replaceAll(":", "/"));
-    // }
-
     public void add(AbstractNode node) {
-        nodes.put(node.getPointer(), node);
+        if (node != null && node.getPointer() != null) {
+            nodes.put(node.getPointer(), node);
+        }
     }
 
     public AbstractNode getRoot() {

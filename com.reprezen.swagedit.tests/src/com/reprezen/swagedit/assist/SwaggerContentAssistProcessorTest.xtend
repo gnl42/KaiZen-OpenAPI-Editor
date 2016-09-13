@@ -29,7 +29,7 @@ class SwaggerContentAssistProcessorTest {
 	def shouldProvideAllRoot_OnEmptyDocument() {
 		val document = new SwaggerDocument
 		val test = setUpContentAssistTest(
-			'''{1}''',
+			'''<1>''',
 			document,
 			viewer
 		)
@@ -62,7 +62,7 @@ class SwaggerContentAssistProcessorTest {
 	def shouldProvideEndOfWord() {
 		val document = new SwaggerDocument
 		val test = setUpContentAssistTest(
-			'''swa{1}''',
+			'''swa<1>''',
 			document,
 			viewer
 		)
