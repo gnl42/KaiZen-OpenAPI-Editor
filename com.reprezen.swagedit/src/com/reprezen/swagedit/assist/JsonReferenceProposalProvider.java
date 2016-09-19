@@ -27,40 +27,36 @@ import org.eclipse.core.runtime.IPath;
 
 import com.fasterxml.jackson.core.JsonPointer;
 import com.fasterxml.jackson.databind.JsonNode;
-import com.fasterxml.jackson.databind.ObjectMapper;
 import com.google.common.base.Strings;
 import com.google.common.collect.Lists;
 import com.reprezen.swagedit.editor.DocumentUtils;
 import com.reprezen.swagedit.json.JsonDocumentManager;
-import com.reprezen.swagedit.model.Model;
 
 /**
  * Completion proposal provider for JSON references.
  */
-public class JsonReferenceProposalProvider extends AbstractProposalProvider {
+public class JsonReferenceProposalProvider {
 
     protected static final String SCHEMA_DEFINITION_REGEX = "^/definitions/(\\w+/)+\\$ref|.*schema/(\\w+/)?\\$ref";
     protected static final String RESPONSE_REGEX = ".*responses/\\d+/\\$ref";
     protected static final String PARAMETER_REGEX = ".*/parameters/\\d+/\\$ref";
     protected static final String PATH_ITEM_REGEX = "/paths/~1[^/]+/\\$ref";
 
-    private final ObjectMapper mapper = new ObjectMapper();
     private final JsonDocumentManager manager = JsonDocumentManager.getInstance();
 
     protected IFile getActiveFile() {
         return DocumentUtils.getActiveEditorInput().getFile();
     }
 
-    @Override
-    public Iterable<JsonNode> createProposals(JsonPointer pointer, Model model, int cycle) {
+    public Collection<Proposal> getProposals(JsonPointer pointer, JsonNode doc, int cycle) {
         final Scope scope = Scope.get(cycle);
         final ContextType type = ContextType.get(pointer.toString());
-        final List<JsonNode> proposals = Lists.newArrayList();
         final IFile currentFile = getActiveFile();
         final IPath basePath = currentFile.getParent().getFullPath();
+        final List<Proposal> proposals = Lists.newArrayList();
 
         if (scope == Scope.LOCAL) {
-            // proposals.addAll(collectProposals(model, type.value(), null));
+            proposals.addAll(collectProposals(doc, type.value(), null));
         } else {
             IContainer parent;
             if (scope == Scope.PROJECT) {
@@ -72,8 +68,8 @@ public class JsonReferenceProposalProvider extends AbstractProposalProvider {
             Iterable<IFile> files = collectFiles(parent);
             for (IFile file : files) {
                 IPath relative = file.equals(currentFile) ? null : file.getFullPath().makeRelativeTo(basePath);
-                // JsonNode content = file.equals(currentFile) ? doc : manager.getDocument(file.getLocationURI());
-                // proposals.addAll(collectProposals(content, type.value(), relative));
+                JsonNode content = file.equals(currentFile) ? doc : manager.getDocument(file.getLocationURI());
+                proposals.addAll(collectProposals(content, type.value(), relative));
             }
         }
 
@@ -177,8 +173,8 @@ public class JsonReferenceProposalProvider extends AbstractProposalProvider {
      * @param path
      * @return Collection of proposals
      */
-    protected Collection<JsonNode> collectProposals(JsonNode document, String fieldName, IPath path) {
-        final Collection<JsonNode> results = Lists.newArrayList();
+    protected Collection<Proposal> collectProposals(JsonNode document, String fieldName, IPath path) {
+        final Collection<Proposal> results = Lists.newArrayList();
         if (fieldName == null || !document.has(fieldName)) {
             return results;
         }
@@ -191,8 +187,7 @@ public class JsonReferenceProposalProvider extends AbstractProposalProvider {
             String value = basePath + key.replaceAll("/", "~1");
             String encoded = encodeURL(value);
 
-            results.add(mapper.createObjectNode().put("value", "\"" + encoded + "\"").put("label", key)
-                    .put("type", value));
+            results.add(new Proposal("\"" + encoded + "\"", key, null, value));
         }
 
         return results;

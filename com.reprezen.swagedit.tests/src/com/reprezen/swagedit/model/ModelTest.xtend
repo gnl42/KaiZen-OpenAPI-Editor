@@ -94,7 +94,7 @@ class ModelTest {
 	def void testParsePathParameters_OneOfType() {
 		val text = '''
 			paths:
-			  /:
+			  /pets:
 			    get:
 			      parameters:
 			        - name: limit
@@ -112,16 +112,16 @@ class ModelTest {
 		val paths = root.get("paths").type
 		assertEquals(schema.asJson.at("/definitions/paths".ptr), paths.getDefinition)
 
-		val pathItem = root.get("paths").get("/").type
+		val pathItem = root.get("paths").get("/pets").type
 		assertEquals(schema.asJson.at("/definitions/pathItem".ptr), pathItem.getDefinition)
 
-		val get = root.get("paths").get("/").get("get").type
+		val get = root.get("paths").get("/pets").get("get").type
 		assertEquals(schema.asJson.at("/definitions/operation".ptr), get.getDefinition)
 
-		val parameters = root.get("paths").get("/").get("get").get("parameters").type
+		val parameters = root.get("paths").get("/pets").get("get").get("parameters").type
 		assertEquals(schema.asJson.at("/definitions/parametersList".ptr), parameters.getDefinition)
 
-		val param1 = root.get("paths").get("/").get("get").get("parameters").get(0).type
+		val param1 = root.get("paths").get("/pets").get("get").get("parameters").get(0).type
 		assertEquals(schema.asJson.at("/definitions/parametersList/items".ptr), param1.getDefinition)
 	}
 

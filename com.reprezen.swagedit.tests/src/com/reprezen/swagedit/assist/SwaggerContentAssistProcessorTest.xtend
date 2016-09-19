@@ -87,8 +87,40 @@ class SwaggerContentAssistProcessorTest {
 			  license:
 			    <1>
 		''', document, viewer)
-		
+
 		val proposals = test.apply(processor, "1")
 		println(proposals.map[(it as StyledCompletionProposal).replacementString])
 	}
+
+	@Test
+	def void test2() {
+		val document = new SwaggerDocument
+		val test = setUpContentAssistTest('''
+			paths:
+			  /pets:    
+			    get:
+			      summary: List all pets
+			      operationId: listPets
+			      tags:
+			        - pets
+			        - ds        
+			      parameters:
+			        <1>
+			        - name: ad
+			          <2>
+			        - name: limit
+			          in: query
+			          <3>
+		''', document, viewer)
+
+		var proposals = test.apply(processor, "1")
+		println(proposals.map[(it as StyledCompletionProposal).replacementString])
+		
+		proposals = test.apply(processor, "2")
+		println(proposals.map[(it as StyledCompletionProposal).replacementString])
+		
+		proposals = test.apply(processor, "3")
+		println(proposals.map[(it as StyledCompletionProposal).replacementString])
+	}
+
 }

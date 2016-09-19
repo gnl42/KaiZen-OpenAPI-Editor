@@ -9,7 +9,6 @@ import org.eclipse.jface.text.Position;
 
 import com.fasterxml.jackson.core.JsonLocation;
 import com.fasterxml.jackson.core.JsonPointer;
-import com.fasterxml.jackson.databind.JsonNode;
 import com.google.common.collect.Iterables;
 import com.reprezen.swagedit.json.TypeDefinition;
 
@@ -90,10 +89,6 @@ public abstract class AbstractNode {
 
     public Iterable<AbstractNode> elements() {
         return Collections.emptyList();
-    }
-
-    public Iterable<JsonNode> getProposals() {
-        return getType().getProposals(this);
     }
 
     public abstract String getText();

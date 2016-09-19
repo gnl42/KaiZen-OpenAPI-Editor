@@ -135,6 +135,7 @@ class SwaggerDocumentTest {
 			  /test<1>ing<2>:
 			    <3>get<4>:
 			      parameters:
+			        <5>
 			        - name: id
 			          type: number
 			          required: true
@@ -145,6 +146,26 @@ class SwaggerDocumentTest {
 		test.apply("/paths/~1testing", "2")
 		test.apply("/paths/~1testing/get", "3")
 		test.apply("/paths/~1testing/get", "4")
+		test.apply("/paths/~1testing/get/parameters", "5")
+	}
+	
+	@Test
+	def void testGetPath3() {
+		val test = setUpPathTest('''
+			paths:
+			  /testing:
+			    get:
+			      parameters:
+			        - <1>
+			        - name: id
+			          type: number
+			          required: true
+			          in: path
+			          <2>
+		''', document)
+
+		test.apply("/paths/~1testing/get/parameters/0", "1")
+		test.apply("/paths/~1testing/get/parameters/1", "2")
 	}
 
 }

@@ -4,30 +4,38 @@ import java.util.HashMap;
 import java.util.Iterator;
 import java.util.Map;
 import java.util.Map.Entry;
-import java.util.Set;
+import java.util.regex.Matcher;
+import java.util.regex.Pattern;
 
 import com.fasterxml.jackson.core.JsonPointer;
 import com.fasterxml.jackson.databind.JsonNode;
 import com.reprezen.swagedit.json.references.JsonReference;
-import com.reprezen.swagedit.model.AbstractNode;
 
 public class ObjectTypeDefinition extends TypeDefinition {
 
     public Map<String, TypeDefinition> patternProperties = new HashMap<>();
 
-    public ObjectTypeDefinition(JsonNode schema, JsonPointer pointer, JsonNode definition, JsonType type) {
+    public ObjectTypeDefinition(SwaggerSchema schema, JsonPointer pointer, JsonNode definition, JsonType type) {
         super(schema, pointer, definition, type);
         init();
-    }
-
-    @Override
-    public Set<JsonNode> getProposals(AbstractNode element) {
-        return createObjectProposal(definition, element);
     }
 
     private void init() {
         initProperties("properties", properties);
         initProperties("patternProperties", patternProperties);
+
+        if (definition.has("definitions")) {
+            JsonNode definitions = definition.get("definitions");
+
+            for (Iterator<Entry<String, JsonNode>> it = definitions.fields(); it.hasNext();) {
+                Entry<String, JsonNode> e = it.next();
+                JsonPointer pointer = JsonPointer.compile(getPointer().toString() + "/definitions/" + e.getKey());
+
+                if (pointer != null && !pointer.equals(getPointer()) && schema.getType(pointer) == null) {
+                    TypeDefinition.create(schema, pointer);
+                }
+            }
+        }
     }
 
     private void initProperties(String container, Map<String, TypeDefinition> properties) {
@@ -36,15 +44,30 @@ public class ObjectTypeDefinition extends TypeDefinition {
                 Entry<String, JsonNode> e = it.next();
                 JsonPointer pointer = getPropertyPointer(container, e.getKey(), e.getValue());
 
-                properties.put(e.getKey(), TypeDefinition.create(schema, pointer));
+                if (pointer != null) {
+                    if (pointer.equals(getPointer())) {
+                        properties.put(e.getKey(), this);
+                    } else if (schema.getType(pointer) != null) {
+                        properties.put(e.getKey(), schema.getType(pointer));
+                    } else {
+                        properties.put(e.getKey(), TypeDefinition.create(schema, pointer));
+                    }
+                }
             }
         }
     }
 
     private JsonPointer getPropertyPointer(String container, String key, JsonNode node) {
         String p = getPointer().toString();
+
         if (node.isObject() && node.has(JsonReference.PROPERTY)) {
-            p = node.get(JsonReference.PROPERTY).asText().substring(1);
+            String ref = node.get(JsonReference.PROPERTY).asText();
+
+            if (ref.startsWith("http") || ref.startsWith("https")) {
+                return null;
+            }
+
+            p = ref.substring(1);
         } else {
             p += "/" + container + "/" + key;
         }
@@ -52,15 +75,27 @@ public class ObjectTypeDefinition extends TypeDefinition {
         return JsonPointer.compile(p);
     }
 
+    @Override
+    public TypeDefinition getPropertyType(String property) {
+        TypeDefinition type = super.getPropertyType(property);
+        if (type == null) {
+            type = findMatchingPattern(property);
+        }
+        return type;
+    }
+
     public TypeDefinition findMatchingPattern(String path) {
-        path = path.replaceAll("~1", "/");
         TypeDefinition found = null;
         Iterator<String> patterns = patternProperties.keySet().iterator();
 
+        path = path.replaceAll("~1", "/");
+
         while (patterns.hasNext() && found == null) {
             String pattern = patterns.next();
-            if (path.matches(pattern)) {
+            Matcher matcher = Pattern.compile(pattern).matcher(path);
+            if (matcher.find() || matcher.matches()) {
                 found = patternProperties.get(pattern);
+
             }
         }
 

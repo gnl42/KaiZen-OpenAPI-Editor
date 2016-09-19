@@ -4,8 +4,12 @@ import com.reprezen.swagedit.model.Model
 import org.junit.Test
 
 import static org.junit.Assert.*
+import com.reprezen.swagedit.tests.utils.PointerHelpers
+import com.reprezen.swagedit.model.ValueNode
 
 class SwaggerSchemaTest {
+
+	extension PointerHelpers = new PointerHelpers
 
 	val schema = new SwaggerSchema
 
@@ -80,6 +84,12 @@ class SwaggerSchemaTest {
 			  /foo:
 			    get:
 		'''
+	}
+	
+	@Test
+	def void test5() {
+		val type = schema.getType(new ValueNode(null, "/paths/~1pets/get/parameters/0/in".ptr, null))
 
+		println(type)
 	}
 }

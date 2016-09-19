@@ -10,22 +10,18 @@
  *******************************************************************************/
 package com.reprezen.swagedit.assist
 
-import com.fasterxml.jackson.databind.JsonNode
-import com.fasterxml.jackson.databind.ObjectMapper
 import com.reprezen.swagedit.editor.SwaggerDocument
 import com.reprezen.swagedit.mocks.Mocks
+import com.reprezen.swagedit.tests.utils.PointerHelpers
 import org.junit.Before
 import org.junit.Test
 
 import static org.hamcrest.core.IsCollectionContaining.*
 import static org.junit.Assert.*
-import com.reprezen.swagedit.tests.utils.PointerHelpers
 
 class JsonReferenceProposalProviderTest {
 
 	extension PointerHelpers = new PointerHelpers
-
-	val mapper = new ObjectMapper
 	var JsonReferenceProposalProvider provider
 
 	@Before
@@ -40,80 +36,74 @@ class JsonReferenceProposalProviderTest {
 	@Test
 	def void testLocalProposals_Schema() {
 		val text = '''
-		swagger: '2.0'
-		info:
-		  version: 0.0.0
-		  title: Simple API
-		paths:
-		  /foo:
-		    get:
-		      responses:
-		        '200':
-		          schema:
-		            $ref: 
-		          description: OK
-		definitions:
-		  Valid:
-		    type: string
+			swagger: '2.0'
+			info:
+			  version: 0.0.0
+			  title: Simple API
+			paths:
+			  /foo:
+			    get:
+			      responses:
+			        '200':
+			          schema:
+			            $ref: 
+			          description: OK
+			definitions:
+			  Valid:
+			    type: string
 		'''
 
 		val document = new SwaggerDocument
 		document.set(text)
 
-		val proposals = provider.createProposals("/paths/~1foo/get/responses/200/schema/$ref".ptr, document, 0)
+		val proposals = provider.getProposals("/paths/~1foo/get/responses/200/schema/$ref".ptr, document.asJson, 0)
 
 		assertThat(proposals, hasItems(
-			mapper.createObjectNode
-				.put("value", "\"#/definitions/Valid\"")
-				.put("label", "Valid")
-				.put("type", "#/definitions/Valid") as JsonNode
+			new Proposal("\"#/definitions/Valid\"", "Valid", null, "#/definitions/Valid")
 		))
 	}
 
 	@Test
 	def void testLocalProposals_Definitions() {
 		val text = '''
-		swagger: '2.0'
-		info:
-		  version: 0.0.0
-		  title: Simple API
-		definitions:
-		  Foo:
-		    type: object
-		  Bar:
-		    type: object
-		    properties:
-		      foo:
-		        $ref: 
+			swagger: '2.0'
+			info:
+			  version: 0.0.0
+			  title: Simple API
+			definitions:
+			  Foo:
+			    type: object
+			  Bar:
+			    type: object
+			    properties:
+			      foo:
+			        $ref: 
 		'''
 
 		val document = new SwaggerDocument
 		document.set(text)
 
-		val proposals = provider.createProposals("/definitions/Bar/properties/foo/$ref".ptr, document, 0)
+		val proposals = provider.getProposals("/definitions/Bar/properties/foo/$ref".ptr, document.asJson, 0)
 
 		assertThat(proposals, hasItems(
-			mapper.createObjectNode
-				.put("value", "\"#/definitions/Foo\"")
-				.put("label", "Foo")
-				.put("type", "#/definitions/Foo") as JsonNode
+			new Proposal("\"#/definitions/Foo\"", "Foo", null, "#/definitions/Foo")
 		))
 	}
 
 	@Test
 	def void shouldEncodeWhiteSpaceCharacters() {
 		val text = '''
-		paths:
-		  /foo:
-		    get:
-		      responses:
-		        '200':
-		          schema:
-		            $ref: 
-		          description: OK
-		definitions:
-		  Valid:
-		    type: string
+			paths:
+			  /foo:
+			    get:
+			      responses:
+			        '200':
+			          schema:
+			            $ref: 
+			          description: OK
+			definitions:
+			  Valid:
+			    type: string
 		'''
 
 		val document = new SwaggerDocument
@@ -123,27 +113,33 @@ class JsonReferenceProposalProviderTest {
 		val proposals = provider.collectProposals(document.asJson, "paths", path)
 
 		assertThat(proposals, hasItems(
-			mapper.createObjectNode
-				.put("value", "\"../Path%20With%20Spaces/Other%20%20Spaces.yaml#/paths/~1foo\"")
-				.put("label", "/foo")
-				.put("type", "../Path With Spaces/Other  Spaces.yaml#/paths/~1foo") as JsonNode
+			new Proposal(
+				"\"../Path%20With%20Spaces/Other%20%20Spaces.yaml#/paths/~1foo\"",
+				"/foo",
+				null,
+				"../Path With Spaces/Other  Spaces.yaml#/paths/~1foo"
+			)
 		))
 	}
 
 	@Test
 	def void testContextTypes() {
 		// schema definitions
-		assertTrue("/definitions/Foo/properties/bar/$ref".matches(JsonReferenceProposalProvider.SCHEMA_DEFINITION_REGEX))
-		assertTrue("/paths/~1foo/get/responses/200/schema/$ref".matches(JsonReferenceProposalProvider.SCHEMA_DEFINITION_REGEX))
-		assertTrue("/paths/~1foo/get/responses/200/schema/items/$ref".matches(JsonReferenceProposalProvider.SCHEMA_DEFINITION_REGEX))
-		
+		assertTrue(
+			"/definitions/Foo/properties/bar/$ref".matches(JsonReferenceProposalProvider.SCHEMA_DEFINITION_REGEX))
+		assertTrue(
+			"/paths/~1foo/get/responses/200/schema/$ref".matches(JsonReferenceProposalProvider.SCHEMA_DEFINITION_REGEX))
+		assertTrue(
+			"/paths/~1foo/get/responses/200/schema/items/$ref".matches(
+				JsonReferenceProposalProvider.SCHEMA_DEFINITION_REGEX))
+
 		// responses
 		assertTrue("/paths/~1foo/get/responses/200/$ref".matches(JsonReferenceProposalProvider.RESPONSE_REGEX))
-		
+
 		// parameters
 		assertTrue("/paths/~1/get/parameters/0/$ref".matches(JsonReferenceProposalProvider.PARAMETER_REGEX))
 
 		// path items
 		assertTrue("/paths/~1pets~1{id}/$ref".matches(JsonReferenceProposalProvider.PATH_ITEM_REGEX))
 	}
-}	
+}

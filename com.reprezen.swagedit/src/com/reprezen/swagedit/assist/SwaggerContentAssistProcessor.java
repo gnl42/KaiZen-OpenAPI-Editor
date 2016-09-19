@@ -11,6 +11,7 @@
 package com.reprezen.swagedit.assist;
 
 import java.util.ArrayList;
+import java.util.Collection;
 import java.util.List;
 
 import org.eclipse.jface.text.BadLocationException;
@@ -44,6 +45,7 @@ import org.eclipse.ui.PlatformUI;
 import org.eclipse.ui.keys.IBindingService;
 
 import com.fasterxml.jackson.core.JsonPointer;
+import com.google.common.base.Strings;
 import com.google.common.collect.Lists;
 import com.reprezen.swagedit.Activator;
 import com.reprezen.swagedit.Activator.Icons;
@@ -136,37 +138,54 @@ public class SwaggerContentAssistProcessor extends TemplateCompletionProcessor
         }
 
         Model model = document.getModel(documentOffset - prefix.length());
-        System.out.println(model.allNodes());
         currentPath = model.getPath(line, column);
         System.out.println(currentPath);
 
-        final List<ICompletionProposal> proposals = new ArrayList<>();
-
         isRefCompletion = currentPath != null && currentPath.toString().endsWith("$ref");
+
+        Collection<Proposal> p;
         if (isRefCompletion) {
-
-            if (contentAssistant != null) {
-                if (textMessages == null) {
-                    textMessages = initTextMessages();
-                }
-                contentAssistant.setStatusMessage(textMessages[cyclePosition]);
-            }
-
-            proposals.addAll(referenceProposalProvider.getCompletionProposals(currentPath, model, prefix,
-                    documentOffset, cyclePosition));
+            updateStatus();
+            p = referenceProposalProvider.getProposals(currentPath, document.asJson(), cyclePosition);
         } else {
-            // compute template proposals
-            final ICompletionProposal[] templateProposals = super.computeCompletionProposals(viewer, documentOffset);
-            proposals.addAll(
-                    proposalProvider.getCompletionProposals(currentPath, model, prefix, documentOffset,
-                    cyclePosition));
+            p = proposalProvider.getProposals(currentPath, model);
+        }
 
+        final Collection<ICompletionProposal> proposals = getCompletionProposals(p, prefix, documentOffset);
+        // compute template proposals
+        if (!isRefCompletion) {
+            final ICompletionProposal[] templateProposals = super.computeCompletionProposals(viewer, documentOffset);
             if (templateProposals != null && templateProposals.length > 0) {
                 proposals.addAll(Lists.newArrayList(templateProposals));
             }
         }
 
         return proposals.toArray(new ICompletionProposal[proposals.size()]);
+    }
+
+    protected void updateStatus() {
+        if (contentAssistant != null) {
+            if (textMessages == null) {
+                textMessages = initTextMessages();
+            }
+            contentAssistant.setStatusMessage(textMessages[cyclePosition]);
+        }
+    }
+
+    protected Collection<ICompletionProposal> getCompletionProposals(Collection<Proposal> proposals,
+            String prefix, int offset) {
+        final List<ICompletionProposal> result = new ArrayList<>();
+
+        prefix = Strings.emptyToNull(prefix);
+
+        for (Proposal proposal : proposals) {
+            StyledCompletionProposal styledProposal = proposal.asStyledCompletionProposal(prefix, offset);
+            if (styledProposal != null) {
+                result.add(styledProposal);
+            }
+        }
+
+        return result;
     }
 
     @Override
