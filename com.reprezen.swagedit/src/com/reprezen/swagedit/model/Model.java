@@ -116,6 +116,12 @@ public class Model {
     }
 
     protected AbstractNode findCorrectNode(AbstractNode current, int column) {
+        if (startColumn(current) == column) {
+            if (current.getParent() instanceof ObjectNode) {
+                return current.getParent();
+            }
+        }
+
         if (startColumn(current) < column) {
             return current;
         } else {

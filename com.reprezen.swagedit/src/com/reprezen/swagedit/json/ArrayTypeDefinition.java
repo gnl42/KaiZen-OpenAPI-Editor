@@ -1,18 +1,14 @@
 package com.reprezen.swagedit.json;
 
-import java.util.LinkedHashSet;
-import java.util.Set;
-
 import com.fasterxml.jackson.core.JsonPointer;
 import com.fasterxml.jackson.databind.JsonNode;
 import com.reprezen.swagedit.json.references.JsonReference;
-import com.reprezen.swagedit.model.AbstractNode;
 
 public class ArrayTypeDefinition extends TypeDefinition {
 
     public final TypeDefinition itemsType;
 
-    public ArrayTypeDefinition(JsonNode schema, JsonPointer pointer, JsonNode definition, JsonType type) {
+    public ArrayTypeDefinition(SwaggerSchema schema, JsonPointer pointer, JsonNode definition, JsonType type) {
         super(schema, pointer, definition, type);
 
         itemsType = TypeDefinition.create(schema, getItemsPointer());
@@ -33,13 +29,7 @@ public class ArrayTypeDefinition extends TypeDefinition {
     }
 
     @Override
-    public Set<JsonNode> getProposals(AbstractNode node) {
-        final Set<JsonNode> proposals = new LinkedHashSet<>();
-        proposals.add(mapper.createObjectNode() //
-                .put("value", "-") //
-                .put("label", "-") //
-                .put("type", "array item"));
-
-        return proposals;
+    public TypeDefinition getPropertyType(String property) {
+        return itemsType;
     }
 }

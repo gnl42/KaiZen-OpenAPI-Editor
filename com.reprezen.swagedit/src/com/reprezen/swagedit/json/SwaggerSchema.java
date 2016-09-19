@@ -1,6 +1,8 @@
 package com.reprezen.swagedit.json;
 
 import java.io.IOException;
+import java.util.HashMap;
+import java.util.Map;
 
 import com.fasterxml.jackson.core.JsonPointer;
 import com.fasterxml.jackson.databind.JsonNode;
@@ -9,9 +11,10 @@ import com.reprezen.swagedit.model.AbstractNode;
 
 public class SwaggerSchema {
 
-    private ObjectMapper mapper = new ObjectMapper();
-    protected JsonNode content;
-    protected TypeDefinition rootType;
+    private final ObjectMapper mapper = new ObjectMapper();
+    private JsonNode content;
+    private TypeDefinition rootType;
+    private final Map<JsonPointer, TypeDefinition> types = new HashMap<>();
 
     public SwaggerSchema() {
         init();
@@ -24,8 +27,7 @@ public class SwaggerSchema {
             return;
         }
 
-        JsonNode schema = content;
-        rootType = TypeDefinition.create(schema, JsonPointer.compile(""));
+        rootType = TypeDefinition.create(this, JsonPointer.compile(""));
     }
 
     public JsonNode asJson() {
@@ -43,18 +45,8 @@ public class SwaggerSchema {
         TypeDefinition current = rootType;
 
         if (current != null) {
-            for (String path : paths) {
-
-                TypeDefinition next = null;
-                if (current instanceof ArrayTypeDefinition) {
-                    next = ((ArrayTypeDefinition) current).itemsType;
-                } else if (current instanceof ObjectTypeDefinition) {
-                    next = current.properties.get(path);
-
-                    if (next == null) {
-                        next = ((ObjectTypeDefinition) current).findMatchingPattern(path);
-                    }
-                }
+            for (String property : paths) {
+                TypeDefinition next = current.getPropertyType(property);
 
                 // not found, we stop here
                 if (next == null) {
@@ -65,6 +57,22 @@ public class SwaggerSchema {
         }
 
         return current;
+    }
+
+    public TypeDefinition getRootType() {
+        return rootType;
+    }
+
+    public TypeDefinition getType(JsonPointer pointer) {
+        return types.get(pointer);
+    }
+
+    public void add(TypeDefinition typeDef) {
+        types.put(typeDef.getPointer(), typeDef);
+    }
+
+    public ObjectMapper getMapper() {
+        return mapper;
     }
 
 }

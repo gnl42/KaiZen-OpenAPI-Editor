@@ -1,36 +1,48 @@
 package com.reprezen.swagedit.json;
 
-import static com.google.common.collect.Iterators.transform;
-import static com.google.common.collect.Sets.newHashSet;
-
-import java.util.Set;
+import java.util.Collection;
+import java.util.HashSet;
+import java.util.Iterator;
 
 import com.fasterxml.jackson.core.JsonPointer;
 import com.fasterxml.jackson.databind.JsonNode;
-import com.google.common.base.Function;
-import com.reprezen.swagedit.model.AbstractNode;
+import com.reprezen.swagedit.json.references.JsonReference;
 
 public class ComplexTypeDefinition extends TypeDefinition {
 
-    public ComplexTypeDefinition(JsonNode schema, JsonPointer pointer, JsonNode definition, JsonType type) {
+    private Collection<TypeDefinition> allTypes = new HashSet<>();
+
+    public ComplexTypeDefinition(final SwaggerSchema schema, JsonPointer pointer, JsonNode definition, JsonType type) {
         super(schema, pointer, definition, type);
+
+        for (Iterator<JsonNode> it = definition.get(type.getValue()).elements(); it.hasNext();) {
+            JsonNode current = it.next();
+            if (JsonReference.isReference(current)) {
+                JsonPointer p = JsonPointer.compile(current.get(JsonReference.PROPERTY).asText().substring(1));
+                TypeDefinition def = schema.getType(p);
+                if (def == null) {
+                    def = TypeDefinition.create(getSchema(), p);
+                }
+                allTypes.add(def);
+            }
+        }
+    }
+
+    public Collection<TypeDefinition> getAllTypes() {
+        return allTypes;
     }
 
     @Override
-    public Set<JsonNode> getProposals(AbstractNode node) {
-        return newHashSet(
-                transform(transform(definition.get(type.getValue()).elements(), new Function<JsonNode, JsonNode>() {
-                    @Override
-                    public JsonNode apply(JsonNode n) {
-                        return resolve(schema, n);
-                    }
-                }), new Function<JsonNode, JsonNode>() {
-                    @Override
-                    public JsonNode apply(JsonNode n) {
-                        // TODO
-                        return n;
-                    }
-                }));
+    public TypeDefinition getPropertyType(String property) {
+        TypeDefinition found = null;
 
+        for (TypeDefinition type : allTypes) {
+            found = type.getPropertyType(property);
+            if (found != null) {
+                return found;
+            }
+        }
+
+        return found;
     }
 }

@@ -32,6 +32,7 @@ public class StyledCompletionProposal
     private final String replacementString;
     private final StyledString label;
     private final int cursorPosition;
+    private String description;
 
     public StyledCompletionProposal(String replacement, StyledString label, int offset, int lenght, int position) {
         this.replacementString = replacement;
@@ -39,6 +40,10 @@ public class StyledCompletionProposal
         this.replacementOffset = offset;
         this.replacementLength = lenght;
         this.cursorPosition = position;
+    }
+
+    public void setDescription(String description) {
+        this.description = description;
     }
 
     @Override
@@ -62,12 +67,12 @@ public class StyledCompletionProposal
 
     @Override
     public String getAdditionalProposalInfo() {
-        return null;
+        return description;
     }
 
     @Override
     public String getDisplayString() {
-        return null;
+        return label.getString();
     }
 
     @Override
@@ -86,7 +91,6 @@ public class StyledCompletionProposal
 
     @Override
     public Object getAdditionalProposalInfo(IProgressMonitor monitor) {
-        // TODO Auto-generated method stub
-        return null;
+        return description;
     }
 }
