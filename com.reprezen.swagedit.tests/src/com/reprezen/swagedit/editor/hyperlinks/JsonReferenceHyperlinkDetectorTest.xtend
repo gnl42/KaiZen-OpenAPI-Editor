@@ -7,7 +7,6 @@ import java.net.URI
 import java.net.URISyntaxException
 import java.util.Arrays
 import org.eclipse.jface.text.BadLocationException
-import org.eclipse.jface.text.ITextViewer
 import org.eclipse.jface.text.Region
 import org.junit.Before
 import org.junit.Test
@@ -16,11 +15,9 @@ import static org.hamcrest.core.IsCollectionContaining.hasItem
 import static org.junit.Assert.assertNotNull
 import static org.junit.Assert.assertNull
 import static org.junit.Assert.assertThat
-import static org.mockito.Mockito.when
 
 class JsonReferenceHyperlinkDetectorTest {
-	
-	var ITextViewer viewer;
+
     var URI uri;
 
     protected def JsonReferenceHyperlinkDetector detector(JsonNode document) {
@@ -29,14 +26,13 @@ class JsonReferenceHyperlinkDetectorTest {
 
     @Before
     def void setUp() throws URISyntaxException {
-        viewer = Mocks.mockTextViewer()
         uri = new URI(null, null, null)
     }
 
     @Test
     def void testShouldCreateHyperlink_ForJsonReference() throws BadLocationException {
-        val document = new SwaggerDocument();
-        when(viewer.getDocument()).thenReturn(document);
+        val document = new SwaggerDocument()
+        val viewer = Mocks.mockTextViewer(document)
 
         val text = '''
         	schema:
@@ -46,7 +42,7 @@ class JsonReferenceHyperlinkDetectorTest {
         	    type: object
        '''
 
-        document.set(text);
+        document.set(text)       
 
         // region that includes `$ref: '#/definitions/User'`
         val region = new Region("schema:\n  $ref: '#/definitions".length(), 1)
@@ -59,14 +55,15 @@ class JsonReferenceHyperlinkDetectorTest {
                 "'#/definitions/User'".length())
         val targetRegion = new Region(document.getLineOffset(4), 17)
 
-        assertThat(Arrays.asList(hyperlinks), hasItem(new SwaggerHyperlink("/definitions/User", viewer, linkRegion,
+        assertThat(Arrays.asList(hyperlinks), 
+        	hasItem(new SwaggerHyperlink("/definitions/User", viewer, linkRegion,
                 targetRegion)))
     }
 
     @Test
     def void testShould_Not_CreateHyperlink_For_Invalid_JsonReference() throws BadLocationException {
         val document = new SwaggerDocument()
-        when(viewer.getDocument()).thenReturn(document)
+        val viewer = Mocks.mockTextViewer(document)
 
         val text = '''
         	schema:
@@ -75,7 +72,7 @@ class JsonReferenceHyperlinkDetectorTest {
         	  User:
         	    type: object"
        	'''
-        
+
         document.set(text)
 
         // region that includes `$ref: '#/definitions/User'`
@@ -88,7 +85,7 @@ class JsonReferenceHyperlinkDetectorTest {
     @Test
     def void testShouldCreateHyperlink_ForPathReference() throws BadLocationException {
         val document = new SwaggerDocument()
-        when(viewer.getDocument()).thenReturn(document)
+        val viewer = Mocks.mockTextViewer(document)
 
         val text = '''
           schema:
@@ -118,7 +115,7 @@ class JsonReferenceHyperlinkDetectorTest {
     @Test
     def void testShould_Not_CreateHyperlink_For_Invalid_PathReference() throws BadLocationException {
         val document = new SwaggerDocument()
-        when(viewer.getDocument()).thenReturn(document)
+        val viewer = Mocks.mockTextViewer(document)
 
         val text = '''
           schema:

@@ -20,11 +20,11 @@ import com.google.common.collect.Lists;
 
 public abstract class SwaggerContextType extends TemplateContextType {
 
-    private static final String PARAMETERS_SCHEMA_REGEX = ".*:parameters(:@\\d+):schema";
-    private static final String PATH_ITEM_REGEX = ":paths:/[^:]+";
-    // we can use a ? here as both 'PATH_ITEM_REGEX + ":parameters$"' and
-    // 'PATH_ITEM_REGEX + ":[^:]+:parameters$"' are supported
-    private static final String PARAMETERS_LIST_REGEX = PATH_ITEM_REGEX + ":([^:]+:)?parameters";
+    private static final String PARAMETERS_SCHEMA_REGEX = ".*/parameters(/\\d+)/schema";
+    private static final String PATH_ITEM_REGEX = "/paths/~1[^/]+";
+    // we can use a ? here as both 'PATH_ITEM_REGEX + "/parameters$"' and
+    // 'PATH_ITEM_REGEX + "/[^/]+/parameters$"' are supported
+    private static final String PARAMETERS_LIST_REGEX = PATH_ITEM_REGEX + "/([^/]+/)?parameters";
 
     public SwaggerContextType() {
         addGlobalResolvers();
@@ -42,41 +42,41 @@ public abstract class SwaggerContextType extends TemplateContextType {
     }
 
     public static String getContextType(String path) {
-        if (path != null && path.endsWith(":")) {
+        if (path != null && path.endsWith("/")) {
             path = path.substring(0, path.length() - 1);
         }
-        if (path == null || path.isEmpty() || ":".equals(path)) {
+        if (path == null || path.isEmpty() || "/".equals(path)) {
             return RootContextType.CONTEXT_ID;
         }
-        if (path.equals(":securityDefinitions")) {
+        if (path.equals("/securityDefinitions")) {
             return SecurityDefContextType.CONTEXT_ID;
         }
-        if (path.equals(":paths")) {
+        if (path.equals("/paths")) {
             return PathsContextType.CONTEXT_ID;
         }
         if (path.matches(PATH_ITEM_REGEX + "$")) { // /paths/[pathItem]/
             return PathItemContextType.CONTEXT_ID;
         }
-        if (path.equals(":responses")//
-                || path.matches(PATH_ITEM_REGEX + ":[^:]+:responses$")) {
+        if (path.equals("/responses")//
+                || path.matches(PATH_ITEM_REGEX + "/[^/]+/responses$")) {
             return ResponsesContextType.CONTEXT_ID;
         }
         if (path.matches(PARAMETERS_LIST_REGEX + "$")) {
             return ParametersListContextType.CONTEXT_ID;
         }
-        if (path.matches(PARAMETERS_LIST_REGEX + ":@\\d+$")//
-                || path.matches(":parameters:[^:]+$")) {
+        if (path.matches(PARAMETERS_LIST_REGEX + "/\\d+$")//
+                || path.matches("/parameters/[^/]+$")) {
             return ParameterObjectContextType.CONTEXT_ID;
         }
-        if (path.equals(":parameters")) {
+        if (path.equals("/parameters")) {
             return ParameterDefinitionContextType.CONTEXT_ID;
         }
-        if (path.matches(":definitions:[^:]+$") //
-                || path.matches(".+:[^:]+:additionalProperties$")//
+        if (path.matches("/definitions/[^/]+$") //
+                || path.matches(".+/[^/]+/additionalProperties$")//
                 || path.matches(PARAMETERS_SCHEMA_REGEX + "$")//
-                || path.matches(PARAMETERS_SCHEMA_REGEX + ":items$")//
-                || path.matches(PARAMETERS_SCHEMA_REGEX + ":properties:[^:]+$")//
-                || path.matches(".+:responses:[^:]+:schema$")) {
+                || path.matches(PARAMETERS_SCHEMA_REGEX + "/items$")//
+                || path.matches(PARAMETERS_SCHEMA_REGEX + "/properties/[^/]+$")//
+                || path.matches(".+/responses/[^/]+/schema$")) {
             return SchemaContextType.CONTEXT_ID;
         }
         return null;
@@ -109,7 +109,6 @@ public abstract class SwaggerContextType extends TemplateContextType {
 
     public static class PathsContextType extends SwaggerContextType {
         public static final String CONTEXT_ID = "com.reprezen.swagedit.templates.swagger.paths";
-
     }
 
     public static class ResponsesContextType extends SwaggerContextType {

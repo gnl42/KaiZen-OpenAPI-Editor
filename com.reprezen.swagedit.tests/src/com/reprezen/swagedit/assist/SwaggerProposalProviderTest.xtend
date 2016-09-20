@@ -5,6 +5,7 @@ import com.reprezen.swagedit.model.ArrayNode
 import com.reprezen.swagedit.model.ObjectNode
 import com.reprezen.swagedit.model.ValueNode
 import com.reprezen.swagedit.tests.utils.PointerHelpers
+import org.hamcrest.Matcher
 import org.junit.Test
 
 import static org.hamcrest.core.IsCollectionContaining.*
@@ -22,7 +23,7 @@ class SwaggerProposalProviderTest {
 		val node = new ObjectNode(null, "".ptr)
 		node.type = schema.getType(node)
 
-		assertThat(provider.getProposals(node).map[replacementString], hasItems(#[
+		assertThat(provider.getProposals(node).map[replacementString], hasItems(
 			"swagger:",
 			"info:",
 			"host:",
@@ -39,7 +40,7 @@ class SwaggerProposalProviderTest {
 			"tags:",
 			"externalDocs:",
 			"x-:"
-		]))
+		))
 	}
 
 	@Test
@@ -49,7 +50,7 @@ class SwaggerProposalProviderTest {
 
 		assertThat(provider.getProposals(node).map [
 			replacementString
-		], hasItems(#["\"2.0\""]))
+		], hasItems("\"2.0\""))
 	}
 
 	@Test
@@ -59,14 +60,14 @@ class SwaggerProposalProviderTest {
 
 		assertThat(provider.getProposals(node).map [
 			replacementString
-		], hasItems(#[
+		], hasItems(
 			"title:",
 			"version:",
 			"description:",
 			"termsOfService:",
 			"contact:",
 			"license:"
-		]))
+		))
 	}
 
 	@Test
@@ -76,12 +77,12 @@ class SwaggerProposalProviderTest {
 
 		assertThat(provider.getProposals(node).map [
 			replacementString
-		], hasItems(#[
+		], hasItems(
 			"- http",
 			"- https",
 			"- ws",
 			"- wss"
-		]))
+		) as Matcher<Iterable<String>>)
 	}
 
 	@Test
@@ -91,10 +92,10 @@ class SwaggerProposalProviderTest {
 
 		assertThat(provider.getProposals(node).map [
 			replacementString
-		], hasItems(#[
+		], hasItems(
 			"/:",
 			"x-:"
-		]))
+		))
 	}
 
 	@Test
@@ -104,19 +105,19 @@ class SwaggerProposalProviderTest {
 
 		assertThat(provider.getProposals(node).map [
 			replacementString
-		], hasItems(#[
+		], hasItems(
 			"_key_:"
-		]))
+		))
 	}
 
 	@Test
 	def void testPathGetProposals() {
-		val node = new ObjectNode(null, "/paths/~1/get".ptr, null) 
+		val node = new ObjectNode(null, "/paths/~1/get".ptr, null)
 		node.type = schema.getType(node)
 
 		assertThat(provider.getProposals(node).map [
 			replacementString
-		], hasItems(#[
+		], hasItems(
 			"tags:",
 			"summary:",
 			"description:",
@@ -130,19 +131,19 @@ class SwaggerProposalProviderTest {
 			"deprecated:",
 			"security:",
 			"x-:"
-		]))
+		))
 	}
 
 	@Test
 	def void testPathParametersProposals() {
-		val node = new ArrayNode(null, "/paths/~1/get/parameters".ptr, null) 
+		val node = new ArrayNode(null, "/paths/~1/get/parameters".ptr, null)
 		node.type = schema.getType(node)
 
 		assertThat(provider.getProposals(node).map [
 			replacementString
-		], hasItems(#[
+		], hasItems(
 			"-"
-		]))
+		))
 	}
 
 	@Test
@@ -152,14 +153,14 @@ class SwaggerProposalProviderTest {
 
 		assertThat(provider.getProposals(node).map [
 			replacementString
-		], hasItems(#[
+		], hasItems(
 			"description:",
 			"schema:",
 			"headers:",
 			"examples:",
 			"x-:",
 			"$ref:"
-		]))
+		))
 	}
 
 	@Test
@@ -168,8 +169,5 @@ class SwaggerProposalProviderTest {
 //			mapper.createObjectNode,
 //			definitionProvider.getDefinitions(":definitions:foo:type")
 //		)
-//
-//		println(proposals)
-//		println(proposals.map[it.get("value")])
 	}
 }

@@ -9,10 +9,14 @@ import java.util.Map;
 import org.eclipse.core.resources.IContainer;
 import org.eclipse.core.resources.IFile;
 import org.eclipse.core.runtime.IPath;
+import org.eclipse.jface.text.ITextSelection;
 import org.eclipse.jface.text.ITextViewer;
+import org.eclipse.jface.viewers.ISelectionProvider;
+import org.eclipse.swt.graphics.Point;
 import org.mockito.Mockito;
 
 import com.fasterxml.jackson.databind.JsonNode;
+import com.reprezen.swagedit.editor.SwaggerDocument;
 import com.reprezen.swagedit.editor.hyperlinks.JsonReferenceHyperlinkDetector;
 import com.reprezen.swagedit.json.JsonDocumentManager;
 import com.reprezen.swagedit.json.references.JsonReference;
@@ -98,6 +102,34 @@ public class Mocks {
     public static ITextViewer mockTextViewer() {
         ITextViewer viewer = mock(ITextViewer.class);
         return viewer;
+    }
+
+    public static ITextViewer mockTextViewer(SwaggerDocument document) {
+        ITextViewer viewer = mock(ITextViewer.class);
+        when(viewer.getDocument()).thenReturn(document);
+        return viewer;
+    }
+
+    public static ITextViewer mockTextViewer(SwaggerDocument document, int offset) {
+        ITextViewer viewer = mock(ITextViewer.class);
+        ISelectionProvider selectionProvider = mockSelectionProvider();
+        ITextSelection selection = mockSelection();
+
+        when(viewer.getDocument()).thenReturn(document);
+        when(viewer.getSelectedRange()).thenReturn(new Point(0, 0));
+        when(viewer.getSelectionProvider()).thenReturn(selectionProvider);
+        when(selectionProvider.getSelection()).thenReturn(selection);
+        when(selection.getOffset()).thenReturn(offset);
+
+        return viewer;
+    }
+
+    public static ISelectionProvider mockSelectionProvider() {
+        return mock(ISelectionProvider.class);
+    }
+
+    public static ITextSelection mockSelection() {
+        return mock(ITextSelection.class);
     }
 
 }
