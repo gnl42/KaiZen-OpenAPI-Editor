@@ -10,92 +10,94 @@
  *******************************************************************************/
 package com.reprezen.swagedit.templates;
 
-import static org.junit.Assert.*;
-import static org.hamcrest.CoreMatchers.*;
 import static com.reprezen.swagedit.templates.SwaggerContextType.getContextType;
+import static org.hamcrest.CoreMatchers.equalTo;
+import static org.hamcrest.CoreMatchers.not;
+import static org.junit.Assert.assertFalse;
+import static org.junit.Assert.assertThat;
+import static org.junit.Assert.assertTrue;
 
 import org.junit.Test;
 
 import com.reprezen.swagedit.templates.SwaggerContextType.ParameterDefinitionContextType;
-import com.reprezen.swagedit.templates.SwaggerContextType.ParametersListContextType;
 import com.reprezen.swagedit.templates.SwaggerContextType.ParameterObjectContextType;
+import com.reprezen.swagedit.templates.SwaggerContextType.ParametersListContextType;
 import com.reprezen.swagedit.templates.SwaggerContextType.PathItemContextType;
 import com.reprezen.swagedit.templates.SwaggerContextType.ResponsesContextType;
 import com.reprezen.swagedit.templates.SwaggerContextType.SchemaContextType;
 import com.reprezen.swagedit.templates.SwaggerContextType.SecurityDefContextType;
 
-;
-
 public class CodeTemplateContextTest {
 
     @Test
     public void testPathItem() throws Exception {
-        assertThat(getContextType(":paths:/petstore"), equalTo(PathItemContextType.CONTEXT_ID));
-        assertThat(getContextType(":paths:/pet-store"), equalTo(PathItemContextType.CONTEXT_ID));
-        assertThat(getContextType(":paths:/pets/{id}"), equalTo(PathItemContextType.CONTEXT_ID));
-        assertThat(getContextType(":paths:/pets/{pet-id}"), equalTo(PathItemContextType.CONTEXT_ID));
-        assertThat(getContextType(":paths:/my-pets/{pet-id}"), equalTo(PathItemContextType.CONTEXT_ID));
-        assertThat(getContextType(":paths:/my-pets/v1/{pet-id}"), equalTo(PathItemContextType.CONTEXT_ID));
-        assertThat(getContextType(":paths:/pets"), equalTo(PathItemContextType.CONTEXT_ID));
+        assertThat(getContextType("/paths/~1petstore"), equalTo(PathItemContextType.CONTEXT_ID));
+        assertThat(getContextType("/paths/~1pet-store"), equalTo(PathItemContextType.CONTEXT_ID));
+        assertThat(getContextType("/paths/~1pets~1{id}"), equalTo(PathItemContextType.CONTEXT_ID));
+        assertThat(getContextType("/paths/~1pets~1{pet-id}"), equalTo(PathItemContextType.CONTEXT_ID));
+        assertThat(getContextType("/paths/~1my-pets~1{pet-id}"), equalTo(PathItemContextType.CONTEXT_ID));
+        assertThat(getContextType("/paths/~1my-pets~1v1~1{pet-id}"), equalTo(PathItemContextType.CONTEXT_ID));
+        assertThat(getContextType("/paths/~1pets"), equalTo(PathItemContextType.CONTEXT_ID));
 
         // tests for #Templates defined in the Path context show in other
         // contexts
-        assertThat(getContextType(":paths:"), not(equalTo(PathItemContextType.CONTEXT_ID)));
-        assertThat(getContextType(":paths:/pets:get"), not(equalTo(PathItemContextType.CONTEXT_ID)));
-        assertThat(getContextType(":paths:/pets:get:responses"), not(equalTo(PathItemContextType.CONTEXT_ID)));
-        assertThat(getContextType(":paths:/my-pets/v1/{pet-id}:somethingElse"),
+        assertThat(getContextType("/paths/"), not(equalTo(PathItemContextType.CONTEXT_ID)));
+        assertThat(getContextType("/paths/~1pets/get"), not(equalTo(PathItemContextType.CONTEXT_ID)));
+        assertThat(getContextType("/paths/~1pets/get/responses"), not(equalTo(PathItemContextType.CONTEXT_ID)));
+        assertThat(getContextType("/paths/~1my-pets~1v1~1{pet-id}/somethingElse"),
                 not(equalTo(PathItemContextType.CONTEXT_ID)));
     }
 
     @Test
     public void testSecurityDef() throws Exception {
-        assertThat(getContextType(":securityDefinitions"), equalTo(SecurityDefContextType.CONTEXT_ID));
+        assertThat(getContextType("/securityDefinitions"), equalTo(SecurityDefContextType.CONTEXT_ID));
     }
 
     @Test
     public void testResponses() throws Exception {
-        assertThat(getContextType(":responses"), equalTo(ResponsesContextType.CONTEXT_ID));
-        assertThat(getContextType(":paths:/resource:get:responses"), equalTo(ResponsesContextType.CONTEXT_ID));
+        assertThat(getContextType("/responses"), equalTo(ResponsesContextType.CONTEXT_ID));
+        assertThat(getContextType("/paths/~1resource/get/responses"), equalTo(ResponsesContextType.CONTEXT_ID));
     }
 
     @Test
     public void testParameterObject() throws Exception {
         // top-level parameter definition
-        assertThat(getContextType(":parameters:skipParam:"), equalTo(ParameterObjectContextType.CONTEXT_ID));
+        assertThat(getContextType("/parameters/skipParam/"), equalTo(ParameterObjectContextType.CONTEXT_ID));
         // resource parameter
-        assertThat(getContextType(":paths:/taxFilings/{id}:parameters:@0:"),
+        assertThat(getContextType("/paths/~1taxFilings~1{id}/parameters/0/"),
                 equalTo(ParameterObjectContextType.CONTEXT_ID));
         // method parameter
-        assertThat(getContextType(":paths:/taxFilings/{id}:get:parameters:@0:"),
+        assertThat(getContextType("/paths/~1taxFilings~1{id}/get/parameters/0/"),
                 equalTo(ParameterObjectContextType.CONTEXT_ID));
     }
 
     @Test
     public void testParameterDefinition() throws Exception {
-        assertThat(getContextType(":parameters:"), equalTo(ParameterDefinitionContextType.CONTEXT_ID));
+        assertThat(getContextType("/parameters/"), equalTo(ParameterDefinitionContextType.CONTEXT_ID));
     }
 
     @Test
     public void testParametersList() throws Exception {
         // resource parameters list
-        assertThat(getContextType(":paths:/resource:parameters:"), equalTo(ParametersListContextType.CONTEXT_ID));
+        assertThat(getContextType("/paths/~1resource/parameters/"), equalTo(ParametersListContextType.CONTEXT_ID));
         // method parameters list
-        assertThat(getContextType(":paths:/taxFilings/{id}:get:parameters"),
+        assertThat(getContextType("/paths/~1taxFilings~1{id}/get/parameters"),
                 equalTo(ParametersListContextType.CONTEXT_ID));
     }
 
     @Test
     public void testSchema() throws Exception {
-        assertThat(getContextType(":definitions:Pet:"), equalTo(SchemaContextType.CONTEXT_ID));
-        assertThat(getContextType(":paths:/pets/{id}:delete:responses:default:schema:"),
+        assertThat(getContextType("/definitions/Pet/"), equalTo(SchemaContextType.CONTEXT_ID));
+        assertThat(getContextType("/paths/~1pets/{id}/delete/responses/default/schema/"),
                 equalTo(SchemaContextType.CONTEXT_ID));
-        assertThat(getContextType(":paths:/pets/{id}:get:responses:200:schema:"), equalTo(SchemaContextType.CONTEXT_ID));
-        assertThat(getContextType(":paths:/pets:post:parameters:@0:schema:"), equalTo(SchemaContextType.CONTEXT_ID));
-        assertThat(getContextType(":paths:/pets:post:parameters:@0:schema:properties:name"),
+        assertThat(getContextType("/paths/~1pets/{id}/get/responses/200/schema/"),
                 equalTo(SchemaContextType.CONTEXT_ID));
-        assertThat(getContextType(":paths:/pets:post:parameters:@0:schema:items"),
+        assertThat(getContextType("/paths/~1pets/post/parameters/0/schema/"), equalTo(SchemaContextType.CONTEXT_ID));
+        assertThat(getContextType("/paths/~1pets/post/parameters/0/schema/properties/name"),
                 equalTo(SchemaContextType.CONTEXT_ID));
-        assertThat(getContextType(":definitions:TaxFilingObject:additionalProperties"),
+        assertThat(getContextType("/paths/~1pets/post/parameters/0/schema/items"),
+                equalTo(SchemaContextType.CONTEXT_ID));
+        assertThat(getContextType("/definitions/TaxFilingObject/additionalProperties"),
                 equalTo(SchemaContextType.CONTEXT_ID));
     }
 

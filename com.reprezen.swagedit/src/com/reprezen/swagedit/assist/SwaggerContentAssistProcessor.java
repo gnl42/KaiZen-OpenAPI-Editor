@@ -139,7 +139,6 @@ public class SwaggerContentAssistProcessor extends TemplateCompletionProcessor
 
         Model model = document.getModel(documentOffset - prefix.length());
         currentPath = model.getPath(line, column);
-        System.out.println(currentPath);
 
         isRefCompletion = currentPath != null && currentPath.toString().endsWith("$ref");
 

@@ -14,7 +14,6 @@ import java.util.ArrayList;
 import java.util.Collection;
 import java.util.Collections;
 import java.util.HashSet;
-import java.util.Iterator;
 import java.util.LinkedHashSet;
 import java.util.List;
 
@@ -37,12 +36,10 @@ public class SwaggerProposalProvider {
 
     public Collection<Proposal> getProposals(JsonPointer pointer, Model model) {
         final AbstractNode node = model.find(pointer);
-        System.out.println(">> " + pointer + " " + node);
         if (node == null) {
             return Collections.emptyList();
         }
 
-        System.out.println(node.getType());
         return getProposals(node.getType(), node);
     }
 
@@ -57,13 +54,10 @@ public class SwaggerProposalProvider {
         case STRING:
         case INTEGER:
         case NUMBER:
-            proposals.add(new Proposal("", "", getDescription(type.getDefinition()), type.getType().getValue()));
+            proposals.add(new Proposal("", "", type.getDescription(), type.getType().getValue()));
             break;
         case BOOLEAN:
-            proposals
-                    .add(new Proposal("true", "true", getDescription(type.getDefinition()), type.getType().getValue()));
-            proposals.add(
-                    new Proposal("false", "false", getDescription(type.getDefinition()), type.getType().getValue()));
+            proposals = createBooleanProposals(type);
             break;
         case ENUM:
             proposals = createEnumProposals(type, node);
@@ -86,46 +80,35 @@ public class SwaggerProposalProvider {
         return proposals;
     }
 
-    protected Proposal createPropertyProposal(String key, JsonNode value) {
-        // final JsonNode resolved = resolve(schema, value);
-        final JsonType type = JsonType.valueOf(value);
+    protected Collection<Proposal> createBooleanProposals(TypeDefinition type) {
+        Collection<Proposal> proposals = new ArrayList<>();
+        proposals.add(new Proposal("true", "true", type.getDescription(), type.getType().getValue()));
+        proposals.add(new Proposal("false", "false", type.getDescription(), type.getType().getValue()));
 
-        return new Proposal(key + ":", key, getDescription(value), type.getValue());
+        return proposals;
     }
 
-    protected String getDescription(JsonNode node) {
-        return node.has("description") ? node.get("description").asText() : null;
+    protected Proposal createPropertyProposal(String key, TypeDefinition type) {
+        return new Proposal(key + ":", key, type.getDescription(), type.getType().getValue());
     }
 
     protected Collection<Proposal> createObjectProposals(ObjectTypeDefinition type, AbstractNode element) {
         final Collection<Proposal> proposals = new LinkedHashSet<>();
-        final JsonNode definition = type.getDefinition();
 
-        if (definition.has("properties")) {
-            final JsonNode properties = definition.get("properties");
-
-            for (Iterator<String> it = properties.fieldNames(); it.hasNext();) {
-                final String key = it.next();
-
-                if (element.get(key) == null) {
-                    proposals.add(createPropertyProposal(key, properties.get(key)));
-                }
+        for (String property : type.getProperties().keySet()) {
+            if (element.get(property) == null) {
+                proposals.add(createPropertyProposal(property, type.getProperties().get(property)));
             }
         }
 
-        if (definition.has("patternProperties")) {
-            final JsonNode properties = definition.get("patternProperties");
+        for (String property : type.getPatternProperties().keySet()) {
+            TypeDefinition tt = type.getPatternProperties().get(property);
 
-            for (Iterator<String> it = properties.fieldNames(); it.hasNext();) {
-                String key = it.next();
-                final JsonNode value = properties.get(key);
-
-                if (key.startsWith("^")) {
-                    key = key.substring(1);
-                }
-
-                proposals.add(createPropertyProposal(key, value));
+            if (property.startsWith("^")) {
+                property = property.substring(1);
             }
+
+            proposals.add(createPropertyProposal(property, tt));
         }
 
         if (proposals.isEmpty()) {
@@ -150,11 +133,11 @@ public class SwaggerProposalProvider {
                 replStr = "- " + literal;
                 // }
 
-                proposals.add(new Proposal(replStr, literal, getDescription(type.itemsType.getDefinition()),
+                proposals.add(new Proposal(replStr, literal, type.itemsType.getDescription(),
                         type.itemsType.getType().getValue()));
             }
         } else {
-            proposals.add(new Proposal("-", "-", getDescription(type.getDefinition()), "array item"));
+            proposals.add(new Proposal("-", "-", type.getDescription(), "array item"));
         }
 
         return proposals;
@@ -184,7 +167,6 @@ public class SwaggerProposalProvider {
                 type.getDefinition().get("type").asText() : //
                 null;
 
-        String descr = getDescription(type.getDefinition());
         String replStr;
 
         for (String literal : enumLiterals(type)) {
@@ -197,7 +179,7 @@ public class SwaggerProposalProvider {
                 replStr = literal;
             }
 
-            proposals.add(new Proposal(replStr, literal, descr, type.getType().getValue()));
+            proposals.add(new Proposal(replStr, literal, type.getDescription(), type.getType().getValue()));
         }
 
         return proposals;

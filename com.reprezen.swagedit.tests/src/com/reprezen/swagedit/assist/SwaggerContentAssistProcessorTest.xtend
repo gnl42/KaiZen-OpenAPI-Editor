@@ -1,16 +1,15 @@
 package com.reprezen.swagedit.assist
 
 import com.reprezen.swagedit.editor.SwaggerDocument
-import com.reprezen.swagedit.mocks.Mocks
 import java.util.ArrayList
 import org.junit.Test
 
 import static com.reprezen.swagedit.tests.utils.Cursors.*
+import static org.hamcrest.core.IsCollectionContaining.*
 import static org.junit.Assert.*
 
 class SwaggerContentAssistProcessorTest {
 
-	val viewer = Mocks.mockTextViewer
 	val processor = new SwaggerContentAssistProcessor() {
 		override protected initTextMessages() {
 			new ArrayList
@@ -30,8 +29,7 @@ class SwaggerContentAssistProcessorTest {
 		val document = new SwaggerDocument
 		val test = setUpContentAssistTest(
 			'''<1>''',
-			document,
-			viewer
+			document
 		)
 
 		val proposals = test.apply(processor, "1")
@@ -54,24 +52,29 @@ class SwaggerContentAssistProcessorTest {
 			"x-:"
 		]
 
-		assertEquals(expected.size, proposals.length);
+		assertEquals(expected.size, proposals.length)
 		assertTrue(proposals.forall[it|expected.contains((it as StyledCompletionProposal).replacementString)])
 	}
 
 	@Test
 	def shouldProvideEndOfWord() {
 		val document = new SwaggerDocument
-		val test = setUpContentAssistTest(
-			'''swa<1>''',
-			document,
-			viewer
-		)
+		val test = setUpContentAssistTest('''swa<1>''', document)
 
 		val proposals = test.apply(processor, "1")
 		assertEquals(1, proposals.length);
 
 		val proposal = proposals.get(0)
 		proposal.apply(document)
+		assertEquals("swagger:", document.get())
+		
+		val test2 = setUpContentAssistTest('''s<1>''', document)
+
+		val proposals2 = test2.apply(processor, "1")		
+		assertEquals(1, proposals2.length);
+
+		val proposal2 = proposals2.get(0)
+		proposal2.apply(document)
 
 		assertEquals("swagger:", document.get())
 	}
@@ -86,10 +89,15 @@ class SwaggerContentAssistProcessorTest {
 			  title: Swagger Petstore
 			  license:
 			    <1>
-		''', document, viewer)
+		''', document)
 
-		val proposals = test.apply(processor, "1")
-		println(proposals.map[(it as StyledCompletionProposal).replacementString])
+		val proposals = test.apply(processor, "1")		
+		assertThat(proposals.map[(it as StyledCompletionProposal).replacementString], 
+			hasItems(
+				"name:",
+				"url:",
+				"x-:"
+			))
 	}
 
 	@Test
@@ -111,16 +119,47 @@ class SwaggerContentAssistProcessorTest {
 			        - name: limit
 			          in: query
 			          <3>
-		''', document, viewer)
+		''', document)
 
 		var proposals = test.apply(processor, "1")
-		println(proposals.map[(it as StyledCompletionProposal).replacementString])
-		
+		assertThat(proposals.map[(it as StyledCompletionProposal).replacementString], 
+			hasItems(
+				"-"
+			))
+
 		proposals = test.apply(processor, "2")
-		println(proposals.map[(it as StyledCompletionProposal).replacementString])
+		assertThat(proposals.map[(it as StyledCompletionProposal).replacementString], 
+			hasItems(
+				"uniqueItems:",
+				"format:",
+				"default:",
+				"maxItems:",
+				"$ref:",
+				"schema:",
+				"maximum:",
+				"required:",
+				"collectionFormat:",
+				"allowEmptyValue:",
+				"minLength:",
+				"maxLength:"			
+			))
 		
 		proposals = test.apply(processor, "3")
-		println(proposals.map[(it as StyledCompletionProposal).replacementString])
+		assertThat(proposals.map[(it as StyledCompletionProposal).replacementString], 
+			hasItems(
+				"uniqueItems:",
+				"format:",
+				"default:",
+				"maxItems:",
+				"$ref:",
+				"schema:",
+				"maximum:",
+				"required:",
+				"collectionFormat:",
+				"allowEmptyValue:",
+				"minLength:",
+				"maxLength:"			
+			))
 	}
 
 }

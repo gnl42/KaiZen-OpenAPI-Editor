@@ -163,6 +163,9 @@ public class SwaggerDocument extends Document {
     }
 
     public Model getModel() {
+        if (model == null) {
+            parseModel();
+        }
         return model;
     }
 

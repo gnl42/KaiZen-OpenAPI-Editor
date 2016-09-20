@@ -17,8 +17,8 @@ class SwaggerSchemaTest {
 	def void test() {
 		assertNotNull(schema.rootType)
 
-		println(schema.rootType.properties.get("swagger"))
-		println(schema.rootType.properties.get("paths"))
+//		assertTrue(schema.rootType.properties.containsKey("swagger"))
+//		assertTrue(schema.rootType.properties.containsKey("paths"))
 	}
 
 	@Test
@@ -32,9 +32,6 @@ class SwaggerSchemaTest {
 		val schema = new SwaggerSchema
 		val rootType = schema.getType(root)
 		val swaggerType = schema.getType(root.get("swagger"))
-
-		println(rootType)
-		println(swaggerType)
 	}
 
 	@Test
@@ -85,7 +82,7 @@ class SwaggerSchemaTest {
 			    get:
 		'''
 	}
-	
+
 	@Test
 	def void test5() {
 		val type = schema.getType(new ValueNode(null, "/paths/~1pets/get/parameters/0/in".ptr, null))

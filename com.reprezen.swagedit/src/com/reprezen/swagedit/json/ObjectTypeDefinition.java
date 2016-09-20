@@ -13,7 +13,8 @@ import com.reprezen.swagedit.json.references.JsonReference;
 
 public class ObjectTypeDefinition extends TypeDefinition {
 
-    public Map<String, TypeDefinition> patternProperties = new HashMap<>();
+    private final Map<String, TypeDefinition> properties = new HashMap<>();
+    private final Map<String, TypeDefinition> patternProperties = new HashMap<>();
 
     public ObjectTypeDefinition(SwaggerSchema schema, JsonPointer pointer, JsonNode definition, JsonType type) {
         super(schema, pointer, definition, type);
@@ -77,11 +78,20 @@ public class ObjectTypeDefinition extends TypeDefinition {
 
     @Override
     public TypeDefinition getPropertyType(String property) {
-        TypeDefinition type = super.getPropertyType(property);
+        TypeDefinition type = getProperties().get(property);
+
         if (type == null) {
             type = findMatchingPattern(property);
         }
         return type;
+    }
+
+    public Map<String, TypeDefinition> getProperties() {
+        return properties;
+    }
+
+    public Map<String, TypeDefinition> getPatternProperties() {
+        return patternProperties;
     }
 
     public TypeDefinition findMatchingPattern(String path) {

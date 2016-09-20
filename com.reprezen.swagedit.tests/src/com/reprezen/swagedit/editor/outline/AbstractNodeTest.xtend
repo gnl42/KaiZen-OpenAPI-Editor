@@ -49,7 +49,7 @@ class AbstractNodeTest {
 		assertEquals("1.0.0", version.asValue.getValue)
 
 		assertSame(info, model.find("/info".ptr));
-		assertSame(title, model.find("/.info/title".ptr));
+		assertSame(title, model.find("/info/title".ptr));
 		assertSame(version, model.find("/info/version".ptr));
 	}
 

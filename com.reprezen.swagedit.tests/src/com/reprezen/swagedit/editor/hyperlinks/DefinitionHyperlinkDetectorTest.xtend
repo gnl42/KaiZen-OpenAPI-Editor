@@ -2,6 +2,7 @@ package com.reprezen.swagedit.editor.hyperlinks
 
 import com.reprezen.swagedit.editor.SwaggerDocument
 import com.reprezen.swagedit.mocks.Mocks
+import com.reprezen.swagedit.tests.utils.PointerHelpers
 import java.util.Arrays
 import org.eclipse.jface.text.BadLocationException
 import org.eclipse.jface.text.ITextViewer
@@ -10,15 +11,12 @@ import org.junit.Test
 
 import static org.hamcrest.core.IsCollectionContaining.hasItem
 import static org.junit.Assert.*
-import static org.mockito.Mockito.when
-import com.reprezen.swagedit.tests.utils.PointerHelpers
 
 class DefinitionHyperlinkDetectorTest {
 
 	extension PointerHelpers = new PointerHelpers
 
 	val detector = new DefinitionHyperlinkDetector()
-	val ITextViewer viewer = Mocks.mockTextViewer
 
 	@Test
 	def void testCanDetect() {
@@ -29,7 +27,7 @@ class DefinitionHyperlinkDetectorTest {
 	@Test
 	def void testShouldCreateHyperLink_ToDefinition() throws BadLocationException {
 		val document = new SwaggerDocument()
-		when(viewer.getDocument()).thenReturn(document)
+		val ITextViewer viewer = Mocks.mockTextViewer(document)
 
 		val text = '''
 			tags:  
@@ -55,7 +53,7 @@ class DefinitionHyperlinkDetectorTest {
 	@Test
 	def void testShouldCreateHyperLink_FromRequired_ToProperty() throws BadLocationException {
 		val document = new SwaggerDocument()
-		when(viewer.getDocument()).thenReturn(document)
+		val ITextViewer viewer = Mocks.mockTextViewer(document)
 
 		val text = '''
 			NewPet:

@@ -75,7 +75,7 @@ class SwaggerDocumentTest {
 			  license:
 			    <1>
 		''', document)
-		
+
 		test.apply("/info/license", "1")
 	}
 
@@ -148,7 +148,7 @@ class SwaggerDocumentTest {
 		test.apply("/paths/~1testing/get", "4")
 		test.apply("/paths/~1testing/get/parameters", "5")
 	}
-	
+
 	@Test
 	def void testGetPath3() {
 		val test = setUpPathTest('''

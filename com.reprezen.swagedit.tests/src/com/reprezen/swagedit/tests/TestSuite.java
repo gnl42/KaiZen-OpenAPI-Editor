@@ -33,22 +33,24 @@ import com.reprezen.swagedit.validation.ValidationMessageTest;
 import com.reprezen.swagedit.validation.ValidatorTest;
 
 @RunWith(Suite.class)
-@SuiteClasses({ SwaggerContentAssistProcessorTest.class,//
-        SwaggerDocumentTest.class,//
-        SwaggerProposalProviderTest.class,//
-        SwaggerSchemaTest.class,//
-        JsonReferenceHyperlinkDetectorTest.class,//
-        JsonReferenceFactoryTest.class,//
-        PathParamHyperlinkDetectorTest.class,//
-        DefinitionHyperlinkDetectorTest.class,//
-        ValidationMessageTest.class,//
-        ValidatorTest.class,//
-        CodeTemplateContextTest.class,//
-        ErrorProcessorTest.class,//
-        MultipleSwaggerErrorMessageTest.class,//
-        ReferenceValidatorTest.class,//
-        JsonReferenceProposalProviderTest.class,//
-        AbstractNodeTest.class,//
-        OutlineStyledLabelProviderTest.class })
+@SuiteClasses({ //
+        JsonReferenceProposalProviderTest.class, //
+        SwaggerContentAssistProcessorTest.class, //
+        SwaggerProposalProviderTest.class, //
+        SwaggerDocumentTest.class, //
+        DefinitionHyperlinkDetectorTest.class, //
+        JsonReferenceHyperlinkDetectorTest.class, //
+        PathParamHyperlinkDetectorTest.class, //
+        AbstractNodeTest.class, //
+        OutlineStyledLabelProviderTest.class, //
+        SwaggerSchemaTest.class, //
+        JsonReferenceFactoryTest.class, //
+        CodeTemplateContextTest.class, //
+        ErrorProcessorTest.class, //
+        MultipleSwaggerErrorMessageTest.class, //
+        ReferenceValidatorTest.class, //
+        ValidationMessageTest.class, //
+        ValidatorTest.class //
+})
 public class TestSuite {
 }

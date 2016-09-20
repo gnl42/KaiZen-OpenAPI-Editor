@@ -10,6 +10,8 @@
  *******************************************************************************/
 package com.reprezen.swagedit.json.references;
 
+import static com.reprezen.swagedit.json.references.JsonReference.PROPERTY;
+
 import java.net.URI;
 import java.net.URISyntaxException;
 
@@ -33,8 +35,8 @@ public class JsonReferenceFactory {
             return new JsonReference(null, null, false, false, node);
         }
 
-        if (node.isObject() && node.get("$ref") != null) {
-            node = node.get("$ref");
+        if (node.isObject() && node.get(JsonReference.PROPERTY) != null) {
+            node = node.get(JsonReference.PROPERTY);
         }
 
         return doCreate((String) node.asValue().getValue(), node);
@@ -45,7 +47,7 @@ public class JsonReferenceFactory {
             return new JsonReference(null, null, false, false, node);
         }
 
-        String text = node.isTextual() ? node.asText() : node.get("$ref").asText();
+        String text = node.isTextual() ? node.asText() : node.get(PROPERTY).asText();
 
         return doCreate(text, node);
     }

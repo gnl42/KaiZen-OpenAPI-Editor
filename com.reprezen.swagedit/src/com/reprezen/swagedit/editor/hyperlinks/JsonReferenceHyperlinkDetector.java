@@ -85,8 +85,4 @@ public class JsonReferenceHyperlinkDetector extends AbstractSwaggerHyperlinkDete
         return factory;
     }
 
-    protected String pointer(JsonPointer pointer) {
-        return pointer.toString().replaceAll("/", ":").replaceAll("~1", "/");
-    }
-
 }

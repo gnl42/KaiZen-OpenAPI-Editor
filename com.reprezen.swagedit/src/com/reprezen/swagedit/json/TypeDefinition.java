@@ -1,14 +1,10 @@
 package com.reprezen.swagedit.json;
 
-import java.util.HashMap;
-import java.util.Map;
-
 import com.fasterxml.jackson.core.JsonPointer;
 import com.fasterxml.jackson.databind.JsonNode;
 
 public class TypeDefinition {
 
-    protected final Map<String, TypeDefinition> properties = new HashMap<>();
     protected final SwaggerSchema schema;
     protected final JsonNode definition;
     protected final JsonPointer pointer;
@@ -81,17 +77,20 @@ public class TypeDefinition {
         return s.substring(s.lastIndexOf("/") + 1).replaceAll("~1", "/");
     }
 
-    protected static JsonNode resolve(SwaggerSchema schema, JsonNode node) {
-        if (node.isObject() && node.has("$ref")) {
-            JsonPointer p = JsonPointer.compile(node.get("$ref").asText().substring(1));
-            return schema.asJson().at(p);
-        }
-
-        return node;
+    public TypeDefinition getPropertyType(String property) {
+        return null;
     }
 
-    public TypeDefinition getPropertyType(String property) {
-        return properties.get(property);
+    public String getDescription() {
+        if (definition == null) {
+            return null;
+        }
+        
+        if (!definition.has("description")) {
+            return null;
+        }
+
+        return definition.get("description").asText();
     }
 
 }

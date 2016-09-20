@@ -10,17 +10,15 @@ import org.junit.Test
 import static org.hamcrest.core.IsCollectionContaining.hasItem
 import static org.hamcrest.core.IsCollectionContaining.hasItems
 import static org.junit.Assert.assertThat
-import static org.mockito.Mockito.when
 
 class PathParamHyperlinkDetectorTest {
 
 	val detector = new PathParamHyperlinkDetector
-    val viewer = Mocks.mockTextViewer
 
 	@Test
     def void testShouldCreateHyperLink_FromPathParameter_ToParameterDefinition() throws Exception {
         val document = new SwaggerDocument()
-        when(viewer.getDocument()).thenReturn(document)
+        val viewer = Mocks.mockTextViewer(document)
 
         val text = '''
           paths:
