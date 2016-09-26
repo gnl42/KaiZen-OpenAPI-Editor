@@ -10,9 +10,11 @@
  *******************************************************************************/
 package com.reprezen.swagedit.editor
 
+import com.reprezen.swagedit.tests.utils.Cursors
 import org.junit.Test
 
 import static com.reprezen.swagedit.tests.utils.Cursors.*
+import static org.junit.Assert.*
 
 class SwaggerDocumentTest {
 
@@ -129,17 +131,63 @@ class SwaggerDocumentTest {
 	}
 
 	@Test
+	def void groupTest() {
+		val expected = '''
+		paths:
+		  /testing:
+		    get:
+		      parameters:
+		        
+		'''
+
+		val yaml = '''
+		paths:
+		  /test<1>ing<2>:
+		    <3>get<4>:
+		      parameters:
+		        <5>
+		'''
+		
+		val doc = new SwaggerDocument
+		
+		doc.set(expected)
+		val groups = Cursors.groupMarkers(yaml)
+
+		var r = groups.get("1")	
+		var line = doc.getLineOfOffset(r.offset)
+		assertEquals(1, line)
+		assertEquals(7, doc.getColumnOfOffset(1, r))
+		
+		r = groups.get("2")	
+		line = doc.getLineOfOffset(r.offset)
+		assertEquals(1, line)
+		assertEquals(10, doc.getColumnOfOffset(1, r))
+
+		r = groups.get("3")	
+		line = doc.getLineOfOffset(r.offset)
+		assertEquals(2, line)
+		assertEquals(4, doc.getColumnOfOffset(2, r))
+		
+		r = groups.get("4")	
+		line = doc.getLineOfOffset(r.offset)
+		assertEquals(2, line)
+		assertEquals(7, doc.getColumnOfOffset(2, r))
+		
+		r = groups.get("5")	
+		line = doc.getLineOfOffset(r.offset)
+		assertEquals(4, line)
+		assertEquals(8, doc.getColumnOfOffset(4, r))
+	}
+	
+	@Test
 	def void testGetPath2() {
 		val test = setUpPathTest('''
-			paths:
-			  /test<1>ing<2>:
-			    <3>get<4>:
-			      parameters:
-			        <5>
-			        - name: id
-			          type: number
-			          required: true
-			          in: path
+		paths:
+		  /test<1>ing<2>:
+		    <3>get<4>:
+		      parameters:
+		        <5>
+		    <6>
 		''', document)
 
 		test.apply("/paths/~1testing", "1")
@@ -147,6 +195,7 @@ class SwaggerDocumentTest {
 		test.apply("/paths/~1testing/get", "3")
 		test.apply("/paths/~1testing/get", "4")
 		test.apply("/paths/~1testing/get/parameters", "5")
+		test.apply("/paths/~1testing", "6")
 	}
 
 	@Test

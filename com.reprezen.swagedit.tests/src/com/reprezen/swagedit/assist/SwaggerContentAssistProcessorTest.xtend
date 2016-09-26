@@ -67,16 +67,6 @@ class SwaggerContentAssistProcessorTest {
 		val proposal = proposals.get(0)
 		proposal.apply(document)
 		assertEquals("swagger:", document.get())
-		
-		val test2 = setUpContentAssistTest('''s<1>''', document)
-
-		val proposals2 = test2.apply(processor, "1")		
-		assertEquals(1, proposals2.length);
-
-		val proposal2 = proposals2.get(0)
-		proposal2.apply(document)
-
-		assertEquals("swagger:", document.get())
 	}
 
 	@Test
@@ -111,7 +101,7 @@ class SwaggerContentAssistProcessorTest {
 			      operationId: listPets
 			      tags:
 			        - pets
-			        - ds        
+			        - ds
 			      parameters:
 			        <1>
 			        - name: ad

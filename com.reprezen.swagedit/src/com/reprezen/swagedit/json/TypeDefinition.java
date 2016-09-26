@@ -39,6 +39,22 @@ public class TypeDefinition {
         return getProperty(getPointer());
     }
 
+    public TypeDefinition getPropertyType(String property) {
+        return null;
+    }
+
+    public String getDescription() {
+        if (definition == null) {
+            return null;
+        }
+
+        if (!definition.has("description")) {
+            return null;
+        }
+
+        return definition.get("description").asText();
+    }
+
     @Override
     public String toString() {
         return definition.toString();
@@ -75,22 +91,6 @@ public class TypeDefinition {
     protected static String getProperty(JsonPointer pointer) {
         String s = pointer.toString();
         return s.substring(s.lastIndexOf("/") + 1).replaceAll("~1", "/");
-    }
-
-    public TypeDefinition getPropertyType(String property) {
-        return null;
-    }
-
-    public String getDescription() {
-        if (definition == null) {
-            return null;
-        }
-        
-        if (!definition.has("description")) {
-            return null;
-        }
-
-        return definition.get("description").asText();
     }
 
 }

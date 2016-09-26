@@ -171,7 +171,11 @@ public class SwaggerDocument extends Document {
 
     public Model getModel(int offset) {
         try {
-            return Model.parseYaml(schema, offset > 0 ? get(0, offset) : get());
+            if (0 > offset || offset > getLength()) {
+                return Model.parseYaml(schema, get());
+            } else {
+                return Model.parseYaml(schema, get(0, offset));
+            }
         } catch (BadLocationException e) {
             return null;
         }
@@ -183,15 +187,24 @@ public class SwaggerDocument extends Document {
 
     public JsonPointer getPath(IRegion region) {
         int lineOfOffset;
-        int lineOffset;
         try {
             lineOfOffset = getLineOfOffset(region.getOffset());
-            lineOffset = getLineOffset(lineOfOffset);
         } catch (BadLocationException e) {
             return null;
         }
 
-        return getModel().getPath(lineOfOffset, (region.getOffset() - lineOffset) + region.getLength());
+        return getModel().getPath(lineOfOffset, getColumnOfOffset(lineOfOffset, region));
+    }
+
+    public int getColumnOfOffset(int line, IRegion region) {
+        int lineOffset;
+        try {
+            lineOffset = getLineOffset(line);
+        } catch (BadLocationException e) {
+            lineOffset = 0;
+        }
+
+        return (region.getOffset() + region.getLength()) - lineOffset;
     }
 
     public IRegion getRegion(JsonPointer pointer) {

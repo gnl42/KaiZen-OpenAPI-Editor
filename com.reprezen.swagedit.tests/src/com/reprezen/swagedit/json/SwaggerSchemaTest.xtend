@@ -1,11 +1,9 @@
 package com.reprezen.swagedit.json
 
-import com.reprezen.swagedit.model.Model
+import com.reprezen.swagedit.tests.utils.PointerHelpers
 import org.junit.Test
 
 import static org.junit.Assert.*
-import com.reprezen.swagedit.tests.utils.PointerHelpers
-import com.reprezen.swagedit.model.ValueNode
 
 class SwaggerSchemaTest {
 
@@ -14,79 +12,43 @@ class SwaggerSchemaTest {
 	val schema = new SwaggerSchema
 
 	@Test
-	def void test() {
+	def void testRootType() {
 		assertNotNull(schema.rootType)
 
-//		assertTrue(schema.rootType.properties.containsKey("swagger"))
-//		assertTrue(schema.rootType.properties.containsKey("paths"))
-	}
-
-	@Test
-	def void test2() {
-		val yaml = '''
-			swagger: 2.0
-		'''
-
-		val root = Model.parseYaml(schema, yaml).root
-
-		val schema = new SwaggerSchema
-		val rootType = schema.getType(root)
-		val swaggerType = schema.getType(root.get("swagger"))
-	}
-
-	@Test
-	def void test3() {
-		val yaml = '''
-			info:
-			  title: a
-			  description: b
-		'''
-
-		val root = Model.parseYaml(schema, yaml).root
-
-		val schema = new SwaggerSchema
-		val rootType = schema.getType(root)
-		val infoType = schema.getType(root.get("info"))
-		val titleType = schema.getType(root.get("info").get("title"))
-
+		val rootType = schema.rootType
+		assertEquals(schema.asJson, rootType.definition)
 		assertTrue(rootType instanceof ObjectTypeDefinition)
+	}
+
+	@Test
+	def void testSwaggerType() {
+		val swaggerType = schema.rootType.getPropertyType("swagger")
+
+		assertTrue(swaggerType instanceof TypeDefinition)
+		assertEquals(schema.asJson.at('/properties/swagger'), swaggerType.definition)
+	}
+
+	@Test
+	def void testInfoType() {
+		val infoType = schema.getType("/definitions/info".ptr)
 		assertTrue(infoType instanceof ObjectTypeDefinition)
+
+		val titleType = infoType.getPropertyType("title")
 		assertTrue(titleType instanceof TypeDefinition)
+		assertEquals(schema.getType("/definitions/info/properties/title".ptr), titleType)
 	}
 
 	@Test
-	def void test4() {
-		val yaml = '''
-			info:
-			  title: a
-			  description: b
-		'''
-
-		val root = Model.parseYaml(schema, yaml).root
-
-		val schema = new SwaggerSchema
-		val rootType = schema.getType(root)
-		val infoType = schema.getType(root.get("info"))
-		val titleType = schema.getType(root.get("info").get("title"))
-
-		assertTrue(rootType instanceof ObjectTypeDefinition)
-		assertTrue(infoType instanceof ObjectTypeDefinition)
-		assertTrue(titleType instanceof TypeDefinition)
+	def void testPathType() {
+		val pathType = schema.getType("/definitions/paths".ptr)
+		
+		assertTrue(pathType instanceof ObjectTypeDefinition)
 	}
 
 	@Test
-	def void testTypeGetPath2() {
-		val yaml = '''
-			paths:
-			  /foo:
-			    get:
-		'''
-	}
-
-	@Test
-	def void test5() {
-		val type = schema.getType(new ValueNode(null, "/paths/~1pets/get/parameters/0/in".ptr, null))
-
-		println(type)
+	def void testParameterType() {
+		val parametersType = schema.getType("/definitions/parametersList".ptr)
+		
+		assertTrue(parametersType instanceof ArrayTypeDefinition)
 	}
 }

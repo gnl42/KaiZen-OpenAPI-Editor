@@ -25,6 +25,15 @@ public class Model {
         this.schema = schema;
     }
 
+    public static Model empty(SwaggerSchema schema) {
+        Model model = new Model(schema);
+        ObjectNode root = new ObjectNode(null, JsonPointer.compile(""));
+        root.setType(model.schema.getType(root));
+        model.add(root);
+
+        return model;
+    }
+
     /**
      * 
      * 
@@ -32,21 +41,20 @@ public class Model {
      * @return model
      */
     public static Model parseYaml(SwaggerSchema schema, String text) {
-        Model model = new Model(schema);
-
         if (Strings.emptyToNull(text) == null) {
-            model.add(new ObjectNode(null, JsonPointer.compile("")));
-        } else {
-            try {
-                createMapper().reader() //
-                        .withAttribute(ATTRIBUTE_MODEL, model) //
-                        .withAttribute(ATTRIBUTE_PARENT, null) //
-                        .withAttribute(ATTRIBUTE_POINTER, JsonPointer.compile("")) //
-                        .withType(AbstractNode.class) //
-                        .readValue(text);
-            } catch (IllegalArgumentException | IOException e) {
-                // model.addError(e);
-            }
+            return empty(schema);
+        }
+
+        Model model = new Model(schema);
+        try {
+            createMapper().reader() //
+                    .withAttribute(ATTRIBUTE_MODEL, model) //
+                    .withAttribute(ATTRIBUTE_PARENT, null) //
+                    .withAttribute(ATTRIBUTE_POINTER, JsonPointer.compile("")) //
+                    .withType(AbstractNode.class) //
+                    .readValue(text);
+        } catch (IllegalArgumentException | IOException e) {
+            // model.addError(e);
         }
 
         for (AbstractNode node : model.allNodes()) {

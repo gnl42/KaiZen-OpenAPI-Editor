@@ -60,7 +60,7 @@ public class OutlineStyledLabelProvider extends StyledCellLabelProvider {
         Object element = cell.getElement();
 
         if (element instanceof AbstractNode) {
-            StyledString styledString = getSyledString((AbstractNode) element);
+            StyledString styledString = getStyledString((AbstractNode) element);
 
             cell.setText(styledString.toString());
             cell.setStyleRanges(styledString.getStyleRanges());
@@ -68,7 +68,7 @@ public class OutlineStyledLabelProvider extends StyledCellLabelProvider {
         }
     }
 
-    protected StyledString getSyledString(AbstractNode element) {
+    protected StyledString getStyledString(AbstractNode element) {
         StyledString styledString = new StyledString(element.getText(), getTextStyler());
 
         if (element.getParent() != null && (element.isObject() || element.isArray())) {

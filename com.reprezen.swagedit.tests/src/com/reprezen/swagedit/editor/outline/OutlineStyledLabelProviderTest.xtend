@@ -33,7 +33,7 @@ class OutlineStyledLabelProviderTest {
 		val el = root.elements.get(0).elements.get(0)
 
 		assertEquals("key: value", el.text)
-		assertEquals(el.text, provider.getSyledString(el).toString)
+		assertEquals(el.text, provider.getStyledString(el).toString)
 	}
 
 	@Test
@@ -47,15 +47,15 @@ class OutlineStyledLabelProviderTest {
 		val els = Model.parseYaml(schema, text).root
 
 		assertEquals("schemes", els.get(0).text)
-		assertEquals("schemes schemesList", provider.getSyledString(els.get(0)).toString)
+		assertEquals("schemes schemesList", provider.getStyledString(els.get(0)).toString)
 
 		val http = els.get(0).elements.get(0)
 		assertEquals("http", http.text)
-		assertEquals("http", provider.getSyledString(http).toString)
+		assertEquals("http", provider.getStyledString(http).toString)
 
 		val https = els.get(0).elements.get(1)
 		assertEquals("https", https.text)
-		assertEquals("https", provider.getSyledString(https).toString)
+		assertEquals("https", provider.getStyledString(https).toString)
 	}
 
 	@Test

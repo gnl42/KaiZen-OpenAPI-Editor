@@ -94,8 +94,7 @@ class MultipleSwaggerErrorMessageTest {
 			}
 		];
 		assertFalse(combinedSchemas.filterNull.isNullOrEmpty)
-		// println("All nodes: " + combinedSchemas)
-		// println("All labels: " + combinedSchemas.map[it|swaggerError.getHumanFriendlyText(it, null)])
+
 		val emptyLabels = combinedSchemas.filter[it|Strings.isNullOrEmpty(swaggerError.getHumanFriendlyText(it, null))]
 		assertTrue("Null labels are not expected, but got null for the following nodes: " + emptyLabels,
 			emptyLabels.isNullOrEmpty)

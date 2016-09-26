@@ -1,8 +1,10 @@
 package com.reprezen.swagedit.tests.utils
 
-import com.google.common.base.CharMatcher
+import com.fasterxml.jackson.core.JsonPointer
 import com.reprezen.swagedit.editor.SwaggerDocument
+import com.reprezen.swagedit.mocks.Mocks
 import java.util.HashMap
+import org.eclipse.jface.text.Document
 import org.eclipse.jface.text.IRegion
 import org.eclipse.jface.text.Region
 import org.eclipse.jface.text.contentassist.ICompletionProposal
@@ -11,8 +13,6 @@ import org.eclipse.xtext.xbase.lib.Functions.Function2
 import org.eclipse.xtext.xbase.lib.Procedures.Procedure2
 
 import static org.junit.Assert.*
-import com.fasterxml.jackson.core.JsonPointer
-import com.reprezen.swagedit.mocks.Mocks
 
 class Cursors {
 
@@ -37,7 +37,8 @@ class Cursors {
 
 		new Function2<IContentAssistProcessor, String, ICompletionProposal[]>() {
 			override ICompletionProposal[] apply(IContentAssistProcessor processor, String marker) {
-				val offset = groups.get(marker).offset
+				// TODO check why we need to add +1 to offset here
+				val offset = groups.get(marker).offset + 1
 				val viewer = Mocks.mockTextViewer(doc, offset)
 
 				processor.computeCompletionProposals(viewer, offset)
@@ -47,32 +48,31 @@ class Cursors {
 
 	static def groupMarkers(String text) {
 		val groups = new HashMap<String, IRegion>
-		var start = false
-		var String current = null
+
+		val doc = new Document(text)
+		var i = 0
 		var offset = 0
+		var start = false
+		var group = ""
 
-		val t = text.replaceAll("(\\r|\\n)", "").toCharArray
-		var Region region = null
-		for (var i = 0; i < t.length; i++) {
-			var b = t.get(i)
-
-			if (CharMatcher.is('<').matches(b)) {
+		while (i < doc.getLength()) {
+			var current = doc.get(i, 1)
+			if (current.equals("<")) {
 				start = true
-				current = new String()
-				region = new Region(offset, 1)
-			} else if (start) {
-				if (CharMatcher.is('>').matches(b)) {
-					start = false
-					groups.put(current, region)
-					current = null
-					region = null
-				} else {
-					current += b
-				}
+			} else if (current.equals(">")) {
+				start = false
+				groups.put(group, new Region(Math.max(0, offset - 1), 1))
+				group = ""
 			} else {
-				offset++
+				if (start) {
+					group += current
+				} else {
+					offset++
+				}
 			}
+			i++
 		}
+
 		groups
 	}
 
