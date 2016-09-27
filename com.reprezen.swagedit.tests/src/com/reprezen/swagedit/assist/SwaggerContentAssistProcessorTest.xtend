@@ -104,11 +104,11 @@ class SwaggerContentAssistProcessorTest {
 			        - ds
 			      parameters:
 			        <1>
-			        - name: ad
-			          <2>
-			        - name: limit
-			          in: query
+			        - name: <2>
 			          <3>
+			        - name: limit
+			          in: <4>
+			          <5>
 		''', document)
 
 		var proposals = test.apply(processor, "1")
@@ -118,6 +118,12 @@ class SwaggerContentAssistProcessorTest {
 			))
 
 		proposals = test.apply(processor, "2")
+		assertThat(proposals.map[(it as StyledCompletionProposal).replacementString], 
+			hasItems(
+				""
+			))
+
+		proposals = test.apply(processor, "3")
 		assertThat(proposals.map[(it as StyledCompletionProposal).replacementString], 
 			hasItems(
 				"uniqueItems:",
@@ -134,7 +140,17 @@ class SwaggerContentAssistProcessorTest {
 				"maxLength:"			
 			))
 		
-		proposals = test.apply(processor, "3")
+		proposals = test.apply(processor, "4")
+		assertThat(proposals.map[(it as StyledCompletionProposal).replacementString], 
+			hasItems(
+				"body", 
+				"query", 
+				"path", 
+				"header", 
+				"formData"
+			))
+
+		proposals = test.apply(processor, "5")	
 		assertThat(proposals.map[(it as StyledCompletionProposal).replacementString], 
 			hasItems(
 				"uniqueItems:",

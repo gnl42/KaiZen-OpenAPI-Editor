@@ -8,7 +8,7 @@
  * Contributors:
  *    ModelSolv, Inc. - initial API and implementation and/or initial documentation
  *******************************************************************************/
-package com.reprezen.swagedit.json;
+package com.reprezen.swagedit.schema;
 
 import com.fasterxml.jackson.databind.JsonNode;
 

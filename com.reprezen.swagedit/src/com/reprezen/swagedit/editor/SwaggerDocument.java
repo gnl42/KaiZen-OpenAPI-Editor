@@ -16,6 +16,7 @@ import java.io.StringReader;
 import org.eclipse.jface.text.BadLocationException;
 import org.eclipse.jface.text.Document;
 import org.eclipse.jface.text.IRegion;
+import org.eclipse.jface.text.Position;
 import org.eclipse.jface.text.Region;
 import org.yaml.snakeyaml.Yaml;
 import org.yaml.snakeyaml.nodes.Node;
@@ -24,9 +25,9 @@ import org.yaml.snakeyaml.parser.ParserException;
 import com.fasterxml.jackson.core.JsonPointer;
 import com.fasterxml.jackson.databind.JsonNode;
 import com.fasterxml.jackson.databind.ObjectMapper;
-import com.reprezen.swagedit.json.SwaggerSchema;
 import com.reprezen.swagedit.model.AbstractNode;
 import com.reprezen.swagedit.model.Model;
+import com.reprezen.swagedit.schema.SwaggerSchema;
 
 /**
  * SwaggerDocument
@@ -47,6 +48,10 @@ public class SwaggerDocument extends Document {
 
     public SwaggerDocument() {
         this.schema = new SwaggerSchema();
+    }
+
+    public SwaggerSchema getSchema() {
+        return schema;
     }
 
     public Exception getYamlError() {
@@ -123,8 +128,8 @@ public class SwaggerDocument extends Document {
         parseModel();
         parseYaml(content);
 
-        // not need to parse json if
-        // there is a yaml parsing error.
+        // No need to parse json if
+        // there is already a yaml parsing error.
         if (yamlError != null) {
             jsonContent = null;
         } else {
@@ -215,28 +220,12 @@ public class SwaggerDocument extends Document {
 
         AbstractNode node = model.find(pointer);
         if (node == null) {
-            return null;
+            return new Region(0, 0);
         }
 
-        int startOffset;
-        try {
-            startOffset = getLineOffset(node.getStart().getLineNr());
-        } catch (BadLocationException e) {
-            startOffset = 0;
-        }
+        Position position = node.getPosition(this);
 
-        int endOffset;
-        try {
-            endOffset = getLineOffset(node.getEnd().getLineNr());
-        } catch (BadLocationException e) {
-            try {
-                endOffset = getLineOffset(node.getEnd().getLineNr() - 1);
-            } catch (BadLocationException e1) {
-                endOffset = 0;
-            }
-        }
-
-        return new Region(startOffset, Math.max(endOffset - startOffset, 0));
+        return new Region(position.getOffset(), position.getLength());
     }
 
 }

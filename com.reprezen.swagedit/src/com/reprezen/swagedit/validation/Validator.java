@@ -96,12 +96,12 @@ public class Validator {
      * Validates the YAML document against the Swagger schema
      */
     protected Set<SwaggerError> validateAgainstSchema(ErrorProcessor processor, SwaggerDocument document) {
-        final JsonSchemaFactory factory = JsonSchemaFactory.byDefault();
+        final JsonSchemaFactory factory = JsonSchemaFactory.newBuilder().freeze();
         final Set<SwaggerError> errors = Sets.newHashSet();
 
         JsonSchema schema = null;
         try {
-            schema = factory.getJsonSchema(document.getModel().getSchema().asJson());
+            schema = factory.getJsonSchema(document.getSchema().asJson());
         } catch (ProcessingException e) {
             YEditLog.logException(e);
             return errors;

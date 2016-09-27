@@ -19,7 +19,6 @@ import org.yaml.snakeyaml.nodes.ScalarNode;
 
 import com.fasterxml.jackson.core.JsonPointer;
 import com.fasterxml.jackson.databind.JsonNode;
-import com.reprezen.swagedit.json.JsonDocumentManager;
 import com.reprezen.swagedit.model.AbstractNode;
 
 /**
@@ -160,6 +159,14 @@ public class JsonReference {
 
     public static boolean isReference(AbstractNode value) {
         return value != null && value.isObject() && value.get(PROPERTY) != null;
+    }
+
+    public static JsonPointer getPointer(JsonNode node) {
+        String text = node.get(PROPERTY).asText();
+        if (text.startsWith("#")) {
+            text = text.substring(1);
+        }
+        return JsonPointer.compile(text);
     }
 
     /**

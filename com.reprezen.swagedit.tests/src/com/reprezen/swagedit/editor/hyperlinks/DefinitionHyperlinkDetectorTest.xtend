@@ -45,7 +45,7 @@ class DefinitionHyperlinkDetectorTest {
 
 		// expected region
 		val linkRegion = new Region(document.getLineOffset(1) + "  - ".length(), 3)
-		val targetRegion = new Region(document.getLineOffset(4), 17)
+		val targetRegion = new Region(29, 24)
 
 		assertThat(Arrays.asList(hyperlinks), hasItem(new SwaggerHyperlink("foo", viewer, linkRegion, targetRegion)))
 	}
@@ -71,7 +71,7 @@ class DefinitionHyperlinkDetectorTest {
 
 		// expected region
 		val linkRegion = new Region(document.getLineOffset(2) + "    - ".length(), "name".length())
-		val targetRegion = new Region(document.getLineOffset(5), 19)
+		val targetRegion = new Region(45, 29)
 
 		assertThat(Arrays.asList(hyperlinks), hasItem(new SwaggerHyperlink("name", viewer, linkRegion, targetRegion)))
 	}

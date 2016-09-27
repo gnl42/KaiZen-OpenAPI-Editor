@@ -27,8 +27,8 @@ import com.fasterxml.jackson.core.JsonPointer;
 import com.fasterxml.jackson.databind.JsonNode;
 import com.google.common.base.Strings;
 import com.google.common.collect.Lists;
-import com.reprezen.swagedit.editor.DocumentUtils;
-import com.reprezen.swagedit.json.JsonDocumentManager;
+import com.reprezen.swagedit.json.references.JsonDocumentManager;
+import com.reprezen.swagedit.utils.DocumentUtils;
 import com.reprezen.swagedit.utils.URLUtils;
 
 /**

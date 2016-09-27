@@ -19,10 +19,10 @@ import org.eclipse.jface.text.hyperlink.IHyperlink;
 import org.eclipse.ui.part.FileEditorInput;
 
 import com.fasterxml.jackson.core.JsonPointer;
-import com.reprezen.swagedit.editor.DocumentUtils;
 import com.reprezen.swagedit.editor.SwaggerDocument;
 import com.reprezen.swagedit.json.references.JsonReference;
 import com.reprezen.swagedit.json.references.JsonReferenceFactory;
+import com.reprezen.swagedit.utils.DocumentUtils;
 
 /**
  * Hyperlink detector that detects links from JSON references.

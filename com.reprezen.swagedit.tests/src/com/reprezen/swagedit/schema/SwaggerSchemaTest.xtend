@@ -1,8 +1,9 @@
-package com.reprezen.swagedit.json
+package com.reprezen.swagedit.schema
 
 import com.reprezen.swagedit.tests.utils.PointerHelpers
 import org.junit.Test
 
+import static org.hamcrest.core.IsCollectionContaining.*
 import static org.junit.Assert.*
 
 class SwaggerSchemaTest {
@@ -16,8 +17,13 @@ class SwaggerSchemaTest {
 		assertNotNull(schema.rootType)
 
 		val rootType = schema.rootType
-		assertEquals(schema.asJson, rootType.definition)
+		assertEquals(schema.asJson, rootType.content)
 		assertTrue(rootType instanceof ObjectTypeDefinition)
+
+		assertThat(
+			(rootType as ObjectTypeDefinition).requiredProperties,
+			hasItems("swagger", "info", "paths")
+		)
 	}
 
 	@Test
@@ -25,13 +31,18 @@ class SwaggerSchemaTest {
 		val swaggerType = schema.rootType.getPropertyType("swagger")
 
 		assertTrue(swaggerType instanceof TypeDefinition)
-		assertEquals(schema.asJson.at('/properties/swagger'), swaggerType.definition)
+		assertEquals(schema.asJson.at('/properties/swagger'), swaggerType.content)
 	}
 
 	@Test
 	def void testInfoType() {
 		val infoType = schema.getType("/definitions/info".ptr)
 		assertTrue(infoType instanceof ObjectTypeDefinition)
+
+		assertThat(
+			(infoType as ObjectTypeDefinition).requiredProperties,
+			hasItems("version", "title")
+		)
 
 		val titleType = infoType.getPropertyType("title")
 		assertTrue(titleType instanceof TypeDefinition)
@@ -41,14 +52,14 @@ class SwaggerSchemaTest {
 	@Test
 	def void testPathType() {
 		val pathType = schema.getType("/definitions/paths".ptr)
-		
+
 		assertTrue(pathType instanceof ObjectTypeDefinition)
 	}
 
 	@Test
 	def void testParameterType() {
 		val parametersType = schema.getType("/definitions/parametersList".ptr)
-		
+
 		assertTrue(parametersType instanceof ArrayTypeDefinition)
 	}
 }

@@ -1,18 +1,22 @@
-package com.reprezen.swagedit.json;
+package com.reprezen.swagedit.schema;
 
 import com.fasterxml.jackson.core.JsonPointer;
 import com.fasterxml.jackson.databind.JsonNode;
 
+/**
+ * Represents a type defined inside a JSON Schema.
+ *
+ */
 public class TypeDefinition {
 
     protected final SwaggerSchema schema;
-    protected final JsonNode definition;
+    protected final JsonNode content;
     protected final JsonPointer pointer;
     protected final JsonType type;
 
     public TypeDefinition(SwaggerSchema schema, JsonPointer pointer, JsonNode definition, JsonType type) {
         this.schema = schema;
-        this.definition = definition;
+        this.content = definition;
         this.pointer = pointer;
         this.type = type;
 
@@ -23,8 +27,8 @@ public class TypeDefinition {
         return type;
     }
 
-    public JsonNode getDefinition() {
-        return definition;
+    public JsonNode asJson() {
+        return content;
     }
 
     public SwaggerSchema getSchema() {
@@ -43,29 +47,44 @@ public class TypeDefinition {
         return null;
     }
 
+    /**
+     * 
+     * @return
+     */
     public String getDescription() {
-        if (definition == null) {
+        if (content == null) {
             return null;
         }
 
-        if (!definition.has("description")) {
+        if (!content.has("description")) {
             return null;
         }
 
-        return definition.get("description").asText();
+        return content.get("description").asText();
     }
 
     @Override
     public String toString() {
-        return definition.toString();
+        return content.toString();
     }
 
+    /**
+     * Returns the type reachable by the given pointer inside the given schema.
+     * 
+     * @param schema
+     * @param pointer
+     * @return type
+     */
     public static TypeDefinition create(SwaggerSchema schema, JsonPointer pointer) {
         if (schema.getType(pointer) != null) {
             return schema.getType(pointer);
         }
 
         final JsonNode definition = schema.asJson().at(pointer);
+        if (definition == null || definition.isMissingNode()) {
+            return null;
+        }
+
         final JsonType type = JsonType.valueOf(definition);
 
         TypeDefinition typeDef;

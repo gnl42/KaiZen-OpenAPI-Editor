@@ -63,8 +63,8 @@ public class PathParamHyperlinkDetector extends AbstractSwaggerHyperlinkDetector
         }
 
         Iterable<JsonPointer> targetPaths = findParameterPath(doc, pointer, parameter);
-        IRegion linkRegion = new Region(info.getOffset() + start, end - start);
 
+        IRegion linkRegion = new Region(info.getOffset() + start, end - start);
         List<IHyperlink> links = new ArrayList<>();
         for (JsonPointer path : targetPaths) {
             IRegion target = doc.getRegion(path);

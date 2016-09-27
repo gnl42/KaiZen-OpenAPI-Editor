@@ -1,9 +1,10 @@
 package com.reprezen.swagedit.assist
 
-import com.reprezen.swagedit.json.SwaggerSchema
 import com.reprezen.swagedit.model.ArrayNode
 import com.reprezen.swagedit.model.ObjectNode
 import com.reprezen.swagedit.model.ValueNode
+import com.reprezen.swagedit.schema.MultipleTypeDefinition
+import com.reprezen.swagedit.schema.SwaggerSchema
 import com.reprezen.swagedit.tests.utils.PointerHelpers
 import org.hamcrest.Matcher
 import org.junit.Test
@@ -147,6 +148,22 @@ class SwaggerProposalProviderTest {
 	}
 
 	@Test
+	def void testParameterInProposals() {
+		val node = new ValueNode(null, "/paths/~1/get/parameters/0/in".ptr, null)
+		node.type = schema.getType(node)
+
+		assertThat(provider.getProposals(node).map [
+			replacementString
+		], hasItems(
+			"header",
+			"path",
+			"formData",
+			"body",
+			"query"
+		))
+	}
+
+	@Test
 	def void testGetOneOfProposals() {
 		val node = new ObjectNode(null, "/paths/~1/get/responses/200".ptr)
 		node.type = schema.getType(node)
@@ -165,9 +182,24 @@ class SwaggerProposalProviderTest {
 
 	@Test
 	def void testGetAnyOfProposals() {
-//		val proposals = provider.createProposals(
-//			mapper.createObjectNode,
-//			definitionProvider.getDefinitions(":definitions:foo:type")
-//		)
+		val node = new ValueNode(null, "/paths/~1/get/parameters/0/format".ptr, null)
+		node.type = schema.getType(node)
+
+		assertTrue(node.type instanceof MultipleTypeDefinition)
+
+		assertThat(provider.getProposals(node).map [
+			replacementString
+		], hasItems(
+			"",
+			"byte",
+			"double",
+			"date-time",
+			"float",
+			"int32",
+			"int64",
+			"password",
+			"binary",
+			"date"
+		))
 	}
 }

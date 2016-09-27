@@ -2,11 +2,11 @@ package com.reprezen.swagedit.editor.outline
 
 import com.reprezen.swagedit.editor.SwaggerDocument
 import com.reprezen.swagedit.model.Model
+import com.reprezen.swagedit.schema.SwaggerSchema
+import com.reprezen.swagedit.tests.utils.PointerHelpers
 import org.junit.Test
 
 import static org.junit.Assert.*
-import com.reprezen.swagedit.tests.utils.PointerHelpers
-import com.reprezen.swagedit.json.SwaggerSchema
 
 class AbstractNodeTest {
 
@@ -56,7 +56,7 @@ class AbstractNodeTest {
 	@Test
 	def void testCreateFromSingleMapping() {
 		val text = '''
-			foo: bar
+		   foo: bar
 		'''
 
 		val model = Model.parseYaml(schema, text)
@@ -71,7 +71,7 @@ class AbstractNodeTest {
 		val position = el.getPosition(doc)
 		// end of first line
 		assertEquals(0, position.offset)
-		assertEquals(9, position.length)
+		assertEquals(8, position.length)
 
 		// position is first line
 		assertEquals(0, doc.getLineOfOffset(position.offset))
@@ -88,10 +88,8 @@ class AbstractNodeTest {
 
 		val root = model.root
 
-//		assertEquals(JsonType.OBJECT, root.type)
 		assertEquals("".ptr, root.pointer)
 		assertNotNull(root.get("swagger"))
-//		assertEquals(JsonType.ENUM, root.get("swagger").type)
 		assertEquals("swagger", root.get("swagger").property)
 		assertEquals("/swagger".ptr, root.get("swagger").pointer)
 	}
@@ -109,13 +107,11 @@ class AbstractNodeTest {
 
 		val root = model.root
 
-//		assertEquals(JsonType.OBJECT, root.type)
 		assertEquals("".ptr, root.pointer)
 
 		assertNotNull(root.get("info"))
 
 		val info = root.get("info")
-//		assertEquals(JsonType.OBJECT, info.type)
 		assertEquals("info", info.property)
 		assertEquals("/info".ptr, info.pointer)
 
@@ -123,12 +119,10 @@ class AbstractNodeTest {
 		assertNotNull(info.get("title"))
 
 		val version = info.get("version")
-//		assertEquals(JsonType.STRING, version.type)
 		assertEquals("version", version.property)
 		assertEquals("/info/version".ptr, version.pointer)
 
 		val title = info.get("title")
-//		assertEquals(JsonType.STRING, title.type)
 		assertEquals("title", title.property)
 		assertEquals("/info/title".ptr, title.pointer)
 	}
@@ -150,7 +144,6 @@ class AbstractNodeTest {
 
 		val schemes = root.get("schemes")
 		assertTrue(schemes.isArray)
-//		assertEquals(JsonType.ARRAY, schemes.type)
 		assertEquals("schemes", schemes.property)
 		assertEquals("/schemes".ptr, schemes.pointer)
 		assertEquals(2, schemes.elements.size)
@@ -165,9 +158,9 @@ class AbstractNodeTest {
 	@Test
 	def void testCreateFromArrayValues() {
 		val text = '''
-			foo:
-			  - hello
-			  - world
+		foo:
+		  - hello
+		  - world
 		'''
 
 		val model = Model.parseYaml(schema, text)
@@ -185,7 +178,7 @@ class AbstractNodeTest {
 		val position = el.getPosition(doc)
 		// after foo:
 		assertEquals(0, position.offset)
-		assertEquals(5, position.length)
+		assertEquals(25, position.length)
 
 		// should be first line
 		assertEquals(0, doc.getLineOfOffset(position.offset))
@@ -214,7 +207,7 @@ class AbstractNodeTest {
 		val position = el.getPosition(doc)
 		// after foo:
 		assertEquals(0, position.offset)
-		assertEquals(6, position.length)
+		assertEquals(30, position.length)
 
 		// should be first line
 		assertEquals(0, doc.getLineOfOffset(position.offset))

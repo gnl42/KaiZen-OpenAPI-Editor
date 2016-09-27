@@ -1,12 +1,12 @@
 package com.reprezen.swagedit.editor.outline
 
 import com.reprezen.swagedit.model.Model
+import com.reprezen.swagedit.schema.SwaggerSchema
 import org.eclipse.swt.graphics.RGB
 import org.junit.Before
 import org.junit.Test
 
 import static org.junit.Assert.*
-import com.reprezen.swagedit.json.SwaggerSchema
 
 class OutlineStyledLabelProviderTest {
 

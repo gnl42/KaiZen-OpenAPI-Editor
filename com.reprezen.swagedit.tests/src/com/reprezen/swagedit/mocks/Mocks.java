@@ -18,7 +18,7 @@ import org.mockito.Mockito;
 import com.fasterxml.jackson.databind.JsonNode;
 import com.reprezen.swagedit.editor.SwaggerDocument;
 import com.reprezen.swagedit.editor.hyperlinks.JsonReferenceHyperlinkDetector;
-import com.reprezen.swagedit.json.JsonDocumentManager;
+import com.reprezen.swagedit.json.references.JsonDocumentManager;
 import com.reprezen.swagedit.json.references.JsonReference;
 import com.reprezen.swagedit.json.references.JsonReferenceFactory;
 import com.reprezen.swagedit.model.AbstractNode;

@@ -23,8 +23,8 @@ import org.eclipse.swt.widgets.Display;
 import com.google.common.collect.Iterables;
 import com.reprezen.swagedit.Activator;
 import com.reprezen.swagedit.Activator.Icons;
-import com.reprezen.swagedit.json.TypeDefinition;
 import com.reprezen.swagedit.model.AbstractNode;
+import com.reprezen.swagedit.schema.TypeDefinition;
 
 public class OutlineStyledLabelProvider extends StyledCellLabelProvider {
 
@@ -76,8 +76,8 @@ public class OutlineStyledLabelProvider extends StyledCellLabelProvider {
             TypeDefinition definition = element.getType();
 
             String label = null;
-            if (definition.getDefinition().has("title")) {
-                label = definition.getDefinition().get("title").asText();
+            if (definition.asJson().has("title")) {
+                label = definition.asJson().get("title").asText();
             } else if (definition.getContainingProperty() != null) {
                 label = definition.getContainingProperty();
             }

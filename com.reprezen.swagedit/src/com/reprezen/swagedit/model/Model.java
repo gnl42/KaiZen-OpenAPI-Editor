@@ -14,8 +14,12 @@ import com.fasterxml.jackson.databind.ObjectMapper;
 import com.fasterxml.jackson.databind.module.SimpleModule;
 import com.fasterxml.jackson.dataformat.yaml.YAMLFactory;
 import com.google.common.base.Strings;
-import com.reprezen.swagedit.json.SwaggerSchema;
+import com.reprezen.swagedit.schema.SwaggerSchema;
 
+/**
+ * Represents the content of a YAML/JSON document.
+ *
+ */
 public class Model {
 
     private final Map<JsonPointer, AbstractNode> nodes = new LinkedHashMap<>();
@@ -25,6 +29,12 @@ public class Model {
         this.schema = schema;
     }
 
+    /**
+     * Returns an empty model
+     * 
+     * @param schema
+     * @return empty model
+     */
     public static Model empty(SwaggerSchema schema) {
         Model model = new Model(schema);
         ObjectNode root = new ObjectNode(null, JsonPointer.compile(""));
@@ -35,7 +45,7 @@ public class Model {
     }
 
     /**
-     * 
+     * Returns a model build by parsing a YAML content.
      * 
      * @param text
      * @return model
@@ -64,16 +74,12 @@ public class Model {
         return model;
     }
 
-    public static ObjectMapper createMapper() {
+    protected static ObjectMapper createMapper() {
         final ObjectMapper mapper = new ObjectMapper(new YAMLFactory());
         final SimpleModule module = new SimpleModule();
         module.addDeserializer(AbstractNode.class, new NodeDeserializer());
         mapper.registerModule(module);
         return mapper;
-    }
-
-    public SwaggerSchema getSchema() {
-        return schema;
     }
 
     public AbstractNode find(JsonPointer pointer) {
@@ -104,7 +110,9 @@ public class Model {
         }
 
         AbstractNode found = forLine(line);
+
         if (found != null) {
+            found = findChildren(found, line, column);
 
             int c = startColumn(found);
             if (column >= c) {
@@ -121,6 +129,17 @@ public class Model {
         }
 
         return found;
+    }
+
+    protected AbstractNode findChildren(AbstractNode current, int line, int column) {
+        for (AbstractNode el : current.elements()) {
+            if (startLine(el) == line) {
+                if (column >= (el.getLocation().getColumnNr() - 1)) {
+                    return el;
+                }
+            }
+        }
+        return current;
     }
 
     protected AbstractNode findCorrectNode(AbstractNode current, int column) {
@@ -193,7 +212,7 @@ public class Model {
     }
 
     protected int contentColumn(AbstractNode n) {
-        return n.getLocation().getColumnNr() - 1;
+        return Strings.nullToEmpty(n.getProperty()).length() + (n.getLocation().getColumnNr() - 1);
     }
 
     public Iterable<AbstractNode> allNodes() {

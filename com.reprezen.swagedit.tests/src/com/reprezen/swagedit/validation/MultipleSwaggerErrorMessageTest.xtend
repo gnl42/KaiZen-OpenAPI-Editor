@@ -4,7 +4,7 @@ import com.fasterxml.jackson.databind.JsonNode
 import com.fasterxml.jackson.databind.node.ArrayNode
 import com.google.common.base.Strings
 import com.google.common.collect.Lists
-import com.reprezen.swagedit.json.SwaggerSchema
+import com.reprezen.swagedit.schema.SwaggerSchema
 import io.swagger.util.Json
 import java.util.List
 import org.junit.Test

@@ -1,9 +1,29 @@
-package com.reprezen.swagedit.json;
+package com.reprezen.swagedit.schema;
 
 import com.fasterxml.jackson.core.JsonPointer;
 import com.fasterxml.jackson.databind.JsonNode;
 import com.reprezen.swagedit.json.references.JsonReference;
 
+/**
+ * Represents a JSON schema type definition for arrays.
+ * 
+ * <br/>
+ * 
+ * Example of an array type definition:
+ * 
+ * <code>
+ * <pre>
+ * "tags": {
+ *   "type": "array",
+ *   "items": {
+ *     "$ref": "#/definitions/tag"
+ *   },
+ *   "uniqueItems": true
+ * }
+ * </pre>
+ * </code>
+ *
+ */
 public class ArrayTypeDefinition extends TypeDefinition {
 
     public final TypeDefinition itemsType;
@@ -17,7 +37,7 @@ public class ArrayTypeDefinition extends TypeDefinition {
     private JsonPointer getItemsPointer() {
         String p = getPointer().toString();
 
-        JsonNode node = definition.get("items");
+        JsonNode node = content.get("items");
 
         if (node.isObject() && node.has(JsonReference.PROPERTY)) {
             p = node.get(JsonReference.PROPERTY).asText().substring(1);
