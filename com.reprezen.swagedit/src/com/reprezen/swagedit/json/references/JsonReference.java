@@ -19,7 +19,7 @@ import org.yaml.snakeyaml.nodes.ScalarNode;
 
 import com.fasterxml.jackson.core.JsonPointer;
 import com.fasterxml.jackson.databind.JsonNode;
-import com.reprezen.swagedit.json.JsonDocumentManager;
+import com.reprezen.swagedit.model.AbstractNode;
 
 /**
  * Represents a JSON reference as defined by https://tools.ietf.org/html/draft-pbryan-zyp-json-ref-03.
@@ -155,6 +155,18 @@ public class JsonReference {
      */
     public static boolean isReference(JsonNode value) {
         return value != null && value.isObject() && value.has(PROPERTY) && value.get(PROPERTY).isTextual();
+    }
+
+    public static boolean isReference(AbstractNode value) {
+        return value != null && value.isObject() && value.get(PROPERTY) != null;
+    }
+
+    public static JsonPointer getPointer(JsonNode node) {
+        String text = node.get(PROPERTY).asText();
+        if (text.startsWith("#")) {
+            text = text.substring(1);
+        }
+        return JsonPointer.compile(text);
     }
 
     /**

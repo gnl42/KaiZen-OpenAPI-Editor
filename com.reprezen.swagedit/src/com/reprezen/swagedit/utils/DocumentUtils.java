@@ -1,4 +1,4 @@
-package com.reprezen.swagedit.editor;
+package com.reprezen.swagedit.utils;
 
 import java.io.IOException;
 import java.io.InputStream;
@@ -19,6 +19,7 @@ import org.eclipse.ui.PlatformUI;
 import org.eclipse.ui.part.FileEditorInput;
 
 import com.google.common.io.CharStreams;
+import com.reprezen.swagedit.editor.SwaggerDocument;
 
 public class DocumentUtils {
 

@@ -15,34 +15,42 @@ import org.junit.runners.Suite;
 import org.junit.runners.Suite.SuiteClasses;
 
 import com.reprezen.swagedit.assist.JsonReferenceProposalProviderTest;
+import com.reprezen.swagedit.assist.SwaggerContentAssistProcessorTest;
+import com.reprezen.swagedit.assist.SwaggerProposalProviderTest;
+import com.reprezen.swagedit.editor.SwaggerDocumentTest;
 import com.reprezen.swagedit.editor.hyperlinks.DefinitionHyperlinkDetectorTest;
 import com.reprezen.swagedit.editor.hyperlinks.JsonReferenceHyperlinkDetectorTest;
 import com.reprezen.swagedit.editor.hyperlinks.PathParamHyperlinkDetectorTest;
 import com.reprezen.swagedit.editor.outline.AbstractNodeTest;
 import com.reprezen.swagedit.editor.outline.OutlineStyledLabelProviderTest;
 import com.reprezen.swagedit.json.references.JsonReferenceFactoryTest;
+import com.reprezen.swagedit.schema.SwaggerSchemaTest;
+import com.reprezen.swagedit.templates.CodeTemplateContextTest;
 import com.reprezen.swagedit.validation.ErrorProcessorTest;
 import com.reprezen.swagedit.validation.MultipleSwaggerErrorMessageTest;
 import com.reprezen.swagedit.validation.ReferenceValidatorTest;
+import com.reprezen.swagedit.validation.ValidationMessageTest;
 import com.reprezen.swagedit.validation.ValidatorTest;
 
 @RunWith(Suite.class)
-@SuiteClasses({ SwaggerContentAssistProcessorTest.class,//
-        SwaggerDocumentTest.class,//
-        SwaggerProposalProviderTest.class,//
-        SwaggerSchemaTest.class,//
-        JsonReferenceHyperlinkDetectorTest.class,//
-        JsonReferenceFactoryTest.class,//
-        PathParamHyperlinkDetectorTest.class,//
-        DefinitionHyperlinkDetectorTest.class,//
-        ValidationMessageTest.class,//
-        ValidatorTest.class,//
-        CodeTemplateContextTest.class,//
-        ErrorProcessorTest.class,//
-        MultipleSwaggerErrorMessageTest.class,//
-        ReferenceValidatorTest.class,//
-        JsonReferenceProposalProviderTest.class,//
-        AbstractNodeTest.class,//
-        OutlineStyledLabelProviderTest.class })
+@SuiteClasses({ //
+        JsonReferenceProposalProviderTest.class, //
+        SwaggerContentAssistProcessorTest.class, //
+        SwaggerProposalProviderTest.class, //
+        SwaggerDocumentTest.class, //
+        DefinitionHyperlinkDetectorTest.class, //
+        JsonReferenceHyperlinkDetectorTest.class, //
+        PathParamHyperlinkDetectorTest.class, //
+        AbstractNodeTest.class, //
+        OutlineStyledLabelProviderTest.class, //
+        SwaggerSchemaTest.class, //
+        JsonReferenceFactoryTest.class, //
+        CodeTemplateContextTest.class, //
+        ErrorProcessorTest.class, //
+        MultipleSwaggerErrorMessageTest.class, //
+        ReferenceValidatorTest.class, //
+        ValidationMessageTest.class, //
+        ValidatorTest.class //
+})
 public class TestSuite {
 }

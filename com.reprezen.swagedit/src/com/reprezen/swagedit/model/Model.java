@@ -1,5 +1,9 @@
 package com.reprezen.swagedit.model;
 
+import static com.reprezen.swagedit.model.NodeDeserializer.ATTRIBUTE_MODEL;
+import static com.reprezen.swagedit.model.NodeDeserializer.ATTRIBUTE_PARENT;
+import static com.reprezen.swagedit.model.NodeDeserializer.ATTRIBUTE_POINTER;
+
 import java.io.IOException;
 import java.util.Iterator;
 import java.util.LinkedHashMap;
@@ -10,54 +14,94 @@ import com.fasterxml.jackson.databind.ObjectMapper;
 import com.fasterxml.jackson.databind.module.SimpleModule;
 import com.fasterxml.jackson.dataformat.yaml.YAMLFactory;
 import com.google.common.base.Strings;
+import com.reprezen.swagedit.schema.SwaggerSchema;
 
+/**
+ * Represents the content of a YAML/JSON document.
+ *
+ */
 public class Model {
 
     private final Map<JsonPointer, AbstractNode> nodes = new LinkedHashMap<>();
+    private final SwaggerSchema schema;
 
-    public static Model parseYaml(String text) throws IOException {
-        final ObjectMapper mapper = new ObjectMapper(new YAMLFactory());
-        final SimpleModule module = new SimpleModule();
-        module.addDeserializer(AbstractNode.class, new NodeDeserializer());
-        mapper.registerModule(module);
+    Model(SwaggerSchema schema) {
+        this.schema = schema;
+    }
 
-        Model model = new Model();
-        mapper.reader() //
-                .withAttribute("model", model) //
-                .withAttribute("parent", null) //
-                .withAttribute("pointer", JsonPointer.compile("")) //
-                .withType(AbstractNode.class) //
-                .readValue(text);
+    /**
+     * Returns an empty model
+     * 
+     * @param schema
+     * @return empty model
+     */
+    public static Model empty(SwaggerSchema schema) {
+        Model model = new Model(schema);
+        ObjectNode root = new ObjectNode(null, JsonPointer.compile(""));
+        root.setType(model.schema.getType(root));
+        model.add(root);
 
         return model;
     }
 
-    public AbstractNode find(String path) {
-        if (Strings.emptyToNull(path) == null || path.equals(":")) {
-            return getRoot();
+    /**
+     * Returns a model build by parsing a YAML content.
+     * 
+     * @param text
+     * @return model
+     */
+    public static Model parseYaml(SwaggerSchema schema, String text) {
+        if (Strings.emptyToNull(text) == null) {
+            return empty(schema);
         }
 
-        return nodes.get(pointer(path));
+        Model model = new Model(schema);
+        try {
+            createMapper().reader() //
+                    .withAttribute(ATTRIBUTE_MODEL, model) //
+                    .withAttribute(ATTRIBUTE_PARENT, null) //
+                    .withAttribute(ATTRIBUTE_POINTER, JsonPointer.compile("")) //
+                    .withType(AbstractNode.class) //
+                    .readValue(text);
+        } catch (IllegalArgumentException | IOException e) {
+            // model.addError(e);
+        }
+
+        for (AbstractNode node : model.allNodes()) {
+            node.setType(model.schema.getType(node));
+        }
+
+        return model;
     }
 
-    protected JsonPointer pointer(String pointer) {
-        return JsonPointer.compile(pointer.replaceAll("/", "~1").replaceAll(":", "/"));
+    protected static ObjectMapper createMapper() {
+        final ObjectMapper mapper = new ObjectMapper(new YAMLFactory());
+        final SimpleModule module = new SimpleModule();
+        module.addDeserializer(AbstractNode.class, new NodeDeserializer());
+        mapper.registerModule(module);
+        return mapper;
+    }
+
+    public AbstractNode find(JsonPointer pointer) {
+        return nodes.get(pointer);
     }
 
     public void add(AbstractNode node) {
-        nodes.put(node.getPointer(), node);
+        if (node != null && node.getPointer() != null) {
+            nodes.put(node.getPointer(), node);
+        }
     }
 
     public AbstractNode getRoot() {
         return nodes.get(JsonPointer.compile(""));
     }
 
-    public String getPath(int line, int column) {
+    public JsonPointer getPath(int line, int column) {
         AbstractNode node = getNode(line, column);
         if (node != null) {
-            return node.getPointer().toString();
+            return node.getPointer();
         }
-        return "";
+        return JsonPointer.compile("");
     }
 
     public AbstractNode getNode(int line, int column) {
@@ -66,9 +110,11 @@ public class Model {
         }
 
         AbstractNode found = forLine(line);
-        if (found != null) {
 
-            int c = startColumn(found) + Strings.nullToEmpty(found.getProperty()).length();
+        if (found != null) {
+            found = findChildren(found, line, column);
+
+            int c = startColumn(found);
             if (column >= c) {
                 return found;
             } else {
@@ -77,22 +123,42 @@ public class Model {
 
         } else {
             found = findBeforeLine(line, column);
-
             if (found != null) {
-                if (startColumn(found) <= column) {
-                    return found;
-                } else {
-                    return found.getParent();
-                }
+                return findCorrectNode(found, column);
             }
         }
 
-        return null;
+        return found;
+    }
+
+    protected AbstractNode findChildren(AbstractNode current, int line, int column) {
+        for (AbstractNode el : current.elements()) {
+            if (startLine(el) == line) {
+                if (column >= (el.getLocation().getColumnNr() - 1)) {
+                    return el;
+                }
+            }
+        }
+        return current;
+    }
+
+    protected AbstractNode findCorrectNode(AbstractNode current, int column) {
+        if (startColumn(current) == column) {
+            if (current.getParent() instanceof ObjectNode) {
+                return current.getParent();
+            }
+        }
+
+        if (startColumn(current) < column) {
+            return current;
+        } else {
+            return findCorrectNode(current.getParent(), column);
+        }
     }
 
     protected AbstractNode forLine(int line) {
         final AbstractNode root = getRoot();
-        for (AbstractNode node : nodes.values()) {
+        for (AbstractNode node : allNodes()) {
             if (node != root && startLine(node) == line) {
                 return node;
             }
@@ -103,7 +169,7 @@ public class Model {
     protected AbstractNode findBeforeLine(int line, int column) {
         AbstractNode root = getRoot();
         AbstractNode found = null, before = null;
-        Iterator<AbstractNode> it = nodes.values().iterator();
+        Iterator<AbstractNode> it = allNodes().iterator();
 
         while (found == null && it.hasNext()) {
             AbstractNode current = it.next();
@@ -112,9 +178,7 @@ public class Model {
             }
 
             if (startLine(current) < line) {
-                if (contentColumn(current) <= column) {
-                    before = current;
-                }
+                before = current;
             } else {
                 found = before;
             }
@@ -148,10 +212,11 @@ public class Model {
     }
 
     protected int contentColumn(AbstractNode n) {
-        return n.getLocation().getColumnNr() - 1;
+        return Strings.nullToEmpty(n.getProperty()).length() + (n.getLocation().getColumnNr() - 1);
     }
 
     public Iterable<AbstractNode> allNodes() {
         return nodes.values();
     }
+
 }

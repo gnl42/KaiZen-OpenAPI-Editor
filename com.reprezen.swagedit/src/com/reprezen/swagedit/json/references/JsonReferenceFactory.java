@@ -10,6 +10,8 @@
  *******************************************************************************/
 package com.reprezen.swagedit.json.references;
 
+import static com.reprezen.swagedit.json.references.JsonReference.PROPERTY;
+
 import java.net.URI;
 
 import org.yaml.snakeyaml.nodes.ScalarNode;
@@ -17,7 +19,9 @@ import org.yaml.snakeyaml.nodes.ScalarNode;
 import com.fasterxml.jackson.core.JsonPointer;
 import com.fasterxml.jackson.databind.JsonNode;
 import com.google.common.base.Strings;
+import com.reprezen.swagedit.model.AbstractNode;
 import com.reprezen.swagedit.utils.URLUtils;
+
 
 /**
  * JSON Reference Factory
@@ -27,12 +31,24 @@ import com.reprezen.swagedit.utils.URLUtils;
  */
 public class JsonReferenceFactory {
 
+    public JsonReference create(AbstractNode node) {
+        if (node == null) {
+            return new JsonReference(null, null, false, false, false, node);
+        }
+
+        if (node.isObject() && node.get(JsonReference.PROPERTY) != null) {
+            node = node.get(JsonReference.PROPERTY);
+        }
+
+        return doCreate((String) node.asValue().getValue(), node);
+    }
+
     public JsonReference create(JsonNode node) {
         if (node == null || node.isMissingNode()) {
             return new JsonReference(null, null, false, false, false, node);
         }
 
-        String text = node.isTextual() ? node.asText() : node.get("$ref").asText();
+        String text = node.isTextual() ? node.asText() : node.get(PROPERTY).asText();
 
         return doCreate(text, node);
     }
