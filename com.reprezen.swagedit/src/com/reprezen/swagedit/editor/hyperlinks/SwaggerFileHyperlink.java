@@ -21,17 +21,18 @@ import org.eclipse.ui.PlatformUI;
 import org.eclipse.ui.ide.IDE;
 import org.eclipse.ui.texteditor.ITextEditor;
 
-import com.reprezen.swagedit.editor.DocumentUtils;
+import com.fasterxml.jackson.core.JsonPointer;
 import com.reprezen.swagedit.editor.SwaggerDocument;
+import com.reprezen.swagedit.utils.DocumentUtils;
 
 public class SwaggerFileHyperlink implements IHyperlink {
 
     private final IRegion linkRegion;
     private final String label;
     private final IFile file;
-    private final String pointer;
+    private final JsonPointer pointer;
 
-    public SwaggerFileHyperlink(IRegion linkRegion, String label, IFile file, String pointer) {
+    public SwaggerFileHyperlink(IRegion linkRegion, String label, IFile file, JsonPointer pointer) {
         this.linkRegion = linkRegion;
         this.label = label;
         this.file = file;

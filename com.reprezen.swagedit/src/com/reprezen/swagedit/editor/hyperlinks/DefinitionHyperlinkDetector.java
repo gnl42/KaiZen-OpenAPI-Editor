@@ -19,8 +19,9 @@ import org.eclipse.jface.text.IRegion;
 import org.eclipse.jface.text.ITextViewer;
 import org.eclipse.jface.text.hyperlink.IHyperlink;
 
-import com.fasterxml.jackson.databind.JsonNode;
+import com.fasterxml.jackson.core.JsonPointer;
 import com.reprezen.swagedit.editor.SwaggerDocument;
+import com.reprezen.swagedit.model.AbstractNode;
 
 /**
  * Hyperlink detector that detects links to and inside schema definition elements.
@@ -28,26 +29,28 @@ import com.reprezen.swagedit.editor.SwaggerDocument;
  */
 public class DefinitionHyperlinkDetector extends AbstractSwaggerHyperlinkDetector {
 
-    protected static final String TAGS_PATTERN = "^[:\\W+|\\w+]*:tags([:\\W+|\\w+]+)";
-    protected static final String REQUIRED_PATTERN = "^([:\\W+|\\w+]+)(:required[:\\W+|\\w+]+)";
+    protected static final String TAGS_PATTERN = "^[/\\W+|\\w+]*/tags([/\\W+|\\w+]+)";
+    protected static final String REQUIRED_PATTERN = "^([/\\W+|\\w+]+)(/required[/\\W+|\\w+]+)";
 
     @Override
-    protected boolean canDetect(String basePath) {
-        return emptyToNull(basePath) != null && (basePath.matches(REQUIRED_PATTERN) || basePath.matches(TAGS_PATTERN));
+    protected boolean canDetect(JsonPointer pointer) {
+        return pointer != null
+                && (pointer.toString().matches(REQUIRED_PATTERN) || pointer.toString().matches(TAGS_PATTERN));
     }
 
     @Override
-    protected IHyperlink[] doDetect(SwaggerDocument doc, ITextViewer viewer, HyperlinkInfo info, String basePath) {
-        String targetPath;
-        if (basePath.matches(REQUIRED_PATTERN)) {
-            targetPath = getRequiredPropertyPath(doc, info, basePath);
+    protected IHyperlink[] doDetect(SwaggerDocument doc, ITextViewer viewer, HyperlinkInfo info, JsonPointer pointer) {
+        JsonPointer targetPath;
+        if (pointer.toString().matches(REQUIRED_PATTERN)) {
+            targetPath = getRequiredPropertyPath(doc, info, pointer);
         } else {
-            targetPath = getTagDefinitionPath(doc, info, basePath);
+            targetPath = getTagDefinitionPath(doc, info, pointer);
         }
 
         if (targetPath == null) {
             return null;
         }
+
 
         IRegion target = doc.getRegion(targetPath);
         if (target == null) {
@@ -57,8 +60,8 @@ public class DefinitionHyperlinkDetector extends AbstractSwaggerHyperlinkDetecto
         return new IHyperlink[] { new SwaggerHyperlink(info.text, viewer, info.region, target) };
     }
 
-    protected String getRequiredPropertyPath(SwaggerDocument doc, HyperlinkInfo info, String basePath) {
-        Matcher matcher = Pattern.compile(REQUIRED_PATTERN).matcher(basePath);
+    protected JsonPointer getRequiredPropertyPath(SwaggerDocument doc, HyperlinkInfo info, JsonPointer pointer) {
+        Matcher matcher = Pattern.compile(REQUIRED_PATTERN).matcher(pointer.toString());
         String containerPath = null;
         if (matcher.find()) {
             containerPath = matcher.group(1);
@@ -68,19 +71,18 @@ public class DefinitionHyperlinkDetector extends AbstractSwaggerHyperlinkDetecto
             return null;
         }
 
-        JsonNode container = doc.getNodeForPath(containerPath);
-        if (container.at("/properties/" + info.text) != null) {
-            return containerPath + ":properties:" + info.text;
+        AbstractNode container = doc.getModel().find(JsonPointer.compile(containerPath));
+        if (container.get("properties") != null && container.get("properties").get(info.text) != null) {
+            return container.get("properties").get(info.text).getPointer();
         } else {
             return null;
         }
     }
 
-    protected String getTagDefinitionPath(SwaggerDocument doc, HyperlinkInfo info, String basePath) {
-        String path = "/definitions/" + info.text;
-        JsonNode definition = doc.asJson().at(path);
+    protected JsonPointer getTagDefinitionPath(SwaggerDocument doc, HyperlinkInfo info, JsonPointer pointer) {
+        AbstractNode node = doc.getModel().find(JsonPointer.compile("/definitions/" + info.text));
 
-        return definition != null ? ":definitions:" + info.text : null;
+        return node != null ? node.getPointer() : null;
     }
 
 }

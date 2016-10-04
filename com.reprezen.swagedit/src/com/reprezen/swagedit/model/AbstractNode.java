@@ -1,62 +1,82 @@
+/*******************************************************************************
+ * Copyright (c) 2016 ModelSolv, Inc. and others.
+ * All rights reserved. This program and the accompanying materials
+ * are made available under the terms of the Eclipse Public License v1.0
+ * which accompanies this distribution, and is available at
+ * http://www.eclipse.org/legal/epl-v10.html
+ *
+ * Contributors:
+ *    ModelSolv, Inc. - initial API and implementation and/or initial documentation
+ *******************************************************************************/
 package com.reprezen.swagedit.model;
 
 import java.util.Collections;
 import java.util.Objects;
-import java.util.Set;
 
 import org.eclipse.jface.text.BadLocationException;
 import org.eclipse.jface.text.IDocument;
 import org.eclipse.jface.text.Position;
 
-import com.fasterxml.jackson.core.JsonLocation;
 import com.fasterxml.jackson.core.JsonPointer;
-import com.fasterxml.jackson.databind.JsonNode;
 import com.google.common.collect.Iterables;
-import com.reprezen.swagedit.json.JsonType;
-import com.reprezen.swagedit.json.SchemaDefinition;
-import com.reprezen.swagedit.json.SchemaDefinitionProvider;
+import com.reprezen.swagedit.schema.TypeDefinition;
 
+/**
+ * Represents a Node inside a YAML/JSON document.
+ * 
+ * <br/>
+ * 
+ * Nodes can be either Values, Objects or Arrays. They can contain other elements or simply a value. They contain also
+ * information about their location inside a document. A node can be given a type from a JSON schema.
+ *
+ */
 public abstract class AbstractNode {
 
-    private static SchemaDefinitionProvider provider = new SchemaDefinitionProvider();
-
     private final JsonPointer pointer;
+    private final AbstractNode parent;
     private String property;
-    private AbstractNode parent;
-    private JsonType type;
-    private JsonNode schema;
 
-    public final Set<SchemaDefinition> definitions;
-
-    private JsonLocation location;
-
-    private JsonLocation start;
-
-    private JsonLocation end;
+    private TypeDefinition type;
+    private Location start;
+    private Location end;
 
     AbstractNode(AbstractNode parent, JsonPointer ptr) {
-        this(parent, ptr, null);
-    }
-
-    AbstractNode(AbstractNode parent, JsonPointer ptr, JsonLocation location) {
         this.parent = parent;
         this.pointer = ptr;
-        this.location = location;
-        this.definitions = provider.getDefinitions(pointer(ptr));
-        this.schema = definitions.isEmpty() ? null : Iterables.getFirst(definitions, null).definition;
-        this.type = schema != null ? JsonType.valueOf(this.schema) : null;
     }
 
-    public AbstractNode get(int pos) {
+    /**
+     * Returns the child node that is contained at the given index.
+     * 
+     * @param pos
+     * @return node
+     */
+    public AbstractNode get(int index) {
         return null;
     }
 
+    /**
+     * Returns the child node that is contained by the given property.
+     * 
+     * @param property
+     * @return node
+     */
     public AbstractNode get(String property) {
         return null;
     }
 
+    /**
+     * Returns true if the node is an object.
+     * 
+     * @return true if object
+     */
     public abstract boolean isObject();
 
+    /**
+     * Returns true if the node is an array.
+     * 
+     * @return true if array
+     */
     public abstract boolean isArray();
 
     public ObjectNode asObject() {
@@ -71,30 +91,28 @@ public abstract class AbstractNode {
         return (ValueNode) this;
     }
 
-    public JsonLocation getLocation() {
-        return location;
-    }
-
-    protected static String pointer(JsonPointer pointer) {
-        return pointer.toString().replaceAll("/", ":").replaceAll("~1", "/");
-    }
-
+    /**
+     * Returns the JSON pointer that identifies this node.
+     * 
+     * @return JSON pointer
+     */
     public JsonPointer getPointer() {
         return pointer;
     }
 
-    public JsonType getType() {
+    public void setType(TypeDefinition type) {
+        this.type = type;
+    }
+
+    public TypeDefinition getType() {
         return type;
     }
 
-    public JsonNode getSchema() {
-        return schema;
-    }
-
-    public Set<SchemaDefinition> getDefinitions() {
-        return definitions;
-    }
-
+    /**
+     * Returns the parent node that contains this node, or null if the node is the root node.
+     * 
+     * @return parent node
+     */
     public AbstractNode getParent() {
         return parent;
     }
@@ -107,44 +125,73 @@ public abstract class AbstractNode {
         this.property = name;
     }
 
+    /**
+     * Returns the children elements of this node.
+     * 
+     * @return node's children
+     */
     public Iterable<AbstractNode> elements() {
         return Collections.emptyList();
     }
 
-    public abstract String getText();
-
-    public Position getPosition(IDocument document) {
-        JsonLocation location = getStart() != null ? getStart() : getLocation();
-        if (location != null) {
-
-            int startLine = location.getLineNr() - 1;
-            int offset = 0;
-            int length = 0;
-            try {
-                offset = document.getLineOffset(startLine);
-                length = document.getLineOffset(startLine + 1) - offset;
-            } catch (BadLocationException e) {
-                return new Position(0);
-            }
-
-            return new Position(Math.max(0, offset), length);
-        }
-        return new Position(0);
+    /**
+     * Returns the number of elements contained by this node.
+     * 
+     * @return size of children
+     */
+    public int size() {
+        return Iterables.size(elements());
     }
 
-    public void setStartLocation(JsonLocation start) {
+    public abstract String getText();
+
+    /**
+     * Returns the position of the node inside the given document. <br/>
+     * The position matches the area that contains all the node's content.
+     * 
+     * @param document
+     * @return position inside the document
+     */
+    public Position getPosition(IDocument document) {
+        int startLine = getStart().getLine();
+        int offset = 0;
+        int length = 0;
+
+        int endLine = getEnd().getLine();
+        int endCol = getEnd().getColumn();
+        try {
+            offset = document.getLineOffset(startLine);
+            length = (document.getLineOffset(endLine) + endCol) - offset;
+        } catch (BadLocationException e) {
+            return new Position(0);
+        }
+
+        return new Position(Math.max(0, offset), length);
+    }
+
+    public void setStartLocation(Location start) {
         this.start = start;
     }
 
-    public void setEndLocation(JsonLocation location) {
+    public void setEndLocation(Location location) {
         this.end = location;
     }
 
-    public JsonLocation getStart() {
+    /**
+     * Returns the start location of this node.
+     * 
+     * @return start location
+     */
+    public Location getStart() {
         return start;
     }
 
-    public JsonLocation getEnd() {
+    /**
+     * Returns the end location of this node.
+     * 
+     * @return end location
+     */
+    public Location getEnd() {
         return end;
     }
 

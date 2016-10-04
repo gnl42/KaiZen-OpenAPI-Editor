@@ -10,216 +10,211 @@
  *******************************************************************************/
 package com.reprezen.swagedit.assist;
 
+import java.util.ArrayList;
+import java.util.Collection;
 import java.util.Collections;
 import java.util.HashSet;
-import java.util.Iterator;
 import java.util.LinkedHashSet;
-import java.util.Set;
+import java.util.List;
+import java.util.Objects;
 
 import org.apache.commons.lang3.math.NumberUtils;
 
+import com.fasterxml.jackson.core.JsonPointer;
 import com.fasterxml.jackson.databind.JsonNode;
-import com.google.common.collect.Sets;
-import com.reprezen.swagedit.editor.SwaggerDocument;
-import com.reprezen.swagedit.json.JsonType;
-import com.reprezen.swagedit.json.JsonUtil;
-import com.reprezen.swagedit.json.SchemaDefinition;
-import com.reprezen.swagedit.json.SchemaDefinitionProvider;
+import com.google.common.collect.Lists;
+import com.reprezen.swagedit.model.AbstractNode;
+import com.reprezen.swagedit.model.Model;
+import com.reprezen.swagedit.schema.ArrayTypeDefinition;
+import com.reprezen.swagedit.schema.ComplexTypeDefinition;
+import com.reprezen.swagedit.schema.JsonType;
+import com.reprezen.swagedit.schema.MultipleTypeDefinition;
+import com.reprezen.swagedit.schema.ObjectTypeDefinition;
+import com.reprezen.swagedit.schema.TypeDefinition;
 
 /**
  * Provider of completion proposals.
  */
-public class SwaggerProposalProvider extends AbstractProposalProvider {
+public class SwaggerProposalProvider {
 
-    private final SchemaDefinitionProvider walker = new SchemaDefinitionProvider();
+    public Collection<Proposal> getProposals(JsonPointer pointer, Model model) {
+        final AbstractNode node = model.find(pointer);
 
-    @Override
-    protected Iterable<JsonNode> createProposals(String path, SwaggerDocument document, int cycle) {
-        return createProposals(document.getNodeForPath(path), walker.getDefinitions(path));
+        if (node == null) {
+            return Collections.emptyList();
+        }
+        return getProposals(node.getType(), node);
     }
 
-    /**
-     * Returns a list of proposals for the given data and set of schema definition.
-     * 
-     * @param data
-     * @param definitions
-     * @return proposals
-     */
-    public Set<JsonNode> createProposals(JsonNode data, Set<SchemaDefinition> definitions) {
-        Set<JsonNode> proposals = new HashSet<>();
-        for (SchemaDefinition definition : definitions) {
-            Set<JsonNode> pp = createProposals(data, definition);
-            if (!pp.isEmpty()) {
-                proposals.addAll(pp);
-            }
-        }
-
-        return proposals;
+    public Collection<Proposal> getProposals(AbstractNode node) {
+        return getProposals(node.getType(), node);
     }
 
-    /**
-     * Returns a list of proposals for the given data and schema definition.
-     * 
-     * A proposal is a JSON object of the following format: <code>
-     * {
-     *   value: string,
-     *   label: string
-     * }
-     * </code>
-     * 
-     * @param schema
-     * @param data
-     * @param definition
-     * @return proposal
-     */
-    public Set<JsonNode> createProposals(JsonNode data, SchemaDefinition definition) {
-        if (definition == null) {
-            return Collections.emptySet();
-        }
-
-        switch (definition.type) {
-        case OBJECT:
-            return createObjectProposal(data, definition);
+    protected Collection<Proposal> getProposals(TypeDefinition type, AbstractNode node) {
+        switch (type.getType()) {
         case STRING:
-            return createStringProposal(data, definition);
+        case INTEGER:
+        case NUMBER:
+            return createPrimitiveProposals(type);
         case BOOLEAN:
-            return createBooleanProposal(data, definition);
+            return createBooleanProposals(type);
         case ENUM:
-            return createEnumProposal(data, definition);
-        case ONE_OF:
-            return createOneOfProposal(data, definition);
+            return createEnumProposals(type, node);
         case ARRAY:
-            return createArrayProposal(data, definition);
-        case ANY_OF:
-            return createAnyOfProposal(data, definition);
+            return createArrayProposals((ArrayTypeDefinition) type, node);
+        case OBJECT:
+            return createObjectProposals((ObjectTypeDefinition) type, node);
         case ALL_OF:
-            return createAllOfProposal(data, definition);
-        default:
-            return Sets.newHashSet();
-        }
-    }
-
-    private Set<JsonNode> createArrayProposal(JsonNode data, SchemaDefinition definition) {
-        final Set<JsonNode> proposals = new LinkedHashSet<>();
-        proposals.add(mapper.createObjectNode().put("value", "-").put("label", "-").put("type", "array item"));
-
-        return proposals;
-    }
-
-    private Set<JsonNode> createOneOfProposal(JsonNode data, SchemaDefinition definition) {
-        return collect(data, definition, new LinkedHashSet<JsonNode>());
-    }
-
-    private Set<JsonNode> createAnyOfProposal(JsonNode data, SchemaDefinition definition) {
-        return collect(data, definition, new LinkedHashSet<JsonNode>());
-    }
-
-    private Set<JsonNode> createAllOfProposal(JsonNode data, SchemaDefinition definition) {
-        return collect(data, definition, new LinkedHashSet<JsonNode>());
-    }
-
-    private Set<JsonNode> collect(JsonNode data, SchemaDefinition definition, Set<JsonNode> acc) {
-        final JsonType type = definition.type;
-
-        if (JsonType.ONE_OF == type || JsonType.ANY_OF == type) {
-            if (definition.definition.has(type.getValue())) {
-                final JsonNode all = definition.definition.get(type.getValue());
-
-                if (all.isObject()) {
-                    acc.addAll(collect(data, JsonUtil.getReference(definition.schema, all), acc));
-                } else if (all.isArray()) {
-                    for (JsonNode one : all) {
-                        acc.addAll(collect(data, JsonUtil.getReference(definition.schema, one), acc));
-                    }
+        case ANY_OF:
+        case ONE_OF:
+            return createComplextTypeProposals((ComplexTypeDefinition) type, node);
+        case UNDEFINED:
+            Collection<Proposal> proposals = new LinkedHashSet<>();
+            if (type instanceof MultipleTypeDefinition) {
+                for (TypeDefinition currentType : ((MultipleTypeDefinition) type).getMultipleTypes()) {
+                    proposals.addAll(getProposals(currentType, node));
                 }
             }
+            return proposals;
+        }
+        return Collections.emptyList();
+    }
+
+    protected Collection<Proposal> createPrimitiveProposals(TypeDefinition type) {
+        String label;
+        if (type.getType() == JsonType.UNDEFINED) {
+            label = type.getContainingProperty();
         } else {
-            acc.addAll(createProposals(data, JsonUtil.getReference(definition.schema, definition.definition)));
+            label = type.getType().getValue();
         }
 
-        return acc;
+        return Lists.newArrayList(new Proposal("", "", type.getDescription(), label));
     }
 
-    private Set<JsonNode> createEnumProposal(JsonNode data, SchemaDefinition definition) {
-        final Set<JsonNode> proposals = new LinkedHashSet<>();
+    protected Collection<Proposal> createBooleanProposals(TypeDefinition type) {
+        Collection<Proposal> proposals = new ArrayList<>();
 
-        final String type = definition.definition.has("type") ? definition.definition.get("type").asText() : null;
+        String label = type.getContainingProperty();
 
-        for (JsonNode literal : definition.definition.get("enum")) {
-            String value = literal.asText();
+        proposals.add(new Proposal("true", "true", type.getDescription(), label));
+        proposals.add(new Proposal("false", "false", type.getDescription(), label));
 
-            // if the type of array is string and
-            // current value is a number, it should be put
-            // into quotes to avoid validation issues
-            if (NumberUtils.isNumber(value) && "string".equals(type)) {
-                value = "\"" + value + "\"";
+        return proposals;
+    }
+
+    protected Proposal createPropertyProposal(String key, TypeDefinition type) {
+        if (type != null) {
+            String label;
+            if (Objects.equals(key, type.getContainingProperty())) {
+                label = type.getType().getValue();
+            } else {
+                label = type.getContainingProperty();
             }
 
-            proposals.add(mapper.createObjectNode().put("value", value).put("label", literal.asText()));
+            return new Proposal(key + ":", key, type.getDescription(), label);
+        } else {
+            return null;
         }
-
-        return proposals;
     }
 
-    private Set<JsonNode> createStringProposal(JsonNode data, SchemaDefinition definition) {
-        Set<JsonNode> proposals = new LinkedHashSet<>();
-        proposals.add(mapper.createObjectNode().put("value", "").put("label", "").put("type", "string"));
+    protected Collection<Proposal> createObjectProposals(ObjectTypeDefinition type, AbstractNode element) {
+        final Collection<Proposal> proposals = new LinkedHashSet<>();
 
-        return proposals;
-    }
-
-    private Set<JsonNode> createBooleanProposal(JsonNode data, SchemaDefinition definition) {
-        Set<JsonNode> proposals = new LinkedHashSet<>();
-        proposals.add(mapper.createObjectNode().put("value", "true").put("label", "true"));
-        proposals.add(mapper.createObjectNode().put("value", "false").put("label", "false"));
-
-        return proposals;
-    }
-
-    private Set<JsonNode> createObjectProposal(JsonNode data, SchemaDefinition definition) {
-        Set<JsonNode> proposals = new LinkedHashSet<>();
-
-        if (definition.definition.has("properties")) {
-            final JsonNode properties = definition.definition.get("properties");
-
-            for (Iterator<String> it = properties.fieldNames(); it.hasNext();) {
-                final String key = it.next();
-
-                if (data == null || !data.has(key)) {
-                    proposals.add(createPropertyProposal(definition, key, properties.get(key)));
+        for (String property : type.getProperties().keySet()) {
+            if (element.get(property) == null) {
+                Proposal proposal = createPropertyProposal(property, type.getProperties().get(property));
+                if (proposal != null) {
+                    proposals.add(proposal);
                 }
             }
         }
 
-        if (definition.definition.has("patternProperties")) {
-            final JsonNode properties = definition.definition.get("patternProperties");
+        for (String property : type.getPatternProperties().keySet()) {
+            TypeDefinition typeDef = type.getPatternProperties().get(property);
 
-            for (Iterator<String> it = properties.fieldNames(); it.hasNext();) {
-                String key = it.next();
-                final JsonNode value = properties.get(key);
+            if (property.startsWith("^")) {
+                property = property.substring(1);
+            }
 
-                if (key.startsWith("^")) {
-                    key = key.substring(1);
+            Proposal proposal = createPropertyProposal(property, typeDef);
+            if (proposal != null) {
+                proposals.add(proposal);
+            }
+        }
+
+        for (String property : type.getAdditionalProperties().keySet()) {
+            if (element.get(property) == null) {
+                Proposal proposal = createPropertyProposal(property, type.getAdditionalProperties().get(property));
+                if (proposal != null) {
+                    proposals.add(proposal);
                 }
-
-                proposals.add(createPropertyProposal(definition, key, value));
             }
         }
 
         if (proposals.isEmpty()) {
-            proposals.add(mapper.createObjectNode().put("value", "_key_" + ":").put("label", "_key_"));
+            proposals.add(new Proposal("_key_" + ":", "_key_", null, null));
         }
 
         return proposals;
     }
 
-    private JsonNode createPropertyProposal(SchemaDefinition definition, String key, JsonNode value) {
-        final SchemaDefinition resolvedDefinition = JsonUtil.getReference(definition.schema, value);
-        final JsonType type = resolvedDefinition.type;
+    protected Collection<Proposal> createArrayProposals(ArrayTypeDefinition type, AbstractNode node) {
+        Collection<Proposal> proposals = new ArrayList<>();
 
-        return mapper.createObjectNode().put("value", key + ":").put("label", key).put("type",
-                type == JsonType.UNDEFINED && resolvedDefinition.descriptor != null ? resolvedDefinition.descriptor
-                        : type.getValue());
+        if (type.itemsType.getType() == JsonType.ENUM) {
+            String replStr;
+            for (String literal : enumLiterals(type.itemsType)) {
+                replStr = "- " + literal;
+
+                proposals.add(new Proposal(replStr, literal, type.itemsType.getDescription(),
+                        type.itemsType.getContainingProperty()));
+            }
+        } else {
+            proposals.add(new Proposal("-", "-", type.getDescription(), "array item"));
+        }
+
+        return proposals;
+    }
+
+    protected Collection<Proposal> createComplextTypeProposals(ComplexTypeDefinition type, AbstractNode node) {
+        final Collection<Proposal> proposals = new HashSet<>();
+
+        for (TypeDefinition definition : type.getComplexTypes()) {
+            proposals.addAll(getProposals(definition, node));
+        }
+
+        return proposals;
+    }
+
+    protected List<String> enumLiterals(TypeDefinition type) {
+        List<String> literals = new ArrayList<>();
+        for (JsonNode literal : type.asJson().get("enum")) {
+            literals.add(literal.asText());
+        }
+        return literals;
+    }
+
+    protected Collection<Proposal> createEnumProposals(TypeDefinition type, AbstractNode node) {
+        final Collection<Proposal> proposals = new ArrayList<>();
+        final String subType = type.asJson().has("type") ? //
+                type.asJson().get("type").asText() : //
+                null;
+
+        String replStr;
+        for (String literal : enumLiterals(type)) {
+            // if the type of array is string and
+            // current value is a number, it should be put
+            // into quotes to avoid validation issues
+            if (NumberUtils.isNumber(literal) && "string".equals(subType)) {
+                replStr = "\"" + literal + "\"";
+            } else {
+                replStr = literal;
+            }
+
+            proposals.add(new Proposal(replStr, literal, type.getDescription(), type.getContainingProperty()));
+        }
+
+        return proposals;
     }
 
 }

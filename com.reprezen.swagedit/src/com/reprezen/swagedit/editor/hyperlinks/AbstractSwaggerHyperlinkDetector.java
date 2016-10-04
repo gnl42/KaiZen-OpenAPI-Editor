@@ -19,6 +19,7 @@ import org.eclipse.jface.text.Region;
 import org.eclipse.jface.text.hyperlink.AbstractHyperlinkDetector;
 import org.eclipse.jface.text.hyperlink.IHyperlink;
 
+import com.fasterxml.jackson.core.JsonPointer;
 import com.reprezen.swagedit.editor.SwaggerDocument;
 
 public abstract class AbstractSwaggerHyperlinkDetector extends AbstractHyperlinkDetector {
@@ -58,8 +59,8 @@ public abstract class AbstractSwaggerHyperlinkDetector extends AbstractHyperlink
     @Override
     public IHyperlink[] detectHyperlinks(ITextViewer textViewer, IRegion region, boolean canShowMultipleHyperlinks) {
         SwaggerDocument document = (SwaggerDocument) textViewer.getDocument();
+        JsonPointer basePath = document.getPath(region);
 
-        String basePath = document.getPath(region);
         if (!canDetect(basePath)) {
             return null;
         }
@@ -72,10 +73,10 @@ public abstract class AbstractSwaggerHyperlinkDetector extends AbstractHyperlink
         return doDetect(document, textViewer, info, basePath);
     }
 
-    protected abstract boolean canDetect(String basePath);
+    protected abstract boolean canDetect(JsonPointer pointer);
 
     protected abstract IHyperlink[] doDetect(SwaggerDocument doc, ITextViewer viewer, HyperlinkInfo info,
-            String basePath);
+            JsonPointer pointer);
 
     protected HyperlinkInfo getHyperlinkInfo(ITextViewer viewer, IRegion region) {
         final SwaggerDocument document = (SwaggerDocument) viewer.getDocument();
@@ -106,7 +107,7 @@ public abstract class AbstractSwaggerHyperlinkDetector extends AbstractHyperlink
             return null;
         }
 
-        if (emptyToNull(text) == null) {
+        if (emptyToNull(text) == null || text.trim().equals(":") || text.trim().equals("$ref:")) {
             return null;
         }
 

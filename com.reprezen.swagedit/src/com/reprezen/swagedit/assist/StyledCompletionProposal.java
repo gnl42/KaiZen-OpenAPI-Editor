@@ -10,9 +10,11 @@
  *******************************************************************************/
 package com.reprezen.swagedit.assist;
 
+import org.eclipse.core.runtime.IProgressMonitor;
 import org.eclipse.jface.text.BadLocationException;
 import org.eclipse.jface.text.IDocument;
 import org.eclipse.jface.text.contentassist.ICompletionProposal;
+import org.eclipse.jface.text.contentassist.ICompletionProposalExtension5;
 import org.eclipse.jface.text.contentassist.ICompletionProposalExtension6;
 import org.eclipse.jface.text.contentassist.IContextInformation;
 import org.eclipse.jface.viewers.StyledString;
@@ -22,13 +24,15 @@ import org.eclipse.swt.graphics.Point;
 import com.reprezen.swagedit.Activator;
 import com.reprezen.swagedit.Activator.Icons;
 
-public class StyledCompletionProposal implements ICompletionProposal, ICompletionProposalExtension6 {
+public class StyledCompletionProposal
+        implements ICompletionProposal, ICompletionProposalExtension5, ICompletionProposalExtension6 {
 
     private final int replacementOffset;
     private final int replacementLength;
     private final String replacementString;
     private final StyledString label;
     private final int cursorPosition;
+    private String description;
 
     public StyledCompletionProposal(String replacement, StyledString label, int offset, int lenght, int position) {
         this.replacementString = replacement;
@@ -36,6 +40,10 @@ public class StyledCompletionProposal implements ICompletionProposal, ICompletio
         this.replacementOffset = offset;
         this.replacementLength = lenght;
         this.cursorPosition = position;
+    }
+
+    public void setDescription(String description) {
+        this.description = description;
     }
 
     @Override
@@ -59,12 +67,12 @@ public class StyledCompletionProposal implements ICompletionProposal, ICompletio
 
     @Override
     public String getAdditionalProposalInfo() {
-        return null;
+        return description;
     }
 
     @Override
     public String getDisplayString() {
-        return null;
+        return label.getString();
     }
 
     @Override
@@ -77,4 +85,12 @@ public class StyledCompletionProposal implements ICompletionProposal, ICompletio
         return null;
     }
 
+    public String getReplacementString() {
+        return replacementString;
+    }
+
+    @Override
+    public Object getAdditionalProposalInfo(IProgressMonitor monitor) {
+        return description;
+    }
 }

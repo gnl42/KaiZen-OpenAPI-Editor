@@ -27,7 +27,8 @@ public class SwaggerDocumentProvider extends FileDocumentProvider {
     protected IDocument createDocument(Object element) throws CoreException {
         IDocument document = super.createDocument(element);
         if (document != null) {
-            SwaggerScanner scanner = new SwaggerScanner(new ColorManager(), Activator.getDefault().getPreferenceStore());
+            SwaggerScanner scanner = new SwaggerScanner(new ColorManager(),
+                    Activator.getDefault().getPreferenceStore());
             Set<String> tokens = YAMLToken.VALID_TOKENS.keySet();
             FastPartitioner partitioner = new FastPartitioner(scanner, tokens.toArray(new String[tokens.size()]));
             document.setDocumentPartitioner(partitioner);

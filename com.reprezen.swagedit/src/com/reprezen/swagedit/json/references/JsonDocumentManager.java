@@ -8,7 +8,7 @@
  * Contributors:
  *    ModelSolv, Inc. - initial API and implementation and/or initial documentation
  *******************************************************************************/
-package com.reprezen.swagedit.json;
+package com.reprezen.swagedit.json.references;
 
 import java.io.IOException;
 import java.net.MalformedURLException;
@@ -23,7 +23,7 @@ import org.eclipse.core.resources.IFile;
 import com.fasterxml.jackson.databind.JsonNode;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import com.fasterxml.jackson.dataformat.yaml.YAMLFactory;
-import com.reprezen.swagedit.editor.DocumentUtils;
+import com.reprezen.swagedit.utils.DocumentUtils;
 
 /**
  * JsonDocumentManager
