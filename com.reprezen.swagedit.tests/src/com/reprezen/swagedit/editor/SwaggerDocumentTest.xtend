@@ -217,4 +217,22 @@ class SwaggerDocumentTest {
 		test.apply("/paths/~1testing/get/parameters/1", "2")
 	}
 
+	@Test
+	def void testPointerParameter() {
+		val doc = new SwaggerDocument
+		val test = Cursors.setUpPathTest('''
+			paths:
+			  /pets:
+			    get:
+			      parameters:
+			        - $r<1>ef: 's<2>ome_ref'
+			        - $<3>ref: 'some_o<4>ther_ref'
+		''', doc)
+
+		test.apply("/paths/~1pets/get/parameters/0", "1")
+		test.apply("/paths/~1pets/get/parameters/0/$ref", "2")
+		test.apply("/paths/~1pets/get/parameters/1", "3")
+		test.apply("/paths/~1pets/get/parameters/1/$ref", "4")
+	}
+
 }

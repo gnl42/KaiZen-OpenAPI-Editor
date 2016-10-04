@@ -125,29 +125,4 @@ class ModelTest {
 		assertEquals(schema.asJson.at("/definitions/parametersList/items".ptr), param1.asJson)
 	}
 
-	@Test
-	def void testLocations() {
-		val text = '''
-			paths:
-			  /pets:   
-			    get:
-			      summary: List all pets
-			      operationId: listPets
-			      tags:
-			        - pets
-			        - ds
-			      parameters:
-			        - name: foo
-			        - name: limit
-			          in: path
-		'''
-		
-		val model = Model.parseYaml(schema, text)		
-		val root = model.root
-		
-		val paths = root.get("paths")
-		// TODO
-		println( model.startLine(paths) )
-		println( model.startColumn(paths) )
-	}
 }

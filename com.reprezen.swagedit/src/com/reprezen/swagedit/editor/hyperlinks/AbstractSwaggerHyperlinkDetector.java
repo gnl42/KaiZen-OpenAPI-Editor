@@ -107,7 +107,7 @@ public abstract class AbstractSwaggerHyperlinkDetector extends AbstractHyperlink
             return null;
         }
 
-        if (emptyToNull(text) == null) {
+        if (emptyToNull(text) == null || text.trim().equals(":") || text.trim().equals("$ref:")) {
             return null;
         }
 
