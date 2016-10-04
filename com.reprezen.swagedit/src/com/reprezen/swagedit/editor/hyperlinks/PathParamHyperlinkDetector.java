@@ -99,8 +99,7 @@ public class PathParamHyperlinkDetector extends AbstractSwaggerHyperlinkDetector
                     AbstractNode current = parameters.get(i);
 
                     if (JsonReference.isReference(current)) {
-                        JsonPointer ptr = JsonPointer
-                                .compile((String) current.get(JsonReference.PROPERTY).asValue().getValue());
+                        JsonPointer ptr = JsonReference.getPointer(current.asObject());
                         AbstractNode resolved = doc.getModel().find(ptr);
 
                         if (resolved != null && resolved.isObject() && resolved.get("name") != null) {

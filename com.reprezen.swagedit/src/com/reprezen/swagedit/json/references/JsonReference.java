@@ -19,7 +19,10 @@ import org.yaml.snakeyaml.nodes.ScalarNode;
 
 import com.fasterxml.jackson.core.JsonPointer;
 import com.fasterxml.jackson.databind.JsonNode;
+import com.google.common.base.Strings;
 import com.reprezen.swagedit.model.AbstractNode;
+import com.reprezen.swagedit.model.ObjectNode;
+import com.reprezen.swagedit.model.ValueNode;
 
 /**
  * Represents a JSON reference as defined by https://tools.ietf.org/html/draft-pbryan-zyp-json-ref-03.
@@ -162,7 +165,20 @@ public class JsonReference {
     }
 
     public static JsonPointer getPointer(JsonNode node) {
-        String text = node.get(PROPERTY).asText();
+        JsonNode value = node.get(PROPERTY);
+
+        if (value != null) {
+            return createPointer(value.asText());
+        } else {
+            return createPointer(null);
+        }
+    }
+
+    private static JsonPointer createPointer(String text) {
+        if (Strings.emptyToNull(text) == null) {
+            return JsonPointer.compile("");
+        }
+
         if (text.startsWith("#")) {
             text = text.substring(1);
         }
@@ -182,6 +198,16 @@ public class JsonReference {
             return JsonReference.PROPERTY.equals(value) && tuple.getValueNode().getNodeId() == NodeId.scalar;
         }
         return false;
+    }
+
+    public static JsonPointer getPointer(ObjectNode node) {
+        ValueNode value = node.get(PROPERTY).asValue();
+
+        if (value != null) {
+            return createPointer((String) value.getValue());
+        } else {
+            return createPointer(null);
+        }
     }
 
 }
