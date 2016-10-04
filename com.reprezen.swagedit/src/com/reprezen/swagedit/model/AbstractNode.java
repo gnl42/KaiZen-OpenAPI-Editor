@@ -1,3 +1,13 @@
+/*******************************************************************************
+ * Copyright (c) 2016 ModelSolv, Inc. and others.
+ * All rights reserved. This program and the accompanying materials
+ * are made available under the terms of the Eclipse Public License v1.0
+ * which accompanies this distribution, and is available at
+ * http://www.eclipse.org/legal/epl-v10.html
+ *
+ * Contributors:
+ *    ModelSolv, Inc. - initial API and implementation and/or initial documentation
+ *******************************************************************************/
 package com.reprezen.swagedit.model;
 
 import java.util.Collections;
@@ -7,7 +17,6 @@ import org.eclipse.jface.text.BadLocationException;
 import org.eclipse.jface.text.IDocument;
 import org.eclipse.jface.text.Position;
 
-import com.fasterxml.jackson.core.JsonLocation;
 import com.fasterxml.jackson.core.JsonPointer;
 import com.google.common.collect.Iterables;
 import com.reprezen.swagedit.schema.TypeDefinition;
@@ -28,18 +37,12 @@ public abstract class AbstractNode {
     private String property;
 
     private TypeDefinition type;
-    private JsonLocation location;
-    private JsonLocation start;
-    private JsonLocation end;
+    private Location start;
+    private Location end;
 
     AbstractNode(AbstractNode parent, JsonPointer ptr) {
-        this(parent, ptr, null);
-    }
-
-    AbstractNode(AbstractNode parent, JsonPointer ptr, JsonLocation location) {
         this.parent = parent;
         this.pointer = ptr;
-        this.location = location;
     }
 
     /**
@@ -86,10 +89,6 @@ public abstract class AbstractNode {
 
     public ValueNode asValue() {
         return (ValueNode) this;
-    }
-
-    public JsonLocation getLocation() {
-        return location;
     }
 
     /**
@@ -154,12 +153,12 @@ public abstract class AbstractNode {
      * @return position inside the document
      */
     public Position getPosition(IDocument document) {
-        int startLine = getStart().getLineNr() - 1;
+        int startLine = getStart().getLine();
         int offset = 0;
         int length = 0;
 
-        int endLine = getEnd().getLineNr() - 1;
-        int endCol = getEnd().getColumnNr() - 1;
+        int endLine = getEnd().getLine();
+        int endCol = getEnd().getColumn();
         try {
             offset = document.getLineOffset(startLine);
             length = (document.getLineOffset(endLine) + endCol) - offset;
@@ -170,11 +169,11 @@ public abstract class AbstractNode {
         return new Position(Math.max(0, offset), length);
     }
 
-    public void setStartLocation(JsonLocation start) {
+    public void setStartLocation(Location start) {
         this.start = start;
     }
 
-    public void setEndLocation(JsonLocation location) {
+    public void setEndLocation(Location location) {
         this.end = location;
     }
 
@@ -183,7 +182,7 @@ public abstract class AbstractNode {
      * 
      * @return start location
      */
-    public JsonLocation getStart() {
+    public Location getStart() {
         return start;
     }
 
@@ -192,7 +191,7 @@ public abstract class AbstractNode {
      * 
      * @return end location
      */
-    public JsonLocation getEnd() {
+    public Location getEnd() {
         return end;
     }
 

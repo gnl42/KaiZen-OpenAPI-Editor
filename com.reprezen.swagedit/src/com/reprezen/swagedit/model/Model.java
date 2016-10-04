@@ -1,3 +1,13 @@
+/*******************************************************************************
+ * Copyright (c) 2016 ModelSolv, Inc. and others.
+ * All rights reserved. This program and the accompanying materials
+ * are made available under the terms of the Eclipse Public License v1.0
+ * which accompanies this distribution, and is available at
+ * http://www.eclipse.org/legal/epl-v10.html
+ *
+ * Contributors:
+ *    ModelSolv, Inc. - initial API and implementation and/or initial documentation
+ *******************************************************************************/
 package com.reprezen.swagedit.model;
 
 import static com.reprezen.swagedit.model.NodeDeserializer.ATTRIBUTE_MODEL;
@@ -110,11 +120,10 @@ public class Model {
         }
 
         AbstractNode found = forLine(line);
-
         if (found != null) {
             found = findChildren(found, line, column);
 
-            int c = startColumn(found);
+            int c = found.getStart().getColumn();
             if (column >= c) {
                 return found;
             } else {
@@ -133,9 +142,15 @@ public class Model {
 
     protected AbstractNode findChildren(AbstractNode current, int line, int column) {
         for (AbstractNode el : current.elements()) {
-            if (startLine(el) == line) {
-                if (column >= (el.getLocation().getColumnNr() - 1)) {
-                    return el;
+            if (el.getStart().getLine() == line) {
+                if (el instanceof ValueNode) {
+                    if (column >= contentColumn(el)) {
+                        return el;
+                    }
+                } else {
+                    if (column >= el.getStart().getColumn()) {
+                        return el;
+                    }
                 }
             }
         }
@@ -143,13 +158,13 @@ public class Model {
     }
 
     protected AbstractNode findCorrectNode(AbstractNode current, int column) {
-        if (startColumn(current) == column) {
+        if (current.getStart().getColumn() == column) {
             if (current.getParent() instanceof ObjectNode) {
                 return current.getParent();
             }
         }
 
-        if (startColumn(current) < column) {
+        if (current.getStart().getColumn() < column) {
             return current;
         } else {
             return findCorrectNode(current.getParent(), column);
@@ -159,7 +174,7 @@ public class Model {
     protected AbstractNode forLine(int line) {
         final AbstractNode root = getRoot();
         for (AbstractNode node : allNodes()) {
-            if (node != root && startLine(node) == line) {
+            if (node != root && node.getStart().getLine() == line) {
                 return node;
             }
         }
@@ -177,7 +192,7 @@ public class Model {
                 continue;
             }
 
-            if (startLine(current) < line) {
+            if (current.getStart().getLine() < line) {
                 before = current;
             } else {
                 found = before;
@@ -191,28 +206,13 @@ public class Model {
         return found;
     }
 
-    protected int startLine(AbstractNode n) {
-        return n.getStart().getLineNr() - 1;
-    }
-
-    protected int startColumn(AbstractNode n) {
-        return n.getStart().getColumnNr() - 1;
-    }
-
-    protected int endLine(AbstractNode n) {
-        return n.getEnd().getLineNr() - 1;
-    }
-
-    protected int endColumn(AbstractNode n) {
-        return n.getEnd().getColumnNr() - 1;
-    }
-
-    protected int contentLine(AbstractNode n) {
-        return n.getLocation().getLineNr() - 1;
-    }
-
     protected int contentColumn(AbstractNode n) {
-        return Strings.nullToEmpty(n.getProperty()).length() + (n.getLocation().getColumnNr() - 1);
+        String property = Strings.emptyToNull(n.getProperty());
+        if (property == null) {
+            return n.getStart().getColumn();
+        }
+
+        return (property.length() + 1) + n.getStart().getColumn();
     }
 
     public Iterable<AbstractNode> allNodes() {
