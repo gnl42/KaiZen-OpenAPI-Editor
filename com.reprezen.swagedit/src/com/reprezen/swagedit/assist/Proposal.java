@@ -68,10 +68,9 @@ public class Proposal {
     public int hashCode() {
         final int prime = 31;
         int result = 1;
-        result = prime * result + ((description == null) ? 0 : description.hashCode());
         result = prime * result + ((displayString == null) ? 0 : displayString.hashCode());
         result = prime * result + ((replacementString == null) ? 0 : replacementString.hashCode());
-        result = prime * result + ((type == null) ? 0 : type.hashCode());
+
         return result;
     }
 
@@ -90,9 +89,7 @@ public class Proposal {
         Proposal other = (Proposal) obj;
 
         return Objects.equals(other.replacementString, replacementString) //
-                && Objects.equals(other.displayString, displayString) //
-                && Objects.equals(other.description, description) //
-                && Objects.equals(other.type, type);
+                && Objects.equals(other.displayString, displayString);
     }
 
 }

@@ -52,7 +52,7 @@ public class ObjectTypeDefinition extends TypeDefinition {
     private final List<String> requiredProperties = new ArrayList<>();
     private final Map<String, TypeDefinition> properties = new LinkedHashMap<>();
     private final Map<String, TypeDefinition> patternProperties = new LinkedHashMap<>();
-    private final Map<String, TypeDefinition> additionalProperties = new LinkedHashMap<>();
+    private TypeDefinition additionalProperties = null;
 
     public ObjectTypeDefinition(SwaggerSchema schema, JsonPointer pointer, JsonNode definition, JsonType type) {
         super(schema, pointer, definition, type);
@@ -63,7 +63,22 @@ public class ObjectTypeDefinition extends TypeDefinition {
         initRequired();
         initProperties("properties", properties);
         initProperties("patternProperties", patternProperties);
-        initProperties("additionalProperties", additionalProperties);
+
+        if (content.has("additionalProperties") && content.get("additionalProperties").isObject()) {
+            JsonNode properties = content.get("additionalProperties");
+
+            JsonPointer pointer;
+            if (JsonReference.isReference(properties)) {
+                pointer = JsonReference.getPointer(properties);
+            } else {
+                pointer = JsonPointer.compile(getPointer().toString() + "/additionalProperties");
+            }
+
+            TypeDefinition definition = TypeDefinition.create(schema, pointer);
+            if (definition != null) {
+                additionalProperties = definition;
+            }
+        }
 
         if (content.has("definitions") && content.get("definitions").isObject()) {
             JsonNode definitions = content.get("definitions");
@@ -138,6 +153,11 @@ public class ObjectTypeDefinition extends TypeDefinition {
         if (type == null) {
             type = getPatternType(property);
         }
+
+        if (type == null && additionalProperties != null) {
+            type = additionalProperties;
+        }
+
         return type;
     }
 
@@ -173,7 +193,7 @@ public class ObjectTypeDefinition extends TypeDefinition {
      * 
      * @return list of additional properties
      */
-    public Map<String, TypeDefinition> getAdditionalProperties() {
+    public TypeDefinition getAdditionalProperties() {
         return additionalProperties;
     }
 
