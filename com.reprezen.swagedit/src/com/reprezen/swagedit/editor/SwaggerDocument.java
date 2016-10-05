@@ -175,6 +175,11 @@ public class SwaggerDocument extends Document {
     }
 
     public Model getModel(int offset) {
+        // no parse errors
+        if (model != null) {
+            return model;
+        }
+
         try {
             if (0 > offset || offset > getLength()) {
                 return Model.parseYaml(schema, get());

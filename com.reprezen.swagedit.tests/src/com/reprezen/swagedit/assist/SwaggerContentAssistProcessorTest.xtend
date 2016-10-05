@@ -128,7 +128,6 @@ class SwaggerContentAssistProcessorTest {
 			hasItems(
 				"uniqueItems:",
 				"format:",
-				"default:",
 				"maxItems:",
 				"$ref:",
 				"schema:",
@@ -155,7 +154,6 @@ class SwaggerContentAssistProcessorTest {
 			hasItems(
 				"uniqueItems:",
 				"format:",
-				"default:",
 				"maxItems:",
 				"$ref:",
 				"schema:",
@@ -168,4 +166,22 @@ class SwaggerContentAssistProcessorTest {
 			))
 	}
 
+	@Test
+	def void test3() {
+		val test = setUpContentAssistTest('''
+		 definitions:
+		  Product:
+		    <1>required:
+		      - name  
+		    properties:
+		      name:
+		        type: string
+		      description:
+		        type: <2>
+		''', new SwaggerDocument)
+		
+		var proposals = test.apply(processor, "1")
+		proposals = test.apply(processor, "2")
+//		println(proposals.map[(it as StyledCompletionProposal).replacementString])
+	}
 }

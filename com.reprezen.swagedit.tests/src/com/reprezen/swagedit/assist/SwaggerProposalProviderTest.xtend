@@ -11,6 +11,7 @@ import org.junit.Test
 
 import static org.hamcrest.core.IsCollectionContaining.*
 import static org.junit.Assert.*
+import com.reprezen.swagedit.schema.ComplexTypeDefinition
 
 class SwaggerProposalProviderTest {
 
@@ -201,5 +202,19 @@ class SwaggerProposalProviderTest {
 			"binary",
 			"date"
 		))
+	}
+	
+	@Test
+	def void testGetParameterRequired() {
+		val node = new ObjectNode(null, "/parameters/foo".ptr)
+		node.type = schema.getType(node)
+
+		assertTrue(node.type instanceof ComplexTypeDefinition)
+
+		val values = provider.getProposals(node).map [
+			replacementString
+		]
+		
+		assertEquals(1, values.filter[equals("required:")].size)
 	}
 }

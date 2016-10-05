@@ -10,12 +10,9 @@
  *******************************************************************************/
 package com.reprezen.swagedit.assist;
 
-import java.util.ArrayList;
 import java.util.Collection;
 import java.util.Collections;
-import java.util.HashSet;
 import java.util.LinkedHashSet;
-import java.util.List;
 import java.util.Objects;
 
 import org.apache.commons.lang3.math.NumberUtils;
@@ -92,29 +89,29 @@ public class SwaggerProposalProvider {
     }
 
     protected Collection<Proposal> createBooleanProposals(TypeDefinition type) {
-        Collection<Proposal> proposals = new ArrayList<>();
+        Collection<Proposal> proposals = new LinkedHashSet<>();
 
-        String label = type.getContainingProperty();
+        String labelType = type.getType().getValue();
 
-        proposals.add(new Proposal("true", "true", type.getDescription(), label));
-        proposals.add(new Proposal("false", "false", type.getDescription(), label));
+        proposals.add(new Proposal("true", "true", type.getDescription(), labelType));
+        proposals.add(new Proposal("false", "false", type.getDescription(), labelType));
 
         return proposals;
     }
 
     protected Proposal createPropertyProposal(String key, TypeDefinition type) {
-        if (type != null) {
-            String label;
-            if (Objects.equals(key, type.getContainingProperty())) {
-                label = type.getType().getValue();
-            } else {
-                label = type.getContainingProperty();
-            }
-
-            return new Proposal(key + ":", key, type.getDescription(), label);
-        } else {
+        if (type == null || "default".equals(key)) {
             return null;
         }
+
+        String labelType;
+        if (Objects.equals(key, type.getContainingProperty())) {
+            labelType = type.getType().getValue();
+        } else {
+            labelType = type.getContainingProperty();
+        }
+
+        return new Proposal(key + ":", key, type.getDescription(), labelType);
     }
 
     protected Collection<Proposal> createObjectProposals(ObjectTypeDefinition type, AbstractNode element) {
@@ -142,15 +139,6 @@ public class SwaggerProposalProvider {
             }
         }
 
-        for (String property : type.getAdditionalProperties().keySet()) {
-            if (element.get(property) == null) {
-                Proposal proposal = createPropertyProposal(property, type.getAdditionalProperties().get(property));
-                if (proposal != null) {
-                    proposals.add(proposal);
-                }
-            }
-        }
-
         if (proposals.isEmpty()) {
             proposals.add(new Proposal("_key_" + ":", "_key_", null, null));
         }
@@ -159,15 +147,13 @@ public class SwaggerProposalProvider {
     }
 
     protected Collection<Proposal> createArrayProposals(ArrayTypeDefinition type, AbstractNode node) {
-        Collection<Proposal> proposals = new ArrayList<>();
+        Collection<Proposal> proposals = new LinkedHashSet<>();
 
         if (type.itemsType.getType() == JsonType.ENUM) {
-            String replStr;
-            for (String literal : enumLiterals(type.itemsType)) {
-                replStr = "- " + literal;
+            String labelType = type.itemsType.getContainingProperty();
 
-                proposals.add(new Proposal(replStr, literal, type.itemsType.getDescription(),
-                        type.itemsType.getContainingProperty()));
+            for (String literal : enumLiterals(type.itemsType)) {
+                proposals.add(new Proposal("- " + literal, literal, type.getDescription(), labelType));
             }
         } else {
             proposals.add(new Proposal("-", "-", type.getDescription(), "array item"));
@@ -177,7 +163,7 @@ public class SwaggerProposalProvider {
     }
 
     protected Collection<Proposal> createComplextTypeProposals(ComplexTypeDefinition type, AbstractNode node) {
-        final Collection<Proposal> proposals = new HashSet<>();
+        final Collection<Proposal> proposals = new LinkedHashSet<>();
 
         for (TypeDefinition definition : type.getComplexTypes()) {
             proposals.addAll(getProposals(definition, node));
@@ -186,8 +172,8 @@ public class SwaggerProposalProvider {
         return proposals;
     }
 
-    protected List<String> enumLiterals(TypeDefinition type) {
-        List<String> literals = new ArrayList<>();
+    protected Collection<String> enumLiterals(TypeDefinition type) {
+        Collection<String> literals = new LinkedHashSet<>();
         for (JsonNode literal : type.asJson().get("enum")) {
             literals.add(literal.asText());
         }
@@ -195,7 +181,7 @@ public class SwaggerProposalProvider {
     }
 
     protected Collection<Proposal> createEnumProposals(TypeDefinition type, AbstractNode node) {
-        final Collection<Proposal> proposals = new ArrayList<>();
+        final Collection<Proposal> proposals = new LinkedHashSet<>();
         final String subType = type.asJson().has("type") ? //
                 type.asJson().get("type").asText() : //
                 null;
@@ -211,7 +197,9 @@ public class SwaggerProposalProvider {
                 replStr = literal;
             }
 
-            proposals.add(new Proposal(replStr, literal, type.getDescription(), type.getContainingProperty()));
+            String labelType = type.getType().getValue();
+
+            proposals.add(new Proposal(replStr, literal, type.getDescription(), labelType));
         }
 
         return proposals;
