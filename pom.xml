@@ -99,7 +99,7 @@
         <profile>
             <id>sign</id>
             <properties>
-                <sign.keystore>/home/teamcity/reprezen.jks</sign.keystore>
+                <sign.keystore>../reprezen.jks</sign.keystore>
                 <sign.keypass>CHANGEIT</sign.keypass>
                 <sign.storepass>CHANGEIT</sign.storepass>
             </properties>
