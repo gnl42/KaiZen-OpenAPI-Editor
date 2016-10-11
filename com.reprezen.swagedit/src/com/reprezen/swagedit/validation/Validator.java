@@ -135,7 +135,7 @@ public class Validator {
                         ValueNode typeValue = n.get("type").asValue();
                         if ("array".equalsIgnoreCase(typeValue.getValue().toString())) {
                             if (n.get("items") == null) {
-                                errors.add(new SwaggerError(n.getStart().getLine(), IMarker.SEVERITY_ERROR,
+                                errors.add(new SwaggerError(n.getStart().getLine() + 1, IMarker.SEVERITY_ERROR,
                                         Messages.error_array_missing_items));
                             }
                         }
