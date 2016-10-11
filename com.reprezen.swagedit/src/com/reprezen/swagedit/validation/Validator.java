@@ -11,6 +11,7 @@
 package com.reprezen.swagedit.validation;
 
 import java.io.IOException;
+import java.util.HashSet;
 import java.util.Set;
 
 import org.apache.commons.lang3.tuple.Pair;
@@ -37,6 +38,9 @@ import com.reprezen.swagedit.Messages;
 import com.reprezen.swagedit.editor.SwaggerDocument;
 import com.reprezen.swagedit.json.references.JsonReferenceFactory;
 import com.reprezen.swagedit.json.references.JsonReferenceValidator;
+import com.reprezen.swagedit.model.AbstractNode;
+import com.reprezen.swagedit.model.Model;
+import com.reprezen.swagedit.model.ValueNode;
 
 /**
  * This class contains methods for validating a Swagger YAML document.
@@ -83,9 +87,10 @@ public class Validator {
             Node yaml = document.getYaml();
             if (yaml != null) {
                 errors.addAll(validateAgainstSchema(new ErrorProcessor(yaml), document));
+                errors.addAll(checkMissingItemsKeyInArrayType(document.getModel()));
                 errors.addAll(checkDuplicateKeys(yaml));
-                errors.addAll(referenceValidator.validate(editorInput != null ? editorInput.getFile().getLocationURI()
-                        : null, yaml));
+                errors.addAll(referenceValidator
+                        .validate(editorInput != null ? editorInput.getFile().getLocationURI() : null, yaml));
             }
         }
 
@@ -115,6 +120,29 @@ public class Validator {
             errors.addAll(processor.processMessage(e.getProcessingMessage()));
         }
 
+        return errors;
+    }
+
+    protected Set<SwaggerError> checkMissingItemsKeyInArrayType(Model model) {
+        Set<SwaggerError> errors = new HashSet<>();
+        if (model != null && model.getRoot() != null) {
+            AbstractNode root = model.getRoot();
+            AbstractNode definitions = root.get("definitions");
+
+            if (definitions != null) {
+                for (AbstractNode n : definitions.elements()) {
+                    if (n.isObject() && n.get("type") instanceof ValueNode) {
+                        ValueNode typeValue = n.get("type").asValue();
+                        if ("array".equalsIgnoreCase(typeValue.getValue().toString())) {
+                            if (n.get("items") == null) {
+                                errors.add(new SwaggerError(n.getStart().getLine(), IMarker.SEVERITY_ERROR,
+                                        Messages.error_array_missing_items));
+                            }
+                        }
+                    }
+                }
+            }
+        }
         return errors;
     }
 
@@ -172,8 +200,8 @@ public class Validator {
     }
 
     protected SwaggerError createDuplicateError(String key, Node node) {
-        return new SwaggerError(node.getStartMark().getLine() + 1, IMarker.SEVERITY_WARNING, String.format(
-                Messages.error_duplicate_keys, key));
+        return new SwaggerError(node.getStartMark().getLine() + 1, IMarker.SEVERITY_WARNING,
+                String.format(Messages.error_duplicate_keys, key));
     }
 
 }
