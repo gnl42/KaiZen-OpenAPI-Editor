@@ -170,18 +170,97 @@ class SwaggerContentAssistProcessorTest {
 	def void test3() {
 		val test = setUpContentAssistTest('''
 		 definitions:
+		  Foo:
+		    <1>
 		  Product:
-		    <1>required:
+		    <2>required:
 		      - name  
 		    properties:
 		      name:
 		        type: string
 		      description:
-		        type: <2>
+		        type: <3>
 		''', new SwaggerDocument)
-		
+
 		var proposals = test.apply(processor, "1")
+		var values = proposals.map[(it as StyledCompletionProposal).replacementString]
+		assertEquals(30, values.size)
+		assertThat(values, hasItems(
+			"$ref:", 
+			"format:", 
+			"title:", 
+			"description:", 
+			"multipleOf:", 
+			"maximum:", 
+			"exclusiveMaximum:", 
+			"minimum:", 
+			"exclusiveMinimum:", 
+			"maxLength:", 
+			"minLength:", 
+			"pattern:", 
+			"maxItems:", 
+			"minItems:", 
+			"uniqueItems:", 
+			"maxProperties:",
+			"minProperties:", 
+			"required:", 
+			"enum:", 
+			"additionalProperties:", 
+			"type:", 
+			"items:", 
+			"allOf:", 
+			"properties:", 
+			"discriminator:", 
+			"readOnly:", 
+			"xml:", 
+			"externalDocs:", 
+			"example:", 
+			"x-:"))
+
 		proposals = test.apply(processor, "2")
-//		println(proposals.map[(it as StyledCompletionProposal).replacementString])
+		values = proposals.map[(it as StyledCompletionProposal).replacementString]
+		// same without required and properties
+		assertEquals(28, values.size)
+		assertThat(values, hasItems(
+			"$ref:", 
+			"format:", 
+			"title:", 
+			"description:", 
+			"multipleOf:", 
+			"maximum:", 
+			"exclusiveMaximum:", 
+			"minimum:", 
+			"exclusiveMinimum:", 
+			"maxLength:", 
+			"minLength:", 
+			"pattern:", 
+			"maxItems:", 
+			"minItems:", 
+			"uniqueItems:", 
+			"maxProperties:",
+			"minProperties:",  
+			"enum:", 
+			"additionalProperties:", 
+			"type:", 
+			"items:", 
+			"allOf:",  
+			"discriminator:", 
+			"readOnly:", 
+			"xml:", 
+			"externalDocs:", 
+			"example:", 
+			"x-:"))
+		
+		proposals = test.apply(processor, "3")
+		values = proposals.map[(it as StyledCompletionProposal).replacementString]
+		assertEquals(7, values.size)
+		assertThat(values, hasItems(
+			"array",
+			"boolean",
+			"integer",
+			"null",
+			"number",
+			"object",
+			"string"))
 	}
 }

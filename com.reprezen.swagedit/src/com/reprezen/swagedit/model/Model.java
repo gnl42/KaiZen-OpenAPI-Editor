@@ -122,14 +122,12 @@ public class Model {
         AbstractNode found = forLine(line);
         if (found != null) {
             found = findChildren(found, line, column);
-
             int c = found.getStart().getColumn();
-            if (column >= c) {
+            if (column > c || (column == c && found.getParent().isArray())) {
                 return found;
             } else {
                 return found.getParent();
             }
-
         } else {
             found = findBeforeLine(line, column);
             if (found != null) {

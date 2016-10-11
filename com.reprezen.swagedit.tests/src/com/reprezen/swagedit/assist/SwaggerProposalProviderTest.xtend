@@ -3,6 +3,7 @@ package com.reprezen.swagedit.assist
 import com.reprezen.swagedit.model.ArrayNode
 import com.reprezen.swagedit.model.ObjectNode
 import com.reprezen.swagedit.model.ValueNode
+import com.reprezen.swagedit.schema.JsonType
 import com.reprezen.swagedit.schema.MultipleTypeDefinition
 import com.reprezen.swagedit.schema.SwaggerSchema
 import com.reprezen.swagedit.tests.utils.PointerHelpers
@@ -11,7 +12,6 @@ import org.junit.Test
 
 import static org.hamcrest.core.IsCollectionContaining.*
 import static org.junit.Assert.*
-import com.reprezen.swagedit.schema.ComplexTypeDefinition
 
 class SwaggerProposalProviderTest {
 
@@ -203,18 +203,40 @@ class SwaggerProposalProviderTest {
 			"date"
 		))
 	}
-	
+
 	@Test
 	def void testGetParameterRequired() {
 		val node = new ObjectNode(null, "/parameters/foo".ptr)
 		node.type = schema.getType(node)
 
-		assertTrue(node.type instanceof ComplexTypeDefinition)
+		assertEquals(JsonType.ONE_OF, node.type.type)
 
 		val values = provider.getProposals(node).map [
 			replacementString
 		]
-		
+
 		assertEquals(1, values.filter[equals("required:")].size)
+	}
+
+	@Test
+	def void testGetResponsesType() {
+		val node = new ObjectNode(null, "/paths/~1foo/get/responses/200/schema/type".ptr)
+		node.type = schema.getType(node)
+
+		val values = provider.getProposals(node).map [
+			replacementString
+		]
+
+		assertEquals(8, values.size)
+		assertThat(values, hasItems(
+			"array",
+			"boolean",
+			"integer",
+			"null",
+			"number",
+			"object",
+			"string",
+			"file"
+		))
 	}
 }

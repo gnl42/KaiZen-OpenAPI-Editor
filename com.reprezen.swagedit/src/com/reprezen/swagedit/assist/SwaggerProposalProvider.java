@@ -19,6 +19,7 @@ import org.apache.commons.lang3.math.NumberUtils;
 
 import com.fasterxml.jackson.core.JsonPointer;
 import com.fasterxml.jackson.databind.JsonNode;
+import com.google.common.base.Strings;
 import com.google.common.collect.Lists;
 import com.reprezen.swagedit.model.AbstractNode;
 import com.reprezen.swagedit.model.Model;
@@ -27,6 +28,7 @@ import com.reprezen.swagedit.schema.ComplexTypeDefinition;
 import com.reprezen.swagedit.schema.JsonType;
 import com.reprezen.swagedit.schema.MultipleTypeDefinition;
 import com.reprezen.swagedit.schema.ObjectTypeDefinition;
+import com.reprezen.swagedit.schema.ReferenceTypeDefinition;
 import com.reprezen.swagedit.schema.TypeDefinition;
 
 /**
@@ -34,20 +36,28 @@ import com.reprezen.swagedit.schema.TypeDefinition;
  */
 public class SwaggerProposalProvider {
 
-    public Collection<Proposal> getProposals(JsonPointer pointer, Model model) {
+    public Collection<Proposal> getProposals(JsonPointer pointer, Model model, String prefix) {
         final AbstractNode node = model.find(pointer);
-
         if (node == null) {
             return Collections.emptyList();
         }
-        return getProposals(node.getType(), node);
+        return getProposals(node.getType(), node, prefix);
+    }
+
+    public Collection<Proposal> getProposals(JsonPointer pointer, Model model) {
+        return getProposals(pointer, model, null);
     }
 
     public Collection<Proposal> getProposals(AbstractNode node) {
-        return getProposals(node.getType(), node);
+        return getProposals(node.getType(), node, null);
     }
 
-    protected Collection<Proposal> getProposals(TypeDefinition type, AbstractNode node) {
+    protected Collection<Proposal> getProposals(TypeDefinition type, AbstractNode node, String prefix) {
+
+        if (type instanceof ReferenceTypeDefinition) {
+            type = ((ReferenceTypeDefinition) type).resolve();
+        }
+
         switch (type.getType()) {
         case STRING:
         case INTEGER:
@@ -60,16 +70,16 @@ public class SwaggerProposalProvider {
         case ARRAY:
             return createArrayProposals((ArrayTypeDefinition) type, node);
         case OBJECT:
-            return createObjectProposals((ObjectTypeDefinition) type, node);
+            return createObjectProposals((ObjectTypeDefinition) type, node, prefix);
         case ALL_OF:
         case ANY_OF:
         case ONE_OF:
-            return createComplextTypeProposals((ComplexTypeDefinition) type, node);
+            return createComplextTypeProposals((ComplexTypeDefinition) type, node, prefix);
         case UNDEFINED:
             Collection<Proposal> proposals = new LinkedHashSet<>();
             if (type instanceof MultipleTypeDefinition) {
                 for (TypeDefinition currentType : ((MultipleTypeDefinition) type).getMultipleTypes()) {
-                    proposals.addAll(getProposals(currentType, node));
+                    proposals.addAll(getProposals(currentType, node, prefix));
                 }
             }
             return proposals;
@@ -114,13 +124,16 @@ public class SwaggerProposalProvider {
         return new Proposal(key + ":", key, type.getDescription(), labelType);
     }
 
-    protected Collection<Proposal> createObjectProposals(ObjectTypeDefinition type, AbstractNode element) {
+    protected Collection<Proposal> createObjectProposals(ObjectTypeDefinition type, AbstractNode element,
+            String prefix) {
         final Collection<Proposal> proposals = new LinkedHashSet<>();
 
         for (String property : type.getProperties().keySet()) {
-            if (element.get(property) == null) {
-                Proposal proposal = createPropertyProposal(property, type.getProperties().get(property));
-                if (proposal != null) {
+            Proposal proposal = createPropertyProposal(property, type.getProperties().get(property));
+            if (proposal != null) {
+                if (Strings.emptyToNull(prefix) != null && property.startsWith(prefix)) {
+                    proposals.add(proposal);
+                } else if (element.get(property) == null) {
                     proposals.add(proposal);
                 }
             }
@@ -162,11 +175,12 @@ public class SwaggerProposalProvider {
         return proposals;
     }
 
-    protected Collection<Proposal> createComplextTypeProposals(ComplexTypeDefinition type, AbstractNode node) {
+    protected Collection<Proposal> createComplextTypeProposals(ComplexTypeDefinition type, AbstractNode node,
+            String prefix) {
         final Collection<Proposal> proposals = new LinkedHashSet<>();
 
         for (TypeDefinition definition : type.getComplexTypes()) {
-            proposals.addAll(getProposals(definition, node));
+            proposals.addAll(getProposals(definition, node, prefix));
         }
 
         return proposals;
