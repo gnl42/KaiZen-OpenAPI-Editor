@@ -32,6 +32,7 @@ public class Messages extends NLS {
     public static String error_cannot_read_content;
     public static String error_missing_reference;
     public static String error_invalid_reference;
+    public static String error_array_missing_items;
 
     static {
         NLS.initializeMessages(BUNDLE_NAME, Messages.class);
