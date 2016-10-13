@@ -468,4 +468,54 @@ class ValidatorTest {
 
 	}
 
+	@Test
+	def void testArrayWithItemsAreValid() {
+		val content = '''
+		swagger: '2.0'
+		info:
+		  version: 0.0.0
+		  title: Simple API
+		paths:
+		  /foo/{bar}:
+		    get:
+		      responses:
+		        '200':
+		          description: OK
+		definitions:
+		  Pets:
+		    type: array
+		    items: 
+		      type: string
+		'''
+
+		document.set(content)
+		document.onChange()
+		val errors = validator.validate(document, null)
+		assertEquals(0, errors.size())
+	}
+
+	@Test
+	def void testArrayWithMissingItemsAreNotValid() {
+		val content = '''
+		swagger: '2.0'
+		info:
+		  version: 0.0.0
+		  title: Simple API
+		paths:
+		  /foo/{bar}:
+		    get:
+		      responses:
+		        '200':
+		          description: OK
+		definitions:
+		  Pets:
+		    type: array
+		'''
+
+		document.set(content)
+		document.onChange()
+		val errors = validator.validate(document, null)
+		assertEquals(1, errors.size())
+		assertEquals(Messages.error_array_missing_items, errors.get(0).message)
+	}
 }
