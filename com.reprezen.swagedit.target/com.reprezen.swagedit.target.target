@@ -1,5 +1,5 @@
 <?xml version="1.0" encoding="UTF-8" standalone="no"?>
-<?pde version="3.8"?><target name="com.reprezen.swagedit.target" sequenceNumber="5">
+<?pde version="3.8"?><target name="com.reprezen.swagedit.target" sequenceNumber="6">
 <locations>
 <location includeAllPlatforms="false" includeConfigurePhase="true" includeMode="planner" includeSource="true" type="InstallableUnit">
 <unit id="org.eclipse.rcp.feature.group" version="4.4.2.v20150204-1700"/>
@@ -11,8 +11,8 @@
 <repository location="http://download.eclipse.org/eclipse/updates/4.4"/>
 </location>
 <location includeAllPlatforms="false" includeConfigurePhase="true" includeMode="planner" includeSource="true" type="InstallableUnit">
-<unit id="org.dadacoalition.yedit.feature.feature.group" version="1.0.20.201509041456-RELEASE"/>
-<repository location="http://dadacoalition.org/yedit"/>
+<unit id="org.dadacoalition.yedit.feature.feature.group" version="1.0.20.201610121952-SNAPSHOT"/>
+<repository location="http://products.modelsolv.com/yedit/releases/1.0.20.201610121952"/>
 </location>
 <location includeAllPlatforms="false" includeConfigurePhase="true" includeMode="planner" includeSource="true" type="InstallableUnit">
 <unit id="org.eclipse.xtend.sdk.feature.group" version="2.7.3.v201411190455"/>
