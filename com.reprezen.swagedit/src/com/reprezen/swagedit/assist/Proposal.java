@@ -69,7 +69,6 @@ public class Proposal {
         final int prime = 31;
         int result = 1;
         result = prime * result + ((displayString == null) ? 0 : displayString.hashCode());
-        result = prime * result + ((replacementString == null) ? 0 : replacementString.hashCode());
 
         return result;
     }
@@ -88,8 +87,7 @@ public class Proposal {
 
         Proposal other = (Proposal) obj;
 
-        return Objects.equals(other.replacementString, replacementString) //
-                && Objects.equals(other.displayString, displayString);
+        return Objects.equals(other.displayString, displayString);
     }
 
 }

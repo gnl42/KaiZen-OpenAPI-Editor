@@ -97,8 +97,12 @@ public class Validator {
         return errors;
     }
 
-    /*
+    /**
      * Validates the YAML document against the Swagger schema
+     * 
+     * @param processor
+     * @param document
+     * @return error
      */
     protected Set<SwaggerError> validateAgainstSchema(ErrorProcessor processor, SwaggerDocument document) {
         final JsonSchemaFactory factory = JsonSchemaFactory.newBuilder().freeze();
@@ -123,27 +127,37 @@ public class Validator {
         return errors;
     }
 
+    /**
+     * Validates schema definition of type array.
+     * 
+     * This method traverses the node present in the document and checks that nodes that are schema definitions of type
+     * array have a field items.
+     * 
+     * @param model
+     * @return error
+     */
     protected Set<SwaggerError> checkMissingItemsKeyInArrayType(Model model) {
         Set<SwaggerError> errors = new HashSet<>();
-        if (model != null && model.getRoot() != null) {
-            AbstractNode root = model.getRoot();
-            AbstractNode definitions = root.get("definitions");
 
-            if (definitions != null) {
-                for (AbstractNode n : definitions.elements()) {
-                    if (n.isObject() && n.get("type") instanceof ValueNode) {
-                        ValueNode typeValue = n.get("type").asValue();
-                        if ("array".equalsIgnoreCase(typeValue.getValue().toString())) {
-                            if (n.get("items") == null) {
-                                errors.add(new SwaggerError(n.getStart().getLine() + 1, IMarker.SEVERITY_ERROR,
-                                        Messages.error_array_missing_items));
-                            }
-                        }
+        if (model != null && model.getRoot() != null) {
+            for (AbstractNode node : model.allNodes()) {
+                if (hasArrayType(node)) {
+                    if (node.get("items") == null) {
+                        errors.add(new SwaggerError(node.getStart().getLine() + 1, IMarker.SEVERITY_ERROR,
+                                Messages.error_array_missing_items));
                     }
                 }
             }
         }
         return errors;
+    }
+
+    protected boolean hasArrayType(AbstractNode node) {
+        if (node.isObject() && node.get("type") instanceof ValueNode) {
+            ValueNode typeValue = node.get("type").asValue();
+            return "array".equalsIgnoreCase(typeValue.getValue().toString());
+        }
+        return false;
     }
 
     /*

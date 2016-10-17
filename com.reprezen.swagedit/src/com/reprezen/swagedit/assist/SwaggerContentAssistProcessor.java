@@ -147,7 +147,7 @@ public class SwaggerContentAssistProcessor extends TemplateCompletionProcessor
             updateStatus();
             p = referenceProposalProvider.getProposals(currentPath, document.asJson(), cyclePosition);
         } else {
-            p = proposalProvider.getProposals(currentPath, model);
+            p = proposalProvider.getProposals(currentPath, model, prefix);
         }
 
         final Collection<ICompletionProposal> proposals = getCompletionProposals(p, prefix, documentOffset);
