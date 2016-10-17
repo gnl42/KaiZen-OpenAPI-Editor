@@ -32,17 +32,23 @@ import com.reprezen.swagedit.schema.TypeDefinition;
  */
 public abstract class AbstractNode {
 
+    private final Model model;
     private final JsonPointer pointer;
     private final AbstractNode parent;
-    private String property;
 
+    private String property;
     private TypeDefinition type;
     private Location start;
     private Location end;
 
-    AbstractNode(AbstractNode parent, JsonPointer ptr) {
+    AbstractNode(Model model, AbstractNode parent, JsonPointer ptr) {
+        this.model = model;
         this.parent = parent;
         this.pointer = ptr;
+    }
+
+    public Model getModel() {
+        return model;
     }
 
     /**

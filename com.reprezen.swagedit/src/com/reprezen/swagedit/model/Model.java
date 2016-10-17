@@ -17,13 +17,20 @@ import static com.reprezen.swagedit.model.NodeDeserializer.ATTRIBUTE_POINTER;
 import java.io.IOException;
 import java.util.Iterator;
 import java.util.LinkedHashMap;
+import java.util.List;
 import java.util.Map;
+
+import org.eclipse.core.resources.IFile;
+import org.eclipse.core.runtime.IPath;
 
 import com.fasterxml.jackson.core.JsonPointer;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import com.fasterxml.jackson.databind.module.SimpleModule;
 import com.fasterxml.jackson.dataformat.yaml.YAMLFactory;
 import com.google.common.base.Strings;
+import com.google.common.collect.Iterables;
+import com.google.common.collect.Lists;
+import com.reprezen.swagedit.Activator;
 import com.reprezen.swagedit.schema.SwaggerSchema;
 
 /**
@@ -34,9 +41,15 @@ public class Model {
 
     private final Map<JsonPointer, AbstractNode> nodes = new LinkedHashMap<>();
     private final SwaggerSchema schema;
+    private final IPath path;
 
     Model(SwaggerSchema schema) {
+        this(schema, null);
+    }
+
+    Model(SwaggerSchema schema, IPath path) {
         this.schema = schema;
+        this.path = path;
     }
 
     /**
@@ -47,7 +60,7 @@ public class Model {
      */
     public static Model empty(SwaggerSchema schema) {
         Model model = new Model(schema);
-        ObjectNode root = new ObjectNode(null, JsonPointer.compile(""));
+        ObjectNode root = new ObjectNode(model, null, JsonPointer.compile(""));
         root.setType(model.schema.getType(root));
         model.add(root);
 
@@ -84,12 +97,43 @@ public class Model {
         return model;
     }
 
+    public static Iterable<Model> parseYaml(Iterable<IFile> files) {
+        if (files == null || Iterables.isEmpty(files)) {
+            return Lists.newArrayList();
+        }
+
+        final SwaggerSchema schema = Activator.getDefault().getSchema();
+        final ObjectMapper mapper = createMapper();
+
+        final List<Model> modelSet = Lists.newArrayList();
+        for (IFile file : files) {
+            Model model = new Model(schema, file.getFullPath());
+            try {
+                mapper.reader() //
+                        .withAttribute(ATTRIBUTE_MODEL, model) //
+                        .withAttribute(ATTRIBUTE_PARENT, null) //
+                        .withAttribute(ATTRIBUTE_POINTER, JsonPointer.compile("")) //
+                        .withType(AbstractNode.class) //
+                        .readValue(file.getLocationURI().toURL());
+            } catch (IllegalArgumentException | IOException e) {
+                e.printStackTrace();
+            }
+
+            modelSet.add(model);
+        }
+        return modelSet;
+    }
+
     protected static ObjectMapper createMapper() {
         final ObjectMapper mapper = new ObjectMapper(new YAMLFactory());
         final SimpleModule module = new SimpleModule();
         module.addDeserializer(AbstractNode.class, new NodeDeserializer());
         mapper.registerModule(module);
         return mapper;
+    }
+
+    public IPath getPath() {
+        return path;
     }
 
     public AbstractNode find(JsonPointer pointer) {

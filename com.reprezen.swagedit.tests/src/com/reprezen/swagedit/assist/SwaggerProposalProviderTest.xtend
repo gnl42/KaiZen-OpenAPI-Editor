@@ -22,7 +22,7 @@ class SwaggerProposalProviderTest {
 
 	@Test
 	def void testGetProposals_RootObject() {
-		val node = new ObjectNode(null, "".ptr)
+		val node = new ObjectNode(null, null, "".ptr)
 		node.type = schema.getType(node)
 
 		assertThat(provider.getProposals(node).map[replacementString], hasItems(
@@ -47,7 +47,7 @@ class SwaggerProposalProviderTest {
 
 	@Test
 	def void testGetProposals_SwaggerEnum() {
-		val node = new ValueNode(null, "/swagger".ptr, null)
+		val node = new ValueNode(null, null, "/swagger".ptr, null)
 		node.type = schema.getType(node)
 
 		assertThat(provider.getProposals(node).map [
@@ -57,7 +57,7 @@ class SwaggerProposalProviderTest {
 
 	@Test
 	def void testGetProposals_InfoObject() {
-		val node = new ObjectNode(null, "/info".ptr)
+		val node = new ObjectNode(null, null, "/info".ptr)
 		node.type = schema.getType(node)
 
 		assertThat(provider.getProposals(node).map [
@@ -74,7 +74,7 @@ class SwaggerProposalProviderTest {
 
 	@Test
 	def void testGetProposals_SchemesArray() {
-		val node = new ArrayNode(null, "/schemes".ptr)
+		val node = new ArrayNode(null, null, "/schemes".ptr)
 		node.type = schema.getType(node)
 
 		assertThat(provider.getProposals(node).map [
@@ -89,7 +89,7 @@ class SwaggerProposalProviderTest {
 
 	@Test
 	def void testGetProposals_PathsObject() {
-		val node = new ObjectNode(null, "/paths".ptr)
+		val node = new ObjectNode(null, null, "/paths".ptr)
 		node.type = schema.getType(node)
 
 		assertThat(provider.getProposals(node).map [
@@ -102,7 +102,7 @@ class SwaggerProposalProviderTest {
 
 	@Test
 	def void testGetProposals_DefinitionsObject() {
-		val node = new ObjectNode(null, "/definitions".ptr)
+		val node = new ObjectNode(null, null, "/definitions".ptr)
 		node.type = schema.getType(node)
 
 		assertThat(provider.getProposals(node).map [
@@ -114,7 +114,7 @@ class SwaggerProposalProviderTest {
 
 	@Test
 	def void testPathGetProposals() {
-		val node = new ObjectNode(null, "/paths/~1/get".ptr)
+		val node = new ObjectNode(null, null, "/paths/~1/get".ptr)
 		node.type = schema.getType(node)
 
 		assertThat(provider.getProposals(node).map [
@@ -138,7 +138,7 @@ class SwaggerProposalProviderTest {
 
 	@Test
 	def void testPathParametersProposals() {
-		val node = new ArrayNode(null, "/paths/~1/get/parameters".ptr)
+		val node = new ArrayNode(null, null, "/paths/~1/get/parameters".ptr)
 		node.type = schema.getType(node)
 
 		assertThat(provider.getProposals(node).map [
@@ -150,7 +150,7 @@ class SwaggerProposalProviderTest {
 
 	@Test
 	def void testParameterInProposals() {
-		val node = new ValueNode(null, "/paths/~1/get/parameters/0/in".ptr, null)
+		val node = new ValueNode(null, null, "/paths/~1/get/parameters/0/in".ptr, null)
 		node.type = schema.getType(node)
 
 		assertThat(provider.getProposals(node).map [
@@ -166,7 +166,7 @@ class SwaggerProposalProviderTest {
 
 	@Test
 	def void testGetOneOfProposals() {
-		val node = new ObjectNode(null, "/paths/~1/get/responses/200".ptr)
+		val node = new ObjectNode(null, null, "/paths/~1/get/responses/200".ptr)
 		node.type = schema.getType(node)
 
 		assertThat(provider.getProposals(node).map [
@@ -183,7 +183,7 @@ class SwaggerProposalProviderTest {
 
 	@Test
 	def void testGetAnyOfProposals() {
-		val node = new ValueNode(null, "/paths/~1/get/parameters/0/format".ptr, null)
+		val node = new ValueNode(null, null, "/paths/~1/get/parameters/0/format".ptr, null)
 		node.type = schema.getType(node)
 
 		assertTrue(node.type instanceof MultipleTypeDefinition)
@@ -206,7 +206,7 @@ class SwaggerProposalProviderTest {
 	
 	@Test
 	def void testGetParameterRequired() {
-		val node = new ObjectNode(null, "/parameters/foo".ptr)
+		val node = new ObjectNode(null, null, "/parameters/foo".ptr)
 		node.type = schema.getType(node)
 
 		assertTrue(node.type instanceof ComplexTypeDefinition)

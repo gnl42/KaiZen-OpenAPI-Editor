@@ -52,7 +52,7 @@ public class NodeDeserializer extends JsonDeserializer<AbstractNode> {
         final AbstractNode parent = (AbstractNode) context.getAttribute(ATTRIBUTE_PARENT);
         final JsonPointer ptr = (JsonPointer) context.getAttribute(ATTRIBUTE_POINTER);
 
-        final ObjectNode node = new ObjectNode(parent, ptr);
+        final ObjectNode node = new ObjectNode(model, parent, ptr);
         node.setStartLocation(createLocation(startLocation));
         model.add(node);
 
@@ -78,7 +78,7 @@ public class NodeDeserializer extends JsonDeserializer<AbstractNode> {
         final AbstractNode parent = (AbstractNode) context.getAttribute(ATTRIBUTE_PARENT);
         final JsonPointer ptr = (JsonPointer) context.getAttribute(ATTRIBUTE_POINTER);
 
-        ArrayNode node = new ArrayNode(parent, ptr);
+        ArrayNode node = new ArrayNode(model, parent, ptr);
         model.add(node);
 
         int i = 0;
@@ -107,7 +107,7 @@ public class NodeDeserializer extends JsonDeserializer<AbstractNode> {
 
         Object v = context.readValue(p, Object.class);
 
-        ValueNode node = new ValueNode(parent, ptr, v);
+        ValueNode node = new ValueNode(model, parent, ptr, v);
         node.setStartLocation(createLocation(startLocation));
         node.setEndLocation(createLocation(p.getCurrentLocation()));
 

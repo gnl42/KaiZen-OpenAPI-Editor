@@ -25,6 +25,7 @@ import org.yaml.snakeyaml.parser.ParserException;
 import com.fasterxml.jackson.core.JsonPointer;
 import com.fasterxml.jackson.databind.JsonNode;
 import com.fasterxml.jackson.databind.ObjectMapper;
+import com.reprezen.swagedit.Activator;
 import com.reprezen.swagedit.model.AbstractNode;
 import com.reprezen.swagedit.model.Model;
 import com.reprezen.swagedit.schema.SwaggerSchema;
@@ -47,7 +48,7 @@ public class SwaggerDocument extends Document {
     private SwaggerSchema schema;
 
     public SwaggerDocument() {
-        this.schema = new SwaggerSchema();
+        this.schema = Activator.getDefault() != null ? Activator.getDefault().getSchema() : new SwaggerSchema();
     }
 
     public SwaggerSchema getSchema() {
