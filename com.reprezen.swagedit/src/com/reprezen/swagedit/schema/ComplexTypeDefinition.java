@@ -18,7 +18,7 @@ import java.util.List;
 import com.fasterxml.jackson.core.JsonPointer;
 import com.fasterxml.jackson.databind.JsonNode;
 import com.fasterxml.jackson.databind.node.ArrayNode;
-import com.reprezen.swagedit.json.references.JsonReference;
+import com.reprezen.swagedit.schema.SwaggerSchema.JsonSchema;
 
 /**
  * Represents a JSON schema type definition of a complex type, eg oneOf, allOf, anyOf types.
@@ -47,7 +47,7 @@ public class ComplexTypeDefinition extends TypeDefinition {
 
     private final Collection<TypeDefinition> complexTypes = new LinkedHashSet<>();
 
-    public ComplexTypeDefinition(final SwaggerSchema schema, JsonPointer pointer, JsonNode definition, JsonType type) {
+    public ComplexTypeDefinition(JsonSchema schema, JsonPointer pointer, JsonNode definition, JsonType type) {
         super(schema, pointer, definition, type);
         init();
     }
@@ -57,21 +57,8 @@ public class ComplexTypeDefinition extends TypeDefinition {
 
         for (int i = 0; i < container.size(); i++) {
             JsonNode current = container.get(i);
-
-            JsonPointer p;
-            if (JsonReference.isReference(current)) {
-                p = JsonPointer.compile(current.get(JsonReference.PROPERTY).asText().substring(1));
-            } else {
-                p = JsonPointer.compile(pointer.toString() + "/" + type.getValue() + "/" + i);
-            }
-
-            TypeDefinition def = schema.getType(p);
-            if (def == null) {
-                def = TypeDefinition.create(getSchema(), p);
-                if (def != null) {
-                    complexTypes.add(def);
-                }
-            } else {
+            TypeDefinition def = schema.createType(this, type.getValue() + "/" + i, current);
+            if (def != null) {
                 complexTypes.add(def);
             }
         }
@@ -103,6 +90,10 @@ public class ComplexTypeDefinition extends TypeDefinition {
     }
 
     private void collectProperties(String property, TypeDefinition current, List<TypeDefinition> collect) {
+        if (current instanceof ReferenceTypeDefinition) {
+            current = ((ReferenceTypeDefinition) current).resolve();
+        }
+
         if (current instanceof ObjectTypeDefinition) {
             if (current.getPropertyType(property) != null) {
                 collect.add(current.getPropertyType(property));

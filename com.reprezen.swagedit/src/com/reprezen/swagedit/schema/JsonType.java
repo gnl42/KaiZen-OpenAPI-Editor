@@ -59,6 +59,8 @@ public enum JsonType {
             return JsonType.OBJECT;
         } else if (node.has("anyOf")) {
             return JsonType.ANY_OF;
+        } else if (node.has("allOf")) {
+            return JsonType.ALL_OF;
         }
 
         return JsonType.UNDEFINED;

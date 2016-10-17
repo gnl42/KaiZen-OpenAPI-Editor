@@ -192,7 +192,7 @@ class SwaggerDocumentTest {
 
 		test.apply("/paths/~1testing", "1")
 		test.apply("/paths/~1testing", "2")
-		test.apply("/paths/~1testing/get", "3")
+		test.apply("/paths/~1testing", "3")
 		test.apply("/paths/~1testing/get", "4")
 		test.apply("/paths/~1testing/get/parameters", "5")
 		test.apply("/paths/~1testing", "6")
