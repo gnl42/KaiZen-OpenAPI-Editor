@@ -232,7 +232,7 @@ class SwaggerProposalProviderTest {
 			"array",
 			"boolean",
 			"integer",
-			"null",
+			"\"null\"",
 			"number",
 			"object",
 			"string",

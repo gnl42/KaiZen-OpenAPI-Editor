@@ -114,6 +114,10 @@ public class SwaggerProposalProvider {
             return null;
         }
 
+        if (key == "null") {
+            key = "\"" + key + "\"";
+        }
+
         String labelType;
         if (Objects.equals(key, type.getContainingProperty())) {
             labelType = type.getType().getValue();
@@ -205,7 +209,7 @@ public class SwaggerProposalProvider {
             // if the type of array is string and
             // current value is a number, it should be put
             // into quotes to avoid validation issues
-            if (NumberUtils.isNumber(literal) && "string".equals(subType)) {
+            if ((NumberUtils.isNumber(literal) && "string".equals(subType)) || "null".equals(literal)) {
                 replStr = "\"" + literal + "\"";
             } else {
                 replStr = literal;

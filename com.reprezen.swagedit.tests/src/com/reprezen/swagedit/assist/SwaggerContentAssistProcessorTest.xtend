@@ -258,7 +258,7 @@ class SwaggerContentAssistProcessorTest {
 			"array",
 			"boolean",
 			"integer",
-			"null",
+			"\"null\"",
 			"number",
 			"object",
 			"string"))
