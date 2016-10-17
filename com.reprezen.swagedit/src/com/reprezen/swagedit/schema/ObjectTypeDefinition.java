@@ -22,6 +22,7 @@ import java.util.regex.Pattern;
 import com.fasterxml.jackson.core.JsonPointer;
 import com.fasterxml.jackson.databind.JsonNode;
 import com.reprezen.swagedit.json.references.JsonReference;
+import com.reprezen.swagedit.schema.SwaggerSchema.JsonSchema;
 
 /**
  * Represents a JSON schema type definition for objects.
@@ -54,12 +55,21 @@ public class ObjectTypeDefinition extends TypeDefinition {
     private final Map<String, TypeDefinition> patternProperties = new LinkedHashMap<>();
     private TypeDefinition additionalProperties = null;
 
-    public ObjectTypeDefinition(SwaggerSchema schema, JsonPointer pointer, JsonNode definition, JsonType type) {
-        super(schema, pointer, definition, type);
+    public ObjectTypeDefinition(JsonSchema schema, JsonPointer pointer, JsonNode definition) {
+        super(schema, pointer, definition, JsonType.OBJECT);
         init();
     }
 
-    private void init() {
+    protected void init() {
+        if (content.has("definitions") && content.get("definitions").isObject()) {
+            JsonNode definitions = content.get("definitions");
+
+            for (Iterator<Entry<String, JsonNode>> it = definitions.fields(); it.hasNext();) {
+                Entry<String, JsonNode> e = it.next();
+                schema.createType(this, "definitions/" + e.getKey(), e.getValue());
+            }
+        }
+
         initRequired();
         initProperties("properties", properties);
         initProperties("patternProperties", patternProperties);
@@ -67,34 +77,14 @@ public class ObjectTypeDefinition extends TypeDefinition {
         if (content.has("additionalProperties") && content.get("additionalProperties").isObject()) {
             JsonNode properties = content.get("additionalProperties");
 
-            JsonPointer pointer;
-            if (JsonReference.isReference(properties)) {
-                pointer = JsonReference.getPointer(properties);
-            } else {
-                pointer = JsonPointer.compile(getPointer().toString() + "/additionalProperties");
-            }
-
-            TypeDefinition definition = TypeDefinition.create(schema, pointer);
+            TypeDefinition definition = schema.createType(this, "additionalProperties", properties);
             if (definition != null) {
                 additionalProperties = definition;
             }
         }
-
-        if (content.has("definitions") && content.get("definitions").isObject()) {
-            JsonNode definitions = content.get("definitions");
-
-            for (Iterator<Entry<String, JsonNode>> it = definitions.fields(); it.hasNext();) {
-                Entry<String, JsonNode> e = it.next();
-                JsonPointer pointer = JsonPointer.compile(getPointer().toString() + "/definitions/" + e.getKey());
-
-                if (pointer != null && !pointer.equals(getPointer()) && schema.getType(pointer) == null) {
-                    TypeDefinition.create(schema, pointer);
-                }
-            }
-        }
     }
 
-    private void initRequired() {
+    protected void initRequired() {
         JsonNode required = content.get("required");
         if (required != null && required.isArray()) {
             for (JsonNode value : required) {
@@ -103,47 +93,24 @@ public class ObjectTypeDefinition extends TypeDefinition {
         }
     }
 
-    private void initProperties(String container, Map<String, TypeDefinition> properties) {
+    protected void initProperties(String container, Map<String, TypeDefinition> properties) {
         if (content.has(container) && content.get(container).isObject()) {
 
             JsonNode node = content.get(container);
             if (JsonReference.isReference(node)) {
-                node = schema.asJson().at(JsonReference.getPointer(node));
+                node = schema.resolve(JsonReference.getPointer(node));
             }
 
             for (Iterator<Entry<String, JsonNode>> it = node.fields(); it.hasNext();) {
                 Entry<String, JsonNode> e = it.next();
-                JsonPointer pointer = getPropertyPointer(container, e.getKey(), e.getValue());
 
-                if (pointer != null) {
-                    if (pointer.equals(getPointer())) {
-                        properties.put(e.getKey(), this);
-                    } else if (schema.getType(pointer) != null) {
-                        properties.put(e.getKey(), schema.getType(pointer));
-                    } else {
-                        properties.put(e.getKey(), TypeDefinition.create(schema, pointer));
-                    }
+                String property = e.getKey().replaceAll("/", "~1");
+                TypeDefinition type = schema.createType(this, container + "/" + property, e.getValue());
+                if (type != null) {
+                    properties.put(e.getKey(), type);
                 }
             }
         }
-    }
-
-    private JsonPointer getPropertyPointer(String container, String key, JsonNode node) {
-        String p = getPointer().toString();
-
-        if (JsonReference.isReference(node)) {
-            String ref = node.get(JsonReference.PROPERTY).asText();
-
-            if (ref.startsWith("http") || ref.startsWith("https")) {
-                return null;
-            }
-
-            p = ref.substring(1);
-        } else {
-            p += "/" + container + "/" + key;
-        }
-
-        return JsonPointer.compile(p);
     }
 
     @Override
