@@ -510,12 +510,20 @@ class ValidatorTest {
 		definitions:
 		  Pets:
 		    type: array
+		  Foo:
+		    type: object
+		    properties:
+		      bar:
+		        type: array
 		'''
 
 		document.set(content)
 		document.onChange()
 		val errors = validator.validate(document, null)
-		assertEquals(1, errors.size())
+		assertEquals(2, errors.size())
 		assertEquals(Messages.error_array_missing_items, errors.get(0).message)
+		assertEquals(12, errors.get(0).line)
+		assertEquals(Messages.error_array_missing_items, errors.get(1).message)
+		assertEquals(17, errors.get(1).line)
 	}
 }
