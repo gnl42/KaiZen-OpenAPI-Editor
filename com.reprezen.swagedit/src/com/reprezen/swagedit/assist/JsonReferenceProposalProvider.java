@@ -43,6 +43,22 @@ public class JsonReferenceProposalProvider {
         return DocumentUtils.getActiveEditorInput().getFile();
     }
 
+    /**
+     * Returns collection of JSON reference proposals.
+     * 
+     * If the scope is local, it will only return JSON references from within the current document.
+     * 
+     * If the scope is project, it will return all JSON references from within the current document and from all
+     * documents inside the same project.
+     * 
+     * If the scope is workspace, it will return all JSON references from within the current document and from all
+     * documents inside the same workspace.
+     * 
+     * @param pointer
+     * @param doc
+     * @param scope
+     * @return proposals
+     */
     public Collection<Proposal> getProposals(JsonPointer pointer, JsonNode doc, Scope scope) {
         final ContextType type = ContextType.get(pointer.toString());
         final IFile currentFile = getActiveFile();

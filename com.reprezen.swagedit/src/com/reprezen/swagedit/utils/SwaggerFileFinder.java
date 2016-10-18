@@ -22,14 +22,13 @@ import org.eclipse.core.runtime.CoreException;
 
 import com.google.common.collect.Lists;
 
+/**
+ * Utility class used to located swagger files depending on a scope.
+ */
 public class SwaggerFileFinder {
 
     /**
-     * Represents the scope for which the JSON reference proposals have to be computed. <br/>
-     * The default scope LOCAL means that JSON references will be computed only from inside the currently edited file.
-     * The scope PROJECT means that JSON references will be computed from files inside the same project has the
-     * currently edited file. The scope WORKSPACE means that JSON references will be computed from files present in the
-     * current workspace.
+     * Enumeration use to indicate where the finder should locate the swagger files.
      */
     public enum Scope {
         LOCAL(0) {
@@ -75,6 +74,17 @@ public class SwaggerFileFinder {
         }
     }
 
+    /**
+     * Returns the list of swagger files for the given scope.
+     * 
+     * If the scope is local, then only the current file is returned. If the scope is project, then all files in the
+     * same project as the current file are returned. If the scope is workspace, then all files in the current workspace
+     * are returned.
+     * 
+     * @param scope
+     * @param currentFile
+     * @return swagger files
+     */
     public Iterable<IFile> collectFiles(Scope scope, IFile currentFile) {
         if (currentFile == null) {
             return Lists.newArrayList();
