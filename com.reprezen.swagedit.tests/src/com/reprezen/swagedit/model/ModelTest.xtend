@@ -1,7 +1,8 @@
 package com.reprezen.swagedit.model
 
-import com.reprezen.swagedit.schema.ArrayTypeDefinition
+import com.reprezen.swagedit.schema.JsonType
 import com.reprezen.swagedit.schema.ObjectTypeDefinition
+import com.reprezen.swagedit.schema.ReferenceTypeDefinition
 import com.reprezen.swagedit.schema.SwaggerSchema
 import com.reprezen.swagedit.tests.utils.PointerHelpers
 import org.junit.Test
@@ -33,7 +34,7 @@ class ModelTest {
 		assertEquals(schema.asJson.at("/properties/swagger".ptr), swagger.asJson)
 
 		val info = root.get("info").type
-		assertTrue(info instanceof ObjectTypeDefinition)
+		assertTrue(info instanceof ReferenceTypeDefinition)
 		assertEquals("info", info.containingProperty)
 		assertEquals(schema.asJson.at("/definitions/info".ptr), info.asJson)
 
@@ -58,7 +59,10 @@ class ModelTest {
 		val root = model.root
 
 		val schemes = root.get("schemes").type
-		assertTrue(schemes instanceof ArrayTypeDefinition)
+
+		assertTrue(schemes instanceof ReferenceTypeDefinition)
+
+		assertEquals(JsonType.ARRAY, schemes.getType)
 		assertEquals(schema.asJson.at("/definitions/schemesList".ptr), schemes.asJson)
 
 		val http = root.get("schemes").get(0).type
@@ -80,7 +84,8 @@ class ModelTest {
 		val root = model.root
 
 		val consumes = root.get("consumes").type
-		assertTrue(consumes instanceof ArrayTypeDefinition)
+		assertTrue(consumes instanceof ReferenceTypeDefinition)
+		assertEquals(JsonType.ARRAY, consumes.type)
 		assertEquals(schema.asJson.at("/definitions/mediaTypeList".ptr), consumes.asJson)
 
 		val http = root.get("consumes").get(0).type
