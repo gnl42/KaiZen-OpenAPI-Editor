@@ -10,17 +10,11 @@
  *******************************************************************************/
 package com.reprezen.swagedit.assist;
 
-import java.util.ArrayList;
 import java.util.Collection;
 import java.util.Iterator;
 import java.util.List;
 
-import org.eclipse.core.resources.IContainer;
 import org.eclipse.core.resources.IFile;
-import org.eclipse.core.resources.IResource;
-import org.eclipse.core.resources.IResourceProxy;
-import org.eclipse.core.resources.IResourceProxyVisitor;
-import org.eclipse.core.runtime.CoreException;
 import org.eclipse.core.runtime.IPath;
 
 import com.fasterxml.jackson.core.JsonPointer;
@@ -29,6 +23,8 @@ import com.google.common.base.Strings;
 import com.google.common.collect.Lists;
 import com.reprezen.swagedit.json.references.JsonDocumentManager;
 import com.reprezen.swagedit.utils.DocumentUtils;
+import com.reprezen.swagedit.utils.SwaggerFileFinder;
+import com.reprezen.swagedit.utils.SwaggerFileFinder.Scope;
 import com.reprezen.swagedit.utils.URLUtils;
 
 /**
@@ -47,8 +43,23 @@ public class JsonReferenceProposalProvider {
         return DocumentUtils.getActiveEditorInput().getFile();
     }
 
-    public Collection<Proposal> getProposals(JsonPointer pointer, JsonNode doc, int cycle) {
-        final Scope scope = Scope.get(cycle);
+    /**
+     * Returns collection of JSON reference proposals.
+     * 
+     * If the scope is local, it will only return JSON references from within the current document.
+     * 
+     * If the scope is project, it will return all JSON references from within the current document and from all
+     * documents inside the same project.
+     * 
+     * If the scope is workspace, it will return all JSON references from within the current document and from all
+     * documents inside the same workspace.
+     * 
+     * @param pointer
+     * @param doc
+     * @param scope
+     * @return proposals
+     */
+    public Collection<Proposal> getProposals(JsonPointer pointer, JsonNode doc, Scope scope) {
         final ContextType type = ContextType.get(pointer.toString());
         final IFile currentFile = getActiveFile();
         final IPath basePath = currentFile.getParent().getFullPath();
@@ -57,15 +68,9 @@ public class JsonReferenceProposalProvider {
         if (scope == Scope.LOCAL) {
             proposals.addAll(collectProposals(doc, type.value(), null));
         } else {
-            IContainer parent;
-            if (scope == Scope.PROJECT) {
-                parent = currentFile.getProject();
-            } else {
-                parent = currentFile.getWorkspace().getRoot();
-            }
+            final SwaggerFileFinder fileFinder = new SwaggerFileFinder();
 
-            Iterable<IFile> files = collectFiles(parent);
-            for (IFile file : files) {
+            for (IFile file : fileFinder.collectFiles(scope, currentFile)) {
                 IPath relative = file.equals(currentFile) ? null : file.getFullPath().makeRelativeTo(basePath);
                 JsonNode content = file.equals(currentFile) ? doc : manager.getDocument(file.getLocationURI());
                 proposals.addAll(collectProposals(content, type.value(), relative));
@@ -73,49 +78,6 @@ public class JsonReferenceProposalProvider {
         }
 
         return proposals;
-    }
-
-    protected Iterable<IFile> collectFiles(IContainer parent) {
-        final FileVisitor visitor = new FileVisitor();
-
-        try {
-            parent.accept(visitor, 0);
-        } catch (CoreException e) {
-            return Lists.newArrayList();
-        }
-        return visitor.getFiles();
-    }
-
-    /**
-     * Represents the scope for which the JSON reference proposals have to be computed. <br/>
-     * The default scope LOCAL means that JSON references will be computed only from inside the currently edited file.
-     * The scope PROJECT means that JSON references will be computed from files inside the same project has the
-     * currently edited file. The scope WORKSPACE means that JSON references will be computed from files present in the
-     * current workspace.
-     */
-    protected enum Scope {
-        LOCAL(0), PROJECT(1), WORKSPACE(2);
-
-        private final int value;
-
-        Scope(int v) {
-            this.value = v;
-        }
-
-        public int getValue() {
-            return value;
-        }
-
-        public static Scope get(int cycle) {
-            switch (cycle) {
-            case 1:
-                return PROJECT;
-            case 2:
-                return WORKSPACE;
-            default:
-                return Scope.LOCAL;
-            }
-        }
     }
 
     /**
@@ -190,30 +152,6 @@ public class JsonReferenceProposalProvider {
         }
 
         return results;
-    }
-
-    private static class FileVisitor implements IResourceProxyVisitor {
-
-        private final List<IFile> files = new ArrayList<>();
-
-        @Override
-        public boolean visit(IResourceProxy proxy) throws CoreException {
-            if (proxy.getType() == IResource.FILE
-                    && (proxy.getName().endsWith("yaml") || proxy.getName().endsWith("yml"))) {
-
-                if (!proxy.isDerived()) {
-                    files.add((IFile) proxy.requestResource());
-                }
-            } else if (proxy.getType() == IResource.FOLDER
-                    && (proxy.isDerived() || proxy.getName().equalsIgnoreCase("gentargets"))) {
-                return false;
-            }
-            return true;
-        }
-
-        public List<IFile> getFiles() {
-            return files;
-        }
     }
 
 }

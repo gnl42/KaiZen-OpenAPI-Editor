@@ -14,12 +14,6 @@ import org.eclipse.core.resources.IFile;
 import org.eclipse.core.runtime.CoreException;
 import org.eclipse.jface.text.IRegion;
 import org.eclipse.jface.text.hyperlink.IHyperlink;
-import org.eclipse.ui.IEditorPart;
-import org.eclipse.ui.IWorkbenchPage;
-import org.eclipse.ui.PartInitException;
-import org.eclipse.ui.PlatformUI;
-import org.eclipse.ui.ide.IDE;
-import org.eclipse.ui.texteditor.ITextEditor;
 
 import com.fasterxml.jackson.core.JsonPointer;
 import com.reprezen.swagedit.editor.SwaggerDocument;
@@ -61,22 +55,8 @@ public class SwaggerFileHyperlink implements IHyperlink {
         }
 
         try {
-            final IWorkbenchPage page = PlatformUI.getWorkbench().getActiveWorkbenchWindow().getActivePage();
-
-            IEditorPart editor;
-            try {
-                editor = IDE.openEditor(page, file);
-            } catch (PartInitException e) {
-                return;
-            }
-
-            if (editor instanceof ITextEditor) {
-                IRegion region = getTarget();
-                if (region != null) {
-                    ((ITextEditor) editor).selectAndReveal(region.getOffset(), region.getLength());
-                }
-            }
-        } catch (ClassCastException | CoreException e) {
+            DocumentUtils.openAndReveal(file, getTarget());
+        } catch (Exception e) {
             // TODO
         }
     }

@@ -28,6 +28,7 @@ import org.eclipse.ui.plugin.AbstractUIPlugin;
 import org.osgi.framework.Bundle;
 import org.osgi.framework.BundleContext;
 
+import com.reprezen.swagedit.schema.SwaggerSchema;
 import com.reprezen.swagedit.templates.SwaggerContextType;
 
 public class Activator extends AbstractUIPlugin {
@@ -40,6 +41,7 @@ public class Activator extends AbstractUIPlugin {
     private ContributionTemplateStore templateStore;
 
     private ContributionContextTypeRegistry contextTypeRegistry;
+    private SwaggerSchema schema;
 
     /**
      * Bundle icons
@@ -141,4 +143,11 @@ public class Activator extends AbstractUIPlugin {
         return contextTypeRegistry;
     }
 
+    public SwaggerSchema getSchema() {
+        if (schema == null) {
+            schema = new SwaggerSchema();
+        }
+
+        return schema;
+    }
 }

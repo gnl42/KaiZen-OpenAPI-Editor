@@ -31,7 +31,6 @@ import org.eclipse.jface.text.reconciler.IReconciler;
 import org.eclipse.jface.text.reconciler.MonoReconciler;
 import org.eclipse.jface.text.source.ISourceViewer;
 import org.eclipse.swt.widgets.Shell;
-import org.eclipse.ui.part.IShowInTarget;
 
 import com.reprezen.swagedit.Activator;
 import com.reprezen.swagedit.assist.SwaggerContentAssistProcessor;
@@ -44,7 +43,6 @@ public class SwaggerSourceViewerConfiguration extends YEditSourceViewerConfigura
 
     private SwaggerEditor editor;
     private YAMLScanner scanner;
-    private IShowInTarget showInTarget;
     private InformationPresenter informationPresenter;
 
     public SwaggerSourceViewerConfiguration() {
@@ -133,14 +131,10 @@ public class SwaggerSourceViewerConfiguration extends YEditSourceViewerConfigura
     private IInformationControlCreator getOutlineInformationControlCreator() {
         return new IInformationControlCreator() {
             public IInformationControl createInformationControl(Shell parent) {
-                QuickOutline dialog = new QuickOutline(parent, showInTarget);
+                QuickOutline dialog = new QuickOutline(parent, getEditor());
                 return dialog;
             }
         };
-    }
-
-    public void setShowInTarget(IShowInTarget showInTarget) {
-        this.showInTarget = showInTarget;
     }
 
     private class InformationProvider

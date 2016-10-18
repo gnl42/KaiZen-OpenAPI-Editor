@@ -10,6 +10,10 @@
  *******************************************************************************/
 package com.reprezen.swagedit.editor.outline;
 
+import org.eclipse.core.resources.IFile;
+import org.eclipse.jface.bindings.TriggerSequence;
+import org.eclipse.jface.bindings.keys.KeySequence;
+import org.eclipse.jface.bindings.keys.SWTKeySupport;
 import org.eclipse.jface.dialogs.Dialog;
 import org.eclipse.jface.dialogs.PopupDialog;
 import org.eclipse.jface.text.IInformationControl;
@@ -40,22 +44,42 @@ import org.eclipse.swt.widgets.Shell;
 import org.eclipse.swt.widgets.Text;
 import org.eclipse.swt.widgets.Tree;
 import org.eclipse.swt.widgets.TreeItem;
-import org.eclipse.ui.part.IShowInTarget;
+import org.eclipse.ui.IEditorInput;
+import org.eclipse.ui.IFileEditorInput;
+import org.eclipse.ui.PlatformUI;
+import org.eclipse.ui.keys.IBindingService;
 import org.eclipse.ui.part.ShowInContext;
 
 import com.google.common.base.Strings;
+import com.reprezen.swagedit.Messages;
+import com.reprezen.swagedit.editor.SwaggerEditor;
 import com.reprezen.swagedit.model.AbstractNode;
+import com.reprezen.swagedit.model.Model;
+import com.reprezen.swagedit.utils.DocumentUtils;
+import com.reprezen.swagedit.utils.SwaggerFileFinder;
+import com.reprezen.swagedit.utils.SwaggerFileFinder.Scope;
 
 public class QuickOutline extends PopupDialog
         implements IInformationControl, IInformationControlExtension, IInformationControlExtension2 {
 
-    private TreeViewer treeViewer;
-    private IShowInTarget showInTarget;
-    private Text filterText;
+    public static final String COMMAND_ID = "com.reprezen.swagedit.commands.quickoutline";
 
-    public QuickOutline(Shell parent, IShowInTarget showInTarget) {
+    private Scope currentScope = Scope.LOCAL;
+    private TreeViewer treeViewer;
+    private SwaggerEditor editor;
+    private Text filterText;
+    private TriggerSequence triggerSequence;
+    private String bindingKey;
+
+    public QuickOutline(Shell parent, SwaggerEditor editor) {
         super(parent, PopupDialog.INFOPOPUPRESIZE_SHELLSTYLE, true, true, true, true, true, null, null);
-        this.showInTarget = showInTarget;
+
+        IBindingService bindingService = (IBindingService) PlatformUI.getWorkbench().getAdapter(IBindingService.class);
+        this.bindingKey = bindingService.getBestActiveBindingFormattedFor(COMMAND_ID);
+        this.triggerSequence = bindingService.getBestActiveBindingFor(COMMAND_ID);
+        this.editor = editor;
+
+        setInfoText(statusMessage());
         create();
     }
 
@@ -71,6 +95,8 @@ public class QuickOutline extends PopupDialog
 
         filterText.addKeyListener(new KeyListener() {
             public void keyPressed(KeyEvent e) {
+                handleMultiView(e);
+
                 if (e.keyCode == SWT.CR) {
                     handleSelection();
                     QuickOutline.this.close();
@@ -94,9 +120,7 @@ public class QuickOutline extends PopupDialog
         filterText.addModifyListener(new ModifyListener() {
             public void modifyText(ModifyEvent e) {
                 // refresh tree to apply filter
-                treeViewer.getControl().setRedraw(false);
                 treeViewer.refresh();
-                treeViewer.expandAll();
                 TreeItem[] items = treeViewer.getTree().getItems();
                 if (items != null && items.length > 0) {
                     treeViewer.getTree().setSelection(items[0]);
@@ -104,10 +128,54 @@ public class QuickOutline extends PopupDialog
                 } else {
                     treeViewer.setSelection(StructuredSelection.EMPTY);
                 }
-                treeViewer.getControl().setRedraw(true);
+                treeViewer.expandAll();
             }
         });
         return filterText;
+    }
+
+    protected void handleMultiView(KeyEvent e) {
+        if (!isInvocationEvent(e)) {
+            return;
+        }
+
+        currentScope = currentScope.next();
+        SwaggerFileFinder fileFinder = new SwaggerFileFinder();
+        IEditorInput input = editor.getEditorInput();
+
+        IFile currentFile = null;
+        if (input instanceof IFileEditorInput) {
+            currentFile = ((IFileEditorInput) input).getFile();
+        }
+
+        Iterable<IFile> files = fileFinder.collectFiles(currentScope, currentFile);
+        setInfoText(statusMessage());
+
+        if (currentScope == Scope.LOCAL) {
+            treeViewer.setAutoExpandLevel(2);
+        } else {
+            treeViewer.setAutoExpandLevel(0);
+        }
+
+        setInput(Model.parseYaml(files));
+    }
+
+    protected String statusMessage() {
+        switch (currentScope) {
+        case PROJECT:
+            return String.format(Messages.outline_proposal_workspace, bindingKey);
+        case WORKSPACE:
+            return String.format(Messages.outline_proposal_local, bindingKey);
+        default: // LOCAL
+            return String.format(Messages.outline_proposal_project, bindingKey);
+        }
+    }
+
+    protected boolean isInvocationEvent(KeyEvent e) {
+        int accelerator = SWTKeySupport.convertEventToUnmodifiedAccelerator(e);
+        KeySequence keySequence = KeySequence.getInstance(SWTKeySupport.convertAcceleratorToKeyStroke(accelerator));
+
+        return keySequence.startsWith(triggerSequence, true);
     }
 
     protected TreeViewer createTreeViewer(Composite parent) {
@@ -132,6 +200,8 @@ public class QuickOutline extends PopupDialog
 
             @Override
             public void keyPressed(KeyEvent e) {
+                handleMultiView(e);
+
                 if (e.keyCode == SWT.CR) {
                     handleSelection();
                     QuickOutline.this.close();
@@ -161,35 +231,6 @@ public class QuickOutline extends PopupDialog
                 }
             }
         });
-
-        return treeViewer;
-    }
-
-    protected void handleSelection() {
-        ITreeSelection selection = (ITreeSelection) treeViewer.getSelection();
-
-        if (selection != null) {
-            showInTarget.show(new ShowInContext(null, selection));
-        }
-    }
-
-    @Override
-    protected Control createDialogArea(Composite parent) {
-        treeViewer = createTreeViewer(parent);
-
-        final Tree tree = treeViewer.getTree();
-        tree.addKeyListener(new KeyListener() {
-            public void keyPressed(KeyEvent e) {
-                if (e.character == SWT.ESC) {
-                    QuickOutline.this.close();
-                }
-            }
-
-            public void keyReleased(KeyEvent e) {
-                // do nothing
-            }
-        });
-
         tree.addSelectionListener(new SelectionListener() {
             public void widgetSelected(SelectionEvent e) {
                 // do nothing
@@ -199,11 +240,51 @@ public class QuickOutline extends PopupDialog
                 handleSelection();
             }
         });
+
+        return treeViewer;
+    }
+
+    protected void handleSelection() {
+        ITreeSelection selection = (ITreeSelection) treeViewer.getSelection();
+
+        if (selection != null) {
+            Object element = selection.getFirstElement();
+
+            if (element instanceof AbstractNode) {
+                Model model = ((AbstractNode) element).getModel();
+
+                if (model.getPath() != null) {
+                    DocumentUtils.openAndReveal(model.getPath(), selection);
+                } else {
+                    editor.show(new ShowInContext(null, selection));
+                }
+            }
+        }
+    }
+
+    @Override
+    protected Control createDialogArea(Composite parent) {
+        treeViewer = createTreeViewer(parent);
         return treeViewer.getControl();
     }
 
     @Override
     public void setInput(Object input) {
+        if (input instanceof Model) {
+            Model model = (Model) input;
+            if (model.getPath() == null) {
+                IFile currentFile = null;
+                IEditorInput editorInput = editor.getEditorInput();
+
+                if (editorInput instanceof IFileEditorInput) {
+                    currentFile = ((IFileEditorInput) editorInput).getFile();
+                }
+                if (currentFile != null) {
+                    model.setPath(currentFile.getFullPath());
+                }
+            }
+        }
+        
         treeViewer.setInput(input);
         treeViewer.setSelection(null, true);
     }
