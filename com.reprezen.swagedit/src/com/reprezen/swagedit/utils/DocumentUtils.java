@@ -24,15 +24,29 @@ import org.eclipse.core.resources.ResourcesPlugin;
 import org.eclipse.core.runtime.CoreException;
 import org.eclipse.core.runtime.IPath;
 import org.eclipse.core.runtime.Path;
+import org.eclipse.jface.text.IRegion;
+import org.eclipse.jface.viewers.ISelection;
 import org.eclipse.ui.IEditorInput;
+import org.eclipse.ui.IEditorPart;
+import org.eclipse.ui.IWorkbenchPage;
+import org.eclipse.ui.PartInitException;
 import org.eclipse.ui.PlatformUI;
+import org.eclipse.ui.ide.IDE;
 import org.eclipse.ui.part.FileEditorInput;
+import org.eclipse.ui.part.IShowInTarget;
+import org.eclipse.ui.part.ShowInContext;
+import org.eclipse.ui.texteditor.ITextEditor;
 
 import com.google.common.io.CharStreams;
 import com.reprezen.swagedit.editor.SwaggerDocument;
 
 public class DocumentUtils {
 
+    /**
+     * Returns the currently active editor.
+     * 
+     * @return editor
+     */
     public static FileEditorInput getActiveEditorInput() {
         IEditorInput input = PlatformUI.getWorkbench().getActiveWorkbenchWindow().getActivePage().getActiveEditor()
                 .getEditorInput();
@@ -40,6 +54,12 @@ public class DocumentUtils {
         return input instanceof FileEditorInput ? (FileEditorInput) input : null;
     }
 
+    /**
+     * Returns the swagger document if exists for the given path.
+     * 
+     * @param path
+     * @return document
+     */
     public static SwaggerDocument getDocument(IPath path) {
         if (path == null || !path.getFileExtension().matches("ya?ml")) {
             return null;
@@ -104,10 +124,49 @@ public class DocumentUtils {
 
     public static IFileStore getExternalFile(IPath path) {
         IFileStore fileStore = EFS.getLocalFileSystem().getStore(path);
-
         IFileInfo fileInfo = fileStore.fetchInfo();
 
         return fileInfo != null && fileInfo.exists() ? fileStore : null;
     }
 
+    /**
+     * Opens the editor for the given file and reveal the given region.
+     * 
+     * @param file
+     * @param region
+     */
+    public static void openAndReveal(IFile file, IRegion region) {
+        final IEditorPart editor = openEditor(file);
+        if (editor instanceof ITextEditor) {
+            if (region != null) {
+                ((ITextEditor) editor).selectAndReveal(region.getOffset(), region.getLength());
+            }
+        }
+    }
+
+    /**
+     * Opens the editor for the file located at the given path and reveal the selection.
+     * 
+     * @param path
+     * @param selection
+     */
+    public static void openAndReveal(IPath path, ISelection selection) {
+        final IWorkspaceRoot root = ResourcesPlugin.getWorkspace().getRoot();
+        final IFile file = root.getFile(path);
+        final IEditorPart editor = openEditor(file);
+
+        if (editor instanceof IShowInTarget) {
+            IShowInTarget showIn = (IShowInTarget) editor;
+            showIn.show(new ShowInContext(null, selection));
+        }
+    }
+
+    protected static IEditorPart openEditor(IFile file) {
+        final IWorkbenchPage page = PlatformUI.getWorkbench().getActiveWorkbenchWindow().getActivePage();
+        try {
+            return IDE.openEditor(page, file);
+        } catch (PartInitException e) {
+            return null;
+        }
+    }
 }

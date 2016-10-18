@@ -20,7 +20,7 @@ public class ObjectNode extends AbstractNode {
 
     private final Map<String, AbstractNode> elements = new LinkedHashMap<>();
 
-    public ObjectNode(Model model, AbstractNode parent, JsonPointer ptr) {
+    ObjectNode(Model model, AbstractNode parent, JsonPointer ptr) {
         super(model, parent, ptr);
     }
 

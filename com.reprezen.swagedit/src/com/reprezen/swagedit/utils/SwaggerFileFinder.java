@@ -75,8 +75,23 @@ public class SwaggerFileFinder {
         }
     }
 
-    protected Iterable<IFile> collectFiles(IContainer parent) {
-        final FileVisitor visitor = new FileVisitor();
+    public Iterable<IFile> collectFiles(Scope scope, IFile currentFile) {
+        if (currentFile == null) {
+            return Lists.newArrayList();
+        }
+
+        switch (scope) {
+        case PROJECT:
+            return collectFiles(currentFile.getProject(), currentFile);
+        case WORKSPACE:
+            return collectFiles(currentFile.getWorkspace().getRoot(), currentFile);
+        default:
+            return Lists.newArrayList(currentFile);
+        }
+    }
+
+    protected Iterable<IFile> collectFiles(IContainer parent, IFile currentFile) {
+        final FileVisitor visitor = new FileVisitor(currentFile);
 
         try {
             parent.accept(visitor, 0);
@@ -86,24 +101,19 @@ public class SwaggerFileFinder {
         return visitor.getFiles();
     }
 
-    public Iterable<IFile> collectFiles(Scope scope, IFile currentFile) {
-        if (currentFile == null) {
-            return Lists.newArrayList();
-        }
-
-        switch (scope) {
-        case PROJECT:
-            return collectFiles(currentFile.getProject());
-        case WORKSPACE:
-            return collectFiles(currentFile.getWorkspace().getRoot());
-        default:
-            return Lists.newArrayList(currentFile);
-        }
-    }
-
     private static class FileVisitor implements IResourceProxyVisitor {
 
-        private final List<IFile> files = new ArrayList<>();
+        private final List<IFile> files;
+        private final IFile currentFile;
+
+        public FileVisitor(IFile currentFile) {
+            this.currentFile = currentFile;
+            this.files = new ArrayList<IFile>();
+
+            if (currentFile != null) {
+                files.add(currentFile);
+            }
+        }
 
         @Override
         public boolean visit(IResourceProxy proxy) throws CoreException {
@@ -111,7 +121,10 @@ public class SwaggerFileFinder {
                     && (proxy.getName().endsWith("yaml") || proxy.getName().endsWith("yml"))) {
 
                 if (!proxy.isDerived()) {
-                    files.add((IFile) proxy.requestResource());
+                    IFile file = (IFile) proxy.requestResource();
+                    if (!file.equals(currentFile)) {
+                        files.add(file);
+                    }
                 }
             } else if (proxy.getType() == IResource.FOLDER
                     && (proxy.isDerived() || proxy.getName().equalsIgnoreCase("gentargets"))) {

@@ -43,8 +43,7 @@ public class JsonReferenceProposalProvider {
         return DocumentUtils.getActiveEditorInput().getFile();
     }
 
-    public Collection<Proposal> getProposals(JsonPointer pointer, JsonNode doc, int cycle) {
-        final Scope scope = Scope.get(cycle);
+    public Collection<Proposal> getProposals(JsonPointer pointer, JsonNode doc, Scope scope) {
         final ContextType type = ContextType.get(pointer.toString());
         final IFile currentFile = getActiveFile();
         final IPath basePath = currentFile.getParent().getFullPath();

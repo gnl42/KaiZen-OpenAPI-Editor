@@ -19,7 +19,7 @@ public class ArrayNode extends AbstractNode {
 
     private final List<AbstractNode> elements = new ArrayList<>();
 
-    public ArrayNode(Model model, AbstractNode parent, JsonPointer ptr) {
+    ArrayNode(Model model, AbstractNode parent, JsonPointer ptr) {
         super(model, parent, ptr);
     }
 

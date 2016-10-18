@@ -55,6 +55,7 @@ import com.reprezen.swagedit.Messages;
 import com.reprezen.swagedit.editor.SwaggerEditor;
 import com.reprezen.swagedit.model.AbstractNode;
 import com.reprezen.swagedit.model.Model;
+import com.reprezen.swagedit.utils.DocumentUtils;
 import com.reprezen.swagedit.utils.SwaggerFileFinder;
 import com.reprezen.swagedit.utils.SwaggerFileFinder.Scope;
 
@@ -119,9 +120,7 @@ public class QuickOutline extends PopupDialog
         filterText.addModifyListener(new ModifyListener() {
             public void modifyText(ModifyEvent e) {
                 // refresh tree to apply filter
-                treeViewer.getControl().setRedraw(false);
                 treeViewer.refresh();
-                treeViewer.expandAll();
                 TreeItem[] items = treeViewer.getTree().getItems();
                 if (items != null && items.length > 0) {
                     treeViewer.getTree().setSelection(items[0]);
@@ -129,7 +128,7 @@ public class QuickOutline extends PopupDialog
                 } else {
                     treeViewer.setSelection(StructuredSelection.EMPTY);
                 }
-                treeViewer.getControl().setRedraw(true);
+                treeViewer.expandAll();
             }
         });
         return filterText;
@@ -151,11 +150,13 @@ public class QuickOutline extends PopupDialog
 
         Iterable<IFile> files = fileFinder.collectFiles(currentScope, currentFile);
         setInfoText(statusMessage());
+
         if (currentScope == Scope.LOCAL) {
             treeViewer.setAutoExpandLevel(2);
         } else {
             treeViewer.setAutoExpandLevel(0);
         }
+
         setInput(Model.parseYaml(files));
     }
 
@@ -247,7 +248,17 @@ public class QuickOutline extends PopupDialog
         ITreeSelection selection = (ITreeSelection) treeViewer.getSelection();
 
         if (selection != null) {
-            editor.show(new ShowInContext(null, selection));
+            Object element = selection.getFirstElement();
+
+            if (element instanceof AbstractNode) {
+                Model model = ((AbstractNode) element).getModel();
+
+                if (model.getPath() != null) {
+                    DocumentUtils.openAndReveal(model.getPath(), selection);
+                } else {
+                    editor.show(new ShowInContext(null, selection));
+                }
+            }
         }
     }
 
@@ -259,6 +270,21 @@ public class QuickOutline extends PopupDialog
 
     @Override
     public void setInput(Object input) {
+        if (input instanceof Model) {
+            Model model = (Model) input;
+            if (model.getPath() == null) {
+                IFile currentFile = null;
+                IEditorInput editorInput = editor.getEditorInput();
+
+                if (editorInput instanceof IFileEditorInput) {
+                    currentFile = ((IFileEditorInput) editorInput).getFile();
+                }
+                if (currentFile != null) {
+                    model.setPath(currentFile.getFullPath());
+                }
+            }
+        }
+        
         treeViewer.setInput(input);
         treeViewer.setSelection(null, true);
     }

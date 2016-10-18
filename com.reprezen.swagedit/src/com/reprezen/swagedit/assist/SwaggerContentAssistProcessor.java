@@ -55,6 +55,7 @@ import com.reprezen.swagedit.editor.SwaggerDocument;
 import com.reprezen.swagedit.model.Model;
 import com.reprezen.swagedit.templates.SwaggerContextType;
 import com.reprezen.swagedit.templates.SwaggerTemplateContext;
+import com.reprezen.swagedit.utils.SwaggerFileFinder.Scope;
 
 /**
  * This class provides basic content assist based on keywords used by the swagger schema.
@@ -73,11 +74,9 @@ public class SwaggerContentAssistProcessor extends TemplateCompletionProcessor
     private JsonPointer currentPath = null;
 
     /**
-     * Current position in the list of proposals. Use for JSON Reference proposals.
-     * 
-     * @see JsonReferenceProposalProvider.Scope
+     * Current position scope use to retrieve JSON Reference proposals.
      */
-    private int cyclePosition = 0;
+    private Scope currentScope = Scope.LOCAL;
 
     /**
      * True if the proposal is activated on a JSON reference.
@@ -112,7 +111,7 @@ public class SwaggerContentAssistProcessor extends TemplateCompletionProcessor
     @Override
     public ICompletionProposal[] computeCompletionProposals(ITextViewer viewer, int documentOffset) {
         if (isRefCompletion) {
-            cyclePosition = ++cyclePosition % 3;
+            currentScope = currentScope.next();
         }
 
         if (!(viewer.getDocument() instanceof SwaggerDocument)) {
@@ -145,7 +144,7 @@ public class SwaggerContentAssistProcessor extends TemplateCompletionProcessor
         Collection<Proposal> p;
         if (isRefCompletion) {
             updateStatus();
-            p = referenceProposalProvider.getProposals(currentPath, document.asJson(), cyclePosition);
+            p = referenceProposalProvider.getProposals(currentPath, document.asJson(), currentScope);
         } else {
             p = proposalProvider.getProposals(currentPath, model, prefix);
         }
@@ -167,7 +166,7 @@ public class SwaggerContentAssistProcessor extends TemplateCompletionProcessor
             if (textMessages == null) {
                 textMessages = initTextMessages();
             }
-            contentAssistant.setStatusMessage(textMessages[cyclePosition]);
+            contentAssistant.setStatusMessage(textMessages[currentScope.getValue()]);
         }
     }
 
@@ -292,14 +291,14 @@ public class SwaggerContentAssistProcessor extends TemplateCompletionProcessor
 
     @Override
     public void assistSessionStarted(ContentAssistEvent event) {
-        cyclePosition = 0;
+        currentScope = Scope.LOCAL;
         isRefCompletion = false;
         textMessages = null;
     }
 
     @Override
     public void assistSessionEnded(ContentAssistEvent event) {
-        cyclePosition = 0;
+        currentScope = Scope.LOCAL;
         isRefCompletion = false;
         textMessages = null;
     }

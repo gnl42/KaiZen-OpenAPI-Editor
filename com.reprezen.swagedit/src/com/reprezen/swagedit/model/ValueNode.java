@@ -16,7 +16,7 @@ public class ValueNode extends AbstractNode {
 
     private final Object value;
 
-    public ValueNode(Model model, AbstractNode parent, JsonPointer ptr, Object value) {
+    ValueNode(Model model, AbstractNode parent, JsonPointer ptr, Object value) {
         super(model, parent, ptr);
 
         this.value = value;
