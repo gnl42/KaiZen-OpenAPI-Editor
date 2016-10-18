@@ -24,6 +24,7 @@ import com.reprezen.swagedit.editor.hyperlinks.PathParamHyperlinkDetectorTest;
 import com.reprezen.swagedit.editor.outline.AbstractNodeTest;
 import com.reprezen.swagedit.editor.outline.OutlineStyledLabelProviderTest;
 import com.reprezen.swagedit.json.references.JsonReferenceFactoryTest;
+import com.reprezen.swagedit.model.ModelTest;
 import com.reprezen.swagedit.schema.SwaggerSchemaTest;
 import com.reprezen.swagedit.templates.CodeTemplateContextTest;
 import com.reprezen.swagedit.validation.ErrorProcessorTest;
@@ -43,8 +44,9 @@ import com.reprezen.swagedit.validation.ValidatorTest;
         PathParamHyperlinkDetectorTest.class, //
         AbstractNodeTest.class, //
         OutlineStyledLabelProviderTest.class, //
-        SwaggerSchemaTest.class, //
         JsonReferenceFactoryTest.class, //
+        ModelTest.class, //
+        SwaggerSchemaTest.class, //
         CodeTemplateContextTest.class, //
         ErrorProcessorTest.class, //
         MultipleSwaggerErrorMessageTest.class, //

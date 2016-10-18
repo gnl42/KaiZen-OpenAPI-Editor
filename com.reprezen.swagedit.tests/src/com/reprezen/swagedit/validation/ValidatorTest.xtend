@@ -519,11 +519,10 @@ class ValidatorTest {
 
 		document.set(content)
 		document.onChange()
-		val errors = validator.validate(document, null)
-		assertEquals(2, errors.size())
-		assertEquals(Messages.error_array_missing_items, errors.get(0).message)
-		assertEquals(12, errors.get(0).line)
-		assertEquals(Messages.error_array_missing_items, errors.get(1).message)
-		assertEquals(17, errors.get(1).line)
+
+		val errors = validator.validate(document, null)		
+		assertEquals(2, errors.size())		
+		assertTrue(errors.map[message].forall[it.equals(Messages.error_array_missing_items)])
+		assertThat(errors.map[line], hasItems(12, 17))
 	}
 }
