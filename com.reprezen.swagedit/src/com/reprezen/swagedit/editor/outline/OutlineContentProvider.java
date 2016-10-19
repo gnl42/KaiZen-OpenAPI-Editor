@@ -10,36 +10,49 @@
  *******************************************************************************/
 package com.reprezen.swagedit.editor.outline;
 
+import java.util.List;
+
 import org.eclipse.jface.viewers.ITreeContentProvider;
 import org.eclipse.jface.viewers.Viewer;
 
 import com.google.common.collect.Iterables;
+import com.google.common.collect.Lists;
 import com.reprezen.swagedit.model.AbstractNode;
 import com.reprezen.swagedit.model.Model;
 
 public class OutlineContentProvider implements ITreeContentProvider {
 
-    private Model model;
+    private Iterable<Model> models;
 
     @Override
     public void dispose() {
-        model = null;
+        models = Lists.newArrayList();
     }
 
+    @SuppressWarnings("unchecked")
     @Override
     public void inputChanged(Viewer viewer, Object oldInput, Object newInput) {
-        if (newInput instanceof Model) {
-            this.model = (Model) newInput;
+        if (newInput == null) {
+            this.models = Lists.newArrayList();
+        } else if (newInput instanceof Model) {
+            this.models = Lists.newArrayList((Model) newInput);
+        } else if (Iterable.class.isAssignableFrom(newInput.getClass())) {
+            this.models = (Iterable<Model>) newInput;
         }
     }
 
     @Override
     public Object[] getElements(Object inputElement) {
-        if (model == null) {
+        if (models == null || Iterables.isEmpty(models)) {
             return null;
         }
 
-        return new Object[] { model.getRoot() };
+        List<Object> roots = Lists.newArrayList();
+        for (Model model : models) {
+            roots.add(model.getRoot());
+        }
+
+        return roots.toArray(new Object[roots.size()]);
     }
 
     @Override

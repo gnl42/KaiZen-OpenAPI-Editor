@@ -195,7 +195,6 @@ public class SwaggerEditor extends YEdit implements IShowInSource, IShowInTarget
     public SwaggerEditor() {
         super();
         setDocumentProvider(new SwaggerDocumentProvider());
-        sourceViewerConfiguration.setShowInTarget(this);
     }
 
     @Override

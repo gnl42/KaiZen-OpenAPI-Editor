@@ -76,17 +76,25 @@ public class OutlineStyledLabelProvider extends StyledCellLabelProvider {
             TypeDefinition definition = element.getType();
 
             String label = null;
-            if (definition.asJson().has("title")) {
-                label = definition.asJson().get("title").asText();
-            } else if (definition.getContainingProperty() != null) {
-                label = definition.getContainingProperty();
+            if (definition != null && definition.asJson() != null) {
+                if (definition.asJson().has("title")) {
+                    label = definition.asJson().get("title").asText();
+                } else if (definition.getContainingProperty() != null) {
+                    label = definition.getContainingProperty();
+                }
             }
-            
+
             if (label != null) {
                 styledString.append(" ");
                 styledString.append(label, getTagStyler());
             }
 
+        } else if (element.getParent() == null) {
+
+            if (element.getModel().getPath() != null) {
+                styledString.append(" ");
+                styledString.append(element.getModel().getPath().toString(), getTagStyler());
+            }
         }
 
         return styledString;
