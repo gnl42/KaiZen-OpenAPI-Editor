@@ -34,6 +34,17 @@ public class JsonReference {
 
     public static final String PROPERTY = "$ref";
 
+    /**
+     * Represents an unqualified reference, this class is used to support deprecated references.
+     */
+    public static class SimpleReference extends JsonReference {
+
+        SimpleReference(URI baseURI, JsonPointer ptr, Object source) {
+            super(URI.create(baseURI + "#" + ptr.toString()), ptr, false, true, false, source);
+        }
+
+    }
+
     private final URI uri;
     private final JsonPointer pointer;
     private final boolean absolute;
