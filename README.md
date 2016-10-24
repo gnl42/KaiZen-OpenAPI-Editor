@@ -13,6 +13,10 @@ _**Note:** SwagEdit includes code assist, real-time validation, syntax highlight
 [Eclipse Color Theme](https://marketplace.eclipse.org/content/eclipse-color-theme) and [EditBox](http://marketplace.eclipse.org/content/nodeclipse-editbox-background-colors-themes-highlight-code-blocks-c-java-javascript-python) are available as separate plugins.<br/>
 [RepreZen API Studio](http://reprezen.com/swagger-tools) includes the mock service, live Swagger-UI & other features that are not part of SwagEdit._
 
+## Feature Highlights
+
+<img src="/etc/img/ContentAssistQuickOutline.png" alt="Drawing" width="400" />
+
 ## Install SwagEdit
 ### Via an update site 
 You can now install SwagEdit into your Eclipse by clicking on `Help > Install New Software... > Add...`
