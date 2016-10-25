@@ -525,4 +525,93 @@ class ValidatorTest {
 		assertTrue(errors.map[message].forall[it.equals(Messages.error_array_missing_items)])
 		assertThat(errors.map[line], hasItems(12, 17))
 	}
+	
+	@Test
+	def void testValidateMissingTypeInDefinitions() {
+		val content = '''
+		swagger: '2.0'
+		info:
+		  version: 0.0.0
+		  title: Simple API
+		paths:
+		  /foo:
+		    get:
+		      responses:
+		        '200':
+		          description: OK
+		definitions:
+		  Foo:
+		    properties:
+		      bar:
+		        type: string
+		'''
+
+		document.set(content)
+		document.onChange()
+
+		val errors = validator.validate(document, null)		
+		assertEquals(1, errors.size())
+		assertEquals(Messages.error_type_missing, errors.get(0).message)
+	}
+
+	@Test
+	def void testValidateWrongTypeDefinition() {
+		val content = '''
+		swagger: '2.0'
+		info:
+		  version: 0.0.0
+		  title: Simple API
+		paths:
+		  /foo:
+		    get:
+		      responses:
+		        '200':
+		          description: OK
+		definitions:
+		  Foo:
+		    type: string
+		    properties:
+		      bar:
+		        type: string
+		'''
+
+		document.set(content)
+		document.onChange()
+
+		val errors = validator.validate(document, null)		
+		assertEquals(1, errors.size())
+		assertEquals(Messages.error_wrong_type, errors.get(0).message)
+	}
+
+	@Test
+	def void testValidateMissingRequiredProperties() {
+		val content = '''
+		swagger: '2.0'
+		info:
+		  version: 0.0.0
+		  title: Simple API
+		paths:
+		  /foo:
+		    get:
+		      responses:
+		        '200':
+		          description: OK
+		definitions:
+		  Foo:
+		    type: object
+		    properties:
+		      bar:
+		        type: string
+		    required:
+		      - baz
+		'''
+
+		document.set(content)
+		document.onChange()
+
+		val errors = validator.validate(document, null)		
+		assertEquals(1, errors.size())
+		assertEquals(String.format(Messages.error_required_properties, "baz"), errors.get(0).message)
+	}
+
 }
