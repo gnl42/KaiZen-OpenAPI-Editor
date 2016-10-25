@@ -12,7 +12,9 @@ package com.reprezen.swagedit.assist;
 
 import java.util.Collection;
 import java.util.Collections;
+import java.util.Iterator;
 import java.util.LinkedHashSet;
+import java.util.List;
 import java.util.Objects;
 
 import org.apache.commons.lang3.math.NumberUtils;
@@ -21,6 +23,7 @@ import com.fasterxml.jackson.core.JsonPointer;
 import com.fasterxml.jackson.databind.JsonNode;
 import com.google.common.base.Strings;
 import com.google.common.collect.Lists;
+import com.reprezen.swagedit.assist.ext.ContentAssistExt;
 import com.reprezen.swagedit.model.AbstractNode;
 import com.reprezen.swagedit.model.Model;
 import com.reprezen.swagedit.schema.ArrayTypeDefinition;
@@ -36,6 +39,25 @@ import com.reprezen.swagedit.schema.TypeDefinition;
  */
 public class SwaggerProposalProvider {
 
+    private final List<ContentAssistExt> extensions;
+
+    public SwaggerProposalProvider() {
+        this.extensions = Collections.emptyList();
+    }
+
+    public SwaggerProposalProvider(ContentAssistExt... extensions) {
+        this.extensions = Lists.newArrayList(extensions);
+    }
+
+    /**
+     * Returns all proposals for the node inside the given model located at the given pointer. Only proposals that
+     * starts with the given prefix will be returned.
+     * 
+     * @param pointer
+     * @param model
+     * @param prefix
+     * @return proposals
+     */
     public Collection<Proposal> getProposals(JsonPointer pointer, Model model, String prefix) {
         final AbstractNode node = model.find(pointer);
         if (node == null) {
@@ -44,18 +66,35 @@ public class SwaggerProposalProvider {
         return getProposals(node.getType(), node, prefix);
     }
 
+    /**
+     * Returns all proposals for the node inside the given model located at the given pointer.
+     * 
+     * @param pointer
+     * @param model
+     * @return proposals
+     */
     public Collection<Proposal> getProposals(JsonPointer pointer, Model model) {
         return getProposals(pointer, model, null);
     }
 
+    /**
+     * Returns all proposals for the current node.
+     * 
+     * @param node
+     * @return proposals
+     */
     public Collection<Proposal> getProposals(AbstractNode node) {
         return getProposals(node.getType(), node, null);
     }
 
     protected Collection<Proposal> getProposals(TypeDefinition type, AbstractNode node, String prefix) {
-
         if (type instanceof ReferenceTypeDefinition) {
             type = ((ReferenceTypeDefinition) type).resolve();
+        }
+
+        ContentAssistExt ext = findExtension(type);
+        if (ext != null) {
+            return ext.getProposals(type, node, prefix);
         }
 
         switch (type.getType()) {
@@ -223,4 +262,15 @@ public class SwaggerProposalProvider {
         return proposals;
     }
 
+    protected ContentAssistExt findExtension(TypeDefinition type) {
+        ContentAssistExt ext = null;
+        Iterator<ContentAssistExt> it = extensions.iterator();
+        while (ext == null && it.hasNext()) {
+            ContentAssistExt current = it.next();
+            if (current.canProvideContentAssist(type)) {
+                ext = current;
+            }
+        }
+        return ext;
+    }
 }

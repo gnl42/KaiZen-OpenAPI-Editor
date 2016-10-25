@@ -52,6 +52,9 @@ public class Proposal {
             if (replacementString.startsWith(prefix)) {
                 String value = replacementString.substring(prefix.length());
                 p = new StyledCompletionProposal(value, styledString, offset, 0, value.length());
+            } else if (replacementString.contains(prefix)) {
+                p = new StyledCompletionProposal(replacementString, styledString, offset - prefix.length(), 0,
+                        replacementString.length() + prefix.length());
             }
         } else {
             p = new StyledCompletionProposal(replacementString, styledString, offset, 0, replacementString.length());

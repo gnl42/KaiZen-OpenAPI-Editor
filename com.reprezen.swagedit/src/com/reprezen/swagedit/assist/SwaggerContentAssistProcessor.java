@@ -51,6 +51,7 @@ import com.reprezen.swagedit.Activator;
 import com.reprezen.swagedit.Activator.Icons;
 import com.reprezen.swagedit.Messages;
 import com.reprezen.swagedit.assist.JsonReferenceProposalProvider.ContextType;
+import com.reprezen.swagedit.assist.ext.MediaTypeContentAssistExt;
 import com.reprezen.swagedit.editor.SwaggerDocument;
 import com.reprezen.swagedit.model.Model;
 import com.reprezen.swagedit.templates.SwaggerContextType;
@@ -63,7 +64,9 @@ import com.reprezen.swagedit.utils.SwaggerFileFinder.Scope;
 public class SwaggerContentAssistProcessor extends TemplateCompletionProcessor
         implements IContentAssistProcessor, ICompletionListener {
 
-    private final SwaggerProposalProvider proposalProvider = new SwaggerProposalProvider();
+    private final SwaggerProposalProvider proposalProvider = new SwaggerProposalProvider(
+            new MediaTypeContentAssistExt());
+
     private final JsonReferenceProposalProvider referenceProposalProvider = new JsonReferenceProposalProvider();
     private final ContentAssistant contentAssistant;
 
