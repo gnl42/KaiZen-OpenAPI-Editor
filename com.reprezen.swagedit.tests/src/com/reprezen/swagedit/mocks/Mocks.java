@@ -42,6 +42,15 @@ public class Mocks {
             protected JsonReferenceFactory getFactory() {
                 return new JsonReferenceFactory() {
                     @Override
+                    public JsonReference createSimpleReference(URI baseURI, AbstractNode valueNode) {
+                        JsonReference ref = super.createSimpleReference(baseURI, valueNode);
+                        if (ref != null) {
+                            ref.setDocumentManager(manager);
+                        }
+                        return ref;
+                    }
+
+                    @Override
                     public JsonReference create(AbstractNode node) {
                         JsonReference ref = super.create(node);
                         ref.setDocumentManager(manager);
@@ -64,7 +73,7 @@ public class Mocks {
         when(file.exists()).thenReturn(true);
 
         return new JsonReferenceFactory() {
-            public JsonReference create(org.yaml.snakeyaml.nodes.ScalarNode node) {
+            public JsonReference create(AbstractNode node) {
                 JsonReference ref = super.create(node);
                 ref.setDocumentManager(new JsonDocumentManager() {
                     @Override

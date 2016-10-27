@@ -60,6 +60,35 @@ class JsonReferenceHyperlinkDetectorTest {
                 targetRegion)))
     }
 
+	@Test
+    def void testShouldCreateHyperlink_ForSimpleReference() throws BadLocationException {
+        val document = new SwaggerDocument()
+        val viewer = Mocks.mockTextViewer(document)
+
+        val text = '''
+        	schema:
+        	  $ref: User
+        	definitions:
+        	  User:
+        	    type: object
+       '''
+
+        document.set(text)       
+
+        // region that includes `$ref: User`
+        val region = new Region("schema:\n  $ref: U".length(), 1)
+        val hyperlinks = detector(document.asJson()).detectHyperlinks(viewer, region, false)
+
+        assertNotNull(hyperlinks)
+
+        // expected region
+        val linkRegion = new Region(document.getLineOffset(1) + "  $ref: ".length(), "User".length())
+        val targetRegion = new Region(34, 25)
+
+        assertThat(Arrays.asList(hyperlinks), 
+        	hasItem(new SwaggerHyperlink("/definitions/User", viewer, linkRegion, targetRegion)))
+    }
+
     @Test
     def void testShould_Not_CreateHyperlink_For_Invalid_JsonReference() throws BadLocationException {
         val document = new SwaggerDocument()

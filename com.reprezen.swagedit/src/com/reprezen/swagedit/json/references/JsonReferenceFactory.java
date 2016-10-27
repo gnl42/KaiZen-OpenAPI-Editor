@@ -20,6 +20,7 @@ import com.fasterxml.jackson.core.JsonPointer;
 import com.fasterxml.jackson.databind.JsonNode;
 import com.google.common.base.Strings;
 import com.reprezen.swagedit.model.AbstractNode;
+import com.reprezen.swagedit.model.Model;
 import com.reprezen.swagedit.utils.URLUtils;
 
 
@@ -59,6 +60,40 @@ public class JsonReferenceFactory {
         }
 
         return doCreate(node.getValue(), node);
+    }
+
+    /**
+     * Returns a simple reference if the value node points to a definition inside the same document.
+     * 
+     * @param baseURI
+     * @param value
+     * @return reference
+     */
+    public JsonReference createSimpleReference(URI baseURI, AbstractNode valueNode) {
+        if (valueNode.isArray() || valueNode.isObject()) {
+            return null;
+        }
+
+        final Object value = valueNode.asValue().getValue();
+        if (!(value instanceof String)) {
+            return null;
+        }
+
+        String stringValue = (String) value;
+        if (Strings.emptyToNull(stringValue) == null || stringValue.startsWith("#") || stringValue.contains("/")) {
+            return null;
+        }
+
+        final Model model = valueNode.getModel();
+        if (model != null) {
+            JsonPointer ptr = JsonPointer.compile("/definitions/" + value);
+            AbstractNode target = model.find(ptr);
+            if (target != null) {
+                return new JsonReference.SimpleReference(baseURI, ptr, valueNode);
+            }
+        }
+
+        return null;
     }
 
     protected JsonReference doCreate(String value, Object source) {
