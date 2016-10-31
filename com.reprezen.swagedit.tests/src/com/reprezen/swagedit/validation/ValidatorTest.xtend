@@ -614,4 +614,32 @@ class ValidatorTest {
 		assertEquals(String.format(Messages.error_required_properties, "baz"), errors.get(0).message)
 	}
 
+	@Test
+	def void testValidateInlineSchemas() {
+		val content = '''
+		swagger: '2.0'
+		info:
+		  version: 0.0.0
+		  title: Simple API
+		paths:
+		  /foo:
+		    get:
+		      description: ok
+		      responses:
+		        '200':
+		          description: OK
+		          schema:
+		            properties:
+		              bar:
+		                type: string
+		'''
+
+		document.set(content)
+		document.onChange()
+
+		val errors = validator.validate(document, null)		
+		assertEquals(1, errors.size())
+		assertEquals(Messages.error_type_missing, errors.get(0).message)
+	}
+
 }
