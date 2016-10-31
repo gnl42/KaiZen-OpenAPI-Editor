@@ -120,15 +120,21 @@ public class QuickOutline extends PopupDialog
         filterText.addModifyListener(new ModifyListener() {
             public void modifyText(ModifyEvent e) {
                 // refresh tree to apply filter
-                treeViewer.refresh();
-                TreeItem[] items = treeViewer.getTree().getItems();
-                if (items != null && items.length > 0) {
-                    treeViewer.getTree().setSelection(items[0]);
-                    treeViewer.getTree().showItem(items[0]);
+
+                if (Strings.emptyToNull(filterText.getText()) == null) {
+                    treeViewer.refresh();
+                    treeViewer.collapseAll();
                 } else {
-                    treeViewer.setSelection(StructuredSelection.EMPTY);
+                    treeViewer.refresh();
+                    TreeItem[] items = treeViewer.getTree().getItems();
+                    if (items != null && items.length > 0) {
+                        treeViewer.getTree().setSelection(items[0]);
+                        treeViewer.getTree().showItem(items[0]);
+                    } else {
+                        treeViewer.setSelection(StructuredSelection.EMPTY);
+                    }
+                    treeViewer.expandAll();
                 }
-                treeViewer.expandAll();
             }
         });
         return filterText;
