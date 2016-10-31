@@ -13,6 +13,7 @@ package com.reprezen.swagedit.validation;
 import java.io.IOException;
 import java.net.URI;
 import java.util.HashSet;
+import java.util.Objects;
 import java.util.Set;
 
 import org.apache.commons.lang3.tuple.Pair;
@@ -27,6 +28,7 @@ import org.yaml.snakeyaml.nodes.ScalarNode;
 import org.yaml.snakeyaml.nodes.SequenceNode;
 import org.yaml.snakeyaml.parser.ParserException;
 
+import com.fasterxml.jackson.core.JsonPointer;
 import com.fasterxml.jackson.databind.JsonNode;
 import com.github.fge.jsonschema.core.exceptions.ProcessingException;
 import com.github.fge.jsonschema.core.report.ProcessingReport;
@@ -40,7 +42,9 @@ import com.reprezen.swagedit.editor.SwaggerDocument;
 import com.reprezen.swagedit.json.references.JsonReferenceFactory;
 import com.reprezen.swagedit.json.references.JsonReferenceValidator;
 import com.reprezen.swagedit.model.AbstractNode;
+import com.reprezen.swagedit.model.ArrayNode;
 import com.reprezen.swagedit.model.Model;
+import com.reprezen.swagedit.model.ObjectNode;
 import com.reprezen.swagedit.model.ValueNode;
 
 /**
@@ -90,8 +94,8 @@ public class Validator {
                 URI baseURI = editorInput != null ? editorInput.getFile().getLocationURI() : null;
 
                 errors.addAll(validateAgainstSchema(new ErrorProcessor(yaml), document));
+                errors.addAll(validateModel(document.getModel()));
                 errors.addAll(checkDuplicateKeys(yaml));
-                errors.addAll(checkMissingItemsKeyInArrayType(document.getModel()));
                 errors.addAll(referenceValidator.validate(baseURI, document.getModel()));
             }
         }
@@ -130,36 +134,122 @@ public class Validator {
     }
 
     /**
-     * Validates schema definition of type array.
-     * 
-     * This method traverses the node present in the document and checks that nodes that are schema definitions of type
-     * array have a field items.
+     * Validates the model against with different rules that cannot be verified only by JSON schema validation.
      * 
      * @param model
-     * @return error
+     * @return errors
      */
-    protected Set<SwaggerError> checkMissingItemsKeyInArrayType(Model model) {
-        Set<SwaggerError> errors = new HashSet<>();
+    protected Set<SwaggerError> validateModel(Model model) {
+        final Set<SwaggerError> errors = new HashSet<>();
 
         if (model != null && model.getRoot() != null) {
             for (AbstractNode node : model.allNodes()) {
-                if (hasArrayType(node)) {
-                    if (node.get("items") == null) {
-                        errors.add(new SwaggerError(node.getStart().getLine() + 1, IMarker.SEVERITY_ERROR,
-                                Messages.error_array_missing_items));
-                    }
-                }
+                checkMissingItemsKeyInArrayType(errors, node);
+                checkObjectTypeDefinition(errors, node);
             }
         }
         return errors;
     }
 
+    /**
+     * This method checks that the node if an array type definitions includes an items field.
+     * 
+     * @param errors
+     * @param model
+     */
+    protected void checkMissingItemsKeyInArrayType(Set<SwaggerError> errors, AbstractNode node) {
+        if (hasArrayType(node)) {
+            if (node.get("items") == null) {
+                errors.add(error(node, IMarker.SEVERITY_ERROR, Messages.error_array_missing_items));
+            }
+        }
+    }
+
+    /**
+     * Returns true if the node is an array type definition
+     * 
+     * @param node
+     * @return true if array definition
+     */
     protected boolean hasArrayType(AbstractNode node) {
         if (node.isObject() && node.get("type") instanceof ValueNode) {
             ValueNode typeValue = node.get("type").asValue();
             return "array".equalsIgnoreCase(typeValue.getValue().toString());
         }
         return false;
+    }
+
+    /**
+     * Validates an object type definition.
+     * 
+     * @param errors
+     * @param node
+     */
+    protected void checkObjectTypeDefinition(Set<SwaggerError> errors, AbstractNode node) {
+        if (node instanceof ObjectNode) {
+            JsonPointer ptr = node.getPointer();
+            if (ptr != null) {
+                if (ptr.toString().startsWith("/definitions")) {
+                    checkMissingType(errors, node);
+                    checkMissingRequiredProperties(errors, node);
+                } else if (ptr.toString().endsWith("/schema")) {
+                    checkMissingType(errors, node);
+                    checkMissingRequiredProperties(errors, node);
+                }
+            }
+        }
+    }
+
+    /**
+     * This method checks that the node if an object definition includes a type field.
+     * 
+     * @param errors
+     * @param node
+     */
+    protected void checkMissingType(Set<SwaggerError> errors, AbstractNode node) {
+        if (node.get("properties") != null) {
+            if (node.get("type") == null) {
+                errors.add(error(node, IMarker.SEVERITY_ERROR, Messages.error_type_missing));
+            } else {
+                AbstractNode typeValue = node.get("type");
+                if (!(typeValue instanceof ValueNode) || !Objects.equals("object", typeValue.asValue().getValue())) {
+                    errors.add(error(node, IMarker.SEVERITY_ERROR, Messages.error_wrong_type));
+                }
+            }
+        }
+    }
+
+    /**
+     * This method checks that the required values for the object type definition contains only valid properties.
+     * 
+     * @param errors
+     * @param node
+     */
+    protected void checkMissingRequiredProperties(Set<SwaggerError> errors, AbstractNode node) {
+        if (node.get("required") instanceof ArrayNode) {
+            ArrayNode required = node.get("required").asArray();
+
+            AbstractNode properties = node.get("properties");
+            if (properties == null) {
+                errors.add(error(node, IMarker.SEVERITY_ERROR, Messages.error_missing_properties));
+            } else {
+                for (AbstractNode prop : required.elements()) {
+                    if (prop instanceof ValueNode) {
+                        ValueNode valueNode = prop.asValue();
+                        String value = valueNode.getValue().toString();
+
+                        if (properties.get(value) == null) {
+                            errors.add(error(valueNode, IMarker.SEVERITY_ERROR,
+                                    String.format(Messages.error_required_properties, value)));
+                        }
+                    }
+                }
+            }
+        }
+    }
+
+    protected SwaggerError error(AbstractNode node, int level, String message) {
+        return new SwaggerError(node.getStart().getLine() + 1, level, message);
     }
 
     /*
