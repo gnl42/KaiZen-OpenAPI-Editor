@@ -11,6 +11,7 @@
 package com.reprezen.swagedit.validation;
 
 import java.io.IOException;
+import java.net.URI;
 import java.util.HashSet;
 import java.util.Objects;
 import java.util.Set;
@@ -90,11 +91,12 @@ public class Validator {
         if (jsonContent != null) {
             Node yaml = document.getYaml();
             if (yaml != null) {
+                URI baseURI = editorInput != null ? editorInput.getFile().getLocationURI() : null;
+
                 errors.addAll(validateAgainstSchema(new ErrorProcessor(yaml), document));
                 errors.addAll(validateModel(document.getModel()));
                 errors.addAll(checkDuplicateKeys(yaml));
-                errors.addAll(referenceValidator
-                        .validate(editorInput != null ? editorInput.getFile().getLocationURI() : null, yaml));
+                errors.addAll(referenceValidator.validate(baseURI, document.getModel()));
             }
         }
 

@@ -10,6 +10,8 @@
  *******************************************************************************/
 package com.reprezen.swagedit.assist;
 
+import static org.eclipse.ui.IWorkbenchCommandConstants.EDIT_CONTENT_ASSIST;
+
 import java.util.ArrayList;
 import java.util.Collection;
 import java.util.List;
@@ -40,7 +42,6 @@ import org.eclipse.swt.graphics.Image;
 import org.eclipse.swt.graphics.RGB;
 import org.eclipse.swt.graphics.TextStyle;
 import org.eclipse.swt.widgets.Display;
-import org.eclipse.ui.IWorkbenchCommandConstants;
 import org.eclipse.ui.PlatformUI;
 import org.eclipse.ui.keys.IBindingService;
 
@@ -52,6 +53,7 @@ import com.reprezen.swagedit.Activator.Icons;
 import com.reprezen.swagedit.Messages;
 import com.reprezen.swagedit.assist.JsonReferenceProposalProvider.ContextType;
 import com.reprezen.swagedit.editor.SwaggerDocument;
+import com.reprezen.swagedit.json.references.JsonReference;
 import com.reprezen.swagedit.model.Model;
 import com.reprezen.swagedit.templates.SwaggerContextType;
 import com.reprezen.swagedit.templates.SwaggerTemplateContext;
@@ -94,28 +96,14 @@ public class SwaggerContentAssistProcessor extends TemplateCompletionProcessor
         this.textMessages = initTextMessages();
     }
 
-    protected String[] initTextMessages() {
-        IBindingService bindingService = (IBindingService) PlatformUI.getWorkbench().getAdapter(IBindingService.class);
-
-        String bindingKey = bindingService
-                .getBestActiveBindingFormattedFor(IWorkbenchCommandConstants.EDIT_CONTENT_ASSIST);
-
-        ContextType contextType = ContextType.get(currentPath != null ? currentPath.toString() : "");
-        String context = contextType != null ? contextType.label() : "";
-
-        return new String[] { String.format(Messages.content_assist_proposal_project, bindingKey, context),
-                String.format(Messages.content_assist_proposal_workspace, bindingKey, context),
-                String.format(Messages.content_assist_proposal_local, bindingKey, context) };
-    }
-
     @Override
     public ICompletionProposal[] computeCompletionProposals(ITextViewer viewer, int documentOffset) {
-        if (isRefCompletion) {
-            currentScope = currentScope.next();
-        }
-
         if (!(viewer.getDocument() instanceof SwaggerDocument)) {
             return super.computeCompletionProposals(viewer, documentOffset);
+        }
+
+        if (isRefCompletion) {
+            currentScope = currentScope.next();
         }
 
         final SwaggerDocument document = (SwaggerDocument) viewer.getDocument();
@@ -139,13 +127,14 @@ public class SwaggerContentAssistProcessor extends TemplateCompletionProcessor
         Model model = document.getModel(documentOffset - prefix.length());
         currentPath = model.getPath(line, column);
 
-        isRefCompletion = currentPath != null && currentPath.toString().endsWith("$ref");
+        isRefCompletion = currentPath != null && currentPath.toString().endsWith(JsonReference.PROPERTY);
 
         Collection<Proposal> p;
         if (isRefCompletion) {
             updateStatus();
             p = referenceProposalProvider.getProposals(currentPath, document.asJson(), currentScope);
         } else {
+            clearStatus();
             p = proposalProvider.getProposals(currentPath, model, prefix);
         }
 
@@ -166,12 +155,32 @@ public class SwaggerContentAssistProcessor extends TemplateCompletionProcessor
             if (textMessages == null) {
                 textMessages = initTextMessages();
             }
+            contentAssistant.setStatusLineVisible(true);
             contentAssistant.setStatusMessage(textMessages[currentScope.getValue()]);
         }
     }
 
-    protected Collection<ICompletionProposal> getCompletionProposals(Collection<Proposal> proposals,
-            String prefix, int offset) {
+    protected void clearStatus() {
+        if (contentAssistant != null) {
+            contentAssistant.setStatusLineVisible(false);
+        }
+    }
+
+    protected String[] initTextMessages() {
+        IBindingService bindingService = (IBindingService) PlatformUI.getWorkbench().getAdapter(IBindingService.class);
+        String bindingKey = bindingService.getBestActiveBindingFormattedFor(EDIT_CONTENT_ASSIST);
+
+        ContextType contextType = ContextType.get(currentPath != null ? currentPath.toString() : "");
+        String context = contextType != null ? contextType.label() : "";
+
+        return new String[] { //
+                String.format(Messages.content_assist_proposal_project, bindingKey, context),
+                String.format(Messages.content_assist_proposal_workspace, bindingKey, context),
+                String.format(Messages.content_assist_proposal_local, bindingKey, context) };
+    }
+
+    protected Collection<ICompletionProposal> getCompletionProposals(Collection<Proposal> proposals, String prefix,
+            int offset) {
         final List<ICompletionProposal> result = new ArrayList<>();
 
         prefix = Strings.emptyToNull(prefix);

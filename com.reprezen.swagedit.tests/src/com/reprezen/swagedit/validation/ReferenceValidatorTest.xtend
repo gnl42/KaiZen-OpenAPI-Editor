@@ -45,7 +45,7 @@ class ReferenceValidatorTest {
 		document.set(content)
 		val baseURI = new URI(null, null, null)
 		val resolvedURI = new URI(null, null, "/definitions/Valid")
-		val errors = validator(#{resolvedURI -> document.asJson}).validate(baseURI, document.yaml)
+		val errors = validator(#{resolvedURI -> document.asJson}).validate(baseURI, document.model)
 
 		assertEquals(0, errors.size())
 	}
@@ -70,7 +70,7 @@ class ReferenceValidatorTest {
 		document.set(content)
 		val baseURI = new URI(null, null, null)
 		val resolvedURI = new URI(null, null, "/definitions/Invalid")
-		val errors = validator(#{resolvedURI -> document.asJson}).validate(baseURI, document.yaml)
+		val errors = validator(#{resolvedURI -> document.asJson}).validate(baseURI, document.model)
 
 		assertEquals(1, errors.size())
 		assertTrue(errors.contains(
@@ -98,7 +98,7 @@ class ReferenceValidatorTest {
 		document.set(content)
 		val baseURI = new URI(null, null, null)
 		val resolvedURI = new URI(null, null, "/paths/~1foo~1{bar}")
-		val errors = validator(#{resolvedURI -> document.asJson}).validate(baseURI, document.yaml)
+		val errors = validator(#{resolvedURI -> document.asJson}).validate(baseURI, document.model)
 
 		assertEquals(0, errors.size())
 	}
@@ -123,7 +123,7 @@ class ReferenceValidatorTest {
 		document.set(content)
 		val baseURI = new URI(null, null, null)
 		val resolvedURI = new URI(null, null, "/paths/~1foo~1{bar}")
-		val errors = validator(#{resolvedURI -> document.asJson}).validate(baseURI, document.yaml)
+		val errors = validator(#{resolvedURI -> document.asJson}).validate(baseURI, document.model)
 
 		assertEquals(1, errors.size())
 		assertTrue(errors.contains(new SwaggerError(9, IMarker.SEVERITY_WARNING, Messages.error_invalid_reference)))
@@ -149,7 +149,7 @@ class ReferenceValidatorTest {
 		document.set(content)
 		val baseURI = new URI(null, null, null)
 		val resolvedURI = new URI(null, null, "/paths/~1foo")
-		val errors = validator(#{resolvedURI -> document.asJson}).validate(baseURI, document.yaml)
+		val errors = validator(#{resolvedURI -> document.asJson}).validate(baseURI, document.model)
 
 		assertEquals(1, errors.size())
 		assertTrue(errors.contains(
@@ -181,7 +181,7 @@ class ReferenceValidatorTest {
 		document.set(content)
 		val baseURI = new URI(null, null, null)
 		val otherURI = URI.create("other.yaml")
-		val errors = validator(#{otherURI -> other.asJson}).validate(baseURI, document.yaml)
+		val errors = validator(#{otherURI -> other.asJson}).validate(baseURI, document.model)
 
 		assertEquals(0, errors.size())
 	}
@@ -206,7 +206,7 @@ class ReferenceValidatorTest {
 		document.set(content)
 		val baseURI = new URI(null, null, null)
 		val otherURI = URI.create("other.yaml")
-		val errors = validator(#{otherURI -> null}).validate(baseURI, document.yaml)
+		val errors = validator(#{otherURI -> null}).validate(baseURI, document.model)
 
 		assertEquals(1, errors.size())
 		assertTrue(errors.contains(
@@ -241,7 +241,7 @@ class ReferenceValidatorTest {
 		document.set(content)
 		val baseURI = new URI(null, null, null)
 		val otherURI = URI.create("other.yaml#/info/version")
-		val errors = validator(#{otherURI -> other.asJson}).validate(baseURI, document.yaml)
+		val errors = validator(#{otherURI -> other.asJson}).validate(baseURI, document.model)
 
 		assertEquals(0, errors.size())
 	}
@@ -273,7 +273,7 @@ class ReferenceValidatorTest {
 		document.set(content)
 		val baseURI = new URI(null, null, null)
 		val otherURI = URI.create("other.yaml#/info/foo")
-		val errors = validator(#{otherURI -> other.asJson}).validate(baseURI, document.yaml)
+		val errors = validator(#{otherURI -> other.asJson}).validate(baseURI, document.model)
 
 		assertEquals(1, errors.size())
 		assertTrue(errors.contains(
@@ -300,12 +300,41 @@ class ReferenceValidatorTest {
 
 		document.set(content)
 		val baseURI = new URI(null, null, null)
-		val errors = validator(#{}).validate(baseURI, document.yaml)
+		val errors = validator(#{}).validate(baseURI, document.model)
 
 		assertEquals(1, errors.size())
 		assertTrue(errors.contains(
 			new SwaggerError(9, IMarker.SEVERITY_WARNING, Messages.error_missing_reference)
 		))
+	}
+
+	@Test
+	def void should_warn_on_simple_reference() {
+		val content = '''
+			swagger: '2.0'
+			info:
+			  version: 0.0.0
+			  title: Simple API
+			paths:
+			  /foo/{bar}:
+			    get:
+			      parameters:
+			        - $ref: Valid
+			      responses:
+			        '200':
+			          description: OK
+			definitions:
+			  Valid:
+			    type: string
+		'''
+
+		document.set(content)
+		val baseURI = new URI(null, null, null)
+		val resolvedURI = new URI(null, null, "/definitions/Valid")
+		val errors = validator(#{resolvedURI -> document.asJson}).validate(baseURI, document.model)
+
+		assertEquals(1, errors.size())
+		assertEquals(Messages.warning_simple_reference, errors.get(0).message)
 	}
 
 	def asJson(String string) {

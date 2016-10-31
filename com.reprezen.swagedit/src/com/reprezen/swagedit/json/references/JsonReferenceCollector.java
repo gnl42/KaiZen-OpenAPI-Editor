@@ -10,18 +10,14 @@
  *******************************************************************************/
 package com.reprezen.swagedit.json.references;
 
-import java.util.Iterator;
-import java.util.Map;
+import static com.reprezen.swagedit.json.references.JsonReference.PROPERTY;
+
+import java.net.URI;
 import java.util.Set;
 
-import org.yaml.snakeyaml.nodes.MappingNode;
-import org.yaml.snakeyaml.nodes.Node;
-import org.yaml.snakeyaml.nodes.NodeTuple;
-import org.yaml.snakeyaml.nodes.ScalarNode;
-import org.yaml.snakeyaml.nodes.SequenceNode;
-
-import com.fasterxml.jackson.databind.JsonNode;
 import com.google.common.collect.Sets;
+import com.reprezen.swagedit.model.AbstractNode;
+import com.reprezen.swagedit.model.Model;
 
 /**
  * Collector of JSON references present in a JSON or YAML document.
@@ -40,65 +36,26 @@ public class JsonReferenceCollector {
     /**
      * Returns all reference nodes that can be found in the JSON document.
      * 
-     * @param document
+     * @param baseURI
+     * @param model
      * @return all reference nodes
      */
-    public Iterable<JsonReference> collect(JsonNode document) {
-        Set<JsonReference> acc = Sets.newHashSet();
-        collectReferences(document, acc);
-        return acc;
-    }
+    public Iterable<JsonReference> collect(URI baseURI, Model model) {
+        final Set<JsonReference> references = Sets.newHashSet();
 
-    protected void collectReferences(final JsonNode parent, Set<JsonReference> acc) {
-        if (parent.isObject()) {
-            for (Iterator<Map.Entry<String, JsonNode>> it = parent.fields(); it.hasNext();) {
-                final Map.Entry<String, JsonNode> entry = it.next();
-                final JsonNode value = entry.getValue();
-
-                if (JsonReference.isReference(value)) {
-                    acc.add(factory.create(value));
-                } else {
-                    collectReferences(entry.getValue(), acc);
+        for (AbstractNode node : model.allNodes()) {
+            if (JsonReference.isReference(node)) {
+                JsonReference reference = factory.createSimpleReference(baseURI, node.get(PROPERTY));
+                if (reference == null) {
+                    reference = factory.create(node);
+                }
+                if (reference != null) {
+                    references.add(reference);
                 }
             }
-        } else if (parent.isArray()) {
-            for (Iterator<JsonNode> it = parent.elements(); it.hasNext();) {
-                collectReferences(it.next(), acc);
-            }
         }
-    }
 
-    /**
-     * Returns all reference nodes that can be found in the Yaml document.
-     * 
-     * @param document
-     * @return all reference nodes
-     */
-    public Iterable<JsonReference> collect(Node document) {
-        Set<JsonReference> acc = Sets.newHashSet();
-        collectReferences(document, acc);
-        return acc;
-    }
-
-    protected void collectReferences(Node parent, Set<JsonReference> acc) {
-        switch (parent.getNodeId()) {
-        case mapping:
-            for (NodeTuple tuple : ((MappingNode) parent).getValue()) {
-                if (JsonReference.isReference(tuple)) {
-                    acc.add(factory.create((ScalarNode) tuple.getValueNode()));
-                } else {
-                    collectReferences(tuple.getValueNode(), acc);
-                }
-            }
-            break;
-        case sequence:
-            for (Node value : ((SequenceNode) parent).getValue()) {
-                collectReferences(value, acc);
-            }
-            break;
-        default:
-            break;
-        }
+        return references;
     }
 
 }
