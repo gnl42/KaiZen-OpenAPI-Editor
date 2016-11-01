@@ -10,6 +10,9 @@
  *******************************************************************************/
 package com.reprezen.swagedit.editor.outline;
 
+import java.util.Timer;
+import java.util.TimerTask;
+
 import org.eclipse.core.resources.IFile;
 import org.eclipse.jface.bindings.TriggerSequence;
 import org.eclipse.jface.bindings.keys.KeySequence;
@@ -70,6 +73,7 @@ public class QuickOutline extends PopupDialog
     private Text filterText;
     private TriggerSequence triggerSequence;
     private String bindingKey;
+    private Timer filterTimer = null;
 
     public QuickOutline(Shell parent, SwaggerEditor editor) {
         super(parent, PopupDialog.INFOPOPUPRESIZE_SHELLSTYLE, true, true, true, true, true, null, null);
@@ -121,20 +125,43 @@ public class QuickOutline extends PopupDialog
             public void modifyText(ModifyEvent e) {
                 // refresh tree to apply filter
 
-                if (Strings.emptyToNull(filterText.getText()) == null) {
-                    treeViewer.refresh();
-                    treeViewer.collapseAll();
-                } else {
-                    treeViewer.refresh();
-                    TreeItem[] items = treeViewer.getTree().getItems();
-                    if (items != null && items.length > 0) {
-                        treeViewer.getTree().setSelection(items[0]);
-                        treeViewer.getTree().showItem(items[0]);
-                    } else {
-                        treeViewer.setSelection(StructuredSelection.EMPTY);
-                    }
-                    treeViewer.expandAll();
+                if (filterTimer != null) {
+                    filterTimer.cancel();
                 }
+                // reset the timer each time there is a
+                // text modification, so that only the last
+                // one will be executed.
+                filterTimer = new Timer();
+                filterTimer.schedule(new TimerTask() {
+                    @Override
+                    public void run() {
+                        if (filterText.isDisposed()) {
+                            return;
+                        }
+
+                        // Make sure we access the text in the correct thread.
+                        filterText.getDisplay().asyncExec(new Runnable() {
+                            @Override
+                            public void run() {
+                                // refreshing the tree will execute the filter.
+                                if (Strings.emptyToNull(filterText.getText()) == null) {
+                                    treeViewer.refresh();
+                                    treeViewer.collapseAll();
+                                } else {
+                                    treeViewer.refresh();
+                                    TreeItem[] items = treeViewer.getTree().getItems();
+                                    if (items != null && items.length > 0) {
+                                        treeViewer.getTree().setSelection(items[0]);
+                                        treeViewer.getTree().showItem(items[0]);
+                                    } else {
+                                        treeViewer.setSelection(StructuredSelection.EMPTY);
+                                    }
+                                    treeViewer.expandAll();
+                                }
+                            }
+                        });
+                    }
+                }, 500);
             }
         });
         return filterText;
@@ -290,7 +317,7 @@ public class QuickOutline extends PopupDialog
                 }
             }
         }
-        
+
         treeViewer.setInput(input);
         treeViewer.setSelection(null, true);
     }
