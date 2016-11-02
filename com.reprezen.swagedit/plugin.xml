@@ -25,7 +25,8 @@
             default="false"
             icon="icons/swagger_16.png"
             id="com.reprezen.swagedit.editor"
-            name="%editor.name">
+            name="%editor.name"
+            symbolicFontName="com.reprezen.swagedit.editor.textfont">
          <contentTypeBinding
                contentTypeId="com.reprezen.swagedit.contenttype.swagger.yaml">
          </contentTypeBinding>
@@ -203,5 +204,19 @@
             commandId="com.reprezen.swagedit.commands.quickoutline">
       </handler>
    </extension>
-
+   
+   <extension
+         point="org.eclipse.ui.themes">
+        <themeElementCategory label="SwagEdit" id="com.reprezen.swagedit.editor.presentation"/>
+        <fontDefinition
+              categoryId="com.reprezen.swagedit.editor.presentation"
+              id="com.reprezen.swagedit.editor.textfont"
+              label="SwagEdit Text Font"
+              value="Arial-regular-12">
+         <description>
+            This font is used by Swagger editor.
+         </description>
+        </fontDefinition>
+   </extension>
+   
 </plugin>
