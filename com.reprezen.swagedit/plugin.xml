@@ -210,9 +210,9 @@
         <themeElementCategory label="SwagEdit" id="com.reprezen.swagedit.editor.presentation"/>
         <fontDefinition
               categoryId="com.reprezen.swagedit.editor.presentation"
+              defaultsTo="org.eclipse.jface.textfont"
               id="com.reprezen.swagedit.editor.textfont"
-              label="SwagEdit Text Font"
-              value="Arial-regular-12">
+              label="SwagEdit Text Font">
          <description>
             This font is used by Swagger editor.
          </description>
