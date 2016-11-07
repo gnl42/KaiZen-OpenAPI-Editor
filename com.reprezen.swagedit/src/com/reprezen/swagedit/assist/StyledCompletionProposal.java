@@ -73,11 +73,9 @@ public class StyledCompletionProposal
     @Override
     public Point getSelection(IDocument document) {
         int offset = replacementOffset;
-        int length = replacementString.length();
 
         if (Strings.emptyToNull(prefix) != null) {
             if (replacementString.startsWith(prefix)) {
-                length = length - prefix.length();
                 offset = replacementOffset - prefix.length();
             } else if (replacementString.contains(prefix)) {
                 offset = replacementOffset - prefix.length();
