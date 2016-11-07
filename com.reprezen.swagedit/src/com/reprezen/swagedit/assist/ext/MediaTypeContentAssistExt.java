@@ -44,10 +44,15 @@ public class MediaTypeContentAssistExt implements ContentAssistExt {
     }
 
     private JsonNode init() {
-        final URL file = Activator.getDefault().getBundle().getResource("resources/mediaTypes.json");
         try {
-            return new ObjectMapper().readTree(file);
-        } catch (IOException e) {
+            final URL file = Activator.getDefault().getBundle().getResource("resources/mediaTypes.json");
+            try {
+                return new ObjectMapper().readTree(file);
+            } catch (IOException e) {
+                return null;
+            }
+        } catch (NullPointerException e) {
+            // For standalone tests, bundle cannot be loaded.
             return null;
         }
     }
