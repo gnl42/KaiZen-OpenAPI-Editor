@@ -21,6 +21,7 @@ import org.eclipse.jface.viewers.StyledString;
 import org.eclipse.swt.graphics.Image;
 import org.eclipse.swt.graphics.Point;
 
+import com.google.common.base.Strings;
 import com.reprezen.swagedit.Activator;
 import com.reprezen.swagedit.Activator.Icons;
 
@@ -28,21 +29,17 @@ public class StyledCompletionProposal
         implements ICompletionProposal, ICompletionProposalExtension5, ICompletionProposalExtension6 {
 
     private final int replacementOffset;
-    private final int replacementLength;
     private final String replacementString;
     private final StyledString label;
-    private final int cursorPosition;
-    private String description;
+    private final String description;
+    private final String prefix;
 
-    public StyledCompletionProposal(String replacement, StyledString label, int offset, int lenght, int position) {
-        this.replacementString = replacement;
+    public StyledCompletionProposal(String replacement, StyledString label, String prefix, String description,
+            int offset) {
         this.label = label;
+        this.replacementString = replacement;
+        this.prefix = prefix;
         this.replacementOffset = offset;
-        this.replacementLength = lenght;
-        this.cursorPosition = position;
-    }
-
-    public void setDescription(String description) {
         this.description = description;
     }
 
@@ -53,8 +50,21 @@ public class StyledCompletionProposal
 
     @Override
     public void apply(IDocument document) {
+        int length = 0;
+        int offset = replacementOffset;
+        String text = replacementString;
+
+        if (Strings.emptyToNull(prefix) != null) {
+            if (replacementString.startsWith(prefix)) {
+                text = replacementString.substring(prefix.length());
+            } else if (replacementString.contains(prefix)) {
+                offset = replacementOffset - prefix.length();
+                length = prefix.length();
+            }
+        }
+
         try {
-            document.replace(replacementOffset, replacementLength, replacementString);
+            document.replace(offset, length, text);
         } catch (BadLocationException x) {
             // ignore
         }
@@ -62,7 +72,19 @@ public class StyledCompletionProposal
 
     @Override
     public Point getSelection(IDocument document) {
-        return new Point(replacementOffset + cursorPosition, 0);
+        int offset = replacementOffset;
+
+        if (Strings.emptyToNull(prefix) != null) {
+            if (replacementString.startsWith(prefix)) {
+                offset = replacementOffset - prefix.length();
+            } else if (replacementString.contains(prefix)) {
+                offset = replacementOffset - prefix.length();
+            }
+        }
+
+        int cursorPosition = offset + replacementString.length();
+
+        return new Point(cursorPosition, 0);
     }
 
     @Override

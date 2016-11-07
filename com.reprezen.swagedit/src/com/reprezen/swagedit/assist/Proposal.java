@@ -12,12 +12,15 @@ package com.reprezen.swagedit.assist;
 
 import java.util.Objects;
 
+import org.eclipse.jface.text.contentassist.CompletionProposal;
 import org.eclipse.jface.viewers.StyledString;
 import org.eclipse.jface.viewers.StyledString.Styler;
 import org.eclipse.swt.graphics.Color;
 import org.eclipse.swt.graphics.RGB;
 import org.eclipse.swt.graphics.TextStyle;
 import org.eclipse.swt.widgets.Display;
+
+import com.google.common.base.Strings;
 
 public class Proposal {
 
@@ -40,28 +43,30 @@ public class Proposal {
         this.description = description;
     }
 
+    /**
+     * Returns a {@link CompletionProposal}.
+     * 
+     * The {@link CompletionProposal} will be returned only if the prefix is null, or if the replacement string starts
+     * with or contains the prefix. Otherwise this method returns null.
+     * 
+     * @param prefix
+     * @param offset
+     * @return proposal
+     */
     public StyledCompletionProposal asStyledCompletionProposal(String prefix, int offset) {
-        StyledString styledString = new StyledString(displayString);
+        final StyledString styledString = new StyledString(displayString);
         if (type != null) {
             styledString.append(": ", typeStyler).append(type, typeStyler);
         }
 
-        StyledCompletionProposal p = null;
-
-        if (prefix != null) {
-            if (replacementString.startsWith(prefix)) {
-                String value = replacementString.substring(prefix.length());
-                p = new StyledCompletionProposal(value, styledString, offset, 0, value.length());
-            }
-        } else {
-            p = new StyledCompletionProposal(replacementString, styledString, offset, 0, replacementString.length());
+        StyledCompletionProposal proposal = null;
+        if (Strings.emptyToNull(prefix) == null) {
+            proposal = new StyledCompletionProposal(replacementString, styledString, null, description, offset);
+        } else if (replacementString.contains(prefix) || replacementString.startsWith(prefix)) {
+            proposal = new StyledCompletionProposal(replacementString, styledString, prefix, description, offset);
         }
 
-        if (p != null && description != null) {
-            p.setDescription(description);
-        }
-
-        return p;
+        return proposal;
     }
 
     @Override
