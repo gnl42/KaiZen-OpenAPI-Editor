@@ -14,7 +14,7 @@ swagger: "2.0"
        context="com.reprezen.swagedit.templates.swagger.root" 
        enabled="true">
 info:
-  version: ${1.0}
+  version: 1.0
   title: ${API_title}
   description: ${API_description}
   termsOfService: ${terms}
@@ -24,7 +24,7 @@ info:
     email: ${contact_email}
   license:
     name: ${MIT}
-    url: ${http://opensource.org/licenses/MIT}
+    url: http://opensource.org/licenses/MIT
 </template>
 
      <template name="oauth2 security scheme" 

@@ -22,6 +22,7 @@ import com.fasterxml.jackson.core.JsonPointer;
 import com.reprezen.swagedit.editor.SwaggerDocument;
 import com.reprezen.swagedit.json.references.JsonReference;
 import com.reprezen.swagedit.json.references.JsonReferenceFactory;
+import com.reprezen.swagedit.model.AbstractNode;
 import com.reprezen.swagedit.utils.DocumentUtils;
 
 /**
@@ -41,7 +42,12 @@ public class JsonReferenceHyperlinkDetector extends AbstractSwaggerHyperlinkDete
     protected IHyperlink[] doDetect(SwaggerDocument doc, ITextViewer viewer, HyperlinkInfo info, JsonPointer pointer) {
         URI baseURI = getBaseURI();
 
-        JsonReference reference = getFactory().create(doc.getModel().find(pointer));
+        AbstractNode node = doc.getModel().find(pointer);
+        JsonReference reference = getFactory().createSimpleReference(getBaseURI(), node);
+        if (reference == null) {
+            reference = getFactory().create(node);
+        }
+
         if (reference.isInvalid() || reference.isMissing(getBaseURI())) {
             return null;
         }
