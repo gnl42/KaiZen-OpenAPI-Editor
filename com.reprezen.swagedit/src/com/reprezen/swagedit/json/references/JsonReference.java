@@ -12,7 +12,6 @@ package com.reprezen.swagedit.json.references;
 
 import java.net.URI;
 
-import org.eclipse.core.resources.IFile;
 import org.yaml.snakeyaml.nodes.NodeId;
 import org.yaml.snakeyaml.nodes.NodeTuple;
 import org.yaml.snakeyaml.nodes.ScalarNode;
@@ -20,6 +19,7 @@ import org.yaml.snakeyaml.nodes.ScalarNode;
 import com.fasterxml.jackson.core.JsonPointer;
 import com.fasterxml.jackson.databind.JsonNode;
 import com.google.common.base.Strings;
+import com.reprezen.swagedit.editor.SwaggerDocument;
 import com.reprezen.swagedit.model.AbstractNode;
 import com.reprezen.swagedit.model.ObjectNode;
 import com.reprezen.swagedit.model.ValueNode;
@@ -85,12 +85,12 @@ public class JsonReference {
      * @param baseURI
      * @return true if the reference can be resolved.
      */
-    public boolean isMissing(URI baseURI) {
+    public boolean isMissing(SwaggerDocument document, URI baseURI) {
         if (isInvalid()) {
             return false;
         }
 
-        JsonNode resolved = resolve(baseURI);
+        JsonNode resolved = resolve(document, baseURI);
         return resolved == null || resolved.isMissingNode();
     }
 
@@ -103,19 +103,21 @@ public class JsonReference {
      * @param baseURI
      * @return referenced node
      */
-    public JsonNode resolve(URI baseURI) {
+    public JsonNode resolve(SwaggerDocument document, URI baseURI) {
         if (resolved == null) {
-            final URI resolvedURI = resolveURI(baseURI);
-            final IFile file = manager.getFile(resolvedURI);
-            if (file == null || !file.exists()) {
-                return null;
+
+            final JsonNode doc;
+            if (isLocal()) {
+                doc = document.asJson();
+            } else {
+                doc = manager.getDocument(resolveURI(baseURI));
             }
-            final JsonNode doc = manager.getDocument(resolvedURI);
+
             if (doc != null) {
                 try {
                     resolved = doc.at(pointer);
                 } catch (Exception e) {
-                    // ignore, the value will be null
+                    resolved = null;
                 }
             }
         }

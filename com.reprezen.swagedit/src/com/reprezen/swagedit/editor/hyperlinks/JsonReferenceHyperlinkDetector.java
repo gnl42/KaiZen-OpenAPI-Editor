@@ -48,7 +48,7 @@ public class JsonReferenceHyperlinkDetector extends AbstractSwaggerHyperlinkDete
             reference = getFactory().create(node);
         }
 
-        if (reference.isInvalid() || reference.isMissing(getBaseURI())) {
+        if (reference.isInvalid() || reference.isMissing(doc, getBaseURI())) {
             return null;
         }
 

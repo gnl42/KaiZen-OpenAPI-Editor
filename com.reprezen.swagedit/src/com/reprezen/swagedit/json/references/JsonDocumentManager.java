@@ -91,6 +91,11 @@ public class JsonDocumentManager {
     }
 
     public JsonNode getDocument(URI uri) {
+        final IFile file = getFile(uri);
+        if (file == null || !file.exists()) {
+            return null;
+        }
+
         try {
             return getDocument(uri.toURL());
         } catch (MalformedURLException e) {
@@ -106,7 +111,7 @@ public class JsonDocumentManager {
      * @return file
      */
     public IFile getFile(URI uri) {
-        return DocumentUtils.getWorkspaceFile(uri);
+        return uri != null ? DocumentUtils.getWorkspaceFile(uri) : null;
     }
 
 }
