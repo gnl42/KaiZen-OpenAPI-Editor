@@ -96,7 +96,7 @@ public class Validator {
                 errors.addAll(validateAgainstSchema(new ErrorProcessor(yaml), document));
                 errors.addAll(validateModel(document.getModel()));
                 errors.addAll(checkDuplicateKeys(yaml));
-                errors.addAll(referenceValidator.validate(baseURI, document.getModel()));
+                errors.addAll(referenceValidator.validate(baseURI, document));
             }
         }
 
