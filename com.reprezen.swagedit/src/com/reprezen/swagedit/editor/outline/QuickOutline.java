@@ -99,19 +99,17 @@ public class QuickOutline extends PopupDialog
 
         filterText.addKeyListener(new KeyListener() {
             public void keyPressed(KeyEvent e) {
-                handleMultiView(e);
-
-                if (e.keyCode == SWT.CR) {
+                if (isInvocationEvent(e)) {
+                    e.doit = false;
+                    handleMultiView();
+                } else if (e.keyCode == SWT.CR) {
                     handleSelection();
                     QuickOutline.this.close();
-                }
-                if (e.keyCode == SWT.ARROW_DOWN) {
+                } else if (e.keyCode == SWT.ARROW_DOWN) {
                     treeViewer.getTree().setFocus();
-                }
-                if (e.keyCode == SWT.ARROW_UP) {
+                } else if (e.keyCode == SWT.ARROW_UP) {
                     treeViewer.getTree().setFocus();
-                }
-                if (e.character == SWT.ESC) {
+                } else if (e.character == SWT.ESC) {
                     QuickOutline.this.close();
                 }
             }
@@ -167,11 +165,7 @@ public class QuickOutline extends PopupDialog
         return filterText;
     }
 
-    protected void handleMultiView(KeyEvent e) {
-        if (!isInvocationEvent(e)) {
-            return;
-        }
-
+    protected void handleMultiView() {
         currentScope = currentScope.next();
         SwaggerFileFinder fileFinder = new SwaggerFileFinder();
         IEditorInput input = editor.getEditorInput();
@@ -233,9 +227,10 @@ public class QuickOutline extends PopupDialog
 
             @Override
             public void keyPressed(KeyEvent e) {
-                handleMultiView(e);
-
-                if (e.keyCode == SWT.CR) {
+                if (isInvocationEvent(e)) {
+                    e.doit = false;
+                    handleMultiView();
+                } else if (e.keyCode == SWT.CR) {
                     handleSelection();
                     QuickOutline.this.close();
                 }
