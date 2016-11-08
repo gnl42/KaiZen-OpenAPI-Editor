@@ -96,7 +96,7 @@ public class Validator {
                 errors.addAll(validateAgainstSchema(new ErrorProcessor(yaml), document));
                 errors.addAll(validateModel(document.getModel()));
                 errors.addAll(checkDuplicateKeys(yaml));
-                errors.addAll(referenceValidator.validate(baseURI, document.getModel()));
+                errors.addAll(referenceValidator.validate(baseURI, document));
             }
         }
 
@@ -144,7 +144,7 @@ public class Validator {
 
         if (model != null && model.getRoot() != null) {
             for (AbstractNode node : model.allNodes()) {
-                checkMissingItemsKeyInArrayType(errors, node);
+                checkArrayTypeDefinition(errors, node);
                 checkObjectTypeDefinition(errors, node);
             }
         }
@@ -157,10 +157,15 @@ public class Validator {
      * @param errors
      * @param model
      */
-    protected void checkMissingItemsKeyInArrayType(Set<SwaggerError> errors, AbstractNode node) {
+    protected void checkArrayTypeDefinition(Set<SwaggerError> errors, AbstractNode node) {
         if (hasArrayType(node)) {
-            if (node.get("items") == null) {
+            AbstractNode items = node.get("items");
+            if (items == null) {
                 errors.add(error(node, IMarker.SEVERITY_ERROR, Messages.error_array_missing_items));
+            } else {
+                if (!items.isObject()) {
+                    errors.add(error(items, IMarker.SEVERITY_ERROR, Messages.error_array_items_should_be_object));
+                }
             }
         }
     }

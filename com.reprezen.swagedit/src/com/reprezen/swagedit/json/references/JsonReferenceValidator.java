@@ -19,8 +19,8 @@ import java.util.Set;
 
 import com.google.common.collect.Sets;
 import com.reprezen.swagedit.Messages;
+import com.reprezen.swagedit.editor.SwaggerDocument;
 import com.reprezen.swagedit.model.AbstractNode;
-import com.reprezen.swagedit.model.Model;
 import com.reprezen.swagedit.validation.SwaggerError;
 
 /**
@@ -35,24 +35,25 @@ public class JsonReferenceValidator {
     }
 
     /**
-     * Returns a collection containing all errors being invalid JSON references present in the JSON document.
+     * Returns a collection containing all errors being invalid JSON references present in the Swagger document.
      * 
      * @param baseURI
-     * @param model
+     * @param document
      * @return collection of errors
      */
-    public Collection<? extends SwaggerError> validate(URI baseURI, Model model) {
-        return doValidate(baseURI, collector.collect(baseURI, model));
+    public Collection<? extends SwaggerError> validate(URI baseURI, SwaggerDocument doc) {
+        return doValidate(baseURI, doc, collector.collect(baseURI, doc.getModel()));
     }
 
-    protected Collection<? extends SwaggerError> doValidate(URI baseURI, Iterable<JsonReference> references) {
+    protected Collection<? extends SwaggerError> doValidate(URI baseURI, SwaggerDocument doc,
+            Iterable<JsonReference> references) {
         Set<SwaggerError> errors = Sets.newHashSet();
         for (JsonReference reference : references) {
             if (reference instanceof JsonReference.SimpleReference) {
                 errors.add(createReferenceError(SEVERITY_WARNING, Messages.warning_simple_reference, reference));
             } else if (reference.isInvalid()) {
                 errors.add(createReferenceError(SEVERITY_ERROR, Messages.error_invalid_reference, reference));
-            } else if (reference.isMissing(baseURI)) {
+            } else if (reference.isMissing(doc, baseURI)) {
                 errors.add(createReferenceError(SEVERITY_WARNING, Messages.error_missing_reference, reference));
             } else if (reference.containsWarning()) {
                 errors.add(createReferenceError(SEVERITY_WARNING, Messages.error_invalid_reference, reference));
