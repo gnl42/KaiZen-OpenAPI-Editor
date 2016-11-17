@@ -295,7 +295,8 @@ schema:
        id="com.reprezen.swagedit.templates.schema" 
        description="schema template" 
        context="com.reprezen.swagedit.templates.swagger.schema" 
-       enabled="true">required:
+       enabled="true">type: object
+required:
   - ${name}  
 properties:
   ${name}:
