@@ -3,11 +3,6 @@
 	<classpathentry kind="con" path="org.eclipse.jdt.launching.JRE_CONTAINER/org.eclipse.jdt.internal.debug.ui.launcher.StandardVMType/JavaSE-1.7"/>
 	<classpathentry kind="con" path="org.eclipse.pde.core.requiredPlugins"/>
 	<classpathentry exported="true" kind="lib" path="lib/cal10n.api_0.7.4.jar"/>
-	<classpathentry exported="true" kind="lib" path="lib/com.fasterxml.jackson.core.jackson-annotations_2.4.5.jar"/>
-	<classpathentry exported="true" kind="lib" path="lib/com.fasterxml.jackson.core.jackson-core_2.4.5.jar"/>
-	<classpathentry exported="true" kind="lib" path="lib/com.fasterxml.jackson.core.jackson-databind_2.4.5.jar"/>
-	<classpathentry exported="true" kind="lib" path="lib/com.fasterxml.jackson.dataformat.jackson-dataformat-yaml_2.4.5.jar"/>
-	<classpathentry exported="true" kind="lib" path="lib/com.fasterxml.jackson.datatype.jackson-datatype-joda_2.4.5.jar"/>
 	<classpathentry exported="true" kind="lib" path="lib/com.github.fge.btf_1.2.0.jar"/>
 	<classpathentry exported="true" kind="lib" path="lib/com.github.fge.jackson-coreutils_1.8.0.jar"/>
 	<classpathentry exported="true" kind="lib" path="lib/com.github.fge.json-schema-core_1.2.5.jar"/>
