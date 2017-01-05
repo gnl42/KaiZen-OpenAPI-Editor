@@ -105,6 +105,14 @@ public abstract class AbstractNode {
     public JsonPointer getPointer() {
         return pointer;
     }
+    
+    /**
+     * 
+     * @return JSON pointer as a string
+     */
+    public String getPointerString() {
+        return getPointer().toString();
+    }
 
     public void setType(TypeDefinition type) {
         this.type = type;
