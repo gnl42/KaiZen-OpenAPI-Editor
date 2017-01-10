@@ -200,6 +200,10 @@ public class Model {
         return nodes.get(pointer);
     }
 
+    public AbstractNode find(String pointer) {
+        return nodes.get(JsonPointer.valueOf(pointer));
+    }
+    
     private AbstractNode add(AbstractNode node) {
         if (node != null && node.getPointer() != null) {
             nodes.put(node.getPointer(), node);
