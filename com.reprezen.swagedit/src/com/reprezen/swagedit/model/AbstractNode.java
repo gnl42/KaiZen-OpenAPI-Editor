@@ -178,8 +178,10 @@ public abstract class AbstractNode {
             offset = document.getLineOffset(startLine);
             if (selectEntireElement) {
                 length = (document.getLineOffset(endLine) + endCol) - offset;
-            } else {
+            } else if (startLine < document.getNumberOfLines() - 1) {
                 length = document.getLineOffset(startLine+1) - offset;
+            } else {
+                length = document.getLineLength(startLine);
             }
         } catch (BadLocationException e) {
             return new Position(0);
