@@ -53,7 +53,7 @@ class JsonReferenceHyperlinkDetectorTest {
         // expected region
         val linkRegion = new Region(document.getLineOffset(1) + "  $ref: ".length(),
                 "'#/definitions/User'".length())
-        val targetRegion = new Region(50, 25)
+        val targetRegion = new Region(50, 8)
 
         assertThat(Arrays.asList(hyperlinks), 
         	hasItem(new SwaggerHyperlink("/definitions/User", viewer, linkRegion,
@@ -83,7 +83,7 @@ class JsonReferenceHyperlinkDetectorTest {
 
         // expected region
         val linkRegion = new Region(document.getLineOffset(1) + "  $ref: ".length(), "User".length())
-        val targetRegion = new Region(34, 25)
+        val targetRegion = new Region(34, 8)
 
         assertThat(Arrays.asList(hyperlinks), 
         	hasItem(new SwaggerHyperlink("/definitions/User", viewer, linkRegion, targetRegion)))
@@ -135,7 +135,7 @@ class JsonReferenceHyperlinkDetectorTest {
         // expected region
         val linkRegion = new Region(document.getLineOffset(1) + "  $ref: ".length(),
                 "'#/paths/~1foo~1{bar}'".length())
-        val targetRegion = new Region(46, 23)
+        val targetRegion = new Region(46, 14)
 
         assertThat(Arrays.asList(hyperlinks), hasItem(new SwaggerHyperlink("/paths/~1foo~1{bar}", viewer, linkRegion,
                 targetRegion)))

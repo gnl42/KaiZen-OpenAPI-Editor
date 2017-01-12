@@ -38,7 +38,7 @@ class PathParamHyperlinkDetectorTest {
 
         // expected region
         val linkRegion = new Region(document.getLineOffset(1) + "  /".length(), "{id}".length())
-        val targetRegion = new Region(43, 86)
+        val targetRegion = new Region(43, 19)
 
         assertThat(Arrays.asList(hyperlinks), hasItem(new SwaggerHyperlink("id", viewer, linkRegion, targetRegion)));
     }
