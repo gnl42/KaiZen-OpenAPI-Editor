@@ -167,6 +167,7 @@ public abstract class AbstractNode {
      * @return position inside the document
      */
     public Position getPosition(IDocument document) {
+        boolean selectEntireElement = false;
         int startLine = getStart().getLine();
         int offset = 0;
         int length = 0;
@@ -175,7 +176,13 @@ public abstract class AbstractNode {
         int endCol = getEnd().getColumn();
         try {
             offset = document.getLineOffset(startLine);
-            length = (document.getLineOffset(endLine) + endCol) - offset;
+            if (selectEntireElement) {
+                length = (document.getLineOffset(endLine) + endCol) - offset;
+            } else if (startLine < document.getNumberOfLines() - 1) {
+                length = document.getLineOffset(startLine+1) - offset;
+            } else {
+                length = document.getLineLength(startLine);
+            }
         } catch (BadLocationException e) {
             return new Position(0);
         }
