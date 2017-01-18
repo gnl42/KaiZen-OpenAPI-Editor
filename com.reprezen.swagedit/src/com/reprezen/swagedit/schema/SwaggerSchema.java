@@ -154,7 +154,7 @@ public class SwaggerSchema {
         swaggerType.setType(new ObjectTypeDefinition(swaggerType, JsonPointer.compile(""), content));
         try {
             JsonNode definitionsNode = asJson().get("definitions");
-            // FIXME
+      
             jsonRefContexts.put(SwaggerPreferenceConstants.VALIDATION_REF_SECURITY_DEFINITIONS_OBJECT,
                     definitionsNode.get("securityDefinitions"));
 

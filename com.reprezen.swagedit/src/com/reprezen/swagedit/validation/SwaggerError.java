@@ -10,9 +10,12 @@
  *******************************************************************************/
 package com.reprezen.swagedit.validation;
 
+import static com.google.common.collect.Iterators.transform;
+
 import java.util.Arrays;
 import java.util.Comparator;
 import java.util.HashMap;
+import java.util.Iterator;
 import java.util.LinkedList;
 import java.util.Map;
 import java.util.Set;
@@ -24,6 +27,9 @@ import org.yaml.snakeyaml.error.YAMLException;
 
 import com.fasterxml.jackson.core.JsonProcessingException;
 import com.fasterxml.jackson.databind.JsonNode;
+import com.fasterxml.jackson.databind.node.ArrayNode;
+import com.google.common.base.Function;
+import com.google.common.base.Joiner;
 import com.google.common.base.Strings;
 import com.google.common.collect.Lists;
 
@@ -192,7 +198,7 @@ public class SwaggerError {
             return getHumanFriendlyText(swaggerSchemaNode, location);
         }
 
-        /* package */String getHumanFriendlyText(JsonNode swaggerSchemaNode, String defaultValue) {
+        /* package */String getHumanFriendlyText(JsonNode swaggerSchemaNode, final String defaultValue) {
             JsonNode title = swaggerSchemaNode.get("title");
             if (title != null) {
                 return title.asText();
@@ -205,6 +211,23 @@ public class SwaggerError {
             JsonNode ref = swaggerSchemaNode.get("$ref");
             if (ref != null) {
                 return getLabelForRef(ref.asText());
+            }
+            // Auxiliary oneOf in "oneOf": [ { "$ref": "#/definitions/securityRequirement" }]
+            JsonNode oneOf = swaggerSchemaNode.get("oneOf");
+            if (oneOf != null) {
+                if (oneOf instanceof ArrayNode) {
+                    ArrayNode arrayNode = (ArrayNode) oneOf;
+                    if (arrayNode.size() > 0) {
+                        Iterator<String> labels = transform(arrayNode.elements(), new Function<JsonNode, String>() {
+
+                            @Override
+                            public String apply(JsonNode el) {
+                                return getHumanFriendlyText(el, defaultValue);
+                            }
+                        });
+                        return "[" + Joiner.on(", ").join(labels) + "]";
+                    }
+                }
             }
             return defaultValue;
         }
