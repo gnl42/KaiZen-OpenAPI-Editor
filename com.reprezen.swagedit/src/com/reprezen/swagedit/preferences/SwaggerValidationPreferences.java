@@ -15,16 +15,23 @@ import static com.reprezen.swagedit.preferences.SwaggerPreferenceConstants.VALID
 import static com.reprezen.swagedit.preferences.SwaggerPreferenceConstants.VALIDATION_REF_SECURITY_REQUIREMENT_OBJECT;
 import static com.reprezen.swagedit.preferences.SwaggerPreferenceConstants.VALIDATION_REF_SECURITY_SCHEME_OBJECT;
 
+import org.eclipse.jface.layout.GridDataFactory;
+import org.eclipse.jface.layout.GridLayoutFactory;
 import org.eclipse.jface.preference.BooleanFieldEditor;
 import org.eclipse.jface.preference.FieldEditorPreferencePage;
+import org.eclipse.jface.util.IPropertyChangeListener;
+import org.eclipse.swt.SWT;
+import org.eclipse.swt.widgets.Group;
 import org.eclipse.ui.IWorkbench;
 import org.eclipse.ui.IWorkbenchPreferencePage;
 
 import com.reprezen.swagedit.Activator;
 
-public class SwaggerValidationPreferences extends FieldEditorPreferencePage implements IWorkbenchPreferencePage {
+public class SwaggerValidationPreferences extends FieldEditorPreferencePage
+        implements IWorkbenchPreferencePage, IPropertyChangeListener {
 
     public SwaggerValidationPreferences() {
+        super(FieldEditorPreferencePage.GRID);
         setPreferenceStore(Activator.getDefault().getPreferenceStore());
         setDescription("Swagger preferences for validation");
     }
@@ -35,10 +42,17 @@ public class SwaggerValidationPreferences extends FieldEditorPreferencePage impl
 
     @Override
     protected void createFieldEditors() {
-        addField(new BooleanFieldEditor(VALIDATION_REF_SECURITY_DEFINITIONS_OBJECT, "Security Definitions Object", getFieldEditorParent()));
-        addField(new BooleanFieldEditor(VALIDATION_REF_SECURITY_SCHEME_OBJECT, "Security Scheme Object", getFieldEditorParent()));
-        addField(new BooleanFieldEditor(VALIDATION_REF_SECURITY_REQUIREMENTS_ARRAY, "Security Requirements Array", getFieldEditorParent()));
-        addField(new BooleanFieldEditor(VALIDATION_REF_SECURITY_REQUIREMENT_OBJECT, "Security Requirement Object", getFieldEditorParent()));
+        Group group = new Group(getFieldEditorParent(), SWT.SHADOW_OUT);
+        GridLayoutFactory.fillDefaults().applyTo(group);
+        GridDataFactory.fillDefaults().grab(true, false).indent(0, 10).applyTo(group);
+        group.setText("Allow JSON references in additional contexts:");
+        addField(new BooleanFieldEditor(VALIDATION_REF_SECURITY_DEFINITIONS_OBJECT, "Security Definitions Object",
+                group));
+        addField(new BooleanFieldEditor(VALIDATION_REF_SECURITY_SCHEME_OBJECT, "Security Scheme Object", group));
+        addField(new BooleanFieldEditor(VALIDATION_REF_SECURITY_REQUIREMENTS_ARRAY, "Security Requirements Array",
+                group));
+        addField(new BooleanFieldEditor(VALIDATION_REF_SECURITY_REQUIREMENT_OBJECT, "Security Requirement Object",
+                group));
     }
 
 }
