@@ -1166,7 +1166,8 @@
 	          "$ref": "#/definitions/securityRequirement"
 	       }]
 	     }  
-	   }],
+	   }
+	   ],
       "uniqueItems": true
     },
     "securityRequirement": {
@@ -1257,18 +1258,6 @@
             "$ref": "#/definitions/oauth2AccessCodeSecurity"
           }
         ]
-      }
-    },
-    "elementRef": {
-      "type": "object",
-      "additionalProperties": false,
-      "required": [
-        "$ref"
-      ],
-      "properties": {
-        "$ref": {
-        "type": "string"
-        }
       }
     },
     "basicAuthenticationSecurity": {

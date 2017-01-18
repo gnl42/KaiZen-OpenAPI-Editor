@@ -36,6 +36,8 @@ public class SwaggerSchema {
     private JsonSchema swaggerType;
     private JsonSchema coreType;
     private Map<String, ArrayNode> jsonRefContexts = Maps.newHashMap();
+    
+    private final JsonNode refToJsonReferenceNode = mapper.createObjectNode().put("$ref", "#/definitions/jsonReference");
 
     public SwaggerSchema() {
         init();
@@ -155,11 +157,11 @@ public class SwaggerSchema {
             jsonRefContexts.put(SwaggerPreferenceConstants.VALIDATION_REF_SECURITY_SCHEME_OBJECT,
                     (ArrayNode) definitionsNode.get("security").get("oneOf").get(0).get("items").get("oneOf"));
             
-            jsonRefContexts.put(SwaggerPreferenceConstants.VALIDATION_REF_SECURITY_REQUIREMENT_OBJECT,
-                    (ArrayNode) definitionsNode.get("securityRequirement").get("additionalProperties").get("items").get("oneOf"));
-
             jsonRefContexts.put(SwaggerPreferenceConstants.VALIDATION_REF_SECURITY_REQUIREMENTS_ARRAY,
                     (ArrayNode) definitionsNode.get("security").get("oneOf"));
+
+            jsonRefContexts.put(SwaggerPreferenceConstants.VALIDATION_REF_SECURITY_REQUIREMENT_OBJECT,
+                    (ArrayNode) definitionsNode.get("securityRequirement").get("additionalProperties").get("items").get("oneOf"));
  
         } catch (Exception e) {
             e.printStackTrace();
@@ -171,13 +173,15 @@ public class SwaggerSchema {
         if (definition == null) {
             throw new IllegalArgumentException("Invalid JSON Reference Context: " + jsonReferenceContext);
         }
-        JsonNode refNode = mapper.createObjectNode().put("$ref", "#/definitions/elementRef");
+        int lastIndex = definition.size() - 1;
+        JsonNode lastElement = definition.get(lastIndex);
+        boolean alreadyHasJsonReference = refToJsonReferenceNode.equals(lastElement);
         if (allow) {
-            definition.add(refNode.deepCopy());
-        } else {
-            int lastIndex = definition.size() - 1;
-            JsonNode lastElement = definition.get(lastIndex);
-            if (refNode.equals(lastElement)) {
+            if (!alreadyHasJsonReference) {
+                definition.add(refToJsonReferenceNode.deepCopy());
+            }
+        } else { // disallow
+            if (alreadyHasJsonReference) {
                 definition.remove(lastIndex);
             }
         }
