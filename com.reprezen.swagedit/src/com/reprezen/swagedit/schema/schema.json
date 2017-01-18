@@ -1175,11 +1175,7 @@
       "additionalProperties": {
         "type": "array",
         "items": {
-	      "oneOf": [
-	        {
-              "type": "string"
-	        }
-	      ]
+	       "type": "string"
         },
         "uniqueItems": true
       }
