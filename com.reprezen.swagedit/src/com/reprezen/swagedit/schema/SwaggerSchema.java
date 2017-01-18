@@ -10,6 +10,8 @@
  *******************************************************************************/
 package com.reprezen.swagedit.schema;
 
+import static com.reprezen.swagedit.preferences.SwaggerPreferenceConstants.VALIDATION_REF_SECURITY_DEFINITIONS_OBJECT;
+
 import java.io.IOException;
 import java.util.HashMap;
 import java.util.Map;
@@ -18,6 +20,7 @@ import com.fasterxml.jackson.core.JsonPointer;
 import com.fasterxml.jackson.databind.JsonNode;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import com.fasterxml.jackson.databind.node.ArrayNode;
+import com.fasterxml.jackson.databind.node.ObjectNode;
 import com.google.common.base.Strings;
 import com.google.common.collect.Maps;
 import com.reprezen.swagedit.json.references.JsonReference;
@@ -35,7 +38,7 @@ public class SwaggerSchema {
 
     private JsonSchema swaggerType;
     private JsonSchema coreType;
-    private Map<String, ArrayNode> jsonRefContexts = Maps.newHashMap();
+    private Map<String, JsonNode> jsonRefContexts = Maps.newHashMap();
     
     private final JsonNode refToJsonReferenceNode = mapper.createObjectNode().put("$ref", "#/definitions/jsonReference");
 
@@ -151,28 +154,34 @@ public class SwaggerSchema {
         swaggerType.setType(new ObjectTypeDefinition(swaggerType, JsonPointer.compile(""), content));
         try {
             JsonNode definitionsNode = asJson().get("definitions");
+            // FIXME
             jsonRefContexts.put(SwaggerPreferenceConstants.VALIDATION_REF_SECURITY_DEFINITIONS_OBJECT,
-                    (ArrayNode) definitionsNode.get("securityDefinitions").get("additionalProperties").get("oneOf"));
+                    definitionsNode.get("securityDefinitions"));
 
             jsonRefContexts.put(SwaggerPreferenceConstants.VALIDATION_REF_SECURITY_SCHEME_OBJECT,
-                    (ArrayNode) definitionsNode.get("security").get("oneOf").get(0).get("items").get("oneOf"));
-            
+                    (ArrayNode) definitionsNode.get("securityDefinitions").get("additionalProperties").get("oneOf"));
+                    
             jsonRefContexts.put(SwaggerPreferenceConstants.VALIDATION_REF_SECURITY_REQUIREMENTS_ARRAY,
                     (ArrayNode) definitionsNode.get("security").get("oneOf"));
 
             jsonRefContexts.put(SwaggerPreferenceConstants.VALIDATION_REF_SECURITY_REQUIREMENT_OBJECT,
-                    (ArrayNode) definitionsNode.get("securityRequirement").get("additionalProperties").get("items").get("oneOf"));
- 
+                    (ArrayNode) definitionsNode.get("security").get("oneOf").get(0).get("items").get("oneOf"));
+
         } catch (Exception e) {
             e.printStackTrace();
         }
     }
 
     public void allowJsonRefInContext(String jsonReferenceContext, boolean allow) {
-        ArrayNode definition = jsonRefContexts.get(jsonReferenceContext);
-        if (definition == null) {
+        if (jsonRefContexts.get(jsonReferenceContext) == null) {
             throw new IllegalArgumentException("Invalid JSON Reference Context: " + jsonReferenceContext);
         }
+        // special case
+        if (VALIDATION_REF_SECURITY_DEFINITIONS_OBJECT.equals(jsonReferenceContext)) {
+            allowJsonRefInSecurityDefinitionsObject(allow);
+            return;
+        }
+        ArrayNode definition = (ArrayNode) jsonRefContexts.get(jsonReferenceContext);
         int lastIndex = definition.size() - 1;
         JsonNode lastElement = definition.get(lastIndex);
         boolean alreadyHasJsonReference = refToJsonReferenceNode.equals(lastElement);
@@ -184,6 +193,16 @@ public class SwaggerSchema {
             if (alreadyHasJsonReference) {
                 definition.remove(lastIndex);
             }
+        }
+    }
+
+    protected void allowJsonRefInSecurityDefinitionsObject(boolean allow) {
+        ObjectNode definition = (ObjectNode) jsonRefContexts.get(VALIDATION_REF_SECURITY_DEFINITIONS_OBJECT);
+        if (allow) {
+            ObjectNode propertiesNode = definition.putObject("properties");
+            propertiesNode.putObject("$ref").put("type", "string");
+        } else {
+            definition.remove("properties");
         }
     }
 
