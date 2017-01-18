@@ -1158,10 +1158,15 @@
       }
     },
     "security": {
-      "type": "array",
-      "items": {
-        "$ref": "#/definitions/securityRequirement"
-      },
+      "oneOf": [
+	    {
+	    "type": "array",
+	     "items": {
+	     "oneOf": [ {
+	          "$ref": "#/definitions/securityRequirement"
+	       }]
+	     }  
+	   }],
       "uniqueItems": true
     },
     "securityRequirement": {
@@ -1169,7 +1174,11 @@
       "additionalProperties": {
         "type": "array",
         "items": {
-          "type": "string"
+	      "oneOf": [
+	        {
+              "type": "string"
+	        }
+	      ]
         },
         "uniqueItems": true
       }
@@ -1248,6 +1257,18 @@
             "$ref": "#/definitions/oauth2AccessCodeSecurity"
           }
         ]
+      }
+    },
+    "elementRef": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": [
+        "$ref"
+      ],
+      "properties": {
+        "$ref": {
+        "type": "string"
+        }
       }
     },
     "basicAuthenticationSecurity": {

@@ -17,9 +17,12 @@ import java.util.Map;
 import com.fasterxml.jackson.core.JsonPointer;
 import com.fasterxml.jackson.databind.JsonNode;
 import com.fasterxml.jackson.databind.ObjectMapper;
+import com.fasterxml.jackson.databind.node.ArrayNode;
 import com.google.common.base.Strings;
+import com.google.common.collect.Maps;
 import com.reprezen.swagedit.json.references.JsonReference;
 import com.reprezen.swagedit.model.AbstractNode;
+import com.reprezen.swagedit.preferences.SwaggerPreferenceConstants;
 
 /**
  * Represents the Swagger Schema.
@@ -32,6 +35,7 @@ public class SwaggerSchema {
 
     private JsonSchema swaggerType;
     private JsonSchema coreType;
+    private Map<String, ArrayNode> jsonRefContexts = Maps.newHashMap();
 
     public SwaggerSchema() {
         init();
@@ -143,6 +147,40 @@ public class SwaggerSchema {
 
         swaggerType = new JsonSchema(content, this);
         swaggerType.setType(new ObjectTypeDefinition(swaggerType, JsonPointer.compile(""), content));
+        try {
+            JsonNode definitionsNode = asJson().get("definitions");
+            jsonRefContexts.put(SwaggerPreferenceConstants.VALIDATION_REF_SECURITY_DEFINITIONS_OBJECT,
+                    (ArrayNode) definitionsNode.get("securityDefinitions").get("additionalProperties").get("oneOf"));
+
+            jsonRefContexts.put(SwaggerPreferenceConstants.VALIDATION_REF_SECURITY_SCHEME_OBJECT,
+                    (ArrayNode) definitionsNode.get("security").get("oneOf").get(0).get("items").get("oneOf"));
+            
+            jsonRefContexts.put(SwaggerPreferenceConstants.VALIDATION_REF_SECURITY_REQUIREMENT_OBJECT,
+                    (ArrayNode) definitionsNode.get("securityRequirement").get("additionalProperties").get("items").get("oneOf"));
+
+            jsonRefContexts.put(SwaggerPreferenceConstants.VALIDATION_REF_SECURITY_REQUIREMENTS_ARRAY,
+                    (ArrayNode) definitionsNode.get("security").get("oneOf"));
+ 
+        } catch (Exception e) {
+            e.printStackTrace();
+        }
+    }
+
+    public void allowJsonRefInContext(String jsonReferenceContext, boolean allow) {
+        ArrayNode definition = jsonRefContexts.get(jsonReferenceContext);
+        if (definition == null) {
+            throw new IllegalArgumentException("Invalid JSON Reference Context: " + jsonReferenceContext);
+        }
+        JsonNode refNode = mapper.createObjectNode().put("$ref", "#/definitions/elementRef");
+        if (allow) {
+            definition.add(refNode.deepCopy());
+        } else {
+            int lastIndex = definition.size() - 1;
+            JsonNode lastElement = definition.get(lastIndex);
+            if (refNode.equals(lastElement)) {
+                definition.remove(lastIndex);
+            }
+        }
     }
 
     /**
