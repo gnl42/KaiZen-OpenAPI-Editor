@@ -21,7 +21,9 @@ import org.eclipse.jface.preference.BooleanFieldEditor;
 import org.eclipse.jface.preference.FieldEditorPreferencePage;
 import org.eclipse.jface.util.IPropertyChangeListener;
 import org.eclipse.swt.SWT;
+import org.eclipse.swt.widgets.Composite;
 import org.eclipse.swt.widgets.Group;
+import org.eclipse.swt.widgets.Label;
 import org.eclipse.ui.IWorkbench;
 import org.eclipse.ui.IWorkbenchPreferencePage;
 
@@ -31,6 +33,7 @@ public class SwaggerValidationPreferences extends FieldEditorPreferencePage
         implements IWorkbenchPreferencePage, IPropertyChangeListener {
 
     public SwaggerValidationPreferences() {
+        // GRID is needed because we are not attaching the editor fields directly to FieldEditorParent, but to its child
         super(FieldEditorPreferencePage.GRID);
         setPreferenceStore(Activator.getDefault().getPreferenceStore());
         setDescription("Swagger preferences for validation");
@@ -42,17 +45,23 @@ public class SwaggerValidationPreferences extends FieldEditorPreferencePage
 
     @Override
     protected void createFieldEditors() {
-        Group group = new Group(getFieldEditorParent(), SWT.SHADOW_OUT);
-        GridLayoutFactory.fillDefaults().applyTo(group);
-        GridDataFactory.fillDefaults().grab(true, false).indent(0, 10).applyTo(group);
-        group.setText("Allow JSON references in additional contexts:");
+        // IMPORTANT: FieldEditorPreferencePage does not work very well with complex layouts and nested widgets.
+        // Consider switching to com.modelsolv.reprezen.generators.ui.preferences.GroupedFieldEditorPreferencePage from
+        // the RepreZen repo before modifying it
+        Composite refValidationComposite = new Composite(getFieldEditorParent(), SWT.BORDER);
+        GridLayoutFactory.fillDefaults().applyTo(refValidationComposite);
+        GridDataFactory.fillDefaults().grab(true, false).indent(0, 10).applyTo(refValidationComposite);
+
+        Label header = new Label(refValidationComposite, SWT.NONE);
+        header.setText("Allow JSON references in additional contexts:");
+
         addField(new BooleanFieldEditor(VALIDATION_REF_SECURITY_DEFINITIONS_OBJECT, "Security Definitions Object",
-                group));
-        addField(new BooleanFieldEditor(VALIDATION_REF_SECURITY_SCHEME_OBJECT, "Security Scheme Object", group));
+                refValidationComposite));
+        addField(new BooleanFieldEditor(VALIDATION_REF_SECURITY_SCHEME_OBJECT, "Security Scheme Object", refValidationComposite));
         addField(new BooleanFieldEditor(VALIDATION_REF_SECURITY_REQUIREMENTS_ARRAY, "Security Requirements Array",
-                group));
+                refValidationComposite));
         addField(new BooleanFieldEditor(VALIDATION_REF_SECURITY_REQUIREMENT_OBJECT, "Security Requirement Object",
-                group));
+                refValidationComposite));
     }
 
 }
