@@ -191,8 +191,10 @@ public class SwaggerEditor extends YEdit implements IShowInSource, IShowInTarget
                 }
             }
             if (ALL_VALIDATION_PREFS.contains(event.getProperty())) {
-                Activator.getDefault().getSchema().allowJsonRefInContext(event.getProperty(),
-                        (Boolean) event.getNewValue());
+                // Boolean comes from changing a value, String comes when restoring the default value as it uses getDefaultString(name)
+                boolean newValue = event.getNewValue() instanceof Boolean ? (Boolean) event.getNewValue()
+                        : Boolean.valueOf((String) event.getNewValue());
+                Activator.getDefault().getSchema().allowJsonRefInContext(event.getProperty(), newValue);
                 validate();
             }
         }

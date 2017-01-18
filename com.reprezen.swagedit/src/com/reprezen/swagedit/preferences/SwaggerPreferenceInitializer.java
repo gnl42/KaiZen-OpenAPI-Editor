@@ -84,8 +84,8 @@ public class SwaggerPreferenceInitializer extends AbstractPreferenceInitializer 
         store.setDefault(PreferenceConstants.ITALIC_CONSTANT, false);
         store.setDefault(PreferenceConstants.UNDERLINE_CONSTANT, false);
         
-        store.setDefault(VALIDATION_REF_SECURITY_DEFINITIONS_OBJECT, true);
-        store.setDefault(VALIDATION_REF_SECURITY_SCHEME_OBJECT, true);
+        store.setDefault(VALIDATION_REF_SECURITY_DEFINITIONS_OBJECT, false);
+        store.setDefault(VALIDATION_REF_SECURITY_SCHEME_OBJECT, false);
         store.setDefault(VALIDATION_REF_SECURITY_REQUIREMENTS_ARRAY, false);
         store.setDefault(VALIDATION_REF_SECURITY_REQUIREMENT_OBJECT, false);
     }
