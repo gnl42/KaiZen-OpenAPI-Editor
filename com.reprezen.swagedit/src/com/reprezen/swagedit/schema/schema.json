@@ -1158,10 +1158,16 @@
       }
     },
     "security": {
-      "type": "array",
-      "items": {
-        "$ref": "#/definitions/securityRequirement"
-      },
+      "oneOf": [
+	    {
+	    "type": "array",
+	     "items": {
+	     "oneOf": [ {
+	          "$ref": "#/definitions/securityRequirement"
+	       }]
+	     }  
+	   }
+	   ],
       "uniqueItems": true
     },
     "securityRequirement": {
@@ -1169,7 +1175,7 @@
       "additionalProperties": {
         "type": "array",
         "items": {
-          "type": "string"
+	       "type": "string"
         },
         "uniqueItems": true
       }
