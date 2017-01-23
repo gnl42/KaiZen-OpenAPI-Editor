@@ -10,12 +10,16 @@
  *******************************************************************************/
 package com.reprezen.swagedit;
 
+import static com.reprezen.swagedit.preferences.SwaggerPreferenceConstants.ALL_VALIDATION_PREFS;
+
 import java.io.IOException;
 
 import org.dadacoalition.yedit.YEditLog;
 import org.eclipse.core.runtime.FileLocator;
+import org.eclipse.core.runtime.IStatus;
 import org.eclipse.core.runtime.Path;
 import org.eclipse.core.runtime.Platform;
+import org.eclipse.core.runtime.Status;
 import org.eclipse.jface.resource.ImageDescriptor;
 import org.eclipse.jface.text.templates.ContextTypeRegistry;
 import org.eclipse.jface.text.templates.persistence.TemplateStore;
@@ -146,8 +150,14 @@ public class Activator extends AbstractUIPlugin {
     public SwaggerSchema getSchema() {
         if (schema == null) {
             schema = new SwaggerSchema();
+            for (String prefKey : ALL_VALIDATION_PREFS) {
+                try {
+                    schema.allowJsonRefInContext(prefKey, (boolean) getPreferenceStore().getBoolean(prefKey));
+                } catch (Exception e) {
+                    getLog().log(new Status(IStatus.ERROR, Activator.PLUGIN_ID, e.getMessage(), e));
+                }
+            }
         }
-
         return schema;
     }
 }

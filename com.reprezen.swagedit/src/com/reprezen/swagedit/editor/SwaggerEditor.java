@@ -10,6 +10,8 @@
  *******************************************************************************/
 package com.reprezen.swagedit.editor;
 
+import static com.reprezen.swagedit.preferences.SwaggerPreferenceConstants.ALL_VALIDATION_PREFS;
+
 import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.List;
@@ -121,71 +123,80 @@ public class SwaggerEditor extends YEdit implements IShowInSource, IShowInTarget
 
     /*
      * This listener is added to the preference store when the editor is initialized. It listens to changes to color
-     * preferences. Once a color change happens, the editor is re-initialize.
+     * preferences. Once a color change happens, the editor is re-initialized.
+     * It also handles changes in validation preferences
      */
     private final IPropertyChangeListener preferenceChangeListener = new IPropertyChangeListener() {
 
-        private final List<String> preferenceKeys = new ArrayList<>();
+        private final List<String> colorPreferenceKeys = new ArrayList<>();
         {
-            preferenceKeys.add(PreferenceConstants.COLOR_COMMENT);
-            preferenceKeys.add(PreferenceConstants.BOLD_COMMENT);
-            preferenceKeys.add(PreferenceConstants.ITALIC_COMMENT);
-            preferenceKeys.add(PreferenceConstants.UNDERLINE_COMMENT);
+            colorPreferenceKeys.add(PreferenceConstants.COLOR_COMMENT);
+            colorPreferenceKeys.add(PreferenceConstants.BOLD_COMMENT);
+            colorPreferenceKeys.add(PreferenceConstants.ITALIC_COMMENT);
+            colorPreferenceKeys.add(PreferenceConstants.UNDERLINE_COMMENT);
 
-            preferenceKeys.add(PreferenceConstants.COLOR_KEY);
-            preferenceKeys.add(PreferenceConstants.BOLD_KEY);
-            preferenceKeys.add(PreferenceConstants.ITALIC_KEY);
-            preferenceKeys.add(PreferenceConstants.UNDERLINE_KEY);
+            colorPreferenceKeys.add(PreferenceConstants.COLOR_KEY);
+            colorPreferenceKeys.add(PreferenceConstants.BOLD_KEY);
+            colorPreferenceKeys.add(PreferenceConstants.ITALIC_KEY);
+            colorPreferenceKeys.add(PreferenceConstants.UNDERLINE_KEY);
 
-            preferenceKeys.add(PreferenceConstants.COLOR_SCALAR);
-            preferenceKeys.add(PreferenceConstants.BOLD_SCALAR);
-            preferenceKeys.add(PreferenceConstants.ITALIC_SCALAR);
-            preferenceKeys.add(PreferenceConstants.UNDERLINE_SCALAR);
+            colorPreferenceKeys.add(PreferenceConstants.COLOR_SCALAR);
+            colorPreferenceKeys.add(PreferenceConstants.BOLD_SCALAR);
+            colorPreferenceKeys.add(PreferenceConstants.ITALIC_SCALAR);
+            colorPreferenceKeys.add(PreferenceConstants.UNDERLINE_SCALAR);
 
-            preferenceKeys.add(PreferenceConstants.COLOR_DEFAULT);
-            preferenceKeys.add(PreferenceConstants.BOLD_DEFAULT);
-            preferenceKeys.add(PreferenceConstants.ITALIC_DEFAULT);
-            preferenceKeys.add(PreferenceConstants.UNDERLINE_DEFAULT);
+            colorPreferenceKeys.add(PreferenceConstants.COLOR_DEFAULT);
+            colorPreferenceKeys.add(PreferenceConstants.BOLD_DEFAULT);
+            colorPreferenceKeys.add(PreferenceConstants.ITALIC_DEFAULT);
+            colorPreferenceKeys.add(PreferenceConstants.UNDERLINE_DEFAULT);
 
-            preferenceKeys.add(PreferenceConstants.COLOR_DOCUMENT);
-            preferenceKeys.add(PreferenceConstants.BOLD_DOCUMENT);
-            preferenceKeys.add(PreferenceConstants.ITALIC_DOCUMENT);
-            preferenceKeys.add(PreferenceConstants.UNDERLINE_DOCUMENT);
+            colorPreferenceKeys.add(PreferenceConstants.COLOR_DOCUMENT);
+            colorPreferenceKeys.add(PreferenceConstants.BOLD_DOCUMENT);
+            colorPreferenceKeys.add(PreferenceConstants.ITALIC_DOCUMENT);
+            colorPreferenceKeys.add(PreferenceConstants.UNDERLINE_DOCUMENT);
 
-            preferenceKeys.add(PreferenceConstants.COLOR_ANCHOR);
-            preferenceKeys.add(PreferenceConstants.BOLD_ANCHOR);
-            preferenceKeys.add(PreferenceConstants.ITALIC_ANCHOR);
-            preferenceKeys.add(PreferenceConstants.UNDERLINE_ANCHOR);
+            colorPreferenceKeys.add(PreferenceConstants.COLOR_ANCHOR);
+            colorPreferenceKeys.add(PreferenceConstants.BOLD_ANCHOR);
+            colorPreferenceKeys.add(PreferenceConstants.ITALIC_ANCHOR);
+            colorPreferenceKeys.add(PreferenceConstants.UNDERLINE_ANCHOR);
 
-            preferenceKeys.add(PreferenceConstants.COLOR_ALIAS);
-            preferenceKeys.add(PreferenceConstants.BOLD_ALIAS);
-            preferenceKeys.add(PreferenceConstants.ITALIC_ALIAS);
-            preferenceKeys.add(PreferenceConstants.UNDERLINE_ALIAS);
+            colorPreferenceKeys.add(PreferenceConstants.COLOR_ALIAS);
+            colorPreferenceKeys.add(PreferenceConstants.BOLD_ALIAS);
+            colorPreferenceKeys.add(PreferenceConstants.ITALIC_ALIAS);
+            colorPreferenceKeys.add(PreferenceConstants.UNDERLINE_ALIAS);
 
-            preferenceKeys.add(PreferenceConstants.COLOR_TAG_PROPERTY);
-            preferenceKeys.add(PreferenceConstants.BOLD_TAG_PROPERTY);
-            preferenceKeys.add(PreferenceConstants.ITALIC_TAG_PROPERTY);
-            preferenceKeys.add(PreferenceConstants.UNDERLINE_TAG_PROPERTY);
+            colorPreferenceKeys.add(PreferenceConstants.COLOR_TAG_PROPERTY);
+            colorPreferenceKeys.add(PreferenceConstants.BOLD_TAG_PROPERTY);
+            colorPreferenceKeys.add(PreferenceConstants.ITALIC_TAG_PROPERTY);
+            colorPreferenceKeys.add(PreferenceConstants.UNDERLINE_TAG_PROPERTY);
 
-            preferenceKeys.add(PreferenceConstants.COLOR_INDICATOR_CHARACTER);
-            preferenceKeys.add(PreferenceConstants.BOLD_INDICATOR_CHARACTER);
-            preferenceKeys.add(PreferenceConstants.ITALIC_INDICATOR_CHARACTER);
-            preferenceKeys.add(PreferenceConstants.UNDERLINE_INDICATOR_CHARACTER);
+            colorPreferenceKeys.add(PreferenceConstants.COLOR_INDICATOR_CHARACTER);
+            colorPreferenceKeys.add(PreferenceConstants.BOLD_INDICATOR_CHARACTER);
+            colorPreferenceKeys.add(PreferenceConstants.ITALIC_INDICATOR_CHARACTER);
+            colorPreferenceKeys.add(PreferenceConstants.UNDERLINE_INDICATOR_CHARACTER);
 
-            preferenceKeys.add(PreferenceConstants.COLOR_CONSTANT);
-            preferenceKeys.add(PreferenceConstants.BOLD_CONSTANT);
-            preferenceKeys.add(PreferenceConstants.ITALIC_CONSTANT);
-            preferenceKeys.add(PreferenceConstants.UNDERLINE_CONSTANT);
+            colorPreferenceKeys.add(PreferenceConstants.COLOR_CONSTANT);
+            colorPreferenceKeys.add(PreferenceConstants.BOLD_CONSTANT);
+            colorPreferenceKeys.add(PreferenceConstants.ITALIC_CONSTANT);
+            colorPreferenceKeys.add(PreferenceConstants.UNDERLINE_CONSTANT);
         }
-
+        
         @Override
         public void propertyChange(PropertyChangeEvent event) {
-            if (preferenceKeys.contains(event.getProperty())) {
+            if (colorPreferenceKeys.contains(event.getProperty())) {
                 if (getSourceViewer() instanceof SourceViewer) {
                     ((SourceViewer) getSourceViewer()).unconfigure();
                     initializeEditor();
                     getSourceViewer().configure(sourceViewerConfiguration);
                 }
+            }
+            if (ALL_VALIDATION_PREFS.contains(event.getProperty())) {
+                // Boolean comes from changing a value, String comes when restoring the default value as it uses
+                // getDefaultString(name)
+                boolean newValue = event.getNewValue() instanceof Boolean ? (Boolean) event.getNewValue()
+                        : Boolean.valueOf((String) event.getNewValue());
+                Activator.getDefault().getSchema().allowJsonRefInContext(event.getProperty(), newValue);
+                validate();
             }
         }
     };

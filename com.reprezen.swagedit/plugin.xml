@@ -67,6 +67,12 @@
             id="com.reprezen.swagedit.preferences.SwaggerTemplatePreferences"
             name="%preferences.page.templates.name">
       </page>
+      <page
+            category="com.reprezen.swagedit.preferences"
+            class="com.reprezen.swagedit.preferences.SwaggerValidationPreferences"
+            id="com.reprezen.swagedit.preferences.SwaggerValidationPreferences"
+            name="%preferences.page.validation.name">
+      </page>
    </extension>
 
    <extension
