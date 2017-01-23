@@ -14,6 +14,7 @@ import static com.reprezen.swagedit.preferences.SwaggerPreferenceConstants.VALID
 
 import java.io.IOException;
 import java.util.HashMap;
+import java.util.List;
 import java.util.Map;
 
 import com.fasterxml.jackson.core.JsonPointer;
@@ -22,6 +23,7 @@ import com.fasterxml.jackson.databind.ObjectMapper;
 import com.fasterxml.jackson.databind.node.ArrayNode;
 import com.fasterxml.jackson.databind.node.ObjectNode;
 import com.google.common.base.Strings;
+import com.google.common.collect.Lists;
 import com.google.common.collect.Maps;
 import com.reprezen.swagedit.json.references.JsonReference;
 import com.reprezen.swagedit.model.AbstractNode;
@@ -182,16 +184,17 @@ public class SwaggerSchema {
             return;
         }
         ArrayNode definition = (ArrayNode) jsonRefContexts.get(jsonReferenceContext);
-        int lastIndex = definition.size() - 1;
-        JsonNode lastElement = definition.get(lastIndex);
-        boolean alreadyHasJsonReference = refToJsonReferenceNode.equals(lastElement);
+        // should preserve order of the original ArrayNode._children
+        List<JsonNode> children = Lists.newArrayList(definition.elements());
+        int indexOfJsonReference = children.indexOf(refToJsonReferenceNode);
+        boolean alreadyHasJsonReference = indexOfJsonReference > -1;
         if (allow) {
             if (!alreadyHasJsonReference) {
                 definition.add(refToJsonReferenceNode.deepCopy());
             }
         } else { // disallow
             if (alreadyHasJsonReference) {
-                definition.remove(lastIndex);
+                definition.remove(indexOfJsonReference);
             }
         }
     }
