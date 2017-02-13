@@ -45,7 +45,7 @@ class NullValueValidationTest {
 
 		val errors = validator.validate(document, null)
 		assertEquals(1, errors.size())
-		assertTrue(errors.findFirst[true].getMessage().contains("value null is not allowed"))
+		assertThat(errors.findFirst[true].getMessage(), containsString('The null value is not allowed for type, did you mean the "null" string (quoted)?'))
 		assertThat(errors.findFirst[true].line, equalTo(14))
 	}
 
@@ -155,7 +155,7 @@ class NullValueValidationTest {
 
 		val errors = validator.validate(document, null)
 		assertEquals(1, errors.size())
-		assertTrue(errors.findFirst[true].getMessage().contains("value of type null is not allowed"))
+		assertThat(errors.findFirst[true].getMessage(), containsString("value of type null is not allowed"))
 		assertThat(errors.findFirst[true].line, equalTo(15))
 	}
 

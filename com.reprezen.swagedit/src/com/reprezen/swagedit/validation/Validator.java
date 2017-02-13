@@ -193,14 +193,9 @@ public class Validator {
     protected void checkObjectTypeDefinition(Set<SwaggerError> errors, AbstractNode node) {
         if (node instanceof ObjectNode) {
             JsonPointer ptr = node.getPointer();
-            if (ptr != null) {
-                if (ptr.toString().startsWith("/definitions")) {
-                    checkMissingType(errors, node);
-                    checkMissingRequiredProperties(errors, node);
-                } else if (ptr.toString().endsWith("/schema")) {
-                    checkMissingType(errors, node);
-                    checkMissingRequiredProperties(errors, node);
-                }
+            if (ptr != null && ValidationUtil.isInDefinition(ptr.toString())) {
+                checkMissingType(errors, node);
+                checkMissingRequiredProperties(errors, node);
             }
         }
     }

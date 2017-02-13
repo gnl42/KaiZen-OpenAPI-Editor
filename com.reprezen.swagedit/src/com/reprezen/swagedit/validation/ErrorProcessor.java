@@ -169,6 +169,12 @@ public class ErrorProcessor {
             expect = expected.asText();
         }
 
+        if ("null".equals(found.asText())) {
+            String pointer = ValidationUtil.getInstancePointer(error);
+            if (pointer != null && ValidationUtil.isInDefinition(pointer) && pointer.endsWith("/type")) {
+                return Messages.error_nullType;
+            }
+        }
         return String.format(Messages.error_typeNoMatch, found.asText(), expect);
     }
 
