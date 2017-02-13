@@ -179,7 +179,7 @@ public class Validator {
     protected boolean hasArrayType(AbstractNode node) {
         if (node.isObject() && node.get("type") instanceof ValueNode) {
             ValueNode typeValue = node.get("type").asValue();
-            return "array".equalsIgnoreCase(typeValue.getValue().toString());
+            return typeValue.getValue() != null && "array".equalsIgnoreCase(typeValue.getValue().toString());
         }
         return false;
     }
