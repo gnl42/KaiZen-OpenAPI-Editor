@@ -21,6 +21,16 @@ import org.yaml.snakeyaml.nodes.ScalarNode;
 import com.fasterxml.jackson.databind.JsonNode;
 
 public class ValidationUtil {
+    
+    public static boolean isInDefinition(String pointerString) {
+        return pointerString.startsWith("/definitions") || pointerString.endsWith("/schema");
+    }
+    
+    public static String getInstancePointer(JsonNode error) {
+        if (!error.has("instance") || !error.get("instance").has("pointer"))
+            return null;
+        return error.get("instance").get("pointer").asText();
+    }
 
     /*
      * Returns the line for which an error message has been produced.
@@ -34,10 +44,7 @@ public class ValidationUtil {
      * The Node matching the path is found by the methods findNode().
      */
     public static int getLine(JsonNode error, Node yamlTree) {
-        if (!error.has("instance") || !error.get("instance").has("pointer"))
-            return 1;
-
-        String path = error.get("instance").get("pointer").asText();
+        String path = getInstancePointer(error);
 
         if (path == null || path.isEmpty())
             return 1;
