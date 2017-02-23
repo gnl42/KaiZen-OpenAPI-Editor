@@ -39,6 +39,7 @@
             base-type="org.eclipse.core.runtime.text"
             describer="com.reprezen.swagedit.editor.SwaggerContentDescriber"
             file-extensions="yaml"
+            default-charset="UTF-8"
             id="com.reprezen.swagedit.contenttype.swagger.yaml"
             name="%content-type.name"
             priority="high">

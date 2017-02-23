@@ -27,6 +27,7 @@ public class Messages extends NLS {
     public static String outline_proposal_workspace;
 
     // errors
+    public static String error_nullType;
     public static String error_typeNoMatch;
     public static String error_notInEnum;
     public static String error_additional_properties_not_allowed;
