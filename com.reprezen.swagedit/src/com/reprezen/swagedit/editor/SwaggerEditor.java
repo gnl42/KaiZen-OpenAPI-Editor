@@ -31,6 +31,7 @@ import org.eclipse.core.runtime.CoreException;
 import org.eclipse.core.runtime.IProgressMonitor;
 import org.eclipse.core.runtime.IStatus;
 import org.eclipse.core.runtime.Status;
+import org.eclipse.core.runtime.jobs.Job;
 import org.eclipse.jface.text.DocumentEvent;
 import org.eclipse.jface.text.IDocument;
 import org.eclipse.jface.text.IDocumentListener;
@@ -66,6 +67,7 @@ import org.eclipse.ui.IFileEditorInput;
 import org.eclipse.ui.PartInitException;
 import org.eclipse.ui.PlatformUI;
 import org.eclipse.ui.contexts.IContextService;
+import org.eclipse.ui.part.FileEditorInput;
 import org.eclipse.ui.part.IShowInSource;
 import org.eclipse.ui.part.IShowInTarget;
 import org.eclipse.ui.part.ShowInContext;
@@ -552,6 +554,11 @@ public class SwaggerEditor extends YEdit implements IShowInSource, IShowInTarget
 
         public SafeWorkspaceJob(String name) {
             super(name);
+            setPriority(Job.INTERACTIVE);
+            IEditorInput editorInput = SwaggerEditor.this.getEditorInput();
+            if (editorInput != null && editorInput instanceof FileEditorInput) {
+                setRule(((FileEditorInput) editorInput).getFile());
+            }
         }
 
         @Override
