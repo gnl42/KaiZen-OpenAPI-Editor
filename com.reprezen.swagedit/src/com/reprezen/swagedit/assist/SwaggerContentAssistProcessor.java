@@ -77,6 +77,7 @@ public class SwaggerContentAssistProcessor extends TemplateCompletionProcessor
      * 
      */
     private JsonPointer currentPath = null;
+    private int currentOffset = -1;
 
     /**
      * Current position scope use to retrieve JSON Reference proposals.
@@ -105,9 +106,7 @@ public class SwaggerContentAssistProcessor extends TemplateCompletionProcessor
             return super.computeCompletionProposals(viewer, documentOffset);
         }
 
-        if (isRefCompletion) {
-            currentScope = currentScope.next();
-        }
+        maybeSwitchScope(documentOffset);
 
         final SwaggerDocument document = (SwaggerDocument) viewer.getDocument();
         final ITextSelection selection = (ITextSelection) viewer.getSelectionProvider().getSelection();
@@ -140,7 +139,7 @@ public class SwaggerContentAssistProcessor extends TemplateCompletionProcessor
             clearStatus();
             p = proposalProvider.getProposals(currentPath, model, prefix);
         }
-
+   
         final Collection<ICompletionProposal> proposals = getCompletionProposals(p, prefix, documentOffset);
         // compute template proposals
         if (!isRefCompletion) {
@@ -151,6 +150,14 @@ public class SwaggerContentAssistProcessor extends TemplateCompletionProcessor
         }
 
         return proposals.toArray(new ICompletionProposal[proposals.size()]);
+    }
+
+    private void maybeSwitchScope(int documentOffset) {
+        // computeCompletionProposals() is called on Ctrl+space or on typing a new character
+        if (isRefCompletion && (currentOffset == documentOffset)) {
+            currentScope = currentScope.next();
+        }
+        currentOffset = documentOffset;
     }
 
     protected void updateStatus() {
@@ -303,16 +310,19 @@ public class SwaggerContentAssistProcessor extends TemplateCompletionProcessor
 
     @Override
     public void assistSessionStarted(ContentAssistEvent event) {
-        currentScope = Scope.LOCAL;
-        isRefCompletion = false;
-        textMessages = null;
+        resetScope();
     }
 
     @Override
     public void assistSessionEnded(ContentAssistEvent event) {
+        resetScope();
+    }
+
+    private void resetScope() {
         currentScope = Scope.LOCAL;
         isRefCompletion = false;
         textMessages = null;
+        currentOffset = -1;
     }
 
     @Override
