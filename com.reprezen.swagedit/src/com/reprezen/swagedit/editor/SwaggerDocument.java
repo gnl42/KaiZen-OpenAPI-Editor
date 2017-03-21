@@ -168,6 +168,9 @@ public class SwaggerDocument extends Document {
         }
     }
 
+    /**
+     * @return the Model, or null if the spec is invalid YAML
+     */
     public Model getModel() {
         if (model == null) {
             parseModel();
