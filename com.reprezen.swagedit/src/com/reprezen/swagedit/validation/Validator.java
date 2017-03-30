@@ -30,6 +30,7 @@ import org.yaml.snakeyaml.parser.ParserException;
 
 import com.fasterxml.jackson.core.JsonPointer;
 import com.fasterxml.jackson.databind.JsonNode;
+import com.fasterxml.jackson.databind.ObjectMapper;
 import com.github.fge.jsonschema.core.exceptions.ProcessingException;
 import com.github.fge.jsonschema.core.report.ProcessingReport;
 import com.github.fge.jsonschema.main.JsonSchema;
@@ -57,6 +58,7 @@ import com.reprezen.swagedit.model.ValueNode;
 public class Validator {
 
     private final JsonReferenceValidator referenceValidator;
+    private JsonNode schemaRefTemplate = new ObjectMapper().createObjectNode().put("$ref", "#/definitions/schema");
 
     public Validator(JsonReferenceValidator referenceValidator) {
         this.referenceValidator = referenceValidator;
@@ -207,16 +209,24 @@ public class Validator {
      * @param node
      */
     protected void checkMissingType(Set<SwaggerError> errors, AbstractNode node) {
+        // object
         if (node.get("properties") != null) {
             if (node.get("type") == null) {
-                errors.add(error(node, IMarker.SEVERITY_WARNING, Messages.error_type_missing));
+                errors.add(error(node, IMarker.SEVERITY_WARNING, Messages.error_object_type_missing));
             } else {
                 AbstractNode typeValue = node.get("type");
                 if (!(typeValue instanceof ValueNode) || !Objects.equals("object", typeValue.asValue().getValue())) {
                     errors.add(error(node, IMarker.SEVERITY_ERROR, Messages.error_wrong_type));
                 }
             }
+        } else if (isSchemaDefinition(node) && node.get("type") == null) {
+            errors.add(error(node, IMarker.SEVERITY_WARNING, Messages.error_type_missing));
         }
+    }
+
+    private boolean isSchemaDefinition(AbstractNode node) {
+        // need to use getContent() because asJson() returns resolvedValue is some subclasses
+        return schemaRefTemplate.equals(node.getType().getContent());
     }
 
     /**
