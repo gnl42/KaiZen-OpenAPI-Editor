@@ -209,7 +209,7 @@ public class Validator {
     protected void checkMissingType(Set<SwaggerError> errors, AbstractNode node) {
         if (node.get("properties") != null) {
             if (node.get("type") == null) {
-                errors.add(error(node, IMarker.SEVERITY_ERROR, Messages.error_type_missing));
+                errors.add(error(node, IMarker.SEVERITY_WARNING, Messages.error_type_missing));
             } else {
                 AbstractNode typeValue = node.get("type");
                 if (!(typeValue instanceof ValueNode) || !Objects.equals("object", typeValue.asValue().getValue())) {
