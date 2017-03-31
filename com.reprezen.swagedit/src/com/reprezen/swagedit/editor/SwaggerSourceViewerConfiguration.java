@@ -57,7 +57,7 @@ public class SwaggerSourceViewerConfiguration extends YEditSourceViewerConfigura
         ca.setContentAssistProcessor(processor, IDocument.DEFAULT_CONTENT_TYPE);
         ca.setInformationControlCreator(getInformationControlCreator(sourceViewer));
 
-        ca.enableAutoInsert(true);
+        ca.enableAutoInsert(false);
         ca.enablePrefixCompletion(false);
         ca.enableAutoActivation(true);
         ca.setAutoActivationDelay(100);
