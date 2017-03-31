@@ -32,6 +32,7 @@ import org.eclipse.core.runtime.IProgressMonitor;
 import org.eclipse.core.runtime.IStatus;
 import org.eclipse.core.runtime.Status;
 import org.eclipse.core.runtime.jobs.Job;
+import org.eclipse.jface.dialogs.MessageDialog;
 import org.eclipse.jface.text.DocumentEvent;
 import org.eclipse.jface.text.IDocument;
 import org.eclipse.jface.text.IDocumentListener;
@@ -72,6 +73,7 @@ import org.eclipse.ui.part.IShowInSource;
 import org.eclipse.ui.part.IShowInTarget;
 import org.eclipse.ui.part.ShowInContext;
 import org.eclipse.ui.swt.IFocusService;
+import org.eclipse.ui.texteditor.IDocumentProvider;
 import org.eclipse.ui.views.contentoutline.IContentOutlinePage;
 import org.yaml.snakeyaml.error.YAMLException;
 
@@ -402,6 +404,9 @@ public class SwaggerEditor extends YEdit implements IShowInSource, IShowInTarget
 
     @Override
     public void doSave(IProgressMonitor monitor) {
+        // ZEN-3411 SwaggerEditor: changes are not saved on closing file
+        // only save, no validation
+        hack_AbstractTextEditor_doSave(monitor);
         // batch all marker changes into a single delta for ZEN-2736 Refresh live views on swagedit error changes
         new SafeWorkspaceJob("Do save") {
             @Override
@@ -414,6 +419,7 @@ public class SwaggerEditor extends YEdit implements IShowInSource, IShowInTarget
                     shell.getDisplay().syncExec(new Runnable() {
                         @Override
                         public void run() {
+                            // save + validate
                             SwaggerEditor.super.doSave(jobMonitor);
                         }
                     });
@@ -426,6 +432,9 @@ public class SwaggerEditor extends YEdit implements IShowInSource, IShowInTarget
 
     @Override
     public void doSaveAs() {
+        // ZEN-3411 SwaggerEditor: changes are not saved on closing file
+        // SaveAs only, no validation
+        performSaveAs(getProgressMonitor());
         // batch all marker changes into a single delta for ZEN-2736 Refresh live views on swagedit error changes
         new SafeWorkspaceJob("Do save as") {
             @Override
@@ -436,6 +445,7 @@ public class SwaggerEditor extends YEdit implements IShowInSource, IShowInTarget
                     shell.getDisplay().syncExec(new Runnable() {
                         @Override
                         public void run() {
+                            // save + validate
                             SwaggerEditor.super.doSaveAs();
                         }
                     });
@@ -444,6 +454,40 @@ public class SwaggerEditor extends YEdit implements IShowInSource, IShowInTarget
                 return Status.OK_STATUS;
             }
         }.schedule();
+    }
+    
+    /* Copy of AbstractTextEditor#doSave(IProgressMonitor) which is shadowed by YEdit.
+     * Saves the file, but does NOT perform any validation. The validation should be done in a workspace job*/
+    private void hack_AbstractTextEditor_doSave(IProgressMonitor progressMonitor) {
+
+        IDocumentProvider p = getDocumentProvider();
+        if (p == null)
+            return;
+
+        if (p.isDeleted(getEditorInput())) {
+
+            if (isSaveAsAllowed()) {
+
+                /*
+                 * 1GEUSSR: ITPUI:ALL - User should never loose changes made in the editors. Changed Behavior to make
+                 * sure that if called inside a regular save (because of deletion of input element) there is a way to
+                 * report back to the caller.
+                 */
+                performSaveAs(progressMonitor);
+
+            } else {
+
+                Shell shell = getSite().getShell();
+                String title = "Cannot Save";
+                String msg = "The file has been deleted or is not accessible.";
+                MessageDialog.openError(shell, title, msg);
+            }
+
+        } else {
+            updateState(getEditorInput());
+            validateState(getEditorInput());
+            performSave(false, progressMonitor);
+        }
     }
 
     protected void validate() {
