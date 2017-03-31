@@ -404,6 +404,7 @@ public class SwaggerEditor extends YEdit implements IShowInSource, IShowInTarget
 
     @Override
     public void doSave(IProgressMonitor monitor) {
+        // ZEN-3411 SwaggerEditor: changes are not saved on closing file
         // only save, no validation
         hack_AbstractTextEditor_doSave(monitor);
         // batch all marker changes into a single delta for ZEN-2736 Refresh live views on swagedit error changes
@@ -431,6 +432,7 @@ public class SwaggerEditor extends YEdit implements IShowInSource, IShowInTarget
 
     @Override
     public void doSaveAs() {
+        // ZEN-3411 SwaggerEditor: changes are not saved on closing file
         // SaveAs only, no validation
         performSaveAs(getProgressMonitor());
         // batch all marker changes into a single delta for ZEN-2736 Refresh live views on swagedit error changes
@@ -455,7 +457,7 @@ public class SwaggerEditor extends YEdit implements IShowInSource, IShowInTarget
     }
     
     /* Copy of AbstractTextEditor#doSave(IProgressMonitor) which is shadowed by YEdit.
-     * Saves, but does NOT perform any validation. The validation should be done in a workspace job*/
+     * Saves the file, but does NOT perform any validation. The validation should be done in a workspace job*/
     private void hack_AbstractTextEditor_doSave(IProgressMonitor progressMonitor) {
 
         IDocumentProvider p = getDocumentProvider();
