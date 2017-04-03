@@ -14,6 +14,8 @@ import org.eclipse.core.resources.IFile;
 import org.eclipse.core.resources.IMarker;
 import org.eclipse.core.resources.IResource;
 import org.eclipse.core.runtime.CoreException;
+import org.eclipse.core.runtime.IStatus;
+import org.eclipse.core.runtime.Status;
 import org.eclipse.jface.text.BadLocationException;
 import org.eclipse.jface.text.IDocument;
 import org.eclipse.jface.text.TextUtilities;
@@ -27,6 +29,7 @@ import org.eclipse.ui.ide.IDE;
 import org.eclipse.ui.part.FileEditorInput;
 import org.eclipse.ui.texteditor.ITextEditor;
 
+import com.reprezen.swagedit.Activator;
 import com.reprezen.swagedit.Messages;
 
 public class QuickFixer implements IMarkerResolutionGenerator2 {
@@ -52,64 +55,78 @@ public class QuickFixer implements IMarkerResolutionGenerator2 {
         }
     }
 
-    public static class FixMissingObjectType implements IMarkerResolution {
+    public static class FixMissingObjectType extends TextDocumentMarkerResolution {
 
         public String getLabel() {
             return "Set object type to schema definition";
         }
 
-        public void run(IMarker marker) {
-            IDocument document = getDocument(marker);
-            if (document == null) {
-                return;
-            }
-            int line;
+        @Override
+        protected void processFix(IDocument document, IMarker marker) throws CoreException {
+            int line = (int) marker.getAttribute(IMarker.LINE_NUMBER);
             try {
-                line = (int) marker.getAttribute(IMarker.LINE_NUMBER);
-            } catch (CoreException e) {
-                // TODO log
-                return;
-            }
-            // TODO add a new line if it's at the end of the document
-            int nextLineOffset;
-            try {
-                nextLineOffset = document.getLineOffset(line);
-                String definitionLine = document.get(document.getLineOffset(line - 1),
-                        document.getLineLength(line - 1));
-                // TODO use definitionLine to calculate indent
-                String indent = "    ";
-                document.replace(nextLineOffset, 0,
-                        indent + "type: object" + TextUtilities.getDefaultLineDelimiter(document));
-            } catch (BadLocationException e1) {
-                // TODO log
-                return;
+                String indent = getIndent(document, line);
+                // getLineOffset() is zero-based, and imarkerLine is one-based.
+                int endOfCurrLine = document.getLineInformation(line-1).getOffset()
+                        + document.getLineInformation(line-1).getLength();
+                // should be fine for first and last lines in the doc as well
+                document.replace(endOfCurrLine, 0,
+                        TextUtilities.getDefaultLineDelimiter(document) + indent + "type: object");
+            } catch (BadLocationException e) {
+                throw new CoreException(createStatus(e, "Cannot process the IMarker"));
             }
         }
 
-        protected IDocument getDocument(IMarker marker) {
+        protected String getIndent(IDocument document, int line) throws BadLocationException {
+            String definitionLine = document.get(document.getLineOffset(line - 1), document.getLineLength(line - 1));
+            // TODO use definitionLine to calculate indent
+            return "    ";
+        }
+    }
+
+    public abstract static class TextDocumentMarkerResolution implements IMarkerResolution {
+
+        protected abstract void processFix(IDocument document, IMarker marker) throws CoreException;
+
+        public void run(IMarker marker) {
+            try {
+                IDocument document = getDocument(marker);
+                processFix(document, marker);
+            } catch (CoreException e) {
+                Activator.getDefault().getLog().log(e.getStatus());
+            }
+        }
+
+        protected IDocument getDocument(IMarker marker) throws CoreException {
             IResource resource = marker.getResource();
             if (resource.getType() != IResource.FILE) {
-                // TODO log
-                return null;
+                throw new CoreException(createStatus(null, "The editor is not a File: " + resource.getName()));
             }
             IFile file = (IFile) resource;
             ITextEditor editor = openTextEditor(file);
-            if (editor == null) {
-                return null;
+            IDocument document = editor.getDocumentProvider().getDocument(new FileEditorInput(file));
+            if (document == null) {
+                throw new CoreException(createStatus(null, "The document is null"));
             }
-            return editor.getDocumentProvider().getDocument(new FileEditorInput(file));
+            return document;
         }
 
-        protected ITextEditor openTextEditor(IFile file) {
+        protected ITextEditor openTextEditor(IFile file) throws CoreException {
             IWorkbenchPage page = PlatformUI.getWorkbench().getActiveWorkbenchWindow().getActivePage();
             IEditorPart part;
             try {
                 part = IDE.openEditor(page, file, true);
-            } catch (PartInitException e1) {
-                // log error
-                return null;
+            } catch (PartInitException e) {
+                throw new CoreException(createStatus(e, "Cannot open editor"));
             }
-            return part instanceof ITextEditor ? (ITextEditor) part : null;
+            if (!(part instanceof ITextEditor)) {
+                throw new CoreException(createStatus(null, "The editor is not TextEditor: " + part));
+            }
+            return (ITextEditor) part;
+        }
+
+        protected IStatus createStatus(Exception e, String msg) {
+            return new Status(Status.ERROR, Activator.PLUGIN_ID, "Cannot process the quick fix: " + msg, e);
         }
     }
 
