@@ -10,6 +10,9 @@
  *******************************************************************************/
 package com.reprezen.swagedit.validation;
 
+import java.util.regex.Matcher;
+import java.util.regex.Pattern;
+
 import org.eclipse.core.resources.IFile;
 import org.eclipse.core.resources.IMarker;
 import org.eclipse.core.resources.IResource;
@@ -56,6 +59,7 @@ public class QuickFixer implements IMarkerResolutionGenerator2 {
     }
 
     public static class FixMissingObjectType extends TextDocumentMarkerResolution {
+        private static final Pattern WHITESPACE_PATTERN = Pattern.compile("(\\s+)\\S.*", Pattern.DOTALL);
 
         public String getLabel() {
             return "Set object type to schema definition";
@@ -79,8 +83,9 @@ public class QuickFixer implements IMarkerResolutionGenerator2 {
 
         protected String getIndent(IDocument document, int line) throws BadLocationException {
             String definitionLine = document.get(document.getLineOffset(line - 1), document.getLineLength(line - 1));
-            // TODO use definitionLine to calculate indent
-            return "    ";
+            Matcher m = WHITESPACE_PATTERN.matcher(definitionLine);
+            final String definitionIndent = m.matches() ? m.group(1) : "";
+            return definitionIndent + "  ";
         }
     }
 
