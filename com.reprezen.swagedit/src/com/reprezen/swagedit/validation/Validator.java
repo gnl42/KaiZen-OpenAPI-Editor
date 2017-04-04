@@ -40,6 +40,7 @@ import com.google.common.collect.Multimap;
 import com.google.common.collect.Sets;
 import com.reprezen.swagedit.Messages;
 import com.reprezen.swagedit.editor.SwaggerDocument;
+import com.reprezen.swagedit.json.references.JsonReference;
 import com.reprezen.swagedit.json.references.JsonReferenceFactory;
 import com.reprezen.swagedit.json.references.JsonReferenceValidator;
 import com.reprezen.swagedit.model.AbstractNode;
@@ -226,7 +227,9 @@ public class Validator {
 
     private boolean isSchemaDefinition(AbstractNode node) {
         // need to use getContent() because asJson() returns resolvedValue is some subclasses
-        return schemaRefTemplate.equals(node.getType().getContent());
+        return schemaRefTemplate.equals(node.getType().getContent()) //
+                && node.get(JsonReference.PROPERTY) == null //
+                && node.get("allOf") == null;
     }
 
     /**
