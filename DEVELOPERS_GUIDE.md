@@ -40,3 +40,6 @@ Please import [RepreZen Java Code Formatter](https://raw.githubusercontent.com/R
 
 # SwagEdit Architecture
 ![SwagEdit Architecture](https://cloud.githubusercontent.com/assets/644582/13757221/cf31b4e8-e9f9-11e5-8e6b-8aeb26fc3ac9.png)
+
+# JSON Schema
+Code-assist, Outline, and Quick-Outline are built based on Swagger JSON Schema which is analized by our model, you can find more details in [#198 SwagEdit Model](https://github.com/RepreZen/SwagEdit/issues/198).
