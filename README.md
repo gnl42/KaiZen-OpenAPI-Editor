@@ -17,17 +17,23 @@ Code templates:
 <img src="http://i.imgur.com/ZtHJX6A.gif" alt="Code_template" width="400">
 
 Keywords and values:  
-<img src="http://i.imgur.com/3uZ5bQa.gif" alt="Validation_screenshot" width="400">
+<img src="http://i.imgur.com/3uZ5bQa.gif" alt="CodeAssist_keys_and_values" width="400">
 
 ### Code Assist for References
 Code assist for references has several scopes which can be switched by Ctrl+click. The first scope is shows only elements from the current model, the second expands it to the elements from the containing project, and the third shows elements from the entire workspace:  
-<img src="http://i.imgur.com/P0IWIEt.gif" alt="Validation_screenshot" width="400">
+<img src="http://i.imgur.com/P0IWIEt.gif" alt="CodeAssist_for_references" width="400">
 
 ### Navigation to a Reference
+You can navigate to a reference using Ctrl+Click:  
+<img src="http://i.imgur.com/7WpuV3K.gif" alt="Navigation_to_references" width="400">
 
 ### Quick Outline
+Quick Outline can be invoked with Ctrl+O. Similar to code assist for references, it has three scopes: model, project, and project. It also allows filtering:    
+<img src="http://i.imgur.com/jvcoooa.gif" alt="Navigation_to_references" width="400">
 
 ### Outline
+Outline View reflects the open Swagger model:  
+<img src="http://i.imgur.com/iv49CLn.png" alt="Navigation_to_references" width="400">
 
 ## Install SwagEdit
 ### Via an update site 
