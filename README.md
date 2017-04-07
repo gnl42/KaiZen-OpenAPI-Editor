@@ -7,12 +7,20 @@ SwagEdit was developed for [RepreZen API Studio](http://reprezen.com/swagger-too
 We welcome your suggestions and contributions!
 
 ## Feature Highlights
+<img src="/etc/img/ContentAssistQuickOutline.png" alt="Drawing" width="400" />
 
 ### Validation
-<img src="http://imgur.com/GrFw9EM" alt="validation">
+<img src="http://i.imgur.com/GrFw9EM.png" alt="Validation_screenshot" width="400">
 
+### Code Assist
 
-<img src="/etc/img/ContentAssistQuickOutline.png" alt="Drawing" width="400" />
+### Code Assist for References
+
+### Navigation to a Reference
+
+### Quick Outline
+
+### Outline
 
 ## Install SwagEdit
 ### Via an update site 
@@ -38,6 +46,7 @@ SwagEdit is provided under the Eclipse Public License (https://www.eclipse.org/l
 
 ## Video: SwagEdit in RepreZen API Studio
 RepreZen API Studio is built on top of SwagEdit and provides more cool features, such as mock service and live views. Watch here: 
+
 [![Editing Swagger-OpenAPI in RepreZen API Studio](http://img.youtube.com/vi/KX_tHp_KQkE/0.jpg)](https://www.youtube.com/watch?v=KX_tHp_KQkE)
 
 _**Note:** SwagEdit includes code assist, real-time validation, syntax highlighting, and outline view.<br/>
