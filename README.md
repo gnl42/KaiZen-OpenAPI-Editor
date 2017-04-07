@@ -6,14 +6,11 @@ SwagEdit was developed for [RepreZen API Studio](http://reprezen.com/swagger-too
 
 We welcome your suggestions and contributions!
 
-## Video: SwagEdit in RepreZen API Studio
-[![Editing Swagger-OpenAPI in RepreZen API Studio](http://img.youtube.com/vi/KX_tHp_KQkE/0.jpg)](https://www.youtube.com/watch?v=KX_tHp_KQkE)
-
-_**Note:** SwagEdit includes code assist, real-time validation, syntax highlighting, and outline view.<br/>
-[Eclipse Color Theme](https://marketplace.eclipse.org/content/eclipse-color-theme) and [EditBox](http://marketplace.eclipse.org/content/nodeclipse-editbox-background-colors-themes-highlight-code-blocks-c-java-javascript-python) are available as separate plugins.<br/>
-[RepreZen API Studio](http://reprezen.com/swagger-tools) includes the mock service, live Swagger-UI & other features that are not part of SwagEdit._
-
 ## Feature Highlights
+
+### Validation
+<img src="http://imgur.com/GrFw9EM" alt="validation">
+
 
 <img src="/etc/img/ContentAssistQuickOutline.png" alt="Drawing" width="400" />
 
@@ -38,4 +35,12 @@ If you are interested in contributing to SwagEdit please see [Development Page](
 
 ## License
 SwagEdit is provided under the Eclipse Public License (https://www.eclipse.org/legal/epl-v10.html)
+
+## Video: SwagEdit in RepreZen API Studio
+RepreZen API Studio is built on top of SwagEdit and provides more cool features, such as mock service and live views. Watch here: 
+[![Editing Swagger-OpenAPI in RepreZen API Studio](http://img.youtube.com/vi/KX_tHp_KQkE/0.jpg)](https://www.youtube.com/watch?v=KX_tHp_KQkE)
+
+_**Note:** SwagEdit includes code assist, real-time validation, syntax highlighting, and outline view.<br/>
+[Eclipse Color Theme](https://marketplace.eclipse.org/content/eclipse-color-theme) and [EditBox](http://marketplace.eclipse.org/content/nodeclipse-editbox-background-colors-themes-highlight-code-blocks-c-java-javascript-python) are available as separate plugins.<br/>
+[RepreZen API Studio](http://reprezen.com/swagger-tools) includes the mock service, live Swagger-UI & other features that are not part of SwagEdit._
 
