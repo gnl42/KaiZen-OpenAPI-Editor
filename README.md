@@ -13,8 +13,14 @@ We welcome your suggestions and contributions!
 <img src="http://i.imgur.com/GrFw9EM.png" alt="Validation_screenshot" width="400">
 
 ### Code Assist
+Code templates:
+<img src="http://i.imgur.com/ZtHJX6A.gifv" alt="Code_template" width="400">
+Keywords and values:
+<img src="http://i.imgur.com/3uZ5bQa.gifv" alt="Validation_screenshot" width="400">
 
 ### Code Assist for References
+Code assist for references has several scopes which can be switched by Ctrl+click. The first scope is shows only elements from the current model, the second expands it to the elements from the containing project, and the third shows elements from the entire workspace:
+<img src="http://i.imgur.com/P0IWIEt.gifv" alt="Validation_screenshot" width="400">
 
 ### Navigation to a Reference
 
