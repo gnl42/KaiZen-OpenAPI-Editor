@@ -551,7 +551,7 @@ class ValidatorTest {
 
 		val errors = validator.validate(document, null)		
 		assertEquals(1, errors.size())
-		assertEquals(Messages.error_type_missing, errors.get(0).message)
+		assertEquals(Messages.error_object_type_missing, errors.get(0).message)
 	}
 
 	@Test
@@ -639,7 +639,7 @@ class ValidatorTest {
 
 		val errors = validator.validate(document, null)		
 		assertEquals(1, errors.size())
-		assertEquals(Messages.error_type_missing, errors.get(0).message)
+		assertEquals(Messages.error_object_type_missing, errors.get(0).message)
 	}
 
 	@Test

@@ -39,6 +39,7 @@ public class Messages extends NLS {
     public static String error_array_items_should_be_object;
 
     public static String error_array_missing_items;
+    public static String error_object_type_missing;
     public static String error_type_missing;
     public static String error_wrong_type;
     public static String error_missing_properties;
