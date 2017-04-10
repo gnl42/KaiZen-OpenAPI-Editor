@@ -13,12 +13,14 @@ package com.reprezen.swagedit.validation;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
 
+import org.dadacoalition.yedit.preferences.PreferenceConstants;
 import org.eclipse.core.resources.IFile;
 import org.eclipse.core.resources.IMarker;
 import org.eclipse.core.resources.IResource;
 import org.eclipse.core.runtime.CoreException;
 import org.eclipse.core.runtime.IStatus;
 import org.eclipse.core.runtime.Status;
+import org.eclipse.jface.preference.IPreferenceStore;
 import org.eclipse.jface.text.BadLocationException;
 import org.eclipse.jface.text.IDocument;
 import org.eclipse.jface.text.TextUtilities;
@@ -32,6 +34,7 @@ import org.eclipse.ui.ide.IDE;
 import org.eclipse.ui.part.FileEditorInput;
 import org.eclipse.ui.texteditor.ITextEditor;
 
+import com.google.common.base.Strings;
 import com.reprezen.swagedit.Activator;
 import com.reprezen.swagedit.Messages;
 
@@ -85,7 +88,12 @@ public class QuickFixer implements IMarkerResolutionGenerator2 {
             String definitionLine = document.get(document.getLineOffset(line - 1), document.getLineLength(line - 1));
             Matcher m = WHITESPACE_PATTERN.matcher(definitionLine);
             final String definitionIndent = m.matches() ? m.group(1) : "";
-            return definitionIndent + "  ";
+            return definitionIndent + Strings.repeat(" ", getTabWidth());
+        }
+
+        private int getTabWidth() {
+            IPreferenceStore prefs = org.dadacoalition.yedit.Activator.getDefault().getPreferenceStore();
+            return prefs.getInt(PreferenceConstants.SPACES_PER_TAB);
         }
     }
 
