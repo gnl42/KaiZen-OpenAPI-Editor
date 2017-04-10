@@ -58,7 +58,7 @@ If you are interested in contributing to SwagEdit please see [Development Page](
 SwagEdit is provided under the Eclipse Public License (https://www.eclipse.org/legal/epl-v10.html)
 
 ## Video: SwagEdit in RepreZen API Studio
-RepreZen API Studio is built on top of SwagEdit and provides more cool features, such as mock service and live views. Watch here: 
+RepreZen API Studio is built on top of SwagEdit and provides more cool features, such as mock service and live views. Watch :vhs: here: 
 
 [![Editing Swagger-OpenAPI in RepreZen API Studio](http://img.youtube.com/vi/KX_tHp_KQkE/0.jpg)](https://www.youtube.com/watch?v=KX_tHp_KQkE)
 
