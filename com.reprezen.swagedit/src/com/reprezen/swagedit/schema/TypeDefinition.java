@@ -55,6 +55,10 @@ public class TypeDefinition {
     public TypeDefinition getPropertyType(String property) {
         return null;
     }
+    
+    public JsonNode getContent() {
+        return content;
+    }
 
     /**
      * 

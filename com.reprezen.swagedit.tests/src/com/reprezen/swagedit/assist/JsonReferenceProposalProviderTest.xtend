@@ -136,6 +136,7 @@ class JsonReferenceProposalProviderTest {
 
 		// responses
 		assertTrue("/paths/~1foo/get/responses/200/$ref".matches(JsonReferenceProposalProvider.RESPONSE_REGEX))
+		assertTrue("/paths/~1foo/get/responses/default/$ref".matches(JsonReferenceProposalProvider.RESPONSE_REGEX))
 
 		// parameters
 		assertTrue("/paths/~1/get/parameters/0/$ref".matches(JsonReferenceProposalProvider.PARAMETER_REGEX))

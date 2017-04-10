@@ -6,16 +6,34 @@ SwagEdit was developed for [RepreZen API Studio](http://reprezen.com/swagger-too
 
 We welcome your suggestions and contributions!
 
-## Video: SwagEdit in RepreZen API Studio
-[![Editing Swagger-OpenAPI in RepreZen API Studio](http://img.youtube.com/vi/KX_tHp_KQkE/0.jpg)](https://www.youtube.com/watch?v=KX_tHp_KQkE)
-
-_**Note:** SwagEdit includes code assist, real-time validation, syntax highlighting, and outline view.<br/>
-[Eclipse Color Theme](https://marketplace.eclipse.org/content/eclipse-color-theme) and [EditBox](http://marketplace.eclipse.org/content/nodeclipse-editbox-background-colors-themes-highlight-code-blocks-c-java-javascript-python) are available as separate plugins.<br/>
-[RepreZen API Studio](http://reprezen.com/swagger-tools) includes the mock service, live Swagger-UI & other features that are not part of SwagEdit._
-
 ## Feature Highlights
-
 <img src="/etc/img/ContentAssistQuickOutline.png" alt="Drawing" width="400" />
+
+### Validation
+<img src="http://i.imgur.com/GrFw9EM.png" alt="Validation_screenshot" width="400">
+
+### Code Assist
+Code templates:  
+<img src="http://i.imgur.com/ZtHJX6A.gif" alt="Code_template" width="400">
+
+Keywords and values:  
+<img src="http://i.imgur.com/3uZ5bQa.gif" alt="CodeAssist_keys_and_values" width="400">
+
+### Code Assist for References
+Code assist for references has several scopes which can be switched by Ctrl+click. The first scope is shows only elements from the current model, the second expands it to the elements from the containing project, and the third shows elements from the entire workspace:  
+<img src="http://i.imgur.com/P0IWIEt.gif" alt="CodeAssist_for_references" width="400">
+
+### Navigation to a Reference
+You can navigate to a reference using Ctrl+Click:  
+<img src="http://i.imgur.com/7WpuV3K.gif" alt="Navigation_to_references" width="400">
+
+### Quick Outline
+Quick Outline can be invoked with Ctrl+O. Similar to code assist for references, it has three scopes: model, project, and project. It also allows filtering:    
+<img src="http://i.imgur.com/jvcoooa.gif" alt="Navigation_to_references" width="400">
+
+### Outline
+Outline View reflects the open Swagger model:  
+<img src="http://i.imgur.com/iv49CLn.png" alt="Navigation_to_references" width="400">
 
 ## Install SwagEdit
 ### Via an update site 
@@ -38,4 +56,13 @@ If you are interested in contributing to SwagEdit please see [Development Page](
 
 ## License
 SwagEdit is provided under the Eclipse Public License (https://www.eclipse.org/legal/epl-v10.html)
+
+## Video: SwagEdit in RepreZen API Studio
+RepreZen API Studio is built on top of SwagEdit and provides more cool features, such as mock service and live views. Watch :vhs: here: 
+
+[![Editing Swagger-OpenAPI in RepreZen API Studio](http://img.youtube.com/vi/KX_tHp_KQkE/0.jpg)](https://www.youtube.com/watch?v=KX_tHp_KQkE)
+
+_**Note:** SwagEdit includes code assist, real-time validation, syntax highlighting, and outline view.<br/>
+[Eclipse Color Theme](https://marketplace.eclipse.org/content/eclipse-color-theme) and [EditBox](http://marketplace.eclipse.org/content/nodeclipse-editbox-background-colors-themes-highlight-code-blocks-c-java-javascript-python) are available as separate plugins.<br/>
+[RepreZen API Studio](http://reprezen.com/swagger-tools) includes the mock service, live Swagger-UI & other features that are not part of SwagEdit._
 
