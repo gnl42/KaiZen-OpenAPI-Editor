@@ -615,7 +615,7 @@ public class SwaggerEditor extends YEdit implements IShowInSource, IShowInTarget
 
         public SafeWorkspaceJob(String name) {
             super(name);
-            setPriority(Job.INTERACTIVE);
+            setPriority(Job.LONG);
             IEditorInput editorInput = SwaggerEditor.this.getEditorInput();
             if (editorInput != null && editorInput instanceof FileEditorInput) {
                 setRule(((FileEditorInput) editorInput).getFile());
