@@ -1,4 +1,4 @@
-#Developer's Guide
+# Developer's Guide
 
 # Building SwagEdit from sources
 Development of SwagEdit should be done with Eclipse. This project uses Maven/Tycho so you should have the Eclipse maven plugin `m2e` already installed.
