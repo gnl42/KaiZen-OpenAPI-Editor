@@ -207,7 +207,9 @@ public class SwaggerEditor extends YEdit implements IShowInSource, IShowInTarget
     };
 
     private SwaggerContentOutlinePage contentOutline;
-    private static final String VALIDATE_JOB = "SwagEdit_validate";
+    
+    // Intentionally made non-static, so different editor parts will have different objects 
+    private final Object validateEditorContentsJobFamily = new Object();
 
     public SwaggerEditor() {
         super();
@@ -497,7 +499,9 @@ public class SwaggerEditor extends YEdit implements IShowInSource, IShowInTarget
     }
 
     protected void runValidate(final boolean onOpen) {
-        Job.getJobManager().cancel(VALIDATE_JOB);
+        // OK if several editor parts are open at the same time.
+        // Only validation jobs attached to the current part will be cancelled.
+        Job.getJobManager().cancel(validateEditorContentsJobFamily);
         new SafeWorkspaceJob("Update SwagEdit validation markers") {
 
             @Override
@@ -506,7 +510,7 @@ public class SwaggerEditor extends YEdit implements IShowInSource, IShowInTarget
             }
 
             public boolean belongsTo(Object family) {
-                return VALIDATE_JOB.equals(family);
+                return validateEditorContentsJobFamily.equals(family);
             };
         }.schedule();
     }
