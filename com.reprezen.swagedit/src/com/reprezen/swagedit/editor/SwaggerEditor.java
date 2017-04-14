@@ -502,6 +502,8 @@ public class SwaggerEditor extends YEdit implements IShowInSource, IShowInTarget
         // OK if several editor parts are open at the same time.
         // Only validation jobs attached to the current part will be cancelled.
         Job.getJobManager().cancel(validateEditorContentsJobFamily);
+        // ZEN-2736 - wrap manipulations with validation markers in to WorkspaceJob to batch changes. 
+        // See ModelSolv/RepreZen#1009 and https://eclipse.org/articles/Article-Resource-deltas/resource-deltas.html for details .
         new SafeWorkspaceJob("Update SwagEdit validation markers") {
 
             @Override
@@ -620,6 +622,9 @@ public class SwaggerEditor extends YEdit implements IShowInSource, IShowInTarget
         public SafeWorkspaceJob(String name) {
             super(name);
             setPriority(Job.LONG);
+            // ZEN-3183 Add scheduling rule to save jobs
+            // This ensures that these jobs will complete before other jobs that depend on the affected resources are
+            // executed.
             IEditorInput editorInput = SwaggerEditor.this.getEditorInput();
             if (editorInput != null && editorInput instanceof FileEditorInput) {
                 setRule(((FileEditorInput) editorInput).getFile());
