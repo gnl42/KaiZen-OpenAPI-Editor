@@ -42,4 +42,22 @@ Please import [RepreZen Java Code Formatter](https://raw.githubusercontent.com/R
 ![SwagEdit Architecture](https://cloud.githubusercontent.com/assets/644582/13757221/cf31b4e8-e9f9-11e5-8e6b-8aeb26fc3ac9.png)
 
 # JSON Schema
-Code-assist, Outline, and Quick-Outline are built based on Swagger JSON Schema which is analized by our model, you can find more details in [#198 SwagEdit Model](https://github.com/RepreZen/SwagEdit/issues/198).
+Validation, Code-assist, Outline, and Quick-Outline are built based on Swagger JSON Schema which is analized by our model, you can find more details in [#198 SwagEdit Model](https://github.com/RepreZen/SwagEdit/issues/198).
+![JSON Schema Model](http://i.imgur.com/h38zU2C.png)
+### Validation
+See `com.reprezen.swagedit.validation.Validator.isSchemaDefinition(AbstractNode)`
+* Severity: warning vs error
+* Message
+* Line in the document
+
+### Code assist: LabelProvider
+See `com.reprezen.swagedit.assist.SwaggerProposalProvider.getProposals(TypeDefinition, AbstractNode, String)`
+Given a documentOffset, we need:
+* replacementString
+* displayString
+* description
+* type (displayed after the “:”)
+
+### Outline and QuickOutline: LabelProvider
+See `com.reprezen.swagedit.editor.outline.OutlineStyledLabelProvider.getStyledString(AbstractNode)`
+Labels are composed from the corresponding element in the JSON Schema, it’s based on the “title” property of the node, name of the containing property of the path to the property.
