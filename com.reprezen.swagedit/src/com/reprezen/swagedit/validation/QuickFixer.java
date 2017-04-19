@@ -69,7 +69,7 @@ public class QuickFixer implements IMarkerResolutionGenerator2 {
         }
 
         @Override
-        protected void processFix(IDocument document, IMarker marker) throws CoreException {
+        public void processFix(IDocument document, IMarker marker) throws CoreException {
             int line = (int) marker.getAttribute(IMarker.LINE_NUMBER);
             try {
                 String indent = getIndent(document, line);
@@ -99,7 +99,7 @@ public class QuickFixer implements IMarkerResolutionGenerator2 {
 
     public abstract static class TextDocumentMarkerResolution implements IMarkerResolution {
 
-        protected abstract void processFix(IDocument document, IMarker marker) throws CoreException;
+        public abstract void processFix(IDocument document, IMarker marker) throws CoreException;
 
         public void run(IMarker marker) {
             try {

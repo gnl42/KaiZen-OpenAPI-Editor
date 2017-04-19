@@ -14,6 +14,7 @@ import java.util.Iterator;
 import java.util.List;
 
 import org.eclipse.core.resources.IMarker;
+import org.eclipse.core.runtime.CoreException;
 import org.eclipse.jface.text.BadLocationException;
 import org.eclipse.jface.text.IDocument;
 import org.eclipse.jface.text.Position;
@@ -31,6 +32,8 @@ import org.eclipse.ui.IMarkerResolutionGenerator2;
 import org.eclipse.ui.texteditor.MarkerAnnotation;
 
 import com.google.common.collect.Lists;
+import com.reprezen.swagedit.Activator;
+import com.reprezen.swagedit.validation.QuickFixer.TextDocumentMarkerResolution;
 
 public class SwaggerQuickAssistProcessor implements IQuickAssistProcessor {
     private final IMarkerResolutionGenerator2 quickFixer;
@@ -126,7 +129,15 @@ public class SwaggerQuickAssistProcessor implements IQuickAssistProcessor {
 
         @Override
         public void apply(IDocument document) {
-            markerResolution.run(marker);
+            if (markerResolution instanceof TextDocumentMarkerResolution) {
+                try {
+                    ((TextDocumentMarkerResolution) markerResolution).processFix(document, marker);
+                } catch (CoreException e) {
+                    Activator.getDefault().getLog().log(e.getStatus());
+                }
+            } else {
+                markerResolution.run(marker);
+            }
         }
 
         @Override
