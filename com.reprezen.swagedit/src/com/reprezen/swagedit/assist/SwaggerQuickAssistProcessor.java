@@ -17,6 +17,7 @@ import org.eclipse.core.resources.IMarker;
 import org.eclipse.core.runtime.CoreException;
 import org.eclipse.jface.text.BadLocationException;
 import org.eclipse.jface.text.IDocument;
+import org.eclipse.jface.text.IRegion;
 import org.eclipse.jface.text.Position;
 import org.eclipse.jface.text.contentassist.ICompletionProposal;
 import org.eclipse.jface.text.contentassist.IContextInformation;
@@ -80,7 +81,7 @@ public class SwaggerQuickAssistProcessor implements IQuickAssistProcessor {
         List<ICompletionProposal> result = Lists.newArrayList();
         for (IMarker marker : markers) {
             for (IMarkerResolution markerResolution : quickFixer.getResolutions(marker)) {
-                result.add(new MarkerResolutionProposal(marker, markerResolution));
+                result.add(new MarkerResolutionProposal(marker, markerResolution, invocationContext.getSourceViewer()));
             }
         }
         return result.toArray(new ICompletionProposal[0]);
@@ -121,17 +122,23 @@ public class SwaggerQuickAssistProcessor implements IQuickAssistProcessor {
 
         private final IMarker marker;
         private final IMarkerResolution markerResolution;
+        private final ISourceViewer sourceViewer;
 
-        public MarkerResolutionProposal(IMarker marker, IMarkerResolution markerResolution) {
+        public MarkerResolutionProposal(IMarker marker, IMarkerResolution markerResolution,
+                ISourceViewer sourceViewer) {
             this.marker = marker;
             this.markerResolution = markerResolution;
+            this.sourceViewer = sourceViewer;
         }
 
         @Override
         public void apply(IDocument document) {
             if (markerResolution instanceof TextDocumentMarkerResolution) {
                 try {
-                    ((TextDocumentMarkerResolution) markerResolution).processFix(document, marker);
+                    IRegion region = ((TextDocumentMarkerResolution) markerResolution).processFix(document, marker);
+                    if (region != null) {
+                        sourceViewer.setSelectedRange(region.getOffset(), region.getLength());
+                    }
                 } catch (CoreException e) {
                     Activator.getDefault().getLog().log(e.getStatus());
                 }
