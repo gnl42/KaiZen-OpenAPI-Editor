@@ -74,8 +74,8 @@ public class QuickFixer implements IMarkerResolutionGenerator2 {
             try {
                 String indent = getIndent(document, line);
                 // getLineOffset() is zero-based, and imarkerLine is one-based.
-                int endOfCurrLine = document.getLineInformation(line-1).getOffset()
-                        + document.getLineInformation(line-1).getLength();
+                int endOfCurrLine = document.getLineInformation(line - 1).getOffset()
+                        + document.getLineInformation(line - 1).getLength();
                 // should be fine for first and last lines in the doc as well
                 document.replace(endOfCurrLine, 0,
                         TextUtilities.getDefaultLineDelimiter(document) + indent + "type: object");
