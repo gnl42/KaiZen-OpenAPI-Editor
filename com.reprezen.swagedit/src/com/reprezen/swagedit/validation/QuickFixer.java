@@ -80,8 +80,9 @@ public class QuickFixer implements IMarkerResolutionGenerator2 {
                         + document.getLineInformation(line - 1).getLength();
                 // should be fine for first and last lines in the doc as well
                 String replacementText = indent + "type: object";
-                document.replace(endOfCurrLine, 0, TextUtilities.getDefaultLineDelimiter(document) + replacementText);
-                return new Region(endOfCurrLine + 1, replacementText.length());
+                String delim = TextUtilities.getDefaultLineDelimiter(document);
+                document.replace(endOfCurrLine, 0, delim + replacementText);
+                return new Region(endOfCurrLine + delim.length(), replacementText.length());
             } catch (BadLocationException e) {
                 throw new CoreException(createStatus(e, "Cannot process the IMarker"));
             }
