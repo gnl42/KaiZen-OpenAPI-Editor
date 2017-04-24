@@ -23,6 +23,8 @@ import org.eclipse.core.runtime.Status;
 import org.eclipse.jface.preference.IPreferenceStore;
 import org.eclipse.jface.text.BadLocationException;
 import org.eclipse.jface.text.IDocument;
+import org.eclipse.jface.text.IRegion;
+import org.eclipse.jface.text.Region;
 import org.eclipse.jface.text.TextUtilities;
 import org.eclipse.ui.IEditorPart;
 import org.eclipse.ui.IMarkerResolution;
@@ -69,16 +71,18 @@ public class QuickFixer implements IMarkerResolutionGenerator2 {
         }
 
         @Override
-        protected void processFix(IDocument document, IMarker marker) throws CoreException {
+        public IRegion processFix(IDocument document, IMarker marker) throws CoreException {
             int line = (int) marker.getAttribute(IMarker.LINE_NUMBER);
             try {
                 String indent = getIndent(document, line);
                 // getLineOffset() is zero-based, and imarkerLine is one-based.
-                int endOfCurrLine = document.getLineInformation(line-1).getOffset()
-                        + document.getLineInformation(line-1).getLength();
+                int endOfCurrLine = document.getLineInformation(line - 1).getOffset()
+                        + document.getLineInformation(line - 1).getLength();
                 // should be fine for first and last lines in the doc as well
-                document.replace(endOfCurrLine, 0,
-                        TextUtilities.getDefaultLineDelimiter(document) + indent + "type: object");
+                String replacementText = indent + "type: object";
+                String delim = TextUtilities.getDefaultLineDelimiter(document);
+                document.replace(endOfCurrLine, 0, delim + replacementText);
+                return new Region(endOfCurrLine + delim.length(), replacementText.length());
             } catch (BadLocationException e) {
                 throw new CoreException(createStatus(e, "Cannot process the IMarker"));
             }
@@ -99,29 +103,31 @@ public class QuickFixer implements IMarkerResolutionGenerator2 {
 
     public abstract static class TextDocumentMarkerResolution implements IMarkerResolution {
 
-        protected abstract void processFix(IDocument document, IMarker marker) throws CoreException;
+        /**
+         * @return IRegion to be selected in the editor, can be null
+         * @throws CoreException
+         */
+        public abstract IRegion processFix(IDocument document, IMarker marker) throws CoreException;
 
         public void run(IMarker marker) {
             try {
-                IDocument document = getDocument(marker);
-                processFix(document, marker);
+                IResource resource = marker.getResource();
+                if (resource.getType() != IResource.FILE) {
+                    throw new CoreException(createStatus(null, "The editor is not a File: " + resource.getName()));
+                }
+                IFile file = (IFile) resource;
+                ITextEditor editor = openTextEditor(file);
+                IDocument document = editor.getDocumentProvider().getDocument(new FileEditorInput(file));
+                if (document == null) {
+                    throw new CoreException(createStatus(null, "The document is null"));
+                }
+                IRegion region = processFix(document, marker);
+                if (region != null) {
+                    editor.selectAndReveal(region.getOffset(), region.getLength());
+                }
             } catch (CoreException e) {
                 Activator.getDefault().getLog().log(e.getStatus());
             }
-        }
-
-        protected IDocument getDocument(IMarker marker) throws CoreException {
-            IResource resource = marker.getResource();
-            if (resource.getType() != IResource.FILE) {
-                throw new CoreException(createStatus(null, "The editor is not a File: " + resource.getName()));
-            }
-            IFile file = (IFile) resource;
-            ITextEditor editor = openTextEditor(file);
-            IDocument document = editor.getDocumentProvider().getDocument(new FileEditorInput(file));
-            if (document == null) {
-                throw new CoreException(createStatus(null, "The document is null"));
-            }
-            return document;
         }
 
         protected ITextEditor openTextEditor(IFile file) throws CoreException {

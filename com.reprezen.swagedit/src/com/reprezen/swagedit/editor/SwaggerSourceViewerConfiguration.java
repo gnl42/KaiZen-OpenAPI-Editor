@@ -27,6 +27,8 @@ import org.eclipse.jface.text.information.IInformationProvider;
 import org.eclipse.jface.text.information.IInformationProviderExtension;
 import org.eclipse.jface.text.information.IInformationProviderExtension2;
 import org.eclipse.jface.text.information.InformationPresenter;
+import org.eclipse.jface.text.quickassist.IQuickAssistAssistant;
+import org.eclipse.jface.text.quickassist.QuickAssistAssistant;
 import org.eclipse.jface.text.reconciler.IReconciler;
 import org.eclipse.jface.text.reconciler.MonoReconciler;
 import org.eclipse.jface.text.source.ISourceViewer;
@@ -34,10 +36,12 @@ import org.eclipse.swt.widgets.Shell;
 
 import com.reprezen.swagedit.Activator;
 import com.reprezen.swagedit.assist.SwaggerContentAssistProcessor;
+import com.reprezen.swagedit.assist.SwaggerQuickAssistProcessor;
 import com.reprezen.swagedit.editor.hyperlinks.DefinitionHyperlinkDetector;
 import com.reprezen.swagedit.editor.hyperlinks.JsonReferenceHyperlinkDetector;
 import com.reprezen.swagedit.editor.hyperlinks.PathParamHyperlinkDetector;
 import com.reprezen.swagedit.editor.outline.QuickOutline;
+import com.reprezen.swagedit.validation.QuickFixer;
 
 public class SwaggerSourceViewerConfiguration extends YEditSourceViewerConfiguration {
 
@@ -127,6 +131,14 @@ public class SwaggerSourceViewerConfiguration extends YEditSourceViewerConfigura
             informationPresenter.setSizeConstraints(60, 20, true, true);
         }
         return informationPresenter;
+    }
+    
+    @Override
+    public IQuickAssistAssistant getQuickAssistAssistant(ISourceViewer sourceViewer) {
+        QuickAssistAssistant assistant = new QuickAssistAssistant();
+        assistant.setQuickAssistProcessor(new SwaggerQuickAssistProcessor(new QuickFixer()));
+        assistant.setInformationControlCreator(getInformationControlCreator(sourceViewer));
+        return assistant;
     }
 
     private IInformationControlCreator getOutlineInformationControlCreator() {
