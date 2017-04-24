@@ -12,8 +12,6 @@ package com.reprezen.swagedit.editor;
 
 import java.io.IOException;
 import java.io.StringReader;
-import java.util.Timer;
-import java.util.TimerTask;
 
 import org.eclipse.jface.text.BadLocationException;
 import org.eclipse.jface.text.Document;
@@ -48,8 +46,6 @@ public class SwaggerDocument extends Document {
     private Exception jsonError;
     private Model model;
     private SwaggerSchema schema;
-    
-    private Timer modelParserTimer = null;
 
     public SwaggerDocument() {
         this.schema = Activator.getDefault() != null ? Activator.getDefault().getSchema() : new SwaggerSchema();
@@ -164,21 +160,12 @@ public class SwaggerDocument extends Document {
     }
 
     private void parseModel() {
-        if (modelParserTimer != null) {
-            modelParserTimer.cancel();
+        try {
+            model = Model.parseYaml(schema, get());
+        } catch (Exception e) {
+            // e.printStackTrace();
+            model = null;
         }
-        modelParserTimer = new Timer();
-        modelParserTimer.schedule(new TimerTask() {
-            @Override
-            public void run() {
-                try {
-                    model = Model.parseYaml(schema, get());
-                } catch (Exception e) {
-                    // e.printStackTrace();
-                    model = null;
-                }
-            }
-        }, 0);
     }
 
     /**

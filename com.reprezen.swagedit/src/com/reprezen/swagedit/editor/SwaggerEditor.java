@@ -30,7 +30,6 @@ import org.eclipse.core.resources.WorkspaceJob;
 import org.eclipse.core.runtime.CoreException;
 import org.eclipse.core.runtime.IProgressMonitor;
 import org.eclipse.core.runtime.IStatus;
-import org.eclipse.core.runtime.NullProgressMonitor;
 import org.eclipse.core.runtime.Status;
 import org.eclipse.core.runtime.jobs.Job;
 import org.eclipse.jface.dialogs.MessageDialog;
@@ -201,15 +200,12 @@ public class SwaggerEditor extends YEdit implements IShowInSource, IShowInTarget
                 boolean newValue = event.getNewValue() instanceof Boolean ? (Boolean) event.getNewValue()
                         : Boolean.valueOf((String) event.getNewValue());
                 Activator.getDefault().getSchema().allowJsonRefInContext(event.getProperty(), newValue);
-                validate(new NullProgressMonitor());
+                validate();
             }
         }
     };
 
     private SwaggerContentOutlinePage contentOutline;
-    
-    // Intentionally made non-static, so different editor parts will have different objects 
-    private final Object validateEditorContentsJobFamily = new Object();
 
     public SwaggerEditor() {
         super();
@@ -428,7 +424,7 @@ public class SwaggerEditor extends YEdit implements IShowInSource, IShowInTarget
                         }
                     });
                 }
-                validate(jobMonitor);
+                validate();
                 return Status.OK_STATUS;
             }
         }.schedule();
@@ -454,7 +450,7 @@ public class SwaggerEditor extends YEdit implements IShowInSource, IShowInTarget
                         }
                     });
                 }
-                validate(monitor);
+                validate();
                 return Status.OK_STATUS;
             }
         }.schedule();
@@ -494,28 +490,22 @@ public class SwaggerEditor extends YEdit implements IShowInSource, IShowInTarget
         }
     }
 
-    protected void validate(IProgressMonitor monitor) {
-        validate(false, monitor);
+    protected void validate() {
+        validate(false);
     }
 
     protected void runValidate(final boolean onOpen) {
-        // OK if several editor parts are open at the same time.
-        // Only validation jobs attached to the current part will be cancelled.
-        Job.getJobManager().cancel(validateEditorContentsJobFamily);
         new SafeWorkspaceJob("Update SwagEdit validation markers") {
 
             @Override
             public IStatus doRunInWorkspace(IProgressMonitor monitor) throws CoreException {
-                return validate(onOpen, monitor);
+                validate(onOpen);
+                return Status.OK_STATUS;
             }
-
-            public boolean belongsTo(Object family) {
-                return validateEditorContentsJobFamily.equals(family);
-            };
         }.schedule();
     }
 
-    private IStatus validate(boolean onOpen, IProgressMonitor monitor) {
+    private void validate(boolean onOpen) {
         IEditorInput editorInput = getEditorInput();
         final IDocument document = getDocumentProvider().getDocument(getEditorInput());
 
@@ -526,8 +516,7 @@ public class SwaggerEditor extends YEdit implements IShowInSource, IShowInTarget
         if (!(editorInput instanceof IFileEditorInput)) {
             YEditLog.logError("Marking errors not supported for files outside of a project.");
             YEditLog.logger.info("editorInput is not a part of a project.");
-            return new Status(Status.ERROR, Activator.PLUGIN_ID,
-                    "Marking errors not supported for files outside of a project.");
+            return;
         }
 
         if (document instanceof SwaggerDocument) {
@@ -538,20 +527,10 @@ public class SwaggerEditor extends YEdit implements IShowInSource, IShowInTarget
                 // force parsing of yaml to init parsing errors
                 ((SwaggerDocument) document).onChange();
             }
-            if (monitor.isCanceled()) {
-                return Status.CANCEL_STATUS;
-            }
             clearMarkers(file);
-            if (monitor.isCanceled()) {
-                return Status.CANCEL_STATUS;
-            }
             validateYaml(file, (SwaggerDocument) document);
-            if (monitor.isCanceled()) {
-                return Status.CANCEL_STATUS;
-            }
             validateSwagger(file, (SwaggerDocument) document, fileEditorInput);
         }
-        return Status.OK_STATUS;
     }
 
     protected void clearMarkers(IFile file) {
@@ -619,7 +598,7 @@ public class SwaggerEditor extends YEdit implements IShowInSource, IShowInTarget
 
         public SafeWorkspaceJob(String name) {
             super(name);
-            setPriority(Job.LONG);
+            setPriority(Job.INTERACTIVE);
             IEditorInput editorInput = SwaggerEditor.this.getEditorInput();
             if (editorInput != null && editorInput instanceof FileEditorInput) {
                 setRule(((FileEditorInput) editorInput).getFile());
