@@ -8,23 +8,8 @@ Require-Bundle: org.eclipse.ui,
  org.eclipse.core.runtime,
  org.eclipse.ui.editors,
  org.eclipse.jface.text,
- org.dadacoalition.yedit
+ org.dadacoalition.yedit,
+ com.google.guava;bundle-version="15.0.0"
 Bundle-RequiredExecutionEnvironment: JavaSE-1.7
 Bundle-ActivationPolicy: lazy
 Bundle-ClassPath: lib/com.google.guava_16.0.1.jar
-Export-Package: com.google.common.annotations,
- com.google.common.base,
- com.google.common.base.internal,
- com.google.common.cache,
- com.google.common.collect,
- com.google.common.escape,
- com.google.common.eventbus,
- com.google.common.hash,
- com.google.common.html,
- com.google.common.io,
- com.google.common.math,
- com.google.common.net,
- com.google.common.primitives,
- com.google.common.reflect,
- com.google.common.util.concurrent,
- com.google.common.xml
