@@ -1,0 +1,14 @@
+Manifest-Version: 1.0
+Bundle-ManifestVersion: 2
+Bundle-Name: Editor for OpenAPI v3
+Bundle-SymbolicName: com.reprezen.swagedit.openapi3;singleton:=true
+Bundle-Version: 0.1.0.qualifier
+Bundle-Activator: com.reprezen.swagedit.openapi3.Activator
+Bundle-Vendor: RepreZen, Inc.
+Require-Bundle: org.eclipse.ui,
+ org.eclipse.core.runtime,
+ org.eclipse.ui.editors,
+ org.eclipse.jface.text,
+ org.dadacoalition.yedit
+Bundle-RequiredExecutionEnvironment: JavaSE-1.7
+Bundle-ActivationPolicy: lazy

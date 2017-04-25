@@ -10,6 +10,7 @@
 
 	<modules>
 		<module>com.reprezen.swagedit</module>
+		<module>com.reprezen.swagedit.openapi3</module>
 		<module>com.reprezen.swagedit.feature</module>
 		<module>com.reprezen.swagedit.tests</module>
 		<module>com.reprezen.swagedit.repository</module>
