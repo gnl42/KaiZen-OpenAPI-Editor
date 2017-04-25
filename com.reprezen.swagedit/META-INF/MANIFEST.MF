@@ -15,8 +15,8 @@ Require-Bundle: org.eclipse.ui,
  org.eclipse.ui.workbench.texteditor,
  org.dadacoalition.yedit,
  com.github.eclipsecolortheme;resolution:=optional,
- com.reprezen.swagedit.common,
- com.google.guava;bundle-version="15.0.0"
+ com.google.guava;bundle-version="15.0.0",
+ com.reprezen.swagedit.common
 Bundle-ActivationPolicy: lazy
 Bundle-RequiredExecutionEnvironment: JavaSE-1.7
 Bundle-ClassPath: lib/cal10n.api_0.7.4.jar,

@@ -1,38 +1,23 @@
+/*******************************************************************************
+ * Copyright (c) 2016 ModelSolv, Inc. and others.
+ * All rights reserved. This program and the accompanying materials
+ * are made available under the terms of the Eclipse Public License v1.0
+ * which accompanies this distribution, and is available at
+ * http://www.eclipse.org/legal/epl-v10.html
+ *
+ * Contributors:
+ *    ModelSolv, Inc. - initial API and implementation and/or initial documentation
+ *******************************************************************************/
 package com.reprezen.swagedit.openapi3.editor;
 
-import java.io.ByteArrayOutputStream;
-import java.io.IOException;
-import java.io.InputStream;
+import com.reprezen.swagedit.common.editor.TextContentDescriber;
 
-import org.eclipse.core.runtime.QualifiedName;
-import org.eclipse.core.runtime.content.IContentDescriber;
-import org.eclipse.core.runtime.content.IContentDescription;
-
-public class OpenApi3ContentDescriber implements IContentDescriber {
+public class OpenApi3ContentDescriber extends TextContentDescriber {
 
     @Override
-    public int describe(InputStream contents, IContentDescription description) throws IOException {
-        String content = toString(contents);
-        if (content.trim().isEmpty()) {
-            return INDETERMINATE;
-        }
-
-        return content.contains("openapi: \"3.0.") || content.contains("openapi: '3.0") ? VALID : INVALID;
-    }
-
-    @Override
-    public QualifiedName[] getSupportedOptions() {
-        return null;
-    }
-
-    protected String toString(InputStream contents) throws IOException {
-        ByteArrayOutputStream result = new ByteArrayOutputStream();
-        byte[] buffer = new byte[1024];
-        int length;
-        while ((length = contents.read(buffer)) != -1) {
-            result.write(buffer, 0, length);
-        }
-        return result.toString("UTF-8");
+    protected boolean isSupported(String content) {
+        // should support arbitrary patch versions, e.g. `openapi: "3.0.0-RC0"`
+        return content.contains("openapi: \"3.0.") || content.contains("openapi: '3.0");
     }
 
 }
