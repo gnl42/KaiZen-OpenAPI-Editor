@@ -8,7 +8,7 @@ import com.fasterxml.jackson.databind.JsonNode;
 import com.google.common.base.Strings;
 import com.reprezen.swagedit.json.references.JsonReference;
 
-class JsonSchema {
+public class JsonSchema {
 
     private final Map<JsonPointer, TypeDefinition> types = new HashMap<>();
     private final String id;
@@ -32,7 +32,7 @@ class JsonSchema {
         return manager;
     }
 
-    void setType(ObjectTypeDefinition type) {
+    public void setType(ObjectTypeDefinition type) {
         this.type = type;
     }
 

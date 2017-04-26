@@ -1,11 +1,5 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <classpath>
-	<classpathentry exported="true" kind="lib" path="lib/org.yaml.snakeyaml_1.12.0.jar"/>
-	<classpathentry exported="true" kind="lib" path="lib/com.fasterxml.jackson.core.jackson-annotations_2.4.5.jar"/>
-	<classpathentry exported="true" kind="lib" path="lib/com.fasterxml.jackson.core.jackson-core_2.4.5.jar"/>
-	<classpathentry exported="true" kind="lib" path="lib/com.fasterxml.jackson.core.jackson-databind_2.4.5.jar"/>
-	<classpathentry exported="true" kind="lib" path="lib/com.fasterxml.jackson.dataformat.jackson-dataformat-yaml_2.4.5.jar"/>
-	<classpathentry exported="true" kind="lib" path="lib/com.fasterxml.jackson.datatype.jackson-datatype-joda_2.4.5.jar"/>
 	<classpathentry exported="true" kind="lib" path="lib/com.github.fge.btf_1.2.0.jar"/>
 	<classpathentry exported="true" kind="lib" path="lib/com.github.fge.jackson-coreutils_1.8.0.jar"/>
 	<classpathentry exported="true" kind="lib" path="lib/com.github.fge.json-schema-core_1.2.5.jar"/>
