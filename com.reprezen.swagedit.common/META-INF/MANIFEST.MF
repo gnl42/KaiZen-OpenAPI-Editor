@@ -23,10 +23,4 @@ Export-Package: com.reprezen.swagedit.common.editor,
  com.reprezen.swagedit.schema,
  com.reprezen.swagedit.utils,
  com.reprezen.swagedit.validation
-Bundle-ClassPath: lib/com.github.fge.btf_1.2.0.jar,
- lib/com.github.fge.jackson-coreutils_1.8.0.jar,
- lib/com.github.fge.json-schema-core_1.2.5.jar,
- lib/com.github.fge.json-schema-validator_2.2.6.jar,
- lib/com.github.fge.msg-simple_1.1.0.jar,
- lib/com.github.fge.uri-template_0.9.0.jar,
- .
+Bundle-ClassPath: .
