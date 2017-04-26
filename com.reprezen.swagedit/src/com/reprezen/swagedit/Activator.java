@@ -32,6 +32,7 @@ import org.eclipse.ui.plugin.AbstractUIPlugin;
 import org.osgi.framework.Bundle;
 import org.osgi.framework.BundleContext;
 
+import com.reprezen.swagedit.schema.CompositeSchema;
 import com.reprezen.swagedit.schema.SwaggerSchema;
 import com.reprezen.swagedit.templates.SwaggerContextType;
 

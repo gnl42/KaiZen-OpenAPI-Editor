@@ -1,5 +1,17 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <classpath>
+	<classpathentry exported="true" kind="lib" path="lib/org.yaml.snakeyaml_1.12.0.jar"/>
+	<classpathentry exported="true" kind="lib" path="lib/com.fasterxml.jackson.core.jackson-annotations_2.4.5.jar"/>
+	<classpathentry exported="true" kind="lib" path="lib/com.fasterxml.jackson.core.jackson-core_2.4.5.jar"/>
+	<classpathentry exported="true" kind="lib" path="lib/com.fasterxml.jackson.core.jackson-databind_2.4.5.jar"/>
+	<classpathentry exported="true" kind="lib" path="lib/com.fasterxml.jackson.dataformat.jackson-dataformat-yaml_2.4.5.jar"/>
+	<classpathentry exported="true" kind="lib" path="lib/com.fasterxml.jackson.datatype.jackson-datatype-joda_2.4.5.jar"/>
+	<classpathentry exported="true" kind="lib" path="lib/com.github.fge.btf_1.2.0.jar"/>
+	<classpathentry exported="true" kind="lib" path="lib/com.github.fge.jackson-coreutils_1.8.0.jar"/>
+	<classpathentry exported="true" kind="lib" path="lib/com.github.fge.json-schema-core_1.2.5.jar"/>
+	<classpathentry exported="true" kind="lib" path="lib/com.github.fge.json-schema-validator_2.2.6.jar"/>
+	<classpathentry exported="true" kind="lib" path="lib/com.github.fge.msg-simple_1.1.0.jar"/>
+	<classpathentry exported="true" kind="lib" path="lib/com.github.fge.uri-template_0.9.0.jar"/>
 	<classpathentry kind="con" path="org.eclipse.jdt.launching.JRE_CONTAINER/org.eclipse.jdt.internal.debug.ui.launcher.StandardVMType/JavaSE-1.7">
 		<attributes>
 			<attribute name="maven.pomderived" value="true"/>

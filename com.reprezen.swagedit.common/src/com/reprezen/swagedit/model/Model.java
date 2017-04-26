@@ -31,8 +31,7 @@ import com.fasterxml.jackson.dataformat.yaml.YAMLFactory;
 import com.google.common.base.Strings;
 import com.google.common.collect.Iterables;
 import com.google.common.collect.Lists;
-import com.reprezen.swagedit.Activator;
-import com.reprezen.swagedit.schema.SwaggerSchema;
+import com.reprezen.swagedit.schema.CompositeSchema;
 
 /**
  * Represents the content of a YAML/JSON document.
@@ -41,14 +40,14 @@ import com.reprezen.swagedit.schema.SwaggerSchema;
 public class Model {
 
     private final Map<JsonPointer, AbstractNode> nodes = new LinkedHashMap<>();
-    private final SwaggerSchema schema;
+    private final CompositeSchema schema;
     private IPath path;
 
-    private Model(SwaggerSchema schema) {
+    private Model(CompositeSchema schema) {
         this(schema, null);
     }
 
-    private Model(SwaggerSchema schema, IPath path) {
+    private Model(CompositeSchema schema, IPath path) {
         this.schema = schema;
         this.path = path;
     }
@@ -59,7 +58,7 @@ public class Model {
      * @param schema
      * @return empty model
      */
-    public static Model empty(SwaggerSchema schema) {
+    public static Model empty(CompositeSchema schema) {
         Model model = new Model(schema);
         ObjectNode root = new ObjectNode(model, null, JsonPointer.compile(""));
         root.setType(model.schema.getType(root));
@@ -74,7 +73,7 @@ public class Model {
      * @param text
      * @return model
      */
-    public static Model parseYaml(SwaggerSchema schema, String text) {
+    public static Model parseYaml(CompositeSchema schema, String text) {
         if (Strings.emptyToNull(text) == null) {
             return empty(schema);
         }
@@ -99,12 +98,11 @@ public class Model {
      * @param files
      * @return list of models
      */
-    public static Iterable<Model> parseYaml(Iterable<IFile> files) {
+    public static Iterable<Model> parseYaml(Iterable<IFile> files, final CompositeSchema schema) {
         if (files == null || Iterables.isEmpty(files)) {
             return Lists.newArrayList();
         }
 
-        final SwaggerSchema schema = Activator.getDefault().getSchema();
         final List<Model> models = Lists.newArrayList();
         for (IFile file : files) {
             Model model = new Model(schema, file.getFullPath());

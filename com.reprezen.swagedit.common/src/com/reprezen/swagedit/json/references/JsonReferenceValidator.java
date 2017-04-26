@@ -18,8 +18,7 @@ import java.util.Collection;
 import java.util.Set;
 
 import com.google.common.collect.Sets;
-import com.reprezen.swagedit.Messages;
-import com.reprezen.swagedit.editor.SwaggerDocument;
+import com.reprezen.swagedit.common.editor.JsonDocument;
 import com.reprezen.swagedit.model.AbstractNode;
 import com.reprezen.swagedit.validation.SwaggerError;
 
@@ -41,11 +40,11 @@ public class JsonReferenceValidator {
      * @param document
      * @return collection of errors
      */
-    public Collection<? extends SwaggerError> validate(URI baseURI, SwaggerDocument doc) {
+    public Collection<? extends SwaggerError> validate(URI baseURI, JsonDocument doc) {
         return doValidate(baseURI, doc, collector.collect(baseURI, doc.getModel()));
     }
 
-    protected Collection<? extends SwaggerError> doValidate(URI baseURI, SwaggerDocument doc,
+    protected Collection<? extends SwaggerError> doValidate(URI baseURI, JsonDocument doc,
             Iterable<JsonReference> references) {
         Set<SwaggerError> errors = Sets.newHashSet();
         for (JsonReference reference : references) {

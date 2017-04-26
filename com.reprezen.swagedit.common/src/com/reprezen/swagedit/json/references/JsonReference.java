@@ -19,7 +19,7 @@ import org.yaml.snakeyaml.nodes.ScalarNode;
 import com.fasterxml.jackson.core.JsonPointer;
 import com.fasterxml.jackson.databind.JsonNode;
 import com.google.common.base.Strings;
-import com.reprezen.swagedit.editor.SwaggerDocument;
+import com.reprezen.swagedit.common.editor.JsonDocument;
 import com.reprezen.swagedit.model.AbstractNode;
 import com.reprezen.swagedit.model.ObjectNode;
 import com.reprezen.swagedit.model.ValueNode;
@@ -85,7 +85,7 @@ public class JsonReference {
      * @param baseURI
      * @return true if the reference can be resolved.
      */
-    public boolean isMissing(SwaggerDocument document, URI baseURI) {
+    public boolean isMissing(JsonDocument document, URI baseURI) {
         if (isInvalid()) {
             return false;
         }
@@ -103,7 +103,7 @@ public class JsonReference {
      * @param baseURI
      * @return referenced node
      */
-    public JsonNode resolve(SwaggerDocument document, URI baseURI) {
+    public JsonNode resolve(JsonDocument document, URI baseURI) {
         if (resolved == null) {
 
             final JsonNode doc;

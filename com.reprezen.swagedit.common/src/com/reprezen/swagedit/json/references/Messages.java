@@ -8,20 +8,24 @@
  * Contributors:
  *    ModelSolv, Inc. - initial API and implementation and/or initial documentation
  *******************************************************************************/
-package com.reprezen.swagedit.editor;
+package com.reprezen.swagedit.json.references;
 
-import com.reprezen.swagedit.Activator;
-import com.reprezen.swagedit.common.editor.JsonDocument;
-import com.reprezen.swagedit.schema.SwaggerSchema;
+import org.eclipse.osgi.util.NLS;
 
-/**
- * SwaggerDocument
- * 
- */
-public class SwaggerDocument extends JsonDocument {
+public class Messages extends NLS {
 
-    public SwaggerDocument() {
-        super(io.swagger.util.Yaml.mapper(), Activator.getDefault() != null ? Activator.getDefault().getSchema() : new SwaggerSchema());
+    private static final String BUNDLE_NAME = "com.reprezen.swagedit.json.references";
+
+    public static String error_missing_reference;
+    public static String error_invalid_reference;
+  
+    public static String warning_simple_reference;
+
+
+    static {
+        NLS.initializeMessages(BUNDLE_NAME, Messages.class);
     }
 
+    private Messages() {
+    }
 }

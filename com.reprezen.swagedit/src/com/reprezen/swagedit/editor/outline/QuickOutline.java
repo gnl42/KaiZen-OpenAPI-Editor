@@ -54,6 +54,7 @@ import org.eclipse.ui.keys.IBindingService;
 import org.eclipse.ui.part.ShowInContext;
 
 import com.google.common.base.Strings;
+import com.reprezen.swagedit.Activator;
 import com.reprezen.swagedit.Messages;
 import com.reprezen.swagedit.editor.SwaggerEditor;
 import com.reprezen.swagedit.model.AbstractNode;
@@ -184,7 +185,7 @@ public class QuickOutline extends PopupDialog
             treeViewer.setAutoExpandLevel(0);
         }
 
-        setInput(Model.parseYaml(files));
+        setInput(Model.parseYaml(files, Activator.getDefault().getSchema()));
     }
 
     protected String statusMessage() {

@@ -18,7 +18,6 @@ import java.util.List;
 import com.fasterxml.jackson.core.JsonPointer;
 import com.fasterxml.jackson.databind.JsonNode;
 import com.fasterxml.jackson.databind.node.ArrayNode;
-import com.reprezen.swagedit.schema.SwaggerSchema.JsonSchema;
 
 /**
  * Represents a JSON schema type definition of a complex type, eg oneOf, allOf, anyOf types.

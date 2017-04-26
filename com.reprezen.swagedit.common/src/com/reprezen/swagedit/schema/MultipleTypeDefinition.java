@@ -12,8 +12,6 @@ package com.reprezen.swagedit.schema;
 
 import java.util.List;
 
-import com.reprezen.swagedit.schema.SwaggerSchema.JsonSchema;
-
 /**
  * Represents a JSON schema type definition that is defined in separated types.
  * 

@@ -57,12 +57,8 @@ Export-Package: com.reprezen.swagedit,
  com.reprezen.swagedit.editor.hyperlinks,
  com.reprezen.swagedit.editor.outline,
  com.reprezen.swagedit.handlers,
- com.reprezen.swagedit.json.references,
- com.reprezen.swagedit.model,
  com.reprezen.swagedit.preferences,
- com.reprezen.swagedit.schema,
  com.reprezen.swagedit.templates,
- com.reprezen.swagedit.utils,
  com.reprezen.swagedit.validation,
  com.reprezen.swagedit.wizards
 Bundle-Vendor: ModelSolv, Inc. d.b.a. RepreZen

@@ -22,7 +22,6 @@ import java.util.regex.Pattern;
 import com.fasterxml.jackson.core.JsonPointer;
 import com.fasterxml.jackson.databind.JsonNode;
 import com.reprezen.swagedit.json.references.JsonReference;
-import com.reprezen.swagedit.schema.SwaggerSchema.JsonSchema;
 
 /**
  * Represents a JSON schema type definition for objects.

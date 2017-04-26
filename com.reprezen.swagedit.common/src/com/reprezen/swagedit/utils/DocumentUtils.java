@@ -38,7 +38,7 @@ import org.eclipse.ui.part.ShowInContext;
 import org.eclipse.ui.texteditor.ITextEditor;
 
 import com.google.common.io.CharStreams;
-import com.reprezen.swagedit.editor.SwaggerDocument;
+import com.reprezen.swagedit.common.editor.JsonDocument;
 
 public class DocumentUtils {
 
@@ -59,8 +59,9 @@ public class DocumentUtils {
      * 
      * @param path
      * @return document
+     * @throws IOException 
      */
-    public static SwaggerDocument getDocument(IPath path) {
+    public static String getDocumentContent(IPath path) throws IOException {
         if (path == null || !path.getFileExtension().matches("ya?ml")) {
             return null;
         }
@@ -88,14 +89,7 @@ public class DocumentUtils {
             return null;
         }
 
-        SwaggerDocument doc = new SwaggerDocument();
-        try {
-            doc.set(CharStreams.toString(new InputStreamReader(content)));
-        } catch (IOException e) {
-            return null;
-        }
-
-        return doc;
+        return CharStreams.toString(new InputStreamReader(content));
     }
 
     /**

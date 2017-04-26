@@ -2,11 +2,12 @@ package com.reprezen.swagedit.editor.outline
 
 import com.reprezen.swagedit.editor.SwaggerDocument
 import com.reprezen.swagedit.model.Model
-import com.reprezen.swagedit.schema.SwaggerSchema
 import com.reprezen.swagedit.tests.utils.PointerHelpers
 import org.junit.Test
 
 import static org.junit.Assert.*
+import com.reprezen.swagedit.schema.CompositeSchema
+import com.reprezen.swagedit.schema.SwaggerSchema
 
 class AbstractNodeTest {
 

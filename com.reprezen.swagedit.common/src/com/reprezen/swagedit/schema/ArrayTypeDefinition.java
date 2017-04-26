@@ -12,7 +12,6 @@ package com.reprezen.swagedit.schema;
 
 import com.fasterxml.jackson.core.JsonPointer;
 import com.fasterxml.jackson.databind.JsonNode;
-import com.reprezen.swagedit.schema.SwaggerSchema.JsonSchema;
 
 /**
  * Represents a JSON schema type definition for arrays.
