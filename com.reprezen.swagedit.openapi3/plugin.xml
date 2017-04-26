@@ -33,4 +33,16 @@
       </content-type>
    </extension>
    
+   <extension
+         point="org.eclipse.ui.newWizards">
+      <wizard
+            category="com.reprezen.swagedit"
+            class="com.reprezen.swagedit.openapi3.editor.wizard.NewOpenApiV3SpecWizard"
+            icon="icons/OpenAPI_32.png"
+            id="com.reprezen.swagedit.openapi3.editor.wizard.NewOpenApiV3SpecWizard"
+            name="OpenAPI v3 spec">
+            <description>Create an OpenAPI v3 spec</description>
+      </wizard>
+   </extension>
+   
 </plugin>
