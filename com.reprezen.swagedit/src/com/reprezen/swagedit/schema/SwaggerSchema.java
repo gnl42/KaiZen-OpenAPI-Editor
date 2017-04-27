@@ -15,13 +15,12 @@ import com.reprezen.swagedit.preferences.SwaggerPreferenceConstants;
 public class SwaggerSchema extends CompositeSchema {
 
     private JsonSchema coreType;
-    private Map<String, JsonNode> jsonRefContexts = Maps.newHashMap();
+    private final Map<String, JsonNode> jsonRefContexts = Maps.newHashMap();
 
     private final JsonNode refToJsonReferenceNode = mapper.createObjectNode().put("$ref",
             "#/definitions/jsonReference");
 
-    @Override
-    protected void init() {
+    public SwaggerSchema() {
 
         JsonNode core;
         try {

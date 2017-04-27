@@ -30,12 +30,6 @@ public abstract class CompositeSchema {
 
     protected JsonSchema swaggerType;
 
-    public CompositeSchema() {
-        init();
-    }
-
-    protected abstract void init();
-
     /**
      * Returns the content of the schema as JSON.
      * 
