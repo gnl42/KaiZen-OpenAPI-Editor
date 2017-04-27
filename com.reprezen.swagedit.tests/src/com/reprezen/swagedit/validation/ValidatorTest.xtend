@@ -414,7 +414,7 @@ class ValidatorTest {
 		assertThat(document.yamlError, notNullValue)
 		assertThat(document.yamlError.message,
 			equalTo(
-				"null; found undefined alias scope_values;  in 'reader', line 15, column 11:\n        enum: *scope_values\n              ^"))
+				"found undefined alias scope_values\n in 'reader', line 15, column 11:\n        enum: *scope_values\n              ^\n"))
 
 		assertThat(document.jsonError, nullValue)
 
@@ -459,7 +459,7 @@ class ValidatorTest {
 		assertThat(document.yamlError, notNullValue)
 		assertThat(document.yamlError.message,
 			equalTo(
-				"null; found undefined alias scope_values_BROKEN;  in 'reader', line 26, column 11:\n        enum: *scope_values_BROKEN\n              ^"))
+				"found undefined alias scope_values_BROKEN\n in 'reader', line 26, column 11:\n        enum: *scope_values_BROKEN\n              ^\n"))
 
 		assertThat(document.jsonError, nullValue)
 
