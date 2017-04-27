@@ -177,7 +177,7 @@ public class ObjectTypeDefinition extends TypeDefinition {
 
         while (patterns.hasNext() && found == null) {
             String pattern = patterns.next();
-            Matcher matcher = Pattern.compile(pattern).matcher(property);
+            Matcher matcher = Pattern.compile(Pattern.quote(pattern)).matcher(property);
             if (matcher.find() || matcher.matches()) {
                 found = patternProperties.get(pattern);
             }
