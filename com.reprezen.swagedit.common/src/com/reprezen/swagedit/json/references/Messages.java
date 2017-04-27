@@ -14,7 +14,7 @@ import org.eclipse.osgi.util.NLS;
 
 public class Messages extends NLS {
 
-    private static final String BUNDLE_NAME = "com.reprezen.swagedit.json.references";
+    private static final String BUNDLE_NAME = "com.reprezen.swagedit.json.references.messages";
 
     public static String error_missing_reference;
     public static String error_invalid_reference;
