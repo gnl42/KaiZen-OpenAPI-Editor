@@ -96,7 +96,7 @@ public class JsonReferenceFactory {
         return null;
     }
 
-    protected JsonReference doCreate(String value, Object source) {
+    public JsonReference doCreate(String value, Object source) {
         String notNull = Strings.nullToEmpty(value);
 
         URI uri;

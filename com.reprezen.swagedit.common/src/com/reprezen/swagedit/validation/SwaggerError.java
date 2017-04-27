@@ -190,7 +190,7 @@ public class SwaggerError {
             return builder.toString();
         }
 
-        /* package */String getHumanFriendlyText(String location) {
+        public String getHumanFriendlyText(String location) {
             JsonNode swaggerSchemaNode = findNode(location);
             if (swaggerSchemaNode == null) {
                 return location;
@@ -198,7 +198,7 @@ public class SwaggerError {
             return getHumanFriendlyText(swaggerSchemaNode, location);
         }
 
-        /* package */String getHumanFriendlyText(JsonNode swaggerSchemaNode, final String defaultValue) {
+        public String getHumanFriendlyText(JsonNode swaggerSchemaNode, final String defaultValue) {
             JsonNode title = swaggerSchemaNode.get("title");
             if (title != null) {
                 return title.asText();

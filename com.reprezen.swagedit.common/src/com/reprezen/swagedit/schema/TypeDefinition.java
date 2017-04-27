@@ -20,7 +20,7 @@ import com.fasterxml.jackson.databind.JsonNode;
 public class TypeDefinition {
 
     protected final JsonSchema schema;
-    protected final JsonNode content;
+    public final JsonNode content;
     protected final JsonPointer pointer;
     protected final JsonType type;
 
