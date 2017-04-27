@@ -8,7 +8,7 @@
  * Contributors:
  *    ModelSolv, Inc. - initial API and implementation and/or initial documentation
  *******************************************************************************/
-package com.reprezen.swagedit.editor;
+package com.reprezen.swagedit.common.editor;
 
 import java.util.ArrayList;
 
@@ -46,12 +46,12 @@ import org.eclipse.swt.graphics.RGB;
  * This implementation is necessary due to the lack of possibility to override YAMLScanner
  * usage of a preference store.
  */
-public class SwaggerScanner extends YAMLScanner implements IPartitionTokenScanner {
+public class JsonScanner extends YAMLScanner implements IPartitionTokenScanner {
 
     private ColorManager colorManager;
     private IPreferenceStore store;
 
-    public SwaggerScanner(ColorManager colorManager, IPreferenceStore store) {
+    public JsonScanner(ColorManager colorManager, IPreferenceStore store) {
         super(colorManager);
 
         this.colorManager = colorManager;

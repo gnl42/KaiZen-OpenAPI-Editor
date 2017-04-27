@@ -24,7 +24,6 @@ import com.fasterxml.jackson.databind.JsonNode;
 import com.github.fge.jsonschema.core.report.ProcessingMessage;
 import com.github.fge.jsonschema.core.report.ProcessingReport;
 import com.google.common.base.Joiner;
-import com.reprezen.swagedit.Messages;
 import com.reprezen.swagedit.validation.SwaggerError.MultipleSwaggerError;
 
 /**
@@ -66,7 +65,7 @@ public class ErrorProcessor {
         return fromNode(message.asJson(), 0);
     }
 
-    /* package */Set<SwaggerError> processMessageNode(JsonNode value) {
+    public Set<SwaggerError> processMessageNode(JsonNode value) {
         return fromNode(value, 0);
     }
 

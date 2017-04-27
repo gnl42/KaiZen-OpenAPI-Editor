@@ -38,8 +38,7 @@ import com.github.fge.jsonschema.main.JsonSchemaFactory;
 import com.google.common.collect.HashMultimap;
 import com.google.common.collect.Multimap;
 import com.google.common.collect.Sets;
-import com.reprezen.swagedit.Messages;
-import com.reprezen.swagedit.editor.SwaggerDocument;
+import com.reprezen.swagedit.common.editor.JsonDocument;
 import com.reprezen.swagedit.json.references.JsonReference;
 import com.reprezen.swagedit.json.references.JsonReferenceFactory;
 import com.reprezen.swagedit.json.references.JsonReferenceValidator;
@@ -81,7 +80,7 @@ public class Validator {
      * @throws IOException
      * @throws ParserException
      */
-    public Set<SwaggerError> validate(SwaggerDocument document, IFileEditorInput editorInput) {
+    public Set<SwaggerError> validate(JsonDocument document, IFileEditorInput editorInput) {
         Set<SwaggerError> errors = Sets.newHashSet();
 
         JsonNode jsonContent = null;
@@ -113,7 +112,7 @@ public class Validator {
      * @param document
      * @return error
      */
-    protected Set<SwaggerError> validateAgainstSchema(ErrorProcessor processor, SwaggerDocument document) {
+    protected Set<SwaggerError> validateAgainstSchema(ErrorProcessor processor, JsonDocument document) {
         final JsonSchemaFactory factory = JsonSchemaFactory.newBuilder().freeze();
         final Set<SwaggerError> errors = Sets.newHashSet();
 

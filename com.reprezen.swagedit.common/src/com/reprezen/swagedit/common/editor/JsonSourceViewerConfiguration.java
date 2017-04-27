@@ -8,10 +8,11 @@
  * Contributors:
  *    ModelSolv, Inc. - initial API and implementation and/or initial documentation
  *******************************************************************************/
-package com.reprezen.swagedit.editor;
+package com.reprezen.swagedit.common.editor;
 
 import org.dadacoalition.yedit.editor.YEditSourceViewerConfiguration;
 import org.dadacoalition.yedit.editor.scanner.YAMLScanner;
+import org.eclipse.jface.preference.IPreferenceStore;
 import org.eclipse.jface.text.IDocument;
 import org.eclipse.jface.text.IInformationControl;
 import org.eclipse.jface.text.IInformationControlCreator;
@@ -34,42 +35,36 @@ import org.eclipse.jface.text.reconciler.MonoReconciler;
 import org.eclipse.jface.text.source.ISourceViewer;
 import org.eclipse.swt.widgets.Shell;
 
-import com.reprezen.swagedit.Activator;
-import com.reprezen.swagedit.assist.SwaggerContentAssistProcessor;
-import com.reprezen.swagedit.assist.SwaggerQuickAssistProcessor;
-import com.reprezen.swagedit.editor.hyperlinks.DefinitionHyperlinkDetector;
-import com.reprezen.swagedit.editor.hyperlinks.JsonReferenceHyperlinkDetector;
-import com.reprezen.swagedit.editor.hyperlinks.PathParamHyperlinkDetector;
-import com.reprezen.swagedit.editor.outline.QuickOutline;
-import com.reprezen.swagedit.validation.QuickFixer;
+public class JsonSourceViewerConfiguration extends YEditSourceViewerConfiguration {
 
-public class SwaggerSourceViewerConfiguration extends YEditSourceViewerConfiguration {
-
-    private SwaggerEditor editor;
+    private JsonEditor editor;
     private YAMLScanner scanner;
     private InformationPresenter informationPresenter;
+	private final IPreferenceStore store;
 
-    public SwaggerSourceViewerConfiguration() {
+    public JsonSourceViewerConfiguration(IPreferenceStore store) {
         super();
+		this.store = store;
     }
 
     @Override
     public IContentAssistant getContentAssistant(ISourceViewer sourceViewer) {
         ContentAssistant ca = new ContentAssistant();
-        SwaggerContentAssistProcessor processor = new SwaggerContentAssistProcessor(ca);
-
-        ca.setContentAssistProcessor(processor, IDocument.DEFAULT_CONTENT_TYPE);
-        ca.setInformationControlCreator(getInformationControlCreator(sourceViewer));
-
-        ca.enableAutoInsert(false);
-        ca.enablePrefixCompletion(false);
-        ca.enableAutoActivation(true);
-        ca.setAutoActivationDelay(100);
-        ca.enableColoredLabels(true);
-        ca.setShowEmptyList(true);
-        ca.setRepeatedInvocationMode(true);
-        ca.addCompletionListener(processor);
-        ca.setStatusLineVisible(true);
+        // FIXME
+//        SwaggerContentAssistProcessor processor = new SwaggerContentAssistProcessor(ca);
+//
+//        ca.setContentAssistProcessor(processor, IDocument.DEFAULT_CONTENT_TYPE);
+//        ca.setInformationControlCreator(getInformationControlCreator(sourceViewer));
+//
+//        ca.enableAutoInsert(false);
+//        ca.enablePrefixCompletion(false);
+//        ca.enableAutoActivation(true);
+//        ca.setAutoActivationDelay(100);
+//        ca.enableColoredLabels(true);
+//        ca.setShowEmptyList(true);
+//        ca.setRepeatedInvocationMode(true);
+//        ca.addCompletionListener(processor);
+//        ca.setStatusLineVisible(true);
 
         return ca;
     }
@@ -77,7 +72,7 @@ public class SwaggerSourceViewerConfiguration extends YEditSourceViewerConfigura
     @Override
     protected YAMLScanner getScanner() {
         if (scanner == null) {
-            scanner = new SwaggerScanner(colorManager, Activator.getDefault().getPreferenceStore());
+            scanner = new JsonScanner(colorManager, store);
         }
         return scanner;
     }
@@ -89,7 +84,7 @@ public class SwaggerSourceViewerConfiguration extends YEditSourceViewerConfigura
 
     @Override
     public IReconciler getReconciler(ISourceViewer sourceViewer) {
-        SwaggerReconcilingStrategy strategy = new SwaggerReconcilingStrategy();
+        JsonReconcilingStrategy strategy = new JsonReconcilingStrategy();
         strategy.setEditor(editor);
         MonoReconciler reconciler = new MonoReconciler(strategy, false);
         return reconciler;
@@ -97,8 +92,8 @@ public class SwaggerSourceViewerConfiguration extends YEditSourceViewerConfigura
 
     @Override
     public IHyperlinkDetector[] getHyperlinkDetectors(ISourceViewer sourceViewer) {
-        return new IHyperlinkDetector[] { new URLHyperlinkDetector(), new JsonReferenceHyperlinkDetector(),
-                new PathParamHyperlinkDetector(), new DefinitionHyperlinkDetector() };
+        return new IHyperlinkDetector[] { new URLHyperlinkDetector()/* FIXME ,new JsonReferenceHyperlinkDetector(),
+                new PathParamHyperlinkDetector(), new DefinitionHyperlinkDetector() */};
     }
 
     @Override
@@ -107,11 +102,11 @@ public class SwaggerSourceViewerConfiguration extends YEditSourceViewerConfigura
         return super.getInformationPresenter(sourceViewer);
     }
 
-    public void setEditor(SwaggerEditor editor) {
+    public void setEditor(JsonEditor editor) {
         this.editor = editor;
     }
 
-    public SwaggerEditor getEditor() {
+    public JsonEditor getEditor() {
         return editor;
     }
 
@@ -136,16 +131,19 @@ public class SwaggerSourceViewerConfiguration extends YEditSourceViewerConfigura
     @Override
     public IQuickAssistAssistant getQuickAssistAssistant(ISourceViewer sourceViewer) {
         QuickAssistAssistant assistant = new QuickAssistAssistant();
-        assistant.setQuickAssistProcessor(new SwaggerQuickAssistProcessor(new QuickFixer()));
-        assistant.setInformationControlCreator(getInformationControlCreator(sourceViewer));
+        // FIXME
+//        assistant.setQuickAssistProcessor(new SwaggerQuickAssistProcessor(new QuickFixer()));
+//        assistant.setInformationControlCreator(getInformationControlCreator(sourceViewer));
         return assistant;
     }
 
     private IInformationControlCreator getOutlineInformationControlCreator() {
         return new IInformationControlCreator() {
             public IInformationControl createInformationControl(Shell parent) {
-                QuickOutline dialog = new QuickOutline(parent, getEditor());
-                return dialog;
+            	// FIXME 
+//                QuickOutline dialog = new QuickOutline(parent, getEditor());
+//                return dialog;
+            	return null;
             }
         };
     }
@@ -167,8 +165,8 @@ public class SwaggerSourceViewerConfiguration extends YEditSourceViewerConfigura
         public Object getInformation2(ITextViewer textViewer, IRegion subject) {
             IDocument document = textViewer.getDocument();
 
-            if (document instanceof SwaggerDocument) {
-                return ((SwaggerDocument) document).getModel();
+            if (document instanceof JsonDocument) {
+                return ((JsonDocument) document).getModel();
             }
 
             return null;
