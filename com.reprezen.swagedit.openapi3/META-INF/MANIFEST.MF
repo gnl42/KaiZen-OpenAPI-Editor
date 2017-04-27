@@ -11,6 +11,11 @@ Require-Bundle: org.eclipse.ui,
  org.eclipse.jface.text,
  org.dadacoalition.yedit,
  com.reprezen.swagedit.common,
- org.eclipse.ui.ide
+ org.eclipse.ui.ide,
+ org.eclipse.core.resources,
+ com.google.guava;bundle-version="15.0.0"
 Bundle-RequiredExecutionEnvironment: JavaSE-1.7
 Bundle-ActivationPolicy: lazy
+Import-Package: com.fasterxml.jackson.core,
+ com.fasterxml.jackson.databind,
+ io.swagger.util
