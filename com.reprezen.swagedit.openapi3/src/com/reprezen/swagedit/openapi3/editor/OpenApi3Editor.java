@@ -11,7 +11,7 @@ public class OpenApi3Editor extends JsonEditor {
 	public static final String ID = "com.reprezen.swagedit.openapi3.editor";
 
     public OpenApi3Editor() {
-        super(new OpenApi3DocumentProvider(), Activator.getDefault().getPreferenceStore());
+        super(new OpenApi3DocumentProvider());
     }
     
     @Override

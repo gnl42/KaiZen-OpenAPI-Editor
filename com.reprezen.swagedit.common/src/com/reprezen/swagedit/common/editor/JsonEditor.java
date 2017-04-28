@@ -31,7 +31,6 @@ import org.eclipse.core.runtime.IStatus;
 import org.eclipse.core.runtime.Status;
 import org.eclipse.core.runtime.jobs.Job;
 import org.eclipse.jface.dialogs.MessageDialog;
-import org.eclipse.jface.preference.IPreferenceStore;
 import org.eclipse.jface.text.DocumentEvent;
 import org.eclipse.jface.text.IDocument;
 import org.eclipse.jface.text.IDocumentListener;
@@ -73,7 +72,6 @@ import org.eclipse.ui.part.IShowInTarget;
 import org.eclipse.ui.part.ShowInContext;
 import org.eclipse.ui.swt.IFocusService;
 import org.eclipse.ui.texteditor.IDocumentProvider;
-import org.eclipse.ui.views.contentoutline.IContentOutlinePage;
 import org.yaml.snakeyaml.error.YAMLException;
 
 import com.fasterxml.jackson.core.JsonProcessingException;
@@ -202,13 +200,11 @@ public abstract class JsonEditor extends YEdit implements IShowInSource, IShowIn
 //            }
         }
     };
-	private final IPreferenceStore store;
-
+	
    // private SwaggerContentOutlinePage contentOutline;
 
-    public JsonEditor(JsonDocumentProvider documentProvider, IPreferenceStore store) {
+    public JsonEditor(JsonDocumentProvider documentProvider) {
         super();
-		this.store = store;
         setDocumentProvider(documentProvider);
     }
 
