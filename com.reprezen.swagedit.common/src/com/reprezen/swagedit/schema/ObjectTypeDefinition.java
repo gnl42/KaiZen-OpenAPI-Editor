@@ -18,9 +18,11 @@ import java.util.Map;
 import java.util.Map.Entry;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
+import java.util.regex.PatternSyntaxException;
 
 import com.fasterxml.jackson.core.JsonPointer;
 import com.fasterxml.jackson.databind.JsonNode;
+import com.reprezen.swagedit.core.Activator;
 import com.reprezen.swagedit.json.references.JsonReference;
 
 /**
@@ -177,9 +179,13 @@ public class ObjectTypeDefinition extends TypeDefinition {
 
         while (patterns.hasNext() && found == null) {
             String pattern = patterns.next();
-            Matcher matcher = Pattern.compile(pattern).matcher(property);
-            if (matcher.find() || matcher.matches()) {
-                found = patternProperties.get(pattern);
+            try {
+                Matcher matcher = Pattern.compile(pattern).matcher(property);
+                if (matcher.find() || matcher.matches()) {
+                    found = patternProperties.get(pattern);
+                }
+            } catch (PatternSyntaxException e) {
+            	Activator.getDefault().logError("Problem in JSON Schema", e);
             }
         }
 
