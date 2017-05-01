@@ -32,7 +32,6 @@ import org.eclipse.ui.plugin.AbstractUIPlugin;
 import org.osgi.framework.Bundle;
 import org.osgi.framework.BundleContext;
 
-import com.reprezen.swagedit.schema.CompositeSchema;
 import com.reprezen.swagedit.schema.SwaggerSchema;
 import com.reprezen.swagedit.templates.SwaggerContextType;
 
@@ -55,7 +54,7 @@ public class Activator extends AbstractUIPlugin {
      * 
      */
     public enum Icons {
-        assist_item, template_item, outline_document, outline_scalar, outline_mapping, outline_sequence, outline_mapping_scalar
+        outline_document, outline_scalar, outline_mapping, outline_sequence, outline_mapping_scalar
     }
 
     /*
@@ -69,9 +68,7 @@ public class Activator extends AbstractUIPlugin {
 
         if (Display.getCurrent() != null && PlatformUI.isWorkbenchRunning()) {
             Bundle bundle = Platform.getBundle(PLUGIN_ID);
-            addImage(bundle, Icons.assist_item.name(), "icons/assist_item_16.png");
-            addImage(bundle, Icons.template_item.name(), "icons/template_item_16.png");
-
+  
             // for quick outline, add icons from YEdit
             bundle = Platform.getBundle(org.dadacoalition.yedit.Activator.PLUGIN_ID);
             addImage(bundle, Icons.outline_document.name(), "icons/outline_document.gif");

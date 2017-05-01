@@ -22,6 +22,8 @@ import org.eclipse.swt.graphics.Image;
 import org.eclipse.swt.graphics.Point;
 
 import com.google.common.base.Strings;
+import com.reprezen.swagedit.core.Activator;
+import com.reprezen.swagedit.core.Activator.Icons;
 
 public class StyledCompletionProposal
         implements ICompletionProposal, ICompletionProposalExtension5, ICompletionProposalExtension6 {
@@ -95,12 +97,10 @@ public class StyledCompletionProposal
         return label.getString();
     }
 
-    @Override
-    public Image getImage() {
-    	return null;
-    	// FIXME add image
-       // return Activator.getDefault().getImage(Icons.assist_item);
-    }
+	@Override
+	public Image getImage() {
+		return Activator.getDefault().getImage(Icons.assist_item);
+	}
 
     @Override
     public IContextInformation getContextInformation() {
