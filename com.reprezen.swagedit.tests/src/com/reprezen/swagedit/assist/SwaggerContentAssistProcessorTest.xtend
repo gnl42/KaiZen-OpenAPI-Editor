@@ -11,7 +11,7 @@ import com.reprezen.swagedit.core.assist.StyledCompletionProposal
 
 class SwaggerContentAssistProcessorTest {
 
-	val processor = new SwaggerContentAssistProcessor() {
+	val processor = new SwaggerContentAssistProcessor(null) {
 		override protected initTextMessages() {
 			new ArrayList
 		}
@@ -20,7 +20,7 @@ class SwaggerContentAssistProcessorTest {
 			null
 		}
 
-		override protected geTemplateStore() {
+		override protected getTemplateStore() {
 			null
 		}
 	}

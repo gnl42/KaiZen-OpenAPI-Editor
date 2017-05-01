@@ -33,6 +33,8 @@ import org.eclipse.jface.text.quickassist.QuickAssistAssistant;
 import org.eclipse.jface.text.reconciler.IReconciler;
 import org.eclipse.jface.text.reconciler.MonoReconciler;
 import org.eclipse.jface.text.source.ISourceViewer;
+import org.eclipse.jface.text.templates.ContextTypeRegistry;
+import org.eclipse.jface.text.templates.persistence.TemplateStore;
 import org.eclipse.swt.widgets.Shell;
 
 import com.reprezen.swagedit.core.assist.JsonContentAssistProcessor;
@@ -52,7 +54,7 @@ public class JsonSourceViewerConfiguration extends YEditSourceViewerConfiguratio
     @Override
     public IContentAssistant getContentAssistant(ISourceViewer sourceViewer) {
         ContentAssistant ca = new ContentAssistant();
-        JsonContentAssistProcessor processor = new JsonContentAssistProcessor(ca);
+        JsonContentAssistProcessor processor = createContentAssistProcessor(ca);
 
         ca.setContentAssistProcessor(processor, IDocument.DEFAULT_CONTENT_TYPE);
         ca.setInformationControlCreator(getInformationControlCreator(sourceViewer));
@@ -68,6 +70,25 @@ public class JsonSourceViewerConfiguration extends YEditSourceViewerConfiguratio
         ca.setStatusLineVisible(true);
 
         return ca;
+    }
+    
+    protected JsonContentAssistProcessor createContentAssistProcessor(ContentAssistant ca) {
+    	return new JsonContentAssistProcessor(ca){
+
+			@Override
+			protected TemplateStore getTemplateStore() {
+				return null;
+			}
+
+			@Override
+			protected ContextTypeRegistry getContextTypeRegistry() {
+				return null;
+			}
+
+			@Override
+			protected String getContextTypeId(String path) {
+				return null;
+			}};
     }
 
     @Override

@@ -10,8 +10,6 @@
  *******************************************************************************/
 package com.reprezen.swagedit.core.assist;
 
-import static org.eclipse.ui.IWorkbenchCommandConstants.EDIT_CONTENT_ASSIST;
-
 import java.util.ArrayList;
 import java.util.Collection;
 import java.util.List;
@@ -29,7 +27,6 @@ import org.eclipse.jface.text.contentassist.IContentAssistProcessor;
 import org.eclipse.jface.text.contentassist.IContextInformation;
 import org.eclipse.jface.text.contentassist.IContextInformationValidator;
 import org.eclipse.jface.text.templates.ContextTypeRegistry;
-import org.eclipse.jface.text.templates.DocumentTemplateContext;
 import org.eclipse.jface.text.templates.Template;
 import org.eclipse.jface.text.templates.TemplateCompletionProcessor;
 import org.eclipse.jface.text.templates.TemplateContext;
@@ -42,13 +39,13 @@ import org.eclipse.swt.graphics.Image;
 import org.eclipse.swt.graphics.RGB;
 import org.eclipse.swt.graphics.TextStyle;
 import org.eclipse.swt.widgets.Display;
-import org.eclipse.ui.PlatformUI;
-import org.eclipse.ui.keys.IBindingService;
 
 import com.fasterxml.jackson.core.JsonPointer;
 import com.google.common.base.Strings;
 import com.google.common.collect.Lists;
 import com.reprezen.swagedit.common.editor.JsonDocument;
+import com.reprezen.swagedit.core.Activator;
+import com.reprezen.swagedit.core.Activator.Icons;
 import com.reprezen.swagedit.json.references.JsonReference;
 import com.reprezen.swagedit.model.Model;
 import com.reprezen.swagedit.utils.SwaggerFileFinder.Scope;
@@ -56,11 +53,10 @@ import com.reprezen.swagedit.utils.SwaggerFileFinder.Scope;
 /**
  * This class provides basic content assist based on keywords used by the swagger schema.
  */
-public class JsonContentAssistProcessor extends TemplateCompletionProcessor
+public abstract class JsonContentAssistProcessor extends TemplateCompletionProcessor
         implements IContentAssistProcessor, ICompletionListener {
 
-   private final JsonProposalProvider proposalProvider = new JsonProposalProvider(
-            /*FIXME new MediaTypeContentAssistExt()*/);
+   private final JsonProposalProvider proposalProvider;
    // FIXME private final JsonReferenceProposalProvider referenceProposalProvider = new JsonReferenceProposalProvider();
     private final ContentAssistant contentAssistant;
 
@@ -82,15 +78,23 @@ public class JsonContentAssistProcessor extends TemplateCompletionProcessor
     private boolean isRefCompletion = false;
 
     private String[] textMessages;
-
-    public JsonContentAssistProcessor() {
-        this(null);
-    }
-
-    public JsonContentAssistProcessor(ContentAssistant ca) {
+    
+	public JsonContentAssistProcessor(ContentAssistant ca) {
+		this(ca, new JsonProposalProvider());
+	}
+    
+    public JsonContentAssistProcessor(ContentAssistant ca, JsonProposalProvider proposalProvider) {
         this.contentAssistant = ca;
         this.textMessages = initTextMessages();
+        this.proposalProvider = proposalProvider;
     }
+    
+    protected abstract TemplateStore getTemplateStore();
+
+    protected abstract ContextTypeRegistry getContextTypeRegistry();
+    
+    protected abstract String getContextTypeId(String path);
+
 
     @Override
     public ICompletionProposal[] computeCompletionProposals(ITextViewer viewer, int documentOffset) {
@@ -247,26 +251,21 @@ public class JsonContentAssistProcessor extends TemplateCompletionProcessor
         return null;
     }
 
-    @Override
-    protected ICompletionProposal createProposal(Template template, TemplateContext context, IRegion region,
-            int relevance) {
-        if (context instanceof DocumentTemplateContext) {
-            // FIXME context = new SwaggerTemplateContext((DocumentTemplateContext) context);
-        }
-        return new StyledTemplateProposal(template, context, region, getImage(template), getTemplateLabel(template),
-                relevance);
-    }
+	@Override
+	protected ICompletionProposal createProposal(Template template, TemplateContext context, IRegion region,
+			int relevance) {
+		return new StyledTemplateProposal(template, context, region, getImage(template), getTemplateLabel(template),
+				relevance);
+	}
 
     @Override
     protected Template[] getTemplates(String contextTypeId) {
-        return geTemplateStore().getTemplates();
+        return getTemplateStore().getTemplates();
     }
 
     @Override
     protected TemplateContextType getContextType(ITextViewer viewer, IRegion region) {
-    	 String contextType = 
-    			 "";
-       // FIXME  String contextType = SwaggerContextType.getContextType(currentPath.toString());
+        String contextType = getContextTypeId(currentPath.toString());
         ContextTypeRegistry registry = getContextTypeRegistry();
         if (registry != null) {
             return registry.getContextType(contextType);
@@ -277,18 +276,7 @@ public class JsonContentAssistProcessor extends TemplateCompletionProcessor
 
     @Override
     protected Image getImage(Template template) {
-    	return null;
-       // FIXME  return Activator.getDefault().getImage(Icons.template_item);
-    }
-
-    protected TemplateStore geTemplateStore() {
-    	return null;
-        // FIXME return Activator.getDefault().getTemplateStore();
-    }
-
-    protected ContextTypeRegistry getContextTypeRegistry() {
-    	return null;
-        // FIXME return Activator.getDefault().getContextTypeRegistry();
+       return Activator.getDefault().getImage(Icons.template_item);
     }
 
     protected StyledString getTemplateLabel(Template template) {
@@ -324,6 +312,10 @@ public class JsonContentAssistProcessor extends TemplateCompletionProcessor
         isRefCompletion = false;
         textMessages = null;
         currentOffset = -1;
+    }
+    
+    protected JsonPointer getCurrentPath() {
+    	return currentPath;
     }
 
     @Override

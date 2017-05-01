@@ -23,6 +23,7 @@ import org.eclipse.ui.texteditor.templates.TemplatePreferencePage;
 
 import com.reprezen.swagedit.Activator;
 import com.reprezen.swagedit.common.editor.JsonSourceViewerConfiguration;
+import com.reprezen.swagedit.editor.SwaggerSourceViewerConfiguration;
 
 public class SwaggerTemplatePreferences extends TemplatePreferencePage implements IWorkbenchPreferencePage {
 
@@ -35,7 +36,7 @@ public class SwaggerTemplatePreferences extends TemplatePreferencePage implement
 
         protected SourceViewer createViewer(Composite parent) {
             SourceViewer viewer = new SourceViewer(parent, null, null, false, SWT.BORDER | SWT.V_SCROLL | SWT.H_SCROLL);
-            SourceViewerConfiguration configuration = new JsonSourceViewerConfiguration(Activator.getDefault().getPreferenceStore());
+            SourceViewerConfiguration configuration = new SwaggerSourceViewerConfiguration(Activator.getDefault().getPreferenceStore());
             viewer.configure(configuration);
 
             return viewer;

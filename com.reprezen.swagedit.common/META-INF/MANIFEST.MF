@@ -47,3 +47,4 @@ Import-Package: com.fasterxml.jackson.core,
  org.yaml.snakeyaml.error,
  org.yaml.snakeyaml.nodes,
  org.yaml.snakeyaml.parser
+Bundle-Activator: com.reprezen.swagedit.core.Activator

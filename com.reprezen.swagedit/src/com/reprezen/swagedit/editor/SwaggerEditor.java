@@ -14,7 +14,6 @@ import org.dadacoalition.yedit.editor.YEditSourceViewerConfiguration;
 
 import com.reprezen.swagedit.Activator;
 import com.reprezen.swagedit.common.editor.JsonEditor;
-import com.reprezen.swagedit.common.editor.JsonSourceViewerConfiguration;
 
 /**
  * SwagEdit editor.
@@ -31,7 +30,7 @@ public class SwaggerEditor extends JsonEditor {
     
     @Override
     protected YEditSourceViewerConfiguration createSourceViewerConfiguration() {
-        sourceViewerConfiguration = new JsonSourceViewerConfiguration(Activator.getDefault().getPreferenceStore());
+        sourceViewerConfiguration = new SwaggerSourceViewerConfiguration(Activator.getDefault().getPreferenceStore());
         sourceViewerConfiguration.setEditor(this);
         return sourceViewerConfiguration;
     }
