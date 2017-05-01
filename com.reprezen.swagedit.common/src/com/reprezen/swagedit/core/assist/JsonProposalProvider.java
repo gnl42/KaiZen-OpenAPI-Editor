@@ -37,15 +37,15 @@ import com.reprezen.swagedit.schema.TypeDefinition;
 /**
  * Provider of completion proposals.
  */
-public class SwaggerProposalProvider {
+public class JsonProposalProvider {
 
     private final List<ContentAssistExt> extensions;
 
-    public SwaggerProposalProvider() {
+    public JsonProposalProvider() {
         this.extensions = Collections.emptyList();
     }
 
-    public SwaggerProposalProvider(ContentAssistExt... extensions) {
+    public JsonProposalProvider(ContentAssistExt... extensions) {
         this.extensions = Lists.newArrayList(extensions);
     }
 

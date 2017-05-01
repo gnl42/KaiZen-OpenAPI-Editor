@@ -56,7 +56,7 @@ import com.reprezen.swagedit.assist.ext.MediaTypeContentAssistExt;
 import com.reprezen.swagedit.core.assist.Proposal;
 import com.reprezen.swagedit.core.assist.StyledCompletionProposal;
 import com.reprezen.swagedit.core.assist.StyledTemplateProposal;
-import com.reprezen.swagedit.core.assist.SwaggerProposalProvider;
+import com.reprezen.swagedit.core.assist.JsonProposalProvider;
 import com.reprezen.swagedit.editor.SwaggerDocument;
 import com.reprezen.swagedit.json.references.JsonReference;
 import com.reprezen.swagedit.model.Model;
@@ -71,7 +71,7 @@ public class SwaggerContentAssistProcessor extends TemplateCompletionProcessor
         implements IContentAssistProcessor, ICompletionListener {
 
     // FIXME
-	private final SwaggerProposalProvider proposalProvider = new SwaggerProposalProvider();
+	private final JsonProposalProvider proposalProvider = new JsonProposalProvider();
 
     private final JsonReferenceProposalProvider referenceProposalProvider = new JsonReferenceProposalProvider();
     private final ContentAssistant contentAssistant;

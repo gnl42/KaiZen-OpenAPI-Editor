@@ -12,14 +12,14 @@ import static org.hamcrest.core.IsCollectionContaining.*
 import static org.junit.Assert.*
 import com.reprezen.swagedit.schema.CompositeSchema
 import com.reprezen.swagedit.schema.SwaggerSchema
-import com.reprezen.swagedit.core.assist.SwaggerProposalProvider
+import com.reprezen.swagedit.core.assist.JsonProposalProvider
 
 class SwaggerProposalProviderTest {
 
 	extension PointerHelpers = new PointerHelpers
 
 	val schema = new SwaggerSchema	
-	val provider = new SwaggerProposalProvider
+	val provider = new JsonProposalProvider
 	var Model model
 	
 	@Before

@@ -59,7 +59,7 @@ import com.reprezen.swagedit.utils.SwaggerFileFinder.Scope;
 public class JsonContentAssistProcessor extends TemplateCompletionProcessor
         implements IContentAssistProcessor, ICompletionListener {
 
-   private final SwaggerProposalProvider proposalProvider = new SwaggerProposalProvider(
+   private final JsonProposalProvider proposalProvider = new JsonProposalProvider(
             /*FIXME new MediaTypeContentAssistExt()*/);
    // FIXME private final JsonReferenceProposalProvider referenceProposalProvider = new JsonReferenceProposalProvider();
     private final ContentAssistant contentAssistant;

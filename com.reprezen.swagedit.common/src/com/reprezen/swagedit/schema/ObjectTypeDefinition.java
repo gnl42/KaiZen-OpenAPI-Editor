@@ -100,7 +100,7 @@ public class ObjectTypeDefinition extends TypeDefinition {
                 node = schema.resolve(JsonReference.getPointer(node));
             }
 
-            for (Iterator<Entry<String, JsonNode>> it = node.fields(); it.hasNext();) {
+            for (Iterator<Entry<String, JsonNode>> it = node. fields(); it.hasNext();) {
                 Entry<String, JsonNode> e = it.next();
 
                 String property = e.getKey().replaceAll("/", "~1");
