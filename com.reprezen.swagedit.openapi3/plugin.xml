@@ -45,4 +45,25 @@
       </wizard>
    </extension>
    
+   <extension
+         point="org.eclipse.ui.preferencePages">
+      <page
+            class="com.reprezen.swagedit.openapi3.preferences.OpenApi3PreferencePage"
+            id="com.reprezen.swagedit.openapi3.preferences"
+            name="Open API v3">
+      </page>
+      <page
+            category="com.reprezen.swagedit.openapi3.preferences"
+            class="com.reprezen.swagedit.openapi3.preferences.OpenApiColorPreferences"
+            id="com.reprezen.swagedit.openapi3.preferences.OpenApiColorPreferences"
+            name="Color Preferences">
+      </page>
+   </extension>
+   <extension
+         point="org.eclipse.core.runtime.preferences">
+      <initializer
+            class="com.reprezen.swagedit.openapi3.preferences.OpenApi3PreferenceInitializer">
+      </initializer>
+   </extension>
+   
 </plugin>
