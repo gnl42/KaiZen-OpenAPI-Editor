@@ -18,6 +18,8 @@ Bundle-RequiredExecutionEnvironment: JavaSE-1.7
 Bundle-ActivationPolicy: lazy
 Export-Package: com.reprezen.swagedit.common.editor,
  com.reprezen.swagedit.common.wizard,
+ com.reprezen.swagedit.core.assist,
+ com.reprezen.swagedit.core.assist.ext,
  com.reprezen.swagedit.json.references,
  com.reprezen.swagedit.model,
  com.reprezen.swagedit.schema,
@@ -33,7 +35,8 @@ Bundle-ClassPath: .,
  lib/javax.mail.api_1.4.3.jar,
  lib/com.googlecode.libphonenumber_6.2.0.jar,
  lib/com.github.fge.uri-template_0.9.0.jar,
- lib/org.mozilla.rhino_1.0.0.7R4.jar
+ lib/org.mozilla.rhino_1.0.0.7R4.jar,
+ lib/org.apache.commons.lang3_3.2.1.jar
 Import-Package: com.fasterxml.jackson.core,
  com.fasterxml.jackson.databind,
  com.fasterxml.jackson.databind.module,

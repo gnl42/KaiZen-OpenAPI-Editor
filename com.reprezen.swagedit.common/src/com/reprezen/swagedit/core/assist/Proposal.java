@@ -8,7 +8,7 @@
  * Contributors:
  *    ModelSolv, Inc. - initial API and implementation and/or initial documentation
  *******************************************************************************/
-package com.reprezen.swagedit.assist;
+package com.reprezen.swagedit.core.assist;
 
 import java.util.Objects;
 

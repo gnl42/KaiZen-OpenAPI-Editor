@@ -21,6 +21,7 @@ import com.fasterxml.jackson.core.JsonPointer;
 import com.fasterxml.jackson.databind.JsonNode;
 import com.google.common.base.Strings;
 import com.google.common.collect.Lists;
+import com.reprezen.swagedit.core.assist.Proposal;
 import com.reprezen.swagedit.json.references.JsonDocumentManager;
 import com.reprezen.swagedit.utils.DocumentUtils;
 import com.reprezen.swagedit.utils.SwaggerFileFinder;

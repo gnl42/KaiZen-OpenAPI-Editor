@@ -8,7 +8,7 @@
  * Contributors:
  *    ModelSolv, Inc. - initial API and implementation and/or initial documentation
  *******************************************************************************/
-package com.reprezen.swagedit.assist;
+package com.reprezen.swagedit.core.assist;
 
 import java.util.Collection;
 import java.util.Collections;
@@ -23,7 +23,7 @@ import com.fasterxml.jackson.core.JsonPointer;
 import com.fasterxml.jackson.databind.JsonNode;
 import com.google.common.base.Strings;
 import com.google.common.collect.Lists;
-import com.reprezen.swagedit.assist.ext.ContentAssistExt;
+import com.reprezen.swagedit.core.assist.ext.ContentAssistExt;
 import com.reprezen.swagedit.model.AbstractNode;
 import com.reprezen.swagedit.model.Model;
 import com.reprezen.swagedit.schema.ArrayTypeDefinition;
@@ -248,6 +248,7 @@ public class SwaggerProposalProvider {
             // if the type of array is string and
             // current value is a number, it should be put
             // into quotes to avoid validation issues
+        	
             if ((NumberUtils.isNumber(literal) && "string".equals(subType)) || "null".equals(literal)) {
                 replStr = "\"" + literal + "\"";
             } else {

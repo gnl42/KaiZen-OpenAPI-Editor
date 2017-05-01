@@ -165,7 +165,7 @@ public class JsonDocument extends Document {
         try {
             model = Model.parseYaml(schema, get());
         } catch (Exception e) {
-            // e.printStackTrace();
+            e.printStackTrace();
             model = null;
         }
     }

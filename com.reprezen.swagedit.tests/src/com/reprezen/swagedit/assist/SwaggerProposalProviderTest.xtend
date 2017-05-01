@@ -12,6 +12,7 @@ import static org.hamcrest.core.IsCollectionContaining.*
 import static org.junit.Assert.*
 import com.reprezen.swagedit.schema.CompositeSchema
 import com.reprezen.swagedit.schema.SwaggerSchema
+import com.reprezen.swagedit.core.assist.SwaggerProposalProvider
 
 class SwaggerProposalProviderTest {
 

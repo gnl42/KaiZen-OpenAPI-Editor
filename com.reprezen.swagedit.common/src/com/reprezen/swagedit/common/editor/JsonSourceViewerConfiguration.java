@@ -35,6 +35,8 @@ import org.eclipse.jface.text.reconciler.MonoReconciler;
 import org.eclipse.jface.text.source.ISourceViewer;
 import org.eclipse.swt.widgets.Shell;
 
+import com.reprezen.swagedit.core.assist.JsonContentAssistProcessor;
+
 public class JsonSourceViewerConfiguration extends YEditSourceViewerConfiguration {
 
     private JsonEditor editor;
@@ -50,21 +52,20 @@ public class JsonSourceViewerConfiguration extends YEditSourceViewerConfiguratio
     @Override
     public IContentAssistant getContentAssistant(ISourceViewer sourceViewer) {
         ContentAssistant ca = new ContentAssistant();
-        // FIXME
-//        SwaggerContentAssistProcessor processor = new SwaggerContentAssistProcessor(ca);
-//
-//        ca.setContentAssistProcessor(processor, IDocument.DEFAULT_CONTENT_TYPE);
-//        ca.setInformationControlCreator(getInformationControlCreator(sourceViewer));
-//
-//        ca.enableAutoInsert(false);
-//        ca.enablePrefixCompletion(false);
-//        ca.enableAutoActivation(true);
-//        ca.setAutoActivationDelay(100);
-//        ca.enableColoredLabels(true);
-//        ca.setShowEmptyList(true);
-//        ca.setRepeatedInvocationMode(true);
-//        ca.addCompletionListener(processor);
-//        ca.setStatusLineVisible(true);
+        JsonContentAssistProcessor processor = new JsonContentAssistProcessor(ca);
+
+        ca.setContentAssistProcessor(processor, IDocument.DEFAULT_CONTENT_TYPE);
+        ca.setInformationControlCreator(getInformationControlCreator(sourceViewer));
+
+        ca.enableAutoInsert(false);
+        ca.enablePrefixCompletion(false);
+        ca.enableAutoActivation(true);
+        ca.setAutoActivationDelay(100);
+        ca.enableColoredLabels(true);
+        ca.setShowEmptyList(true);
+        ca.setRepeatedInvocationMode(true);
+        ca.addCompletionListener(processor);
+        ca.setStatusLineVisible(true);
 
         return ca;
     }

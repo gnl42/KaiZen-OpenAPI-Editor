@@ -8,7 +8,7 @@
  * Contributors:
  *    ModelSolv, Inc. - initial API and implementation and/or initial documentation
  *******************************************************************************/
-package com.reprezen.swagedit.assist;
+package com.reprezen.swagedit.core.assist;
 
 import org.eclipse.core.runtime.IProgressMonitor;
 import org.eclipse.jface.text.BadLocationException;
@@ -22,8 +22,6 @@ import org.eclipse.swt.graphics.Image;
 import org.eclipse.swt.graphics.Point;
 
 import com.google.common.base.Strings;
-import com.reprezen.swagedit.Activator;
-import com.reprezen.swagedit.Activator.Icons;
 
 public class StyledCompletionProposal
         implements ICompletionProposal, ICompletionProposalExtension5, ICompletionProposalExtension6 {
@@ -99,7 +97,9 @@ public class StyledCompletionProposal
 
     @Override
     public Image getImage() {
-        return Activator.getDefault().getImage(Icons.assist_item);
+    	return null;
+    	// FIXME add image
+       // return Activator.getDefault().getImage(Icons.assist_item);
     }
 
     @Override

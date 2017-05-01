@@ -8,7 +8,7 @@
  * Contributors:
  *    ModelSolv, Inc. - initial API and implementation and/or initial documentation
  *******************************************************************************/
-package com.reprezen.swagedit.assist;
+package com.reprezen.swagedit.core.assist;
 
 import static org.eclipse.ui.IWorkbenchCommandConstants.EDIT_CONTENT_ASSIST;
 
@@ -48,32 +48,20 @@ import org.eclipse.ui.keys.IBindingService;
 import com.fasterxml.jackson.core.JsonPointer;
 import com.google.common.base.Strings;
 import com.google.common.collect.Lists;
-import com.reprezen.swagedit.Activator;
-import com.reprezen.swagedit.Activator.Icons;
-import com.reprezen.swagedit.Messages;
-import com.reprezen.swagedit.assist.JsonReferenceProposalProvider.ContextType;
-import com.reprezen.swagedit.assist.ext.MediaTypeContentAssistExt;
-import com.reprezen.swagedit.core.assist.Proposal;
-import com.reprezen.swagedit.core.assist.StyledCompletionProposal;
-import com.reprezen.swagedit.core.assist.StyledTemplateProposal;
-import com.reprezen.swagedit.core.assist.SwaggerProposalProvider;
-import com.reprezen.swagedit.editor.SwaggerDocument;
+import com.reprezen.swagedit.common.editor.JsonDocument;
 import com.reprezen.swagedit.json.references.JsonReference;
 import com.reprezen.swagedit.model.Model;
-import com.reprezen.swagedit.templates.SwaggerContextType;
-import com.reprezen.swagedit.templates.SwaggerTemplateContext;
 import com.reprezen.swagedit.utils.SwaggerFileFinder.Scope;
 
 /**
  * This class provides basic content assist based on keywords used by the swagger schema.
  */
-public class SwaggerContentAssistProcessor extends TemplateCompletionProcessor
+public class JsonContentAssistProcessor extends TemplateCompletionProcessor
         implements IContentAssistProcessor, ICompletionListener {
 
-    // FIXME
-	private final SwaggerProposalProvider proposalProvider = new SwaggerProposalProvider();
-
-    private final JsonReferenceProposalProvider referenceProposalProvider = new JsonReferenceProposalProvider();
+   private final SwaggerProposalProvider proposalProvider = new SwaggerProposalProvider(
+            /*FIXME new MediaTypeContentAssistExt()*/);
+   // FIXME private final JsonReferenceProposalProvider referenceProposalProvider = new JsonReferenceProposalProvider();
     private final ContentAssistant contentAssistant;
 
     /**
@@ -95,24 +83,24 @@ public class SwaggerContentAssistProcessor extends TemplateCompletionProcessor
 
     private String[] textMessages;
 
-    public SwaggerContentAssistProcessor() {
+    public JsonContentAssistProcessor() {
         this(null);
     }
 
-    public SwaggerContentAssistProcessor(ContentAssistant ca) {
+    public JsonContentAssistProcessor(ContentAssistant ca) {
         this.contentAssistant = ca;
         this.textMessages = initTextMessages();
     }
 
     @Override
     public ICompletionProposal[] computeCompletionProposals(ITextViewer viewer, int documentOffset) {
-        if (!(viewer.getDocument() instanceof SwaggerDocument)) {
+        if (!(viewer.getDocument() instanceof JsonDocument)) {
             return super.computeCompletionProposals(viewer, documentOffset);
         }
 
         maybeSwitchScope(documentOffset);
 
-        final SwaggerDocument document = (SwaggerDocument) viewer.getDocument();
+        final JsonDocument document = (JsonDocument) viewer.getDocument();
         final ITextSelection selection = (ITextSelection) viewer.getSelectionProvider().getSelection();
         int line = 0, lineOffset = 0, column = 0;
         try {
@@ -138,7 +126,9 @@ public class SwaggerContentAssistProcessor extends TemplateCompletionProcessor
         Collection<Proposal> p;
         if (isRefCompletion) {
             updateStatus();
-            p = referenceProposalProvider.getProposals(currentPath, document.asJson(), currentScope);
+            p = Lists.newArrayList();
+            // FIXME
+          //  p = referenceProposalProvider.getProposals(currentPath, document.asJson(), currentScope);
         } else {
             clearStatus();
             p = proposalProvider.getProposals(currentPath, model, prefix);
@@ -181,16 +171,18 @@ public class SwaggerContentAssistProcessor extends TemplateCompletionProcessor
     }
 
     protected String[] initTextMessages() {
-        IBindingService bindingService = (IBindingService) PlatformUI.getWorkbench().getAdapter(IBindingService.class);
-        String bindingKey = bindingService.getBestActiveBindingFormattedFor(EDIT_CONTENT_ASSIST);
+    	return new String[]{"FIXME"};
+    	// FIXME
+//        IBindingService bindingService = (IBindingService) PlatformUI.getWorkbench().getAdapter(IBindingService.class);
+//        String bindingKey = bindingService.getBestActiveBindingFormattedFor(EDIT_CONTENT_ASSIST);
+//
+//        ContextType contextType = ContextType.get(currentPath != null ? currentPath.toString() : "");
+//        String context = contextType != null ? contextType.label() : "";
 
-        ContextType contextType = ContextType.get(currentPath != null ? currentPath.toString() : "");
-        String context = contextType != null ? contextType.label() : "";
-
-        return new String[] { //
-                String.format(Messages.content_assist_proposal_project, bindingKey, context),
-                String.format(Messages.content_assist_proposal_workspace, bindingKey, context),
-                String.format(Messages.content_assist_proposal_local, bindingKey, context) };
+//        return new String[] { //
+//                String.format(Messages.content_assist_proposal_project, bindingKey, context),
+//                String.format(Messages.content_assist_proposal_workspace, bindingKey, context),
+//                String.format(Messages.content_assist_proposal_local, bindingKey, context) };
     }
 
     protected Collection<ICompletionProposal> getCompletionProposals(Collection<Proposal> proposals, String prefix,
@@ -259,7 +251,7 @@ public class SwaggerContentAssistProcessor extends TemplateCompletionProcessor
     protected ICompletionProposal createProposal(Template template, TemplateContext context, IRegion region,
             int relevance) {
         if (context instanceof DocumentTemplateContext) {
-            context = new SwaggerTemplateContext((DocumentTemplateContext) context);
+            // FIXME context = new SwaggerTemplateContext((DocumentTemplateContext) context);
         }
         return new StyledTemplateProposal(template, context, region, getImage(template), getTemplateLabel(template),
                 relevance);
@@ -272,7 +264,9 @@ public class SwaggerContentAssistProcessor extends TemplateCompletionProcessor
 
     @Override
     protected TemplateContextType getContextType(ITextViewer viewer, IRegion region) {
-        String contextType = SwaggerContextType.getContextType(currentPath.toString());
+    	 String contextType = 
+    			 "";
+       // FIXME  String contextType = SwaggerContextType.getContextType(currentPath.toString());
         ContextTypeRegistry registry = getContextTypeRegistry();
         if (registry != null) {
             return registry.getContextType(contextType);
@@ -283,15 +277,18 @@ public class SwaggerContentAssistProcessor extends TemplateCompletionProcessor
 
     @Override
     protected Image getImage(Template template) {
-        return Activator.getDefault().getImage(Icons.template_item);
+    	return null;
+       // FIXME  return Activator.getDefault().getImage(Icons.template_item);
     }
 
     protected TemplateStore geTemplateStore() {
-        return Activator.getDefault().getTemplateStore();
+    	return null;
+        // FIXME return Activator.getDefault().getTemplateStore();
     }
 
     protected ContextTypeRegistry getContextTypeRegistry() {
-        return Activator.getDefault().getContextTypeRegistry();
+    	return null;
+        // FIXME return Activator.getDefault().getContextTypeRegistry();
     }
 
     protected StyledString getTemplateLabel(Template template) {
