@@ -8,7 +8,7 @@
  * Contributors:
  *    ModelSolv, Inc. - initial API and implementation and/or initial documentation
  *******************************************************************************/
-package com.reprezen.swagedit.editor.hyperlinks;
+package com.reprezen.swagedit.core.hyperlinks;
 
 import java.net.URI;
 
@@ -19,7 +19,7 @@ import org.eclipse.jface.text.hyperlink.IHyperlink;
 import org.eclipse.ui.part.FileEditorInput;
 
 import com.fasterxml.jackson.core.JsonPointer;
-import com.reprezen.swagedit.editor.SwaggerDocument;
+import com.reprezen.swagedit.common.editor.JsonDocument;
 import com.reprezen.swagedit.json.references.JsonReference;
 import com.reprezen.swagedit.json.references.JsonReferenceFactory;
 import com.reprezen.swagedit.model.AbstractNode;
@@ -29,9 +29,11 @@ import com.reprezen.swagedit.utils.DocumentUtils;
  * Hyperlink detector that detects links from JSON references.
  * 
  */
-public class JsonReferenceHyperlinkDetector extends AbstractSwaggerHyperlinkDetector {
+public abstract class JsonReferenceHyperlinkDetector extends AbstractJsonHyperlinkDetector {
 
     protected final JsonReferenceFactory factory = new JsonReferenceFactory();
+    
+    protected abstract JsonFileHyperlink createFileHyperlink(IRegion linkRegion, String label, IFile file, JsonPointer pointer) ;
 
     @Override
     protected boolean canDetect(JsonPointer pointer) {
@@ -39,7 +41,7 @@ public class JsonReferenceHyperlinkDetector extends AbstractSwaggerHyperlinkDete
     }
 
     @Override
-    protected IHyperlink[] doDetect(SwaggerDocument doc, ITextViewer viewer, HyperlinkInfo info, JsonPointer pointer) {
+    protected IHyperlink[] doDetect(JsonDocument doc, ITextViewer viewer, HyperlinkInfo info, JsonPointer pointer) {
         URI baseURI = getBaseURI();
 
         AbstractNode node = doc.getModel().find(pointer);
@@ -68,10 +70,9 @@ public class JsonReferenceHyperlinkDetector extends AbstractSwaggerHyperlinkDete
                 return null;
             }
             IFile file = DocumentUtils.getWorkspaceFile(resolved);
-            if (file != null && file.exists()) {
-                return new IHyperlink[] { new SwaggerFileHyperlink(info.region, info.text, file,
-                        reference.getPointer()) };
-            }
+			if (file != null && file.exists()) {
+				return new IHyperlink[] { createFileHyperlink(info.region, info.text, file, reference.getPointer()) };
+			}
         }
 
         return null;

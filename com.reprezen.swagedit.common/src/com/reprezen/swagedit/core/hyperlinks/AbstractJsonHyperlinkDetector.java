@@ -8,7 +8,7 @@
  * Contributors:
  *    ModelSolv, Inc. - initial API and implementation and/or initial documentation
  *******************************************************************************/
-package com.reprezen.swagedit.editor.hyperlinks;
+package com.reprezen.swagedit.core.hyperlinks;
 
 import static com.google.common.base.Strings.emptyToNull;
 
@@ -20,12 +20,12 @@ import org.eclipse.jface.text.hyperlink.AbstractHyperlinkDetector;
 import org.eclipse.jface.text.hyperlink.IHyperlink;
 
 import com.fasterxml.jackson.core.JsonPointer;
-import com.reprezen.swagedit.editor.SwaggerDocument;
+import com.reprezen.swagedit.common.editor.JsonDocument;
 
-public abstract class AbstractSwaggerHyperlinkDetector extends AbstractHyperlinkDetector {
+public abstract class AbstractJsonHyperlinkDetector extends AbstractHyperlinkDetector {
 
     /**
-     * Contains details about potential hyperlinks inside a Swagger document.
+     * Contains details about potential hyperlinks inside a JSON document.
      */
     protected static class HyperlinkInfo {
 
@@ -58,7 +58,7 @@ public abstract class AbstractSwaggerHyperlinkDetector extends AbstractHyperlink
 
     @Override
     public IHyperlink[] detectHyperlinks(ITextViewer textViewer, IRegion region, boolean canShowMultipleHyperlinks) {
-        SwaggerDocument document = (SwaggerDocument) textViewer.getDocument();
+        JsonDocument document = (JsonDocument) textViewer.getDocument();
         JsonPointer basePath = document.getPath(region);
 
         if (!canDetect(basePath)) {
@@ -75,11 +75,11 @@ public abstract class AbstractSwaggerHyperlinkDetector extends AbstractHyperlink
 
     protected abstract boolean canDetect(JsonPointer pointer);
 
-    protected abstract IHyperlink[] doDetect(SwaggerDocument doc, ITextViewer viewer, HyperlinkInfo info,
+    protected abstract IHyperlink[] doDetect(JsonDocument doc, ITextViewer viewer, HyperlinkInfo info,
             JsonPointer pointer);
 
     protected HyperlinkInfo getHyperlinkInfo(ITextViewer viewer, IRegion region) {
-        final SwaggerDocument document = (SwaggerDocument) viewer.getDocument();
+        final JsonDocument document = (JsonDocument) viewer.getDocument();
         IRegion line;
         try {
             line = document.getLineInformationOfOffset(region.getOffset());

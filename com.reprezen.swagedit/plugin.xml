@@ -147,6 +147,7 @@
       <target
             id="com.reprezen.swagedit.hyperlink.target"
             name="SwagEdit">
+            <context type="org.eclipse.ui.texteditor.ITextEditor"/>
       </target>
    </extension>
 
@@ -168,7 +169,7 @@
       </hyperlinkDetector>
       <hyperlinkDetector
             activate="true"
-            class="com.reprezen.swagedit.editor.hyperlinks.JsonReferenceHyperlinkDetector"
+            class="com.reprezen.swagedit.editor.hyperlinks.SwaggerReferenceHyperlinkDetector"
             id="com.reprezen.swagedit.hyperlink.references"
             name="Open Reference"
             targetId="com.reprezen.swagedit.hyperlink.target">
