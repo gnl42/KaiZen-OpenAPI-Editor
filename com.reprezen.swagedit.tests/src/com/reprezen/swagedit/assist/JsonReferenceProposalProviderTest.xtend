@@ -24,11 +24,11 @@ import com.reprezen.swagedit.core.assist.Proposal
 class JsonReferenceProposalProviderTest {
 
 	extension PointerHelpers = new PointerHelpers
-	var JsonReferenceProposalProvider provider
+	var SwaggerReferenceProposalProvider provider
 
 	@Before
 	def void setUp() {
-		provider = new JsonReferenceProposalProvider {
+		provider = new SwaggerReferenceProposalProvider {
 			override protected getActiveFile() {
 				Mocks.mockJsonReferenceProposalFile()
 			}
@@ -128,21 +128,21 @@ class JsonReferenceProposalProviderTest {
 	def void testContextTypes() {
 		// schema definitions
 		assertTrue(
-			"/definitions/Foo/properties/bar/$ref".matches(JsonReferenceProposalProvider.SCHEMA_DEFINITION_REGEX))
+			"/definitions/Foo/properties/bar/$ref".matches(SwaggerReferenceProposalProvider.SCHEMA_DEFINITION_REGEX))
 		assertTrue(
-			"/paths/~1foo/get/responses/200/schema/$ref".matches(JsonReferenceProposalProvider.SCHEMA_DEFINITION_REGEX))
+			"/paths/~1foo/get/responses/200/schema/$ref".matches(SwaggerReferenceProposalProvider.SCHEMA_DEFINITION_REGEX))
 		assertTrue(
 			"/paths/~1foo/get/responses/200/schema/items/$ref".matches(
-				JsonReferenceProposalProvider.SCHEMA_DEFINITION_REGEX))
+				SwaggerReferenceProposalProvider.SCHEMA_DEFINITION_REGEX))
 
 		// responses
-		assertTrue("/paths/~1foo/get/responses/200/$ref".matches(JsonReferenceProposalProvider.RESPONSE_REGEX))
-		assertTrue("/paths/~1foo/get/responses/default/$ref".matches(JsonReferenceProposalProvider.RESPONSE_REGEX))
+		assertTrue("/paths/~1foo/get/responses/200/$ref".matches(SwaggerReferenceProposalProvider.RESPONSE_REGEX))
+		assertTrue("/paths/~1foo/get/responses/default/$ref".matches(SwaggerReferenceProposalProvider.RESPONSE_REGEX))
 
 		// parameters
-		assertTrue("/paths/~1/get/parameters/0/$ref".matches(JsonReferenceProposalProvider.PARAMETER_REGEX))
+		assertTrue("/paths/~1/get/parameters/0/$ref".matches(SwaggerReferenceProposalProvider.PARAMETER_REGEX))
 
 		// path items
-		assertTrue("/paths/~1pets~1{id}/$ref".matches(JsonReferenceProposalProvider.PATH_ITEM_REGEX))
+		assertTrue("/paths/~1pets~1{id}/$ref".matches(SwaggerReferenceProposalProvider.PATH_ITEM_REGEX))
 	}
 }

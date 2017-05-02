@@ -20,7 +20,10 @@ public class Messages extends NLS {
     public static String error_invalid_reference;
   
     public static String warning_simple_reference;
-
+    
+    public static String content_assist_proposal_local;
+    public static String content_assist_proposal_project;
+    public static String content_assist_proposal_workspace;
 
     static {
         NLS.initializeMessages(BUNDLE_NAME, Messages.class);

@@ -10,6 +10,8 @@
  *******************************************************************************/
 package com.reprezen.swagedit.core.assist;
 
+import static org.eclipse.ui.IWorkbenchCommandConstants.EDIT_CONTENT_ASSIST;
+
 import java.util.ArrayList;
 import java.util.Collection;
 import java.util.List;
@@ -39,6 +41,8 @@ import org.eclipse.swt.graphics.Image;
 import org.eclipse.swt.graphics.RGB;
 import org.eclipse.swt.graphics.TextStyle;
 import org.eclipse.swt.widgets.Display;
+import org.eclipse.ui.PlatformUI;
+import org.eclipse.ui.keys.IBindingService;
 
 import com.fasterxml.jackson.core.JsonPointer;
 import com.google.common.base.Strings;
@@ -46,7 +50,9 @@ import com.google.common.collect.Lists;
 import com.reprezen.swagedit.common.editor.JsonDocument;
 import com.reprezen.swagedit.core.Activator;
 import com.reprezen.swagedit.core.Activator.Icons;
+import com.reprezen.swagedit.core.assist.JsonReferenceProposalProvider.ContextType;
 import com.reprezen.swagedit.json.references.JsonReference;
+import com.reprezen.swagedit.json.references.Messages;
 import com.reprezen.swagedit.model.Model;
 import com.reprezen.swagedit.utils.SwaggerFileFinder.Scope;
 
@@ -57,8 +63,8 @@ public abstract class JsonContentAssistProcessor extends TemplateCompletionProce
         implements IContentAssistProcessor, ICompletionListener {
 
    private final JsonProposalProvider proposalProvider;
-   // FIXME private final JsonReferenceProposalProvider referenceProposalProvider = new JsonReferenceProposalProvider();
-    private final ContentAssistant contentAssistant;
+   private final JsonReferenceProposalProvider referenceProposalProvider;
+   private final ContentAssistant contentAssistant;
 
     /**
      * The pointer that helps us locate the current position of the cursor inside the document.
@@ -80,13 +86,15 @@ public abstract class JsonContentAssistProcessor extends TemplateCompletionProce
     private String[] textMessages;
     
 	public JsonContentAssistProcessor(ContentAssistant ca) {
-		this(ca, new JsonProposalProvider());
+		this(ca, new JsonProposalProvider(),
+				new JsonReferenceProposalProvider(ContextType.emptyContentTypeCollection()));
 	}
     
-    public JsonContentAssistProcessor(ContentAssistant ca, JsonProposalProvider proposalProvider) {
+    public JsonContentAssistProcessor(ContentAssistant ca, JsonProposalProvider proposalProvider, JsonReferenceProposalProvider referenceProposalProvider) {
         this.contentAssistant = ca;
-        this.textMessages = initTextMessages();
         this.proposalProvider = proposalProvider;
+        this.referenceProposalProvider = referenceProposalProvider;
+        this.textMessages = initTextMessages();
     }
     
     protected abstract TemplateStore getTemplateStore();
@@ -130,9 +138,7 @@ public abstract class JsonContentAssistProcessor extends TemplateCompletionProce
         Collection<Proposal> p;
         if (isRefCompletion) {
             updateStatus();
-            p = Lists.newArrayList();
-            // FIXME
-          //  p = referenceProposalProvider.getProposals(currentPath, document.asJson(), currentScope);
+            p = referenceProposalProvider.getProposals(currentPath, document.asJson(), currentScope);
         } else {
             clearStatus();
             p = proposalProvider.getProposals(currentPath, model, prefix);
@@ -174,20 +180,18 @@ public abstract class JsonContentAssistProcessor extends TemplateCompletionProce
         }
     }
 
-    protected String[] initTextMessages() {
-    	return new String[]{"FIXME"};
-    	// FIXME
-//        IBindingService bindingService = (IBindingService) PlatformUI.getWorkbench().getAdapter(IBindingService.class);
-//        String bindingKey = bindingService.getBestActiveBindingFormattedFor(EDIT_CONTENT_ASSIST);
-//
-//        ContextType contextType = ContextType.get(currentPath != null ? currentPath.toString() : "");
-//        String context = contextType != null ? contextType.label() : "";
+	protected String[] initTextMessages() {
+		IBindingService bindingService = (IBindingService) PlatformUI.getWorkbench().getAdapter(IBindingService.class);
+		String bindingKey = bindingService.getBestActiveBindingFormattedFor(EDIT_CONTENT_ASSIST);
 
-//        return new String[] { //
-//                String.format(Messages.content_assist_proposal_project, bindingKey, context),
-//                String.format(Messages.content_assist_proposal_workspace, bindingKey, context),
-//                String.format(Messages.content_assist_proposal_local, bindingKey, context) };
-    }
+		ContextType contextType = referenceProposalProvider.getContextTypes().get(getCurrentPath() != null ? getCurrentPath().toString() : "");
+		String context = contextType != null ? contextType.label() : "";
+
+		return new String[] { //
+				String.format(Messages.content_assist_proposal_project, bindingKey, context),
+				String.format(Messages.content_assist_proposal_workspace, bindingKey, context),
+				String.format(Messages.content_assist_proposal_local, bindingKey, context) };
+	}
 
     protected Collection<ICompletionProposal> getCompletionProposals(Collection<Proposal> proposals, String prefix,
             int offset) {

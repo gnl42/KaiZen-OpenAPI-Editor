@@ -10,7 +10,6 @@
  *******************************************************************************/
 package com.reprezen.swagedit.assist;
 
-import static org.eclipse.ui.IWorkbenchCommandConstants.EDIT_CONTENT_ASSIST;
 import org.eclipse.jface.text.IRegion;
 import org.eclipse.jface.text.contentassist.ContentAssistant;
 import org.eclipse.jface.text.contentassist.ICompletionProposal;
@@ -19,12 +18,8 @@ import org.eclipse.jface.text.templates.DocumentTemplateContext;
 import org.eclipse.jface.text.templates.Template;
 import org.eclipse.jface.text.templates.TemplateContext;
 import org.eclipse.jface.text.templates.persistence.TemplateStore;
-import org.eclipse.ui.PlatformUI;
-import org.eclipse.ui.keys.IBindingService;
 
 import com.reprezen.swagedit.Activator;
-import com.reprezen.swagedit.Messages;
-import com.reprezen.swagedit.assist.JsonReferenceProposalProvider.ContextType;
 import com.reprezen.swagedit.assist.ext.MediaTypeContentAssistExt;
 import com.reprezen.swagedit.core.assist.JsonContentAssistProcessor;
 import com.reprezen.swagedit.core.assist.JsonProposalProvider;
@@ -38,7 +33,7 @@ import com.reprezen.swagedit.templates.SwaggerTemplateContext;
 public class SwaggerContentAssistProcessor extends JsonContentAssistProcessor {
 	
 	public SwaggerContentAssistProcessor(ContentAssistant ca) {
-		super(ca, new JsonProposalProvider(new MediaTypeContentAssistExt()));
+		super(ca, new JsonProposalProvider(new MediaTypeContentAssistExt()), new SwaggerReferenceProposalProvider());
 	}
 
 	@Override
@@ -63,20 +58,6 @@ public class SwaggerContentAssistProcessor extends JsonContentAssistProcessor {
 			context = new SwaggerTemplateContext((DocumentTemplateContext) context);
 		}
 		return super.createProposal(template, context, region, relevance);
-	}
-
-	@Override
-	protected String[] initTextMessages() {
-		IBindingService bindingService = (IBindingService) PlatformUI.getWorkbench().getAdapter(IBindingService.class);
-		String bindingKey = bindingService.getBestActiveBindingFormattedFor(EDIT_CONTENT_ASSIST);
-
-		ContextType contextType = ContextType.get(getCurrentPath() != null ? getCurrentPath().toString() : "");
-		String context = contextType != null ? contextType.label() : "";
-
-		return new String[] { //
-				String.format(Messages.content_assist_proposal_project, bindingKey, context),
-				String.format(Messages.content_assist_proposal_workspace, bindingKey, context),
-				String.format(Messages.content_assist_proposal_local, bindingKey, context) };
 	}
 
 }

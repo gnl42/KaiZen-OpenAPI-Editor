@@ -8,9 +8,10 @@
  * Contributors:
  *    ModelSolv, Inc. - initial API and implementation and/or initial documentation
  *******************************************************************************/
-package com.reprezen.swagedit.assist;
+package com.reprezen.swagedit.core.assist;
 
 import java.util.Collection;
+import java.util.Collections;
 import java.util.Iterator;
 import java.util.List;
 
@@ -21,7 +22,6 @@ import com.fasterxml.jackson.core.JsonPointer;
 import com.fasterxml.jackson.databind.JsonNode;
 import com.google.common.base.Strings;
 import com.google.common.collect.Lists;
-import com.reprezen.swagedit.core.assist.Proposal;
 import com.reprezen.swagedit.json.references.JsonDocumentManager;
 import com.reprezen.swagedit.utils.DocumentUtils;
 import com.reprezen.swagedit.utils.SwaggerFileFinder;
@@ -33,15 +33,23 @@ import com.reprezen.swagedit.utils.URLUtils;
  */
 public class JsonReferenceProposalProvider {
 
-    protected static final String SCHEMA_DEFINITION_REGEX = "^/definitions/(\\w+/)+\\$ref|.*schema/(\\w+/)?\\$ref";
-    protected static final String RESPONSE_REGEX = ".*responses/(\\d+|default)/\\$ref";
-    protected static final String PARAMETER_REGEX = ".*/parameters/\\d+/\\$ref";
-    protected static final String PATH_ITEM_REGEX = "/paths/~1[^/]+/\\$ref";
-
     private final JsonDocumentManager manager = JsonDocumentManager.getInstance();
+	private final ContextTypeCollection contextTypes;
+    
+    public JsonReferenceProposalProvider(ContextTypeCollection contextTypes) {
+		this.contextTypes = contextTypes;
+	}
+    
+    public JsonReferenceProposalProvider(Iterable<ContextType> contextTypes) {
+		this(ContextType.newContentTypeCollection(contextTypes));
+	}
 
     protected IFile getActiveFile() {
         return DocumentUtils.getActiveEditorInput().getFile();
+    }
+    
+    protected ContextTypeCollection getContextTypes() {
+    	return contextTypes;
     }
 
     /**
@@ -61,7 +69,7 @@ public class JsonReferenceProposalProvider {
      * @return proposals
      */
     public Collection<Proposal> getProposals(JsonPointer pointer, JsonNode doc, Scope scope) {
-        final ContextType type = ContextType.get(pointer.toString());
+        final ContextType type = contextTypes.get(pointer.toString());
         final IFile currentFile = getActiveFile();
         final IPath basePath = currentFile.getParent().getFullPath();
         final List<Proposal> proposals = Lists.newArrayList();
@@ -85,19 +93,17 @@ public class JsonReferenceProposalProvider {
      * Represents the different contexts for which a JSON reference may be computed. <br/>
      * The context type is determined by the pointer (path) on which the completion proposal has been activated.
      */
-    protected enum ContextType {
-        SCHEMA_DEFINITION("definitions", "schemas"), //
-        PATH_ITEM("paths", "path items"), //
-        PATH_PARAMETER("parameters", "parameters"), //
-        PATH_RESPONSE("responses", "responses"), //
-        UNKNOWN(null, "");
+    public static class ContextType {
+        public static final ContextType UNKNOWN = new ContextType(null, "", null);
 
         private final String value;
         private final String label;
+		private final String regex;
 
-        private ContextType(String value, String label) {
+        public ContextType(String value, String label, String regex) {
             this.value = value;
             this.label = label;
+			this.regex = regex;
         }
 
         public String value() {
@@ -107,24 +113,35 @@ public class JsonReferenceProposalProvider {
         public String label() {
             return label;
         }
-
-        public static ContextType get(String path) {
-            if (Strings.emptyToNull(path) == null) {
-                return UNKNOWN;
-            }
-
-            if (path.matches(SCHEMA_DEFINITION_REGEX)) {
-                return SCHEMA_DEFINITION;
-            } else if (path.matches(PARAMETER_REGEX)) {
-                return PATH_PARAMETER;
-            } else if (path.matches(RESPONSE_REGEX)) {
-                return PATH_RESPONSE;
-            } else if (path.matches(PATH_ITEM_REGEX)) {
-                return PATH_ITEM;
-            }
-
-            return UNKNOWN;
+        
+        public static ContextTypeCollection newContentTypeCollection(Iterable<ContextType> contextTypes) {
+        	return new ContextTypeCollection(contextTypes);
         }
+        
+		public static ContextTypeCollection emptyContentTypeCollection() {
+			return new ContextTypeCollection(Collections.<ContextType>emptyList());
+		}
+    }
+    
+    public static class ContextTypeCollection {
+    	
+    	private final Iterable<ContextType> contextTypes;
+
+		protected ContextTypeCollection(Iterable<ContextType> contextTypes) {
+			this.contextTypes = contextTypes;
+    	}
+		
+		public ContextType get(String path) {
+			if (Strings.emptyToNull(path) == null) {
+				return ContextType.UNKNOWN;
+			}
+			for (ContextType next : contextTypes) {
+				if (path.matches(next.regex)) {
+					return next;
+				}
+			}
+			return ContextType.UNKNOWN;
+		}
     }
 
     /**
@@ -135,7 +152,7 @@ public class JsonReferenceProposalProvider {
      * @param path
      * @return Collection of proposals
      */
-    protected Collection<Proposal> collectProposals(JsonNode document, String fieldName, IPath path) {
+    public Collection<Proposal> collectProposals(JsonNode document, String fieldName, IPath path) {
         final Collection<Proposal> results = Lists.newArrayList();
         if (fieldName == null || !document.has(fieldName)) {
             return results;
