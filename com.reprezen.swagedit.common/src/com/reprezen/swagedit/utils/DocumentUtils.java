@@ -38,7 +38,6 @@ import org.eclipse.ui.part.ShowInContext;
 import org.eclipse.ui.texteditor.ITextEditor;
 
 import com.google.common.io.CharStreams;
-import com.reprezen.swagedit.common.editor.JsonDocument;
 
 public class DocumentUtils {
 

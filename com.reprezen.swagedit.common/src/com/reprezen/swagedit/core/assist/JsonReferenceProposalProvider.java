@@ -10,6 +10,7 @@
  *******************************************************************************/
 package com.reprezen.swagedit.core.assist;
 
+import java.util.Arrays;
 import java.util.Collection;
 import java.util.Collections;
 import java.util.Iterator;
@@ -27,6 +28,8 @@ import com.reprezen.swagedit.utils.DocumentUtils;
 import com.reprezen.swagedit.utils.SwaggerFileFinder;
 import com.reprezen.swagedit.utils.SwaggerFileFinder.Scope;
 import com.reprezen.swagedit.utils.URLUtils;
+import com.reprezen.swagedit.validation.SwaggerError;
+import com.reprezen.swagedit.validation.ValidationUtil;
 
 /**
  * Completion proposal provider for JSON references.
@@ -154,11 +157,14 @@ public class JsonReferenceProposalProvider {
      */
     public Collection<Proposal> collectProposals(JsonNode document, String fieldName, IPath path) {
         final Collection<Proposal> results = Lists.newArrayList();
-        if (fieldName == null || !document.has(fieldName)) {
+        if (fieldName == null) {
             return results;
         }
 
-        final JsonNode parameters = document.get(fieldName);
+		final JsonNode parameters = ValidationUtil.findNode(fieldName, document);
+        if (parameters == null) {
+        	return results;
+        }
         final String basePath = (path != null ? path.toString() : "") + "#/" + fieldName + "/";
 
         for (Iterator<String> it = parameters.fieldNames(); it.hasNext();) {

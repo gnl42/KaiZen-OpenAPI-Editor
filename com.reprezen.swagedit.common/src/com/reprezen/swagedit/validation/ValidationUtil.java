@@ -11,6 +11,7 @@
 package com.reprezen.swagedit.validation;
 
 import java.util.Arrays;
+import java.util.LinkedList;
 import java.util.List;
 
 import org.yaml.snakeyaml.nodes.MappingNode;
@@ -19,6 +20,8 @@ import org.yaml.snakeyaml.nodes.NodeTuple;
 import org.yaml.snakeyaml.nodes.ScalarNode;
 
 import com.fasterxml.jackson.databind.JsonNode;
+import com.google.common.base.Strings;
+import com.google.common.collect.Lists;
 
 public class ValidationUtil {
     
@@ -103,6 +106,33 @@ public class ValidationUtil {
             return findNode((MappingNode) child.getValueNode(), paths);
         }
         return child.getKeyNode();
+    }
+    
+    public static JsonNode findNode(String path, JsonNode root) {
+    	return findNode(Lists.newLinkedList(Arrays.asList(path.split("/"))), root);
+    }
+    
+    private static JsonNode findNode(LinkedList<String> path, JsonNode root) {
+        if (root == null) {
+            return null;
+        }
+        // retrieves the first element, and also *removes* it
+        String firstSegment = path.pop();
+        if (Strings.isNullOrEmpty(firstSegment)) {
+            return findNode(path, root);
+        }
+        int firstSegmentAsNumber = -1;
+        try {
+            firstSegmentAsNumber = Integer.parseInt(firstSegment);
+        } catch (NumberFormatException e) {
+            // ignore
+        }
+        JsonNode nodeForSegment = firstSegmentAsNumber == -1 ? root.get(firstSegment) : root
+                .get(firstSegmentAsNumber);
+        if (path.isEmpty()) {
+            return nodeForSegment;
+        }
+        return findNode(path, nodeForSegment);
     }
 
 }
