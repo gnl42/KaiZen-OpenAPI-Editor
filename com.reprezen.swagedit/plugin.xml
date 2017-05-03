@@ -193,7 +193,7 @@
    <extension point="org.eclipse.ui.ide.markerResolution">
       <markerResolutionGenerator
          markerType="org.eclipse.core.resources.problemmarker"
-         class="com.reprezen.swagedit.validation.QuickFixer"/>
+         class="com.reprezen.swagedit.validation.SwaggerQuickFixer"/>
    </extension>
    
 </plugin>

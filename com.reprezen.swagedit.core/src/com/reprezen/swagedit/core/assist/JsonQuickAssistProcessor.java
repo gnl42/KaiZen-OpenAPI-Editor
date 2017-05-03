@@ -8,7 +8,7 @@
  * Contributors:
  *    ModelSolv, Inc. - initial API and implementation and/or initial documentation
  *******************************************************************************/
-package com.reprezen.swagedit.assist;
+package com.reprezen.swagedit.core.assist;
 
 import java.util.Iterator;
 import java.util.List;
@@ -33,14 +33,14 @@ import org.eclipse.ui.IMarkerResolutionGenerator2;
 import org.eclipse.ui.texteditor.MarkerAnnotation;
 
 import com.google.common.collect.Lists;
-import com.reprezen.swagedit.Activator;
-import com.reprezen.swagedit.validation.QuickFixer.TextDocumentMarkerResolution;
+import com.reprezen.swagedit.core.Activator;
+import com.reprezen.swagedit.core.validation.TextDocumentMarkerResolution;
 
-public class SwaggerQuickAssistProcessor implements IQuickAssistProcessor {
+public class JsonQuickAssistProcessor implements IQuickAssistProcessor {
     private final IMarkerResolutionGenerator2 quickFixer;
     private String errorMessage;
 
-    public SwaggerQuickAssistProcessor(IMarkerResolutionGenerator2 quickFixer) {
+    public JsonQuickAssistProcessor(IMarkerResolutionGenerator2 quickFixer) {
         this.quickFixer = quickFixer;
     }
 

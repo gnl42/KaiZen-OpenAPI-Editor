@@ -38,8 +38,10 @@ import org.eclipse.jface.text.templates.persistence.TemplateStore;
 import org.eclipse.swt.widgets.Shell;
 
 import com.reprezen.swagedit.core.assist.JsonContentAssistProcessor;
+import com.reprezen.swagedit.core.assist.JsonQuickAssistProcessor;
 import com.reprezen.swagedit.core.editor.outline.QuickOutline;
 import com.reprezen.swagedit.core.schema.CompositeSchema;
+import com.reprezen.swagedit.core.validation.QuickFixer;
 
 public abstract class JsonSourceViewerConfiguration extends YEditSourceViewerConfiguration {
 
@@ -155,9 +157,8 @@ public abstract class JsonSourceViewerConfiguration extends YEditSourceViewerCon
     @Override
     public IQuickAssistAssistant getQuickAssistAssistant(ISourceViewer sourceViewer) {
         QuickAssistAssistant assistant = new QuickAssistAssistant();
-        // FIXME
-//        assistant.setQuickAssistProcessor(new SwaggerQuickAssistProcessor(new QuickFixer()));
-//        assistant.setInformationControlCreator(getInformationControlCreator(sourceViewer));
+        assistant.setQuickAssistProcessor(new JsonQuickAssistProcessor(new QuickFixer()));
+        assistant.setInformationControlCreator(getInformationControlCreator(sourceViewer));
         return assistant;
     }
 

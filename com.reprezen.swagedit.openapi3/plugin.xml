@@ -87,4 +87,10 @@
       </hyperlinkDetector>
    </extension>
    
+   <extension point="org.eclipse.ui.ide.markerResolution">
+      <markerResolutionGenerator
+         markerType="org.eclipse.core.resources.problemmarker"
+         class="com.reprezen.swagedit.openapi3.validation.OpenApi3QuickFixer"/>
+   </extension>
+   
 </plugin>
