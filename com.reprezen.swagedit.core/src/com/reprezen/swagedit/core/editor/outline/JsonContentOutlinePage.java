@@ -30,14 +30,14 @@ import com.reprezen.swagedit.core.editor.JsonDocument;
 import com.reprezen.swagedit.core.model.AbstractNode;
 import com.reprezen.swagedit.core.model.Model;
 
-public class SwaggerContentOutlinePage extends ContentOutlinePage {
+public class JsonContentOutlinePage extends ContentOutlinePage {
 
     private final IDocumentProvider documentProvider;
     private final IShowInTarget showInTarget;
 
     private Object currentInput;
 
-    public SwaggerContentOutlinePage(IDocumentProvider documentProvider, IShowInTarget showInTarget) {
+    public JsonContentOutlinePage(IDocumentProvider documentProvider, IShowInTarget showInTarget) {
         super();
         this.documentProvider = documentProvider;
         this.showInTarget = showInTarget;

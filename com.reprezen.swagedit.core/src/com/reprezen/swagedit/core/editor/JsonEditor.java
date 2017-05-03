@@ -72,9 +72,11 @@ import org.eclipse.ui.part.IShowInTarget;
 import org.eclipse.ui.part.ShowInContext;
 import org.eclipse.ui.swt.IFocusService;
 import org.eclipse.ui.texteditor.IDocumentProvider;
+import org.eclipse.ui.views.contentoutline.IContentOutlinePage;
 import org.yaml.snakeyaml.error.YAMLException;
 
 import com.fasterxml.jackson.core.JsonProcessingException;
+import com.reprezen.swagedit.core.editor.outline.JsonContentOutlinePage;
 import com.reprezen.swagedit.core.handlers.OpenQuickOutlineHandler;
 import com.reprezen.swagedit.core.model.AbstractNode;
 import com.reprezen.swagedit.core.validation.SwaggerError;
@@ -109,10 +111,9 @@ public abstract class JsonEditor extends YEdit implements IShowInSource, IShowIn
                     @Override
                     public void run() {
                         document.onChange();
-                        // FIXME
-//                        if (contentOutline != null) {
-//                            contentOutline.setInput(getEditorInput());
-//                        }
+                        if (contentOutline != null) {
+                            contentOutline.setInput(getEditorInput());
+                        }
                         runValidate(false);
                     }
                 });
@@ -200,13 +201,13 @@ public abstract class JsonEditor extends YEdit implements IShowInSource, IShowIn
 //            }
         }
     };
-	
-   // private SwaggerContentOutlinePage contentOutline;
 
-    public JsonEditor(JsonDocumentProvider documentProvider) {
-        super();
-        setDocumentProvider(documentProvider);
-    }
+	private JsonContentOutlinePage contentOutline;
+	
+	public JsonEditor(JsonDocumentProvider documentProvider) {
+		super();
+		setDocumentProvider(documentProvider);
+	}
 
     @Override
     public void init(IEditorSite site, IEditorInput input) throws PartInitException {
@@ -242,15 +243,15 @@ public abstract class JsonEditor extends YEdit implements IShowInSource, IShowIn
     @SuppressWarnings("rawtypes")
     public Object getAdapter(Class required) {
         Object adapter = super.getAdapter(required);
-// FIXME
-//        if (IContentOutlinePage.class.equals(required)) {
-//            if (contentOutline == null) {
-//                contentOutline = new SwaggerContentOutlinePage(getDocumentProvider(), this);
-//                if (getEditorInput() != null)
-//                    contentOutline.setInput(getEditorInput());
-//            }
-//            adapter = contentOutline;
-//        }
+        if (IContentOutlinePage.class.equals(required)) {
+            if (contentOutline == null) {
+                contentOutline = new JsonContentOutlinePage(getDocumentProvider(), this);
+                if (getEditorInput() != null) {
+                    contentOutline.setInput(getEditorInput());
+                }
+            }
+            adapter = contentOutline;
+        }
 
         return adapter;
     }
