@@ -7,6 +7,7 @@ import org.junit.Test
 
 import static org.junit.Assert.*
 import com.reprezen.swagedit.schema.SwaggerSchema
+import com.reprezen.swagedit.core.editor.outline.OutlineStyledLabelProvider
 
 class OutlineStyledLabelProviderTest {
 

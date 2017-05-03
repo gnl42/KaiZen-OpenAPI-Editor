@@ -8,15 +8,22 @@
  * Contributors:
  *    ModelSolv, Inc. - initial API and implementation and/or initial documentation
  *******************************************************************************/
-package com.reprezen.swagedit.openapi3.editor;
+package com.reprezen.swagedit.core;
 
-import com.reprezen.swagedit.core.editor.JsonDocument;
-import com.reprezen.swagedit.openapi3.Activator;
+import org.eclipse.osgi.util.NLS;
 
-public class OpenApi3Document extends JsonDocument {
+public class Messages extends NLS {
 
-	public OpenApi3Document() {
-		super(io.swagger.util.Yaml.mapper(), Activator.getDefault().getSchema());
-	}
+    private static final String BUNDLE_NAME = "com.reprezen.swagedit.core.messages";
 
+    public static String outline_proposal_local;
+    public static String outline_proposal_project;
+    public static String outline_proposal_workspace;
+
+    static {
+        NLS.initializeMessages(BUNDLE_NAME, Messages.class);
+    }
+
+    private Messages() {
+    }
 }

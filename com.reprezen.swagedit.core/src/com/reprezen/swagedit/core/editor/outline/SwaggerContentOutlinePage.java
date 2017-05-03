@@ -8,7 +8,7 @@
  * Contributors:
  *    ModelSolv, Inc. - initial API and implementation and/or initial documentation
  *******************************************************************************/
-package com.reprezen.swagedit.editor.outline;
+package com.reprezen.swagedit.core.editor.outline;
 
 import static com.google.common.collect.Iterables.filter;
 import static com.google.common.collect.Iterables.toArray;
@@ -26,9 +26,9 @@ import org.eclipse.ui.texteditor.IDocumentProvider;
 import org.eclipse.ui.views.contentoutline.ContentOutlinePage;
 
 import com.google.common.base.Predicate;
+import com.reprezen.swagedit.core.editor.JsonDocument;
 import com.reprezen.swagedit.core.model.AbstractNode;
 import com.reprezen.swagedit.core.model.Model;
-import com.reprezen.swagedit.editor.SwaggerDocument;
 
 public class SwaggerContentOutlinePage extends ContentOutlinePage {
 
@@ -74,8 +74,8 @@ public class SwaggerContentOutlinePage extends ContentOutlinePage {
     protected void update() {
         final IDocument document = documentProvider.getDocument(currentInput);
 
-        if (document instanceof SwaggerDocument) {
-            final Model model = ((SwaggerDocument) document).getModel();
+        if (document instanceof JsonDocument) {
+            final Model model = ((JsonDocument) document).getModel();
             if (model == null) {
                 return;
             }

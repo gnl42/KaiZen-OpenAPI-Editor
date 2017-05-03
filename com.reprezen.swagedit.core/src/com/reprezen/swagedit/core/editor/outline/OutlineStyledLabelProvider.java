@@ -8,7 +8,7 @@
  * Contributors:
  *    ModelSolv, Inc. - initial API and implementation and/or initial documentation
  *******************************************************************************/
-package com.reprezen.swagedit.editor.outline;
+package com.reprezen.swagedit.core.editor.outline;
 
 import org.eclipse.jface.viewers.StyledCellLabelProvider;
 import org.eclipse.jface.viewers.StyledString;
@@ -21,8 +21,8 @@ import org.eclipse.swt.graphics.TextStyle;
 import org.eclipse.swt.widgets.Display;
 
 import com.google.common.collect.Iterables;
-import com.reprezen.swagedit.Activator;
-import com.reprezen.swagedit.Activator.Icons;
+import com.reprezen.swagedit.core.Activator;
+import com.reprezen.swagedit.core.Activator.Icons;
 import com.reprezen.swagedit.core.model.AbstractNode;
 import com.reprezen.swagedit.core.schema.TypeDefinition;
 
@@ -68,7 +68,7 @@ public class OutlineStyledLabelProvider extends StyledCellLabelProvider {
         }
     }
 
-    protected StyledString getStyledString(AbstractNode element) {
+    public StyledString getStyledString(AbstractNode element) {
         StyledString styledString = new StyledString(element.getText(), getTextStyler());
 
         if (element.getParent() != null && (element.isObject() || element.isArray())) {

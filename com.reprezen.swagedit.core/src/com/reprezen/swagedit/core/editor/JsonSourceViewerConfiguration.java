@@ -38,8 +38,10 @@ import org.eclipse.jface.text.templates.persistence.TemplateStore;
 import org.eclipse.swt.widgets.Shell;
 
 import com.reprezen.swagedit.core.assist.JsonContentAssistProcessor;
+import com.reprezen.swagedit.core.editor.outline.QuickOutline;
+import com.reprezen.swagedit.core.schema.CompositeSchema;
 
-public class JsonSourceViewerConfiguration extends YEditSourceViewerConfiguration {
+public abstract class JsonSourceViewerConfiguration extends YEditSourceViewerConfiguration {
 
     private JsonEditor editor;
     private YAMLScanner scanner;
@@ -50,6 +52,8 @@ public class JsonSourceViewerConfiguration extends YEditSourceViewerConfiguratio
         super();
 		this.store = store;
     }
+    
+    abstract protected CompositeSchema getSchema();
 
     @Override
     public IContentAssistant getContentAssistant(ISourceViewer sourceViewer) {
@@ -160,10 +164,15 @@ public class JsonSourceViewerConfiguration extends YEditSourceViewerConfiguratio
     private IInformationControlCreator getOutlineInformationControlCreator() {
         return new IInformationControlCreator() {
             public IInformationControl createInformationControl(Shell parent) {
-            	// FIXME 
-//                QuickOutline dialog = new QuickOutline(parent, getEditor());
-//                return dialog;
-            	return null;
+                QuickOutline dialog = new QuickOutline(parent, getEditor()) {
+
+					@Override
+					protected CompositeSchema getSchema() {
+						return JsonSourceViewerConfiguration.this.getSchema();
+					}
+                	
+                };
+                return dialog;
             }
         };
     }

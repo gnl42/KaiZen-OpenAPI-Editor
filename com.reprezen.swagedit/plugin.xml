@@ -175,43 +175,6 @@
             targetId="com.reprezen.swagedit.hyperlink.target">
       </hyperlinkDetector>
    </extension>
-
-   <extension
-         point="org.eclipse.ui.commands">
-      <command
-            description="Open Quick Outline"
-            id="com.reprezen.swagedit.commands.quickoutline"
-            name="Open Quick Outline">
-      </command>
-   </extension>
-
-   <extension
-         point="org.eclipse.ui.bindings">
-      <key
-            sequence="M1+O"
-            commandId="com.reprezen.swagedit.commands.quickoutline"
-            contextId="com.reprezen.swagedit.context"
-            schemeId="org.eclipse.ui.defaultAcceleratorConfiguration">
-      </key>
-   </extension>
-
-   <extension
-         point="org.eclipse.ui.contexts">
-      <context
-            description="Context for SwagEdit"
-            id="com.reprezen.swagedit.context"
-            name="SwagEdit"
-            parentId="org.eclipse.ui.textEditorScope">
-      </context>
-   </extension>
-
-   <extension
-         point="org.eclipse.ui.handlers">
-      <handler
-            class="com.reprezen.swagedit.handlers.OpenQuickOutlineHandler"
-            commandId="com.reprezen.swagedit.commands.quickoutline">
-      </handler>
-   </extension>
    
    <extension
          point="org.eclipse.ui.themes">

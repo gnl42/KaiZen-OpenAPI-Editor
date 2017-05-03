@@ -9,6 +9,7 @@ import org.eclipse.jface.text.source.ISourceViewer;
 import com.reprezen.swagedit.core.assist.JsonContentAssistProcessor;
 import com.reprezen.swagedit.core.editor.JsonEditor;
 import com.reprezen.swagedit.core.editor.JsonSourceViewerConfiguration;
+import com.reprezen.swagedit.core.schema.CompositeSchema;
 import com.reprezen.swagedit.openapi3.Activator;
 import com.reprezen.swagedit.openapi3.assist.OpenApi3ContentAssistProcessor;
 import com.reprezen.swagedit.openapi3.hyperlinks.OpenApi3ReferenceHyperlinkDetector;
@@ -42,6 +43,11 @@ public class OpenApi3Editor extends JsonEditor {
 		@Override
 		public IHyperlinkDetector[] getHyperlinkDetectors(ISourceViewer sourceViewer) {
 			return new IHyperlinkDetector[] { new URLHyperlinkDetector(), new OpenApi3ReferenceHyperlinkDetector() };
+		}
+		
+		@Override
+		protected CompositeSchema getSchema() {
+			return Activator.getDefault().getSchema();
 		}
 
 	}

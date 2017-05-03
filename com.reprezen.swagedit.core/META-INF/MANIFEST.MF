@@ -1,7 +1,7 @@
 Manifest-Version: 1.0
 Bundle-ManifestVersion: 2
-Bundle-Name: SwagEdit Shared Plugins
-Bundle-SymbolicName: com.reprezen.swagedit.core
+Bundle-Name: SwagEdit Core Plugin
+Bundle-SymbolicName: com.reprezen.swagedit.core;singleton:=true
 Bundle-Version: 0.1.0.qualifier
 Bundle-Vendor: RepreZen, Inc.
 Require-Bundle: org.eclipse.ui,
@@ -19,6 +19,8 @@ Bundle-ActivationPolicy: lazy
 Export-Package: com.reprezen.swagedit.core.assist,
  com.reprezen.swagedit.core.assist.ext,
  com.reprezen.swagedit.core.editor,
+ com.reprezen.swagedit.core.editor.outline,
+ com.reprezen.swagedit.core.handlers,
  com.reprezen.swagedit.core.hyperlinks,
  com.reprezen.swagedit.core.json.references,
  com.reprezen.swagedit.core.model,

@@ -75,6 +75,7 @@ import org.eclipse.ui.texteditor.IDocumentProvider;
 import org.yaml.snakeyaml.error.YAMLException;
 
 import com.fasterxml.jackson.core.JsonProcessingException;
+import com.reprezen.swagedit.core.handlers.OpenQuickOutlineHandler;
 import com.reprezen.swagedit.core.model.AbstractNode;
 import com.reprezen.swagedit.core.validation.SwaggerError;
 import com.reprezen.swagedit.core.validation.Validator;
@@ -85,7 +86,6 @@ import com.reprezen.swagedit.core.validation.Validator;
  */
 public abstract class JsonEditor extends YEdit implements IShowInSource, IShowInTarget {
 
-    public static final String ID = "com.reprezen.swagedit.editor";
     public static final String CONTEXT = "com.reprezen.swagedit.context";
 
     private final Validator validator = new Validator();
@@ -334,36 +334,33 @@ public abstract class JsonEditor extends YEdit implements IShowInSource, IShowIn
 
             @Override
             public void doOperation(int operation) {
-            	// FIXME
-//                if (operation == OpenQuickOutlineHandler.QUICK_OUTLINE && outlinePresenter != null) {
-//                    outlinePresenter.showInformation();
-//                    return;
-//                }
+                if (operation == OpenQuickOutlineHandler.QUICK_OUTLINE && outlinePresenter != null) {
+                    outlinePresenter.showInformation();
+                    return;
+                }
                 super.doOperation(operation);
             }
 
             @Override
             public boolean canDoOperation(int operation) {
-            	// FIXME
-//                if (operation == OpenQuickOutlineHandler.QUICK_OUTLINE && outlinePresenter != null) {
-//                    return true;
-//                }
+                if (operation == OpenQuickOutlineHandler.QUICK_OUTLINE && outlinePresenter != null) {
+                    return true;
+                }
                 return super.canDoOperation(operation);
             }
 
             @Override
             public void configure(SourceViewerConfiguration configuration) {
                 super.configure(configuration);
-                // FIXME
+ 
+                if (configuration instanceof JsonSourceViewerConfiguration) {
+                	JsonSourceViewerConfiguration c = (JsonSourceViewerConfiguration) configuration;
+                    outlinePresenter = c.getOutlinePresenter(this);
 
-//                if (configuration instanceof SwaggerSourceViewerConfiguration) {
-//                    SwaggerSourceViewerConfiguration c = (SwaggerSourceViewerConfiguration) configuration;
-//                    outlinePresenter = c.getOutlinePresenter(this);
-//
-//                    if (outlinePresenter != null) {
-//                        outlinePresenter.install(this);
-//                    }
-//                }
+                    if (outlinePresenter != null) {
+                        outlinePresenter.install(this);
+                    }
+                }
             }
         };
 

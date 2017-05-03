@@ -8,7 +8,7 @@
  * Contributors:
  *    ModelSolv, Inc. - initial API and implementation and/or initial documentation
  *******************************************************************************/
-package com.reprezen.swagedit.editor.outline;
+package com.reprezen.swagedit.core.editor.outline;
 
 import java.util.List;
 

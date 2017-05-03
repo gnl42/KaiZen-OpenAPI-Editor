@@ -22,8 +22,7 @@ import com.reprezen.swagedit.core.editor.JsonEditor;
 public class SwaggerEditor extends JsonEditor {
 
     public static final String ID = "com.reprezen.swagedit.editor";
-    public static final String CONTEXT = "com.reprezen.swagedit.context";
-
+  
     public SwaggerEditor() {
         super(new SwaggerDocumentProvider());
     }

@@ -9,6 +9,7 @@ import org.eclipse.jface.text.source.ISourceViewer;
 import com.reprezen.swagedit.assist.SwaggerContentAssistProcessor;
 import com.reprezen.swagedit.core.assist.JsonContentAssistProcessor;
 import com.reprezen.swagedit.core.editor.JsonSourceViewerConfiguration;
+import com.reprezen.swagedit.core.schema.CompositeSchema;
 import com.reprezen.swagedit.editor.hyperlinks.DefinitionHyperlinkDetector;
 import com.reprezen.swagedit.editor.hyperlinks.PathParamHyperlinkDetector;
 import com.reprezen.swagedit.editor.hyperlinks.SwaggerReferenceHyperlinkDetector;
@@ -28,6 +29,11 @@ public class SwaggerSourceViewerConfiguration extends JsonSourceViewerConfigurat
 	public IHyperlinkDetector[] getHyperlinkDetectors(ISourceViewer sourceViewer) {
 		return new IHyperlinkDetector[] { new URLHyperlinkDetector(), new SwaggerReferenceHyperlinkDetector(),
 				new PathParamHyperlinkDetector(), new DefinitionHyperlinkDetector() };
+	}
+	
+	@Override
+	protected CompositeSchema getSchema() {
+		return com.reprezen.swagedit.Activator.getDefault().getSchema();
 	}
 
 }

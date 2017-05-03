@@ -8,7 +8,7 @@
  * Contributors:
  *    ModelSolv, Inc. - initial API and implementation and/or initial documentation
  *******************************************************************************/
-package com.reprezen.swagedit.editor.outline;
+package com.reprezen.swagedit.core.editor.outline;
 
 import java.util.Timer;
 import java.util.TimerTask;
@@ -54,29 +54,31 @@ import org.eclipse.ui.keys.IBindingService;
 import org.eclipse.ui.part.ShowInContext;
 
 import com.google.common.base.Strings;
-import com.reprezen.swagedit.Activator;
-import com.reprezen.swagedit.Messages;
+import com.reprezen.swagedit.core.Messages;
+import com.reprezen.swagedit.core.editor.JsonEditor;
 import com.reprezen.swagedit.core.model.AbstractNode;
 import com.reprezen.swagedit.core.model.Model;
+import com.reprezen.swagedit.core.schema.CompositeSchema;
 import com.reprezen.swagedit.core.utils.DocumentUtils;
 import com.reprezen.swagedit.core.utils.SwaggerFileFinder;
 import com.reprezen.swagedit.core.utils.SwaggerFileFinder.Scope;
-import com.reprezen.swagedit.editor.SwaggerEditor;
 
-public class QuickOutline extends PopupDialog
+public abstract class QuickOutline extends PopupDialog
         implements IInformationControl, IInformationControlExtension, IInformationControlExtension2 {
 
-    public static final String COMMAND_ID = "com.reprezen.swagedit.commands.quickoutline";
+    public static final String COMMAND_ID = "com.reprezen.swagedit.core.commands.quickoutline";
 
     private Scope currentScope = Scope.LOCAL;
     private TreeViewer treeViewer;
-    private SwaggerEditor editor;
+    private JsonEditor editor;
     private Text filterText;
     private TriggerSequence triggerSequence;
     private String bindingKey;
     private Timer filterTimer = null;
+    
+    abstract protected CompositeSchema getSchema();
 
-    public QuickOutline(Shell parent, SwaggerEditor editor) {
+    public QuickOutline(Shell parent, JsonEditor editor) {
         super(parent, PopupDialog.INFOPOPUPRESIZE_SHELLSTYLE, true, true, true, true, true, null, null);
 
         IBindingService bindingService = (IBindingService) PlatformUI.getWorkbench().getAdapter(IBindingService.class);
@@ -185,7 +187,7 @@ public class QuickOutline extends PopupDialog
             treeViewer.setAutoExpandLevel(0);
         }
 
-        setInput(Model.parseYaml(files, Activator.getDefault().getSchema()));
+        setInput(Model.parseYaml(files, getSchema()));
     }
 
     protected String statusMessage() {

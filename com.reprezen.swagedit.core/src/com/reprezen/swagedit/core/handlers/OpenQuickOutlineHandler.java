@@ -8,7 +8,7 @@
  * Contributors:
  *    ModelSolv, Inc. - initial API and implementation and/or initial documentation
  *******************************************************************************/
-package com.reprezen.swagedit.handlers;
+package com.reprezen.swagedit.core.handlers;
 
 import org.eclipse.core.commands.AbstractHandler;
 import org.eclipse.core.commands.ExecutionEvent;
@@ -19,7 +19,7 @@ import org.eclipse.swt.widgets.Control;
 import org.eclipse.ui.IEditorPart;
 import org.eclipse.ui.handlers.HandlerUtil;
 
-import com.reprezen.swagedit.editor.SwaggerEditor;
+import com.reprezen.swagedit.core.editor.JsonEditor;
 
 public class OpenQuickOutlineHandler extends AbstractHandler {
 
@@ -39,8 +39,8 @@ public class OpenQuickOutlineHandler extends AbstractHandler {
 
         if (viewer == null) {
             IEditorPart editor = HandlerUtil.getActiveEditor(event);
-            if (editor instanceof SwaggerEditor) {
-                viewer = ((SwaggerEditor) editor).getProjectionViewer();
+            if (editor instanceof JsonEditor) {
+                viewer = ((JsonEditor) editor).getProjectionViewer();
             }
         }
 
