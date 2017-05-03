@@ -31,6 +31,7 @@ import org.eclipse.core.runtime.IStatus;
 import org.eclipse.core.runtime.Status;
 import org.eclipse.core.runtime.jobs.Job;
 import org.eclipse.jface.dialogs.MessageDialog;
+import org.eclipse.jface.preference.IPreferenceStore;
 import org.eclipse.jface.text.DocumentEvent;
 import org.eclipse.jface.text.IDocument;
 import org.eclipse.jface.text.IDocumentListener;
@@ -126,86 +127,15 @@ public abstract class JsonEditor extends YEdit implements IShowInSource, IShowIn
      * preferences. Once a color change happens, the editor is re-initialized.
      * It also handles changes in validation preferences
      */
-    private final IPropertyChangeListener preferenceChangeListener = new IPropertyChangeListener() {
-
-        private final List<String> colorPreferenceKeys = new ArrayList<>();
-        {
-            colorPreferenceKeys.add(PreferenceConstants.COLOR_COMMENT);
-            colorPreferenceKeys.add(PreferenceConstants.BOLD_COMMENT);
-            colorPreferenceKeys.add(PreferenceConstants.ITALIC_COMMENT);
-            colorPreferenceKeys.add(PreferenceConstants.UNDERLINE_COMMENT);
-
-            colorPreferenceKeys.add(PreferenceConstants.COLOR_KEY);
-            colorPreferenceKeys.add(PreferenceConstants.BOLD_KEY);
-            colorPreferenceKeys.add(PreferenceConstants.ITALIC_KEY);
-            colorPreferenceKeys.add(PreferenceConstants.UNDERLINE_KEY);
-
-            colorPreferenceKeys.add(PreferenceConstants.COLOR_SCALAR);
-            colorPreferenceKeys.add(PreferenceConstants.BOLD_SCALAR);
-            colorPreferenceKeys.add(PreferenceConstants.ITALIC_SCALAR);
-            colorPreferenceKeys.add(PreferenceConstants.UNDERLINE_SCALAR);
-
-            colorPreferenceKeys.add(PreferenceConstants.COLOR_DEFAULT);
-            colorPreferenceKeys.add(PreferenceConstants.BOLD_DEFAULT);
-            colorPreferenceKeys.add(PreferenceConstants.ITALIC_DEFAULT);
-            colorPreferenceKeys.add(PreferenceConstants.UNDERLINE_DEFAULT);
-
-            colorPreferenceKeys.add(PreferenceConstants.COLOR_DOCUMENT);
-            colorPreferenceKeys.add(PreferenceConstants.BOLD_DOCUMENT);
-            colorPreferenceKeys.add(PreferenceConstants.ITALIC_DOCUMENT);
-            colorPreferenceKeys.add(PreferenceConstants.UNDERLINE_DOCUMENT);
-
-            colorPreferenceKeys.add(PreferenceConstants.COLOR_ANCHOR);
-            colorPreferenceKeys.add(PreferenceConstants.BOLD_ANCHOR);
-            colorPreferenceKeys.add(PreferenceConstants.ITALIC_ANCHOR);
-            colorPreferenceKeys.add(PreferenceConstants.UNDERLINE_ANCHOR);
-
-            colorPreferenceKeys.add(PreferenceConstants.COLOR_ALIAS);
-            colorPreferenceKeys.add(PreferenceConstants.BOLD_ALIAS);
-            colorPreferenceKeys.add(PreferenceConstants.ITALIC_ALIAS);
-            colorPreferenceKeys.add(PreferenceConstants.UNDERLINE_ALIAS);
-
-            colorPreferenceKeys.add(PreferenceConstants.COLOR_TAG_PROPERTY);
-            colorPreferenceKeys.add(PreferenceConstants.BOLD_TAG_PROPERTY);
-            colorPreferenceKeys.add(PreferenceConstants.ITALIC_TAG_PROPERTY);
-            colorPreferenceKeys.add(PreferenceConstants.UNDERLINE_TAG_PROPERTY);
-
-            colorPreferenceKeys.add(PreferenceConstants.COLOR_INDICATOR_CHARACTER);
-            colorPreferenceKeys.add(PreferenceConstants.BOLD_INDICATOR_CHARACTER);
-            colorPreferenceKeys.add(PreferenceConstants.ITALIC_INDICATOR_CHARACTER);
-            colorPreferenceKeys.add(PreferenceConstants.UNDERLINE_INDICATOR_CHARACTER);
-
-            colorPreferenceKeys.add(PreferenceConstants.COLOR_CONSTANT);
-            colorPreferenceKeys.add(PreferenceConstants.BOLD_CONSTANT);
-            colorPreferenceKeys.add(PreferenceConstants.ITALIC_CONSTANT);
-            colorPreferenceKeys.add(PreferenceConstants.UNDERLINE_CONSTANT);
-        }
-        
-        @Override
-        public void propertyChange(PropertyChangeEvent event) {
-            if (colorPreferenceKeys.contains(event.getProperty())) {
-                if (getSourceViewer() instanceof SourceViewer) {
-                    ((SourceViewer) getSourceViewer()).unconfigure();
-                    initializeEditor();
-                    getSourceViewer().configure(sourceViewerConfiguration);
-                }
-            }
-            // FIXME
-//            if (ALL_VALIDATION_PREFS.contains(event.getProperty())) {
-//                // Boolean comes from changing a value, String comes when restoring the default value as it uses
-//                // getDefaultString(name)
-//                boolean newValue = event.getNewValue() instanceof Boolean ? (Boolean) event.getNewValue()
-//                        : Boolean.valueOf((String) event.getNewValue());
-//                Activator.getDefault().getSchema().allowJsonRefInContext(event.getProperty(), newValue);
-//                validate();
-//            }
-        }
-    };
+    protected final IPropertyChangeListener preferenceChangeListener = new JsonPreferenceChangeListener();
 
 	private JsonContentOutlinePage contentOutline;
+
+	private final IPreferenceStore preferenceStore;
 	
-	public JsonEditor(JsonDocumentProvider documentProvider) {
+	public JsonEditor(JsonDocumentProvider documentProvider, IPreferenceStore preferenceStore) {
 		super();
+		this.preferenceStore = preferenceStore;
 		setDocumentProvider(documentProvider);
 	}
 
@@ -273,15 +203,13 @@ public abstract class JsonEditor extends YEdit implements IShowInSource, IShowIn
         viewer.doOperation(ProjectionViewer.TOGGLE);
 
         annotationModel = viewer.getProjectionAnnotationModel();
-// FIXME
-     //   Activator.getDefault().getPreferenceStore().addPropertyChangeListener(preferenceChangeListener);
+        preferenceStore.addPropertyChangeListener(preferenceChangeListener);
     }
 
     @Override
     public void dispose() {
         super.dispose();
-// FIXME
-  //      Activator.getDefault().getPreferenceStore().removePropertyChangeListener(preferenceChangeListener);
+        preferenceStore.removePropertyChangeListener(preferenceChangeListener);
     }
 
     @Override
@@ -641,5 +569,72 @@ public abstract class JsonEditor extends YEdit implements IShowInSource, IShowIn
     public ShowInContext getShowInContext() {
         return new ShowInContext(getEditorInput(), new StructuredSelection());
     }
+    
+    public class JsonPreferenceChangeListener implements IPropertyChangeListener {
+
+        private final List<String> colorPreferenceKeys = new ArrayList<>();
+        {
+            colorPreferenceKeys.add(PreferenceConstants.COLOR_COMMENT);
+            colorPreferenceKeys.add(PreferenceConstants.BOLD_COMMENT);
+            colorPreferenceKeys.add(PreferenceConstants.ITALIC_COMMENT);
+            colorPreferenceKeys.add(PreferenceConstants.UNDERLINE_COMMENT);
+
+            colorPreferenceKeys.add(PreferenceConstants.COLOR_KEY);
+            colorPreferenceKeys.add(PreferenceConstants.BOLD_KEY);
+            colorPreferenceKeys.add(PreferenceConstants.ITALIC_KEY);
+            colorPreferenceKeys.add(PreferenceConstants.UNDERLINE_KEY);
+
+            colorPreferenceKeys.add(PreferenceConstants.COLOR_SCALAR);
+            colorPreferenceKeys.add(PreferenceConstants.BOLD_SCALAR);
+            colorPreferenceKeys.add(PreferenceConstants.ITALIC_SCALAR);
+            colorPreferenceKeys.add(PreferenceConstants.UNDERLINE_SCALAR);
+
+            colorPreferenceKeys.add(PreferenceConstants.COLOR_DEFAULT);
+            colorPreferenceKeys.add(PreferenceConstants.BOLD_DEFAULT);
+            colorPreferenceKeys.add(PreferenceConstants.ITALIC_DEFAULT);
+            colorPreferenceKeys.add(PreferenceConstants.UNDERLINE_DEFAULT);
+
+            colorPreferenceKeys.add(PreferenceConstants.COLOR_DOCUMENT);
+            colorPreferenceKeys.add(PreferenceConstants.BOLD_DOCUMENT);
+            colorPreferenceKeys.add(PreferenceConstants.ITALIC_DOCUMENT);
+            colorPreferenceKeys.add(PreferenceConstants.UNDERLINE_DOCUMENT);
+
+            colorPreferenceKeys.add(PreferenceConstants.COLOR_ANCHOR);
+            colorPreferenceKeys.add(PreferenceConstants.BOLD_ANCHOR);
+            colorPreferenceKeys.add(PreferenceConstants.ITALIC_ANCHOR);
+            colorPreferenceKeys.add(PreferenceConstants.UNDERLINE_ANCHOR);
+
+            colorPreferenceKeys.add(PreferenceConstants.COLOR_ALIAS);
+            colorPreferenceKeys.add(PreferenceConstants.BOLD_ALIAS);
+            colorPreferenceKeys.add(PreferenceConstants.ITALIC_ALIAS);
+            colorPreferenceKeys.add(PreferenceConstants.UNDERLINE_ALIAS);
+
+            colorPreferenceKeys.add(PreferenceConstants.COLOR_TAG_PROPERTY);
+            colorPreferenceKeys.add(PreferenceConstants.BOLD_TAG_PROPERTY);
+            colorPreferenceKeys.add(PreferenceConstants.ITALIC_TAG_PROPERTY);
+            colorPreferenceKeys.add(PreferenceConstants.UNDERLINE_TAG_PROPERTY);
+
+            colorPreferenceKeys.add(PreferenceConstants.COLOR_INDICATOR_CHARACTER);
+            colorPreferenceKeys.add(PreferenceConstants.BOLD_INDICATOR_CHARACTER);
+            colorPreferenceKeys.add(PreferenceConstants.ITALIC_INDICATOR_CHARACTER);
+            colorPreferenceKeys.add(PreferenceConstants.UNDERLINE_INDICATOR_CHARACTER);
+
+            colorPreferenceKeys.add(PreferenceConstants.COLOR_CONSTANT);
+            colorPreferenceKeys.add(PreferenceConstants.BOLD_CONSTANT);
+            colorPreferenceKeys.add(PreferenceConstants.ITALIC_CONSTANT);
+            colorPreferenceKeys.add(PreferenceConstants.UNDERLINE_CONSTANT);
+        }
+        
+        @Override
+        public void propertyChange(PropertyChangeEvent event) {
+            if (colorPreferenceKeys.contains(event.getProperty())) {
+                if (getSourceViewer() instanceof SourceViewer) {
+                    ((SourceViewer) getSourceViewer()).unconfigure();
+                    initializeEditor();
+                    getSourceViewer().configure(sourceViewerConfiguration);
+                }
+            }
+        }
+    };
 
 }
