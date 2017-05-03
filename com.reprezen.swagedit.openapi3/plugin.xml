@@ -66,4 +66,25 @@
       </initializer>
    </extension>
    
+   
+   <extension
+         point="org.eclipse.ui.workbench.texteditor.hyperlinkDetectorTargets">
+      <target
+            id="com.reprezen.swagedit.openapi3.hyperlink.target"
+            name="SwagEdit OpenAPI v3">
+            <context type="org.eclipse.ui.texteditor.ITextEditor"/>
+      </target>
+   </extension>
+
+   <extension
+         point="org.eclipse.ui.workbench.texteditor.hyperlinkDetectors">
+      <hyperlinkDetector
+            activate="true"
+            class="com.reprezen.swagedit.openapi3.hyperlinks.OpenApi3ReferenceHyperlinkDetector"
+            id="com.reprezen.swagedit.openapi3.hyperlink.references"
+            name="Open Reference"
+            targetId="com.reprezen.swagedit.openapi3.hyperlink.target">
+      </hyperlinkDetector>
+   </extension>
+   
 </plugin>
