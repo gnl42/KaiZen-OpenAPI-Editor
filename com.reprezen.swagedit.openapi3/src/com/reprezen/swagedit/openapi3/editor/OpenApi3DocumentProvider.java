@@ -12,7 +12,7 @@ package com.reprezen.swagedit.openapi3.editor;
 
 import org.eclipse.jface.text.IDocument;
 
-import com.reprezen.swagedit.common.editor.JsonDocumentProvider;
+import com.reprezen.swagedit.core.editor.JsonDocumentProvider;
 import com.reprezen.swagedit.openapi3.Activator;
 
 public class OpenApi3DocumentProvider extends JsonDocumentProvider {

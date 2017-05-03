@@ -1,13 +1,14 @@
 package com.reprezen.swagedit.model
 
-import com.reprezen.swagedit.schema.JsonType
-import com.reprezen.swagedit.schema.ObjectTypeDefinition
-import com.reprezen.swagedit.schema.ReferenceTypeDefinition
+import com.reprezen.swagedit.core.schema.JsonType
+import com.reprezen.swagedit.core.schema.ObjectTypeDefinition
+import com.reprezen.swagedit.core.schema.ReferenceTypeDefinition
 import com.reprezen.swagedit.schema.SwaggerSchema
 import com.reprezen.swagedit.tests.utils.PointerHelpers
 import org.junit.Test
 
 import static org.junit.Assert.*
+import com.reprezen.swagedit.core.model.Model
 
 class ModelTest {
 

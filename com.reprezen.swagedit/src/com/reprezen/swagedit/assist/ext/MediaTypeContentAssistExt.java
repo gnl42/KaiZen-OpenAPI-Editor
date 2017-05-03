@@ -24,9 +24,9 @@ import com.google.common.collect.Lists;
 import com.reprezen.swagedit.Activator;
 import com.reprezen.swagedit.core.assist.Proposal;
 import com.reprezen.swagedit.core.assist.ext.ContentAssistExt;
-import com.reprezen.swagedit.model.AbstractNode;
-import com.reprezen.swagedit.schema.ArrayTypeDefinition;
-import com.reprezen.swagedit.schema.TypeDefinition;
+import com.reprezen.swagedit.core.model.AbstractNode;
+import com.reprezen.swagedit.core.schema.ArrayTypeDefinition;
+import com.reprezen.swagedit.core.schema.TypeDefinition;
 
 /**
  * Content assist extension providing completion proposals for mime types.

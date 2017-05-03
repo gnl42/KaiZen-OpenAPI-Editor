@@ -18,7 +18,7 @@ import org.junit.Test
 
 import static org.hamcrest.core.IsCollectionContaining.*
 import static org.junit.Assert.*
-import com.reprezen.swagedit.utils.SwaggerFileFinder.Scope
+import com.reprezen.swagedit.core.utils.SwaggerFileFinder.Scope
 import com.reprezen.swagedit.core.assist.Proposal
 
 class JsonReferenceProposalProviderTest {

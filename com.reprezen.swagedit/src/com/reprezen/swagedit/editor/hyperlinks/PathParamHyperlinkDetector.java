@@ -24,12 +24,12 @@ import org.eclipse.jface.text.hyperlink.IHyperlink;
 
 import com.fasterxml.jackson.core.JsonPointer;
 import com.google.common.collect.Lists;
-import com.reprezen.swagedit.common.editor.JsonDocument;
+import com.reprezen.swagedit.core.editor.JsonDocument;
 import com.reprezen.swagedit.core.hyperlinks.AbstractJsonHyperlinkDetector;
 import com.reprezen.swagedit.core.hyperlinks.SwaggerHyperlink;
+import com.reprezen.swagedit.core.json.references.JsonReference;
+import com.reprezen.swagedit.core.model.AbstractNode;
 import com.reprezen.swagedit.editor.SwaggerDocument;
-import com.reprezen.swagedit.json.references.JsonReference;
-import com.reprezen.swagedit.model.AbstractNode;
 
 import io.swagger.models.HttpMethod;
 

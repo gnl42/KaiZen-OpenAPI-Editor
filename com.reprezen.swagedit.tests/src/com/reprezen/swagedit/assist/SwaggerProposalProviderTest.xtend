@@ -1,8 +1,8 @@
 package com.reprezen.swagedit.assist
 
-import com.reprezen.swagedit.model.Model
-import com.reprezen.swagedit.schema.JsonType
-import com.reprezen.swagedit.schema.MultipleTypeDefinition
+import com.reprezen.swagedit.core.model.Model
+import com.reprezen.swagedit.core.schema.JsonType
+import com.reprezen.swagedit.core.schema.MultipleTypeDefinition
 import com.reprezen.swagedit.tests.utils.PointerHelpers
 import org.hamcrest.Matcher
 import org.junit.Before
@@ -10,7 +10,6 @@ import org.junit.Test
 
 import static org.hamcrest.core.IsCollectionContaining.*
 import static org.junit.Assert.*
-import com.reprezen.swagedit.schema.CompositeSchema
 import com.reprezen.swagedit.schema.SwaggerSchema
 import com.reprezen.swagedit.core.assist.JsonProposalProvider
 

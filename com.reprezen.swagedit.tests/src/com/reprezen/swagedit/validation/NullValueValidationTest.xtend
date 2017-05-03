@@ -15,7 +15,7 @@ import org.junit.Test
 
 import static org.hamcrest.CoreMatchers.*
 import static org.junit.Assert.*
-import com.reprezen.swagedit.common.editor.JsonDocument
+import com.reprezen.swagedit.core.validation.Validator
 
 class NullValueValidationTest {
 

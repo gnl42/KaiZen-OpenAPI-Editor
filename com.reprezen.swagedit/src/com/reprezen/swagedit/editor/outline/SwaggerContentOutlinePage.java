@@ -26,9 +26,9 @@ import org.eclipse.ui.texteditor.IDocumentProvider;
 import org.eclipse.ui.views.contentoutline.ContentOutlinePage;
 
 import com.google.common.base.Predicate;
+import com.reprezen.swagedit.core.model.AbstractNode;
+import com.reprezen.swagedit.core.model.Model;
 import com.reprezen.swagedit.editor.SwaggerDocument;
-import com.reprezen.swagedit.model.AbstractNode;
-import com.reprezen.swagedit.model.Model;
 
 public class SwaggerContentOutlinePage extends ContentOutlinePage {
 

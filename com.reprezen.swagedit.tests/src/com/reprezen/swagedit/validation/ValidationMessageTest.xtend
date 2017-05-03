@@ -11,7 +11,7 @@
 package com.reprezen.swagedit.validation
 
 import com.reprezen.swagedit.editor.SwaggerDocument
-import com.reprezen.swagedit.validation.Validator
+import com.reprezen.swagedit.core.validation.Validator
 import org.junit.Test
 
 import static org.hamcrest.core.IsCollectionContaining.*

@@ -10,7 +10,7 @@
  *******************************************************************************/
 package com.reprezen.swagedit.editor;
 
-import com.reprezen.swagedit.common.editor.TextContentDescriber;
+import com.reprezen.swagedit.core.editor.TextContentDescriber;
 
 public class SwaggerContentDescriber extends TextContentDescriber {
 

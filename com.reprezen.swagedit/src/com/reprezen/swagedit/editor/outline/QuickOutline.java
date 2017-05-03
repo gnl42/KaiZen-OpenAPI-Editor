@@ -56,12 +56,12 @@ import org.eclipse.ui.part.ShowInContext;
 import com.google.common.base.Strings;
 import com.reprezen.swagedit.Activator;
 import com.reprezen.swagedit.Messages;
+import com.reprezen.swagedit.core.model.AbstractNode;
+import com.reprezen.swagedit.core.model.Model;
+import com.reprezen.swagedit.core.utils.DocumentUtils;
+import com.reprezen.swagedit.core.utils.SwaggerFileFinder;
+import com.reprezen.swagedit.core.utils.SwaggerFileFinder.Scope;
 import com.reprezen.swagedit.editor.SwaggerEditor;
-import com.reprezen.swagedit.model.AbstractNode;
-import com.reprezen.swagedit.model.Model;
-import com.reprezen.swagedit.utils.DocumentUtils;
-import com.reprezen.swagedit.utils.SwaggerFileFinder;
-import com.reprezen.swagedit.utils.SwaggerFileFinder.Scope;
 
 public class QuickOutline extends PopupDialog
         implements IInformationControl, IInformationControlExtension, IInformationControlExtension2 {

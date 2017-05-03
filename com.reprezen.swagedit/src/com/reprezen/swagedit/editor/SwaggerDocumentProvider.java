@@ -13,7 +13,7 @@ package com.reprezen.swagedit.editor;
 import org.eclipse.jface.text.IDocument;
 
 import com.reprezen.swagedit.Activator;
-import com.reprezen.swagedit.common.editor.JsonDocumentProvider;
+import com.reprezen.swagedit.core.editor.JsonDocumentProvider;
 
 public class SwaggerDocumentProvider extends JsonDocumentProvider {
 

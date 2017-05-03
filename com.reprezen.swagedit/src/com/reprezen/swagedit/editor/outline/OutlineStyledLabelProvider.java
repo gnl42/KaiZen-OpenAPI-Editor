@@ -23,8 +23,8 @@ import org.eclipse.swt.widgets.Display;
 import com.google.common.collect.Iterables;
 import com.reprezen.swagedit.Activator;
 import com.reprezen.swagedit.Activator.Icons;
-import com.reprezen.swagedit.model.AbstractNode;
-import com.reprezen.swagedit.schema.TypeDefinition;
+import com.reprezen.swagedit.core.model.AbstractNode;
+import com.reprezen.swagedit.core.schema.TypeDefinition;
 
 public class OutlineStyledLabelProvider extends StyledCellLabelProvider {
 

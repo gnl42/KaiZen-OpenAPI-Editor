@@ -17,12 +17,12 @@ import org.mockito.Mockito;
 
 import com.fasterxml.jackson.databind.JsonNode;
 import com.reprezen.swagedit.core.hyperlinks.JsonReferenceHyperlinkDetector;
+import com.reprezen.swagedit.core.json.references.JsonDocumentManager;
+import com.reprezen.swagedit.core.json.references.JsonReference;
+import com.reprezen.swagedit.core.json.references.JsonReferenceFactory;
+import com.reprezen.swagedit.core.model.AbstractNode;
 import com.reprezen.swagedit.editor.SwaggerDocument;
 import com.reprezen.swagedit.editor.hyperlinks.SwaggerReferenceHyperlinkDetector;
-import com.reprezen.swagedit.json.references.JsonDocumentManager;
-import com.reprezen.swagedit.json.references.JsonReference;
-import com.reprezen.swagedit.json.references.JsonReferenceFactory;
-import com.reprezen.swagedit.model.AbstractNode;
 
 public class Mocks {
 

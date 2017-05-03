@@ -10,7 +10,7 @@
  *******************************************************************************/
 package com.reprezen.swagedit.openapi3.editor;
 
-import com.reprezen.swagedit.common.editor.JsonDocument;
+import com.reprezen.swagedit.core.editor.JsonDocument;
 import com.reprezen.swagedit.openapi3.schema.OpenApi3Schema;
 
 public class OpenApi3Document extends JsonDocument {

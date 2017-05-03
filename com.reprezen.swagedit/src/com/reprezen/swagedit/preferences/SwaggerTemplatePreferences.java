@@ -22,7 +22,7 @@ import org.eclipse.ui.IWorkbenchPreferencePage;
 import org.eclipse.ui.texteditor.templates.TemplatePreferencePage;
 
 import com.reprezen.swagedit.Activator;
-import com.reprezen.swagedit.common.editor.JsonSourceViewerConfiguration;
+import com.reprezen.swagedit.core.editor.JsonSourceViewerConfiguration;
 import com.reprezen.swagedit.editor.SwaggerSourceViewerConfiguration;
 
 public class SwaggerTemplatePreferences extends TemplatePreferencePage implements IWorkbenchPreferencePage {

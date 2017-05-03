@@ -18,6 +18,8 @@ import org.junit.Test
 
 import static org.hamcrest.CoreMatchers.*
 import static org.junit.Assert.*
+import com.reprezen.swagedit.core.validation.Validator
+import com.reprezen.swagedit.core.validation.SwaggerError
 
 class ValidatorTest {
 

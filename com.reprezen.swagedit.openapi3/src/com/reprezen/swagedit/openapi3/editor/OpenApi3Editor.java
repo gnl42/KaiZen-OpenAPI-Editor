@@ -6,9 +6,9 @@ import org.eclipse.jface.text.hyperlink.IHyperlinkDetector;
 import org.eclipse.jface.text.hyperlink.URLHyperlinkDetector;
 import org.eclipse.jface.text.source.ISourceViewer;
 
-import com.reprezen.swagedit.common.editor.JsonEditor;
-import com.reprezen.swagedit.common.editor.JsonSourceViewerConfiguration;
 import com.reprezen.swagedit.core.assist.JsonContentAssistProcessor;
+import com.reprezen.swagedit.core.editor.JsonEditor;
+import com.reprezen.swagedit.core.editor.JsonSourceViewerConfiguration;
 import com.reprezen.swagedit.openapi3.Activator;
 import com.reprezen.swagedit.openapi3.assist.OpenApi3ContentAssistProcessor;
 import com.reprezen.swagedit.openapi3.hyperlinks.OpenApi3ReferenceHyperlinkDetector;

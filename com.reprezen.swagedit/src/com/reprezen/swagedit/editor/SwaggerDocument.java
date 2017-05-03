@@ -11,7 +11,7 @@
 package com.reprezen.swagedit.editor;
 
 import com.reprezen.swagedit.Activator;
-import com.reprezen.swagedit.common.editor.JsonDocument;
+import com.reprezen.swagedit.core.editor.JsonDocument;
 import com.reprezen.swagedit.schema.SwaggerSchema;
 
 /**

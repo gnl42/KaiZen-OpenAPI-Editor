@@ -13,7 +13,7 @@ package com.reprezen.swagedit.editor;
 import org.dadacoalition.yedit.editor.YEditSourceViewerConfiguration;
 
 import com.reprezen.swagedit.Activator;
-import com.reprezen.swagedit.common.editor.JsonEditor;
+import com.reprezen.swagedit.core.editor.JsonEditor;
 
 /**
  * SwagEdit editor.

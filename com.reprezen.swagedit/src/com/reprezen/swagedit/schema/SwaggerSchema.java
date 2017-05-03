@@ -10,6 +10,9 @@ import com.fasterxml.jackson.databind.node.ArrayNode;
 import com.fasterxml.jackson.databind.node.ObjectNode;
 import com.google.common.collect.Lists;
 import com.google.common.collect.Maps;
+import com.reprezen.swagedit.core.schema.CompositeSchema;
+import com.reprezen.swagedit.core.schema.JsonSchema;
+import com.reprezen.swagedit.core.schema.ObjectTypeDefinition;
 import com.reprezen.swagedit.preferences.SwaggerPreferenceConstants;
 
 public class SwaggerSchema extends CompositeSchema {

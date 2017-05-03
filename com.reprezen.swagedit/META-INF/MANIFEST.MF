@@ -15,7 +15,7 @@ Require-Bundle: org.eclipse.ui,
  org.eclipse.ui.workbench.texteditor,
  org.dadacoalition.yedit,
  com.github.eclipsecolortheme;resolution:=optional,
- com.reprezen.swagedit.common,
+ com.reprezen.swagedit.core,
  com.google.guava;bundle-version="15.0.0"
 Bundle-ActivationPolicy: lazy
 Bundle-RequiredExecutionEnvironment: JavaSE-1.7

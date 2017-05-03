@@ -10,7 +10,7 @@
  *******************************************************************************/
 package com.reprezen.swagedit.openapi3.editor;
 
-import com.reprezen.swagedit.common.editor.TextContentDescriber;
+import com.reprezen.swagedit.core.editor.TextContentDescriber;
 
 public class OpenApi3ContentDescriber extends TextContentDescriber {
 

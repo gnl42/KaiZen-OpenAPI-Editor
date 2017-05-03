@@ -10,7 +10,7 @@
  *******************************************************************************/
 package com.reprezen.swagedit.editor;
 
-import com.reprezen.swagedit.common.editor.JsonReconcilingStrategy;
+import com.reprezen.swagedit.core.editor.JsonReconcilingStrategy;
 
 public class SwaggerReconcilingStrategy extends JsonReconcilingStrategy {
 }

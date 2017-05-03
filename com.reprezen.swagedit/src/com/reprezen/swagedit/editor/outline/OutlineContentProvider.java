@@ -17,8 +17,8 @@ import org.eclipse.jface.viewers.Viewer;
 
 import com.google.common.collect.Iterables;
 import com.google.common.collect.Lists;
-import com.reprezen.swagedit.model.AbstractNode;
-import com.reprezen.swagedit.model.Model;
+import com.reprezen.swagedit.core.model.AbstractNode;
+import com.reprezen.swagedit.core.model.Model;
 
 public class OutlineContentProvider implements ITreeContentProvider {
 

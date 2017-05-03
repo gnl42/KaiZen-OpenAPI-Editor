@@ -10,7 +10,7 @@
 
 	<modules>
 		<module>com.reprezen.swagedit</module>
-		<module>com.reprezen.swagedit.common</module>
+		<module>com.reprezen.swagedit.core</module>
 		<module>com.reprezen.swagedit.openapi3</module>
 		<module>com.reprezen.swagedit.feature</module>
 		<module>com.reprezen.swagedit.tests</module>

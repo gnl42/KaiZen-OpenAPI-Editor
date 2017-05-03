@@ -14,7 +14,7 @@ import org.eclipse.core.resources.IFile;
 import org.eclipse.jface.text.IRegion;
 
 import com.fasterxml.jackson.core.JsonPointer;
-import com.reprezen.swagedit.common.editor.JsonDocument;
+import com.reprezen.swagedit.core.editor.JsonDocument;
 import com.reprezen.swagedit.core.hyperlinks.JsonFileHyperlink;
 import com.reprezen.swagedit.core.hyperlinks.JsonReferenceHyperlinkDetector;
 import com.reprezen.swagedit.editor.SwaggerDocument;

@@ -13,7 +13,7 @@ package com.reprezen.swagedit.wizards;
 import org.eclipse.jface.viewers.IStructuredSelection;
 import org.eclipse.ui.dialogs.WizardNewFileCreationPage;
 
-import com.reprezen.swagedit.common.wizard.NewFileWizard;
+import com.reprezen.swagedit.core.wizard.NewFileWizard;
 import com.reprezen.swagedit.editor.SwaggerEditor;
 
 public class SwagEditNewWizard extends NewFileWizard {
