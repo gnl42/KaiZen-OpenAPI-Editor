@@ -114,13 +114,11 @@ public class JsonSourceViewerConfiguration extends YEditSourceViewerConfiguratio
 
     @Override
     public IHyperlinkDetector[] getHyperlinkDetectors(ISourceViewer sourceViewer) {
-        return new IHyperlinkDetector[] { new URLHyperlinkDetector()/* FIXME ,new JsonReferenceHyperlinkDetector(),
-                new PathParamHyperlinkDetector(), new DefinitionHyperlinkDetector() */};
+        return new IHyperlinkDetector[] { new URLHyperlinkDetector()};
     }
 
     @Override
     public IInformationPresenter getInformationPresenter(ISourceViewer sourceViewer) {
-        // TODO Auto-generated method stub
         return super.getInformationPresenter(sourceViewer);
     }
 
