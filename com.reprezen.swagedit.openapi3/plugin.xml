@@ -93,4 +93,12 @@
          class="com.reprezen.swagedit.openapi3.validation.OpenApi3QuickFixer"/>
    </extension>
    
+   <extension point="com.github.eclipsecolortheme.mapper">
+       <mapper
+           class="com.github.eclipsecolortheme.mapper.GenericMapper"
+           name="OpenAPI v3"
+           pluginId="com.reprezen.swagedit.openapi3"
+           xml="resources/com.reprezen.swagedit.openapi3.xml"/>
+    </extension>
+   
 </plugin>

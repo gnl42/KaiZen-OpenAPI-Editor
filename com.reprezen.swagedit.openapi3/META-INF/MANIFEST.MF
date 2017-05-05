@@ -13,6 +13,7 @@ Require-Bundle: org.eclipse.ui,
  com.reprezen.swagedit.core,
  org.eclipse.ui.ide,
  org.eclipse.core.resources,
+ com.github.eclipsecolortheme;resolution:=optional,
  com.google.guava;bundle-version="15.0.0"
 Bundle-RequiredExecutionEnvironment: JavaSE-1.7
 Bundle-ActivationPolicy: lazy
