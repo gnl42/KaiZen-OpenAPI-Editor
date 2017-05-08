@@ -1,6 +1,6 @@
 Manifest-Version: 1.0
 Bundle-ManifestVersion: 2
-Bundle-Name: Editor for OpenAPI v3
+Bundle-Name: KaiZen-OpenAPI-Editor for OpenAPI v3
 Bundle-SymbolicName: com.reprezen.swagedit.openapi3;singleton:=true
 Bundle-Version: 0.1.0.qualifier
 Bundle-Activator: com.reprezen.swagedit.openapi3.Activator
