@@ -40,7 +40,7 @@
             class="com.reprezen.swagedit.openapi3.editor.wizard.NewOpenApiV3SpecWizard"
             icon="icons/OpenAPI_32.png"
             id="com.reprezen.swagedit.openapi3.editor.wizard.NewOpenApiV3SpecWizard"
-            name="OpenAPI v3 spec">
+            name="OpenAPI v3 Spec">
             <description>Create an OpenAPI v3 spec</description>
       </wizard>
    </extension>
@@ -48,9 +48,10 @@
    <extension
          point="org.eclipse.ui.preferencePages">
       <page
+            category="com.reprezen.kaizen.preferences"
             class="com.reprezen.swagedit.openapi3.preferences.OpenApi3PreferencePage"
             id="com.reprezen.swagedit.openapi3.preferences"
-            name="Open API v3">
+            name="OpenAPI v3">
       </page>
       <page
             category="com.reprezen.swagedit.openapi3.preferences"
