@@ -48,6 +48,7 @@
    <extension
          point="org.eclipse.ui.preferencePages">
       <page
+            category="com.reprezen.kaizen.preferences"
             class="com.reprezen.swagedit.openapi3.preferences.OpenApi3PreferencePage"
             id="com.reprezen.swagedit.openapi3.preferences"
             name="Open API v3">
