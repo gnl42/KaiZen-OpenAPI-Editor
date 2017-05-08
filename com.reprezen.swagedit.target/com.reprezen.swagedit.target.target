@@ -19,8 +19,8 @@
 <repository location="http://eclipse-color-theme.github.io/update/"/>
 </location>
 <location includeAllPlatforms="false" includeConfigurePhase="true" includeMode="planner" includeSource="true" type="InstallableUnit">
-<unit id="com.modelsolv.reprezen.bundles" version="1.0.0.201704172114"/>
-<repository location="http://products.reprezen.com/target-platform/89/"/>
+<unit id="com.modelsolv.reprezen.bundles" version="1.0.0.201705040406"/>
+<repository location="http://products-internal.reprezen.com/target-platform/118/"/>
 </location>
 <location includeAllPlatforms="false" includeConfigurePhase="true" includeMode="planner" includeSource="true" type="InstallableUnit">
 <unit id="com.google.guava" version="15.0.0.v201403281430"/>
