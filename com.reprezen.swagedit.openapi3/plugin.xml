@@ -40,7 +40,7 @@
             class="com.reprezen.swagedit.openapi3.editor.wizard.NewOpenApiV3SpecWizard"
             icon="icons/OpenAPI_32.png"
             id="com.reprezen.swagedit.openapi3.editor.wizard.NewOpenApiV3SpecWizard"
-            name="OpenAPI v3 Spec">
+            name="OpenAPI v3 Spec (experimental)">
             <description>Create an OpenAPI v3 spec</description>
       </wizard>
    </extension>
