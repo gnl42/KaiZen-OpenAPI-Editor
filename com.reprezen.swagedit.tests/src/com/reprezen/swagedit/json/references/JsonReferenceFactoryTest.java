@@ -10,6 +10,8 @@ import java.net.URISyntaxException;
 import org.junit.Test;
 
 import com.fasterxml.jackson.core.JsonPointer;
+import com.reprezen.swagedit.core.json.references.JsonReference;
+import com.reprezen.swagedit.core.json.references.JsonReferenceFactory;
 
 public class JsonReferenceFactoryTest {
 

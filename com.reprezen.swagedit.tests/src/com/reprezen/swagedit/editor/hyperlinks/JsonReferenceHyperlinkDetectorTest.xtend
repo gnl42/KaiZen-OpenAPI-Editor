@@ -15,6 +15,8 @@ import static org.hamcrest.core.IsCollectionContaining.hasItem
 import static org.junit.Assert.assertNotNull
 import static org.junit.Assert.assertNull
 import static org.junit.Assert.assertThat
+import com.reprezen.swagedit.core.hyperlinks.JsonReferenceHyperlinkDetector
+import com.reprezen.swagedit.core.hyperlinks.SwaggerHyperlink
 
 class JsonReferenceHyperlinkDetectorTest {
 

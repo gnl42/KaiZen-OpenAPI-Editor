@@ -7,10 +7,11 @@ import org.junit.Test
 import static com.reprezen.swagedit.tests.utils.Cursors.*
 import static org.hamcrest.core.IsCollectionContaining.*
 import static org.junit.Assert.*
+import com.reprezen.swagedit.core.assist.StyledCompletionProposal
 
 class SwaggerContentAssistProcessorTest {
 
-	val processor = new SwaggerContentAssistProcessor() {
+	val processor = new SwaggerContentAssistProcessor(null) {
 		override protected initTextMessages() {
 			new ArrayList
 		}
@@ -19,7 +20,7 @@ class SwaggerContentAssistProcessorTest {
 			null
 		}
 
-		override protected geTemplateStore() {
+		override protected getTemplateStore() {
 			null
 		}
 	}

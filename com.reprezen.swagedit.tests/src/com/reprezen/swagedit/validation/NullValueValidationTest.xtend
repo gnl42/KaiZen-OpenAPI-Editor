@@ -15,11 +15,12 @@ import org.junit.Test
 
 import static org.hamcrest.CoreMatchers.*
 import static org.junit.Assert.*
+import com.reprezen.swagedit.core.validation.Validator
 
 class NullValueValidationTest {
 
 	val validator = new Validator
-	val document = new SwaggerDocument
+	val SwaggerDocument document = new SwaggerDocument
 
 	@Test
 	def void testErrorOnNullValueForType() {

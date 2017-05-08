@@ -11,6 +11,7 @@ import org.junit.Test
 
 import static org.hamcrest.core.IsCollectionContaining.hasItem
 import static org.junit.Assert.*
+import com.reprezen.swagedit.core.hyperlinks.SwaggerHyperlink
 
 class DefinitionHyperlinkDetectorTest {
 

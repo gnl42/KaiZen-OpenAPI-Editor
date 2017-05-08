@@ -1,26 +1,16 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <classpath>
-	<classpathentry kind="con" path="org.eclipse.jdt.launching.JRE_CONTAINER/org.eclipse.jdt.internal.debug.ui.launcher.StandardVMType/JavaSE-1.7"/>
-	<classpathentry kind="con" path="org.eclipse.pde.core.requiredPlugins"/>
-	<classpathentry exported="true" kind="lib" path="lib/cal10n.api_0.7.4.jar"/>
-	<classpathentry exported="true" kind="lib" path="lib/com.fasterxml.jackson.core.jackson-annotations_2.4.5.jar"/>
-	<classpathentry exported="true" kind="lib" path="lib/com.fasterxml.jackson.core.jackson-core_2.4.5.jar"/>
-	<classpathentry exported="true" kind="lib" path="lib/com.fasterxml.jackson.core.jackson-databind_2.4.5.jar"/>
-	<classpathentry exported="true" kind="lib" path="lib/com.fasterxml.jackson.dataformat.jackson-dataformat-yaml_2.4.5.jar"/>
-	<classpathentry exported="true" kind="lib" path="lib/com.fasterxml.jackson.datatype.jackson-datatype-joda_2.4.5.jar"/>
-	<classpathentry exported="true" kind="lib" path="lib/com.github.fge.btf_1.2.0.jar"/>
 	<classpathentry exported="true" kind="lib" path="lib/com.github.fge.jackson-coreutils_1.8.0.jar"/>
-	<classpathentry exported="true" kind="lib" path="lib/com.github.fge.json-schema-core_1.2.5.jar"/>
 	<classpathentry exported="true" kind="lib" path="lib/com.github.fge.json-schema-validator_2.2.6.jar"/>
 	<classpathentry exported="true" kind="lib" path="lib/com.github.fge.msg-simple_1.1.0.jar"/>
 	<classpathentry exported="true" kind="lib" path="lib/com.github.fge.uri-template_0.9.0.jar"/>
+	<classpathentry exported="true" kind="lib" path="lib/com.github.fge.btf_1.2.0.jar"/>
+	<classpathentry exported="true" kind="lib" path="lib/com.github.fge.json-schema-core_1.2.5.jar"/>
+	<classpathentry kind="con" path="org.eclipse.jdt.launching.JRE_CONTAINER/org.eclipse.jdt.internal.debug.ui.launcher.StandardVMType/JavaSE-1.7"/>
+	<classpathentry kind="con" path="org.eclipse.pde.core.requiredPlugins"/>
+	<classpathentry exported="true" kind="lib" path="lib/cal10n.api_0.7.4.jar"/>
 	<classpathentry exported="true" kind="lib" path="lib/com.google.code.findbugs.jsr305_3.0.0.jar"/>
-	<classpathentry exported="true" kind="lib" path="lib/com.google.guava_16.0.1.jar"/>
 	<classpathentry exported="true" kind="lib" path="lib/com.googlecode.libphonenumber_6.2.0.jar"/>
-	<classpathentry exported="true" kind="lib" path="lib/io.swagger.annotations_1.5.3.jar"/>
-	<classpathentry exported="true" kind="lib" path="lib/io.swagger.core_1.5.3.jar"/>
-	<classpathentry exported="true" kind="lib" path="lib/io.swagger.models_1.5.3.jar"/>
-	<classpathentry exported="true" kind="lib" path="lib/io.swagger.parser_1.0.10.jar"/>
 	<classpathentry exported="true" kind="lib" path="lib/javax.activation_1.1.0.jar"/>
 	<classpathentry exported="true" kind="lib" path="lib/javax.mail.api_1.4.3.jar"/>
 	<classpathentry exported="true" kind="lib" path="lib/javax.validation.api_1.1.0.Final.jar"/>
@@ -29,9 +19,8 @@
 	<classpathentry exported="true" kind="lib" path="lib/org.apache.commons.io_2.4.0.jar"/>
 	<classpathentry exported="true" kind="lib" path="lib/org.apache.commons.lang3_3.2.1.jar"/>
 	<classpathentry exported="true" kind="lib" path="lib/org.mozilla.rhino_1.0.0.7R4.jar"/>
-	<classpathentry exported="true" kind="lib" path="lib/org.yaml.snakeyaml_1.12.0.jar"/>
 	<classpathentry exported="true" kind="lib" path="lib/slf4j.api_1.6.3.jar"/>
 	<classpathentry exported="true" kind="lib" path="lib/slf4j.ext_1.6.3.jar"/>
-	<classpathentry kind="src" path="src/"/>
+	<classpathentry kind="src" path="src"/>
 	<classpathentry kind="output" path="target/classes"/>
 </classpath>

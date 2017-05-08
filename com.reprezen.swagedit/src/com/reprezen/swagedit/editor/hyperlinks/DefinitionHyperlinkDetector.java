@@ -20,14 +20,17 @@ import org.eclipse.jface.text.ITextViewer;
 import org.eclipse.jface.text.hyperlink.IHyperlink;
 
 import com.fasterxml.jackson.core.JsonPointer;
+import com.reprezen.swagedit.core.editor.JsonDocument;
+import com.reprezen.swagedit.core.hyperlinks.AbstractJsonHyperlinkDetector;
+import com.reprezen.swagedit.core.hyperlinks.SwaggerHyperlink;
+import com.reprezen.swagedit.core.model.AbstractNode;
 import com.reprezen.swagedit.editor.SwaggerDocument;
-import com.reprezen.swagedit.model.AbstractNode;
 
 /**
  * Hyperlink detector that detects links to and inside schema definition elements.
  * 
  */
-public class DefinitionHyperlinkDetector extends AbstractSwaggerHyperlinkDetector {
+public class DefinitionHyperlinkDetector extends AbstractJsonHyperlinkDetector {
 
     protected static final String TAGS_PATTERN = "^[/\\W+|\\w+]*/tags([/\\W+|\\w+]+)";
     protected static final String REQUIRED_PATTERN = "^([/\\W+|\\w+]+)(/required[/\\W+|\\w+]+)";
@@ -39,7 +42,7 @@ public class DefinitionHyperlinkDetector extends AbstractSwaggerHyperlinkDetecto
     }
 
     @Override
-    protected IHyperlink[] doDetect(SwaggerDocument doc, ITextViewer viewer, HyperlinkInfo info, JsonPointer pointer) {
+    protected IHyperlink[] doDetect(JsonDocument doc, ITextViewer viewer, HyperlinkInfo info, JsonPointer pointer) {
         JsonPointer targetPath;
         if (pointer.toString().matches(REQUIRED_PATTERN)) {
             targetPath = getRequiredPropertyPath(doc, info, pointer);
@@ -60,7 +63,7 @@ public class DefinitionHyperlinkDetector extends AbstractSwaggerHyperlinkDetecto
         return new IHyperlink[] { new SwaggerHyperlink(info.text, viewer, info.region, target) };
     }
 
-    protected JsonPointer getRequiredPropertyPath(SwaggerDocument doc, HyperlinkInfo info, JsonPointer pointer) {
+    protected JsonPointer getRequiredPropertyPath(JsonDocument doc, HyperlinkInfo info, JsonPointer pointer) {
         Matcher matcher = Pattern.compile(REQUIRED_PATTERN).matcher(pointer.toString());
         String containerPath = null;
         if (matcher.find()) {
@@ -79,7 +82,7 @@ public class DefinitionHyperlinkDetector extends AbstractSwaggerHyperlinkDetecto
         }
     }
 
-    protected JsonPointer getTagDefinitionPath(SwaggerDocument doc, HyperlinkInfo info, JsonPointer pointer) {
+    protected JsonPointer getTagDefinitionPath(JsonDocument doc, HyperlinkInfo info, JsonPointer pointer) {
         AbstractNode node = doc.getModel().find(JsonPointer.compile("/definitions/" + info.text));
 
         return node != null ? node.getPointer() : null;

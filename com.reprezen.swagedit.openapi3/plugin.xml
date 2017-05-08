@@ -1,0 +1,104 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<?eclipse version="3.2"?>
+<plugin>
+   <extension
+         point="org.eclipse.ui.editors">
+      <editor
+            class="com.reprezen.swagedit.openapi3.editor.OpenApi3Editor"
+            contributorClass="org.eclipse.ui.texteditor.BasicTextEditorActionContributor"
+            default="false"
+            icon="icons/OpenAPI_16.png"
+            id="com.reprezen.swagedit.openapi3.editor"
+            name="%editor.name"
+            symbolicFontName="com.reprezen.swagedit.editor.textfont">
+         <contentTypeBinding
+               contentTypeId="com.reprezen.swagedit.contenttype.openapi3.yaml">
+         </contentTypeBinding>
+      </editor>
+   </extension>
+
+   <extension
+         point="org.eclipse.core.contenttype.contentTypes">
+      <content-type
+            base-type="org.eclipse.core.runtime.text"
+            describer="com.reprezen.swagedit.openapi3.editor.OpenApi3ContentDescriber"
+            file-extensions="yaml"
+            default-charset="UTF-8"
+            id="com.reprezen.swagedit.contenttype.openapi3.yaml"
+            name="%content-type.name"
+            priority="high">
+         <describer
+               class="com.reprezen.swagedit.editor.SwaggerContentDescriber">
+         </describer>
+      </content-type>
+   </extension>
+   
+   <extension
+         point="org.eclipse.ui.newWizards">
+      <wizard
+            category="com.reprezen.swagedit"
+            class="com.reprezen.swagedit.openapi3.editor.wizard.NewOpenApiV3SpecWizard"
+            icon="icons/OpenAPI_32.png"
+            id="com.reprezen.swagedit.openapi3.editor.wizard.NewOpenApiV3SpecWizard"
+            name="OpenAPI v3 spec">
+            <description>Create an OpenAPI v3 spec</description>
+      </wizard>
+   </extension>
+   
+   <extension
+         point="org.eclipse.ui.preferencePages">
+      <page
+            class="com.reprezen.swagedit.openapi3.preferences.OpenApi3PreferencePage"
+            id="com.reprezen.swagedit.openapi3.preferences"
+            name="Open API v3">
+      </page>
+      <page
+            category="com.reprezen.swagedit.openapi3.preferences"
+            class="com.reprezen.swagedit.openapi3.preferences.OpenApiColorPreferences"
+            id="com.reprezen.swagedit.openapi3.preferences.OpenApiColorPreferences"
+            name="Color Preferences">
+      </page>
+   </extension>
+   <extension
+         point="org.eclipse.core.runtime.preferences">
+      <initializer
+            class="com.reprezen.swagedit.openapi3.preferences.OpenApi3PreferenceInitializer">
+      </initializer>
+   </extension>
+   
+   
+   <extension
+         point="org.eclipse.ui.workbench.texteditor.hyperlinkDetectorTargets">
+      <target
+            id="com.reprezen.swagedit.openapi3.hyperlink.target"
+            name="SwagEdit OpenAPI v3">
+            <context type="org.eclipse.ui.texteditor.ITextEditor"/>
+      </target>
+   </extension>
+
+   <extension
+         point="org.eclipse.ui.workbench.texteditor.hyperlinkDetectors">
+      <hyperlinkDetector
+            activate="true"
+            class="com.reprezen.swagedit.openapi3.hyperlinks.OpenApi3ReferenceHyperlinkDetector"
+            id="com.reprezen.swagedit.openapi3.hyperlink.references"
+            name="Open Reference"
+            targetId="com.reprezen.swagedit.openapi3.hyperlink.target">
+      </hyperlinkDetector>
+   </extension>
+   
+   <extension point="org.eclipse.ui.ide.markerResolution">
+      <markerResolutionGenerator
+         markerType="org.eclipse.core.resources.problemmarker"
+         class="com.reprezen.swagedit.openapi3.validation.OpenApi3QuickFixer"/>
+   </extension>
+   
+   <extension point="com.github.eclipsecolortheme.mapper">
+       <mapper
+           class="com.github.eclipsecolortheme.mapper.GenericMapper"
+           name="OpenAPI v3"
+           pluginId="com.reprezen.swagedit.openapi3"
+           xml="resources/com.reprezen.swagedit.openapi3.xml"/>
+    </extension>
+   
+</plugin>

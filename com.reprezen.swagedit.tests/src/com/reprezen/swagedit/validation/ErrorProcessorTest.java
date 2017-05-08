@@ -23,6 +23,8 @@ import org.yaml.snakeyaml.nodes.Node;
 
 import com.fasterxml.jackson.databind.JsonNode;
 import com.fasterxml.jackson.databind.ObjectMapper;
+import com.reprezen.swagedit.core.validation.ErrorProcessor;
+import com.reprezen.swagedit.core.validation.SwaggerError;
 
 public class ErrorProcessorTest {
 

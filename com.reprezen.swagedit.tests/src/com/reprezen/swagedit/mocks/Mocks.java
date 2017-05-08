@@ -16,12 +16,13 @@ import org.eclipse.swt.graphics.Point;
 import org.mockito.Mockito;
 
 import com.fasterxml.jackson.databind.JsonNode;
+import com.reprezen.swagedit.core.hyperlinks.JsonReferenceHyperlinkDetector;
+import com.reprezen.swagedit.core.json.references.JsonDocumentManager;
+import com.reprezen.swagedit.core.json.references.JsonReference;
+import com.reprezen.swagedit.core.json.references.JsonReferenceFactory;
+import com.reprezen.swagedit.core.model.AbstractNode;
 import com.reprezen.swagedit.editor.SwaggerDocument;
-import com.reprezen.swagedit.editor.hyperlinks.JsonReferenceHyperlinkDetector;
-import com.reprezen.swagedit.json.references.JsonDocumentManager;
-import com.reprezen.swagedit.json.references.JsonReference;
-import com.reprezen.swagedit.json.references.JsonReferenceFactory;
-import com.reprezen.swagedit.model.AbstractNode;
+import com.reprezen.swagedit.editor.hyperlinks.SwaggerReferenceHyperlinkDetector;
 
 public class Mocks {
 
@@ -33,7 +34,7 @@ public class Mocks {
         when(manager.getDocument(Mockito.any(URI.class))).thenReturn(document);
         when(manager.getFile(Mockito.any(URI.class))).thenReturn(file);
 
-        return new JsonReferenceHyperlinkDetector() {
+        return new SwaggerReferenceHyperlinkDetector() {
             // allow running tests as non plugin tests
             protected URI getBaseURI() {
                 return uri;

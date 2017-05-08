@@ -147,6 +147,7 @@
       <target
             id="com.reprezen.swagedit.hyperlink.target"
             name="SwagEdit">
+            <context type="org.eclipse.ui.texteditor.ITextEditor"/>
       </target>
    </extension>
 
@@ -168,48 +169,11 @@
       </hyperlinkDetector>
       <hyperlinkDetector
             activate="true"
-            class="com.reprezen.swagedit.editor.hyperlinks.JsonReferenceHyperlinkDetector"
+            class="com.reprezen.swagedit.editor.hyperlinks.SwaggerReferenceHyperlinkDetector"
             id="com.reprezen.swagedit.hyperlink.references"
             name="Open Reference"
             targetId="com.reprezen.swagedit.hyperlink.target">
       </hyperlinkDetector>
-   </extension>
-
-   <extension
-         point="org.eclipse.ui.commands">
-      <command
-            description="Open Quick Outline"
-            id="com.reprezen.swagedit.commands.quickoutline"
-            name="Open Quick Outline">
-      </command>
-   </extension>
-
-   <extension
-         point="org.eclipse.ui.bindings">
-      <key
-            sequence="M1+O"
-            commandId="com.reprezen.swagedit.commands.quickoutline"
-            contextId="com.reprezen.swagedit.context"
-            schemeId="org.eclipse.ui.defaultAcceleratorConfiguration">
-      </key>
-   </extension>
-
-   <extension
-         point="org.eclipse.ui.contexts">
-      <context
-            description="Context for SwagEdit"
-            id="com.reprezen.swagedit.context"
-            name="SwagEdit"
-            parentId="org.eclipse.ui.textEditorScope">
-      </context>
-   </extension>
-
-   <extension
-         point="org.eclipse.ui.handlers">
-      <handler
-            class="com.reprezen.swagedit.handlers.OpenQuickOutlineHandler"
-            commandId="com.reprezen.swagedit.commands.quickoutline">
-      </handler>
    </extension>
    
    <extension
@@ -229,7 +193,7 @@
    <extension point="org.eclipse.ui.ide.markerResolution">
       <markerResolutionGenerator
          markerType="org.eclipse.core.resources.problemmarker"
-         class="com.reprezen.swagedit.validation.QuickFixer"/>
+         class="com.reprezen.swagedit.validation.SwaggerQuickFixer"/>
    </extension>
    
 </plugin>

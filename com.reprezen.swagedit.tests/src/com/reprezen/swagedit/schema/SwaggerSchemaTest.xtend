@@ -4,6 +4,12 @@ import org.junit.Test
 
 import static org.hamcrest.core.IsCollectionContaining.*
 import static org.junit.Assert.*
+import com.reprezen.swagedit.core.schema.ObjectTypeDefinition
+import com.reprezen.swagedit.core.schema.JsonType
+import com.reprezen.swagedit.core.schema.ArrayTypeDefinition
+import com.reprezen.swagedit.core.schema.TypeDefinition
+import com.reprezen.swagedit.core.schema.ComplexTypeDefinition
+import com.reprezen.swagedit.core.schema.ReferenceTypeDefinition
 
 class SwaggerSchemaTest {
 

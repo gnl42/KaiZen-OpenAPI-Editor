@@ -10,6 +10,8 @@
 
 	<modules>
 		<module>com.reprezen.swagedit</module>
+		<module>com.reprezen.swagedit.core</module>
+		<module>com.reprezen.swagedit.openapi3</module>
 		<module>com.reprezen.swagedit.feature</module>
 		<module>com.reprezen.swagedit.tests</module>
 		<module>com.reprezen.swagedit.repository</module>
@@ -19,7 +21,7 @@
 
 	<properties>
 		<tycho.version>0.23.1</tycho.version>
-		<xtend-maven-plugin.version>2.8.0</xtend-maven-plugin.version>
+		<xtend-maven-plugin.version>2.11.0</xtend-maven-plugin.version>
 		<target-platform-artifact-id>com.reprezen.swagedit.target</target-platform-artifact-id>
 		<project.build.sourceEncoding>UTF-8</project.build.sourceEncoding>
 	</properties>

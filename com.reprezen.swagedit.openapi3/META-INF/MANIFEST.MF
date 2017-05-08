@@ -1,0 +1,22 @@
+Manifest-Version: 1.0
+Bundle-ManifestVersion: 2
+Bundle-Name: Editor for OpenAPI v3
+Bundle-SymbolicName: com.reprezen.swagedit.openapi3;singleton:=true
+Bundle-Version: 0.1.0.qualifier
+Bundle-Activator: com.reprezen.swagedit.openapi3.Activator
+Bundle-Vendor: RepreZen, Inc.
+Require-Bundle: org.eclipse.ui,
+ org.eclipse.core.runtime,
+ org.eclipse.ui.editors,
+ org.eclipse.jface.text,
+ org.dadacoalition.yedit,
+ com.reprezen.swagedit.core,
+ org.eclipse.ui.ide,
+ org.eclipse.core.resources,
+ com.github.eclipsecolortheme;resolution:=optional,
+ com.google.guava;bundle-version="15.0.0"
+Bundle-RequiredExecutionEnvironment: JavaSE-1.7
+Bundle-ActivationPolicy: lazy
+Import-Package: com.fasterxml.jackson.core,
+ com.fasterxml.jackson.databind,
+ io.swagger.util
