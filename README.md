@@ -1,9 +1,9 @@
 <img src="https://cdn2.hubspot.net/hubfs/597611/Assets_Swagger/KZOE.png" alt="KaiZen OpenAPI Editor Logo" height="50%" width="50%"/>
 # KaiZen OpenAPI Editor for Eclipse
 
-KaiZen OpenAPI Editor is an Eclipse Editor for the [Swagger](http://swagger.io) API Description Language, now known as the [OpenAPI Specification](http://openapis.org). The editor supports Swagger-OpenAPI version 2.0, with OpenAPI 3.0 support coming soon. 
+KaiZen OpenAPI Editor is an Eclipse Editor for the [Swagger](http://swagger.io) API Description Language, now known as the [OpenAPI Specification](http://openapis.org). The editor supports Swagger-OpenAPI version 2.0, with OpenAPI 3.0 support coming soon.
 
-KaiZen Editor was developed for [RepreZen API Studio](http://reprezen.com/swagger-tools), a comprehensive solution for API modeling, documentation, visualization, testing and code generation, built on Eclipse.
+KaiZen Editor, formerly known as SwagEdit, was developed for [RepreZen API Studio](http://reprezen.com/swagger-tools), a comprehensive solution for API modeling, documentation, visualization, testing and code generation, built on Eclipse.
 
 We welcome your suggestions and contributions!
 
