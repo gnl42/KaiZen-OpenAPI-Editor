@@ -2,7 +2,7 @@
 
 # KaiZen OpenAPI Editor for Eclipse
 
-KaiZen OpenAPI Editor is an Eclipse Editor for the [Swagger](http://swagger.io) API Description Language, now known as the [OpenAPI Specification](http://openapis.org). The editor supports Swagger-OpenAPI version 2.0, with OpenAPI 3.0 support coming soon.
+KaiZen OpenAPI Editor is an Eclipse editor for the [Swagger](http://swagger.io) API Description Language, now known as the [OpenAPI Specification](http://openapis.org). The editor supports Swagger-OpenAPI version 2.0, with OpenAPI 3.0 support coming soon.
 
 KaiZen Editor, formerly known as SwagEdit, was developed for [RepreZen API Studio](http://reprezen.com/swagger-tools), a comprehensive solution for API modeling, documentation, visualization, testing and code generation, built on Eclipse.
 
@@ -22,46 +22,46 @@ Keywords and values:
 <img src="http://i.imgur.com/3uZ5bQa.gif" alt="CodeAssist_keys_and_values" width="400">
 
 ### Code Assist for References
-Code assist for references has several scopes which can be switched by Ctrl+click. The first scope is shows only elements from the current model, the second expands it to the elements from the containing project, and the third shows elements from the entire workspace:  
+Code assist for references has several scopes which can be viewed in sequence using the assigned hotkey (`Ctrl`+`Space` on Windows). The first scope shows only elements from the current document; the second expands it to elements from the containing project; and the third shows elements from the entire workspace:  
 <img src="http://i.imgur.com/P0IWIEt.gif" alt="CodeAssist_for_references" width="400">
 
 ### Navigation to a Reference
-You can navigate to a reference using Ctrl+Click:  
+You can navigate to a reference using `Ctrl`+`Click`:  
 <img src="http://i.imgur.com/7WpuV3K.gif" alt="Navigation_to_references" width="400">
 
 ### Quick Outline
-Quick Outline can be invoked with Ctrl+O. Similar to code assist for references, it has three scopes: model, project, and project. It also allows filtering:    
+Quick Outline can be invoked with `Ctrl`+`o`. Similar to code assist for references, it has three scopes: model, project, and workspace. It also allows filtering:    
 <img src="http://i.imgur.com/jvcoooa.gif" alt="Navigation_to_references" width="400">
 
 ### Outline
-Outline View reflects the open Swagger model:  
+Outline View shows the contents of the active OpenAPI spec:  
 <img src="http://i.imgur.com/iv49CLn.png" alt="Navigation_to_references" width="400">
 
 ## Installing KaiZen OpenAPI Editor
 
 ### Installing from Eclipse Marketplace
-The easiest way to install KaiZen Editor into an Eclipse IDE is using the [Eclipse Marketplace solution](https://marketplace.eclipse.org/content/kaizen-openapi-editor). You can drag-and-drop the Install button into your Eclipse IDE, or use the built-in Eclipse Marketplace Client.
+The [Eclipse Marketplace solution](https://marketplace.eclipse.org/content/kaizen-openapi-editor) is the easiest way to install KaiZen Editor into an Eclipse IDE. You can drag-and-drop the Install button into your Eclipse IDE, or use the built-in Eclipse Marketplace Client.
 
-### Via an update site 
-You can now install KaiZen OpenAPI Editor into your Eclipse by clicking on `Help > Install New Software... > Add...`
-This will show a dialog box from where you can select the location of the update site.
-Use the update site from [http://products.modelsolv.com/swagedit/0.1.0/latest/](http://products.modelsolv.com/swagedit/0.1.0/latest/) as URL.
+### Installing from the Update Site 
+You can install KaiZen OpenAPI Editor into your Eclipse IDE by clicking on `Help > Install New Software... > Add...`
+This will show a dialog box where you can select the location of the update site.
+Use the update site from [http://products.modelsolv.com/swagedit/0.1.0/latest/](http://products.modelsolv.com/swagedit/0.1.0/latest/) as the URL.
 
-### In RepreZen API Studio
+### Installing with RepreZen API Studio
 KaiZen Editor is fully functional inside RepreZen API Studio, which adds live documentation and diagram views, sandbox testing with the built-in mock service and Swagger-UI, powerful code generation, and other features. See the RepreZen API Studio [video and feature tour](http://www.reprezen.com/swagger-tools) to learn more and download a free trial.
 
 ## Troubleshooting
-See [Troubleshooting](https://github.com/RepreZen/SwagEdit/blob/master/TROUBLESHOOTING.md)
+See the [Troubleshooting Guide](https://github.com/RepreZen/SwagEdit/blob/master/TROUBLESHOOTING.md) for solutions to common problems.
 
 ## Contributing to KaiZen OpenAPI Editor
 We welcome contributions - documentation, bug reports or bug fixes.
-If you are interested in contributing to KaiZen Editor please see the [Developer's Guide](https://github.com/RepreZen/SwagEdit/blob/master/DEVELOPERS_GUIDE.md). 
+If you are interested in contributing to KaiZen Editor, please see the [Developer's Guide](https://github.com/RepreZen/SwagEdit/blob/master/DEVELOPERS_GUIDE.md). 
 
 We also created a list of [good first bugs](https://github.com/RepreZen/SwagEdit/labels/Good%20First%20Bug)
 that are relatively easy to fix.
 
 ## License
-KaiZen OpenAPI Editor is provided under the Eclipse Public License (https://www.eclipse.org/legal/epl-v10.html)
+KaiZen OpenAPI Editor is provided under the [Eclipse Public License v1.0](https://www.eclipse.org/legal/epl-v10.html)
 
 ## Video: KaiZen Editor in RepreZen API Studio
 
