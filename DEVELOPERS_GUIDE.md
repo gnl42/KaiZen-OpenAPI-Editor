@@ -11,15 +11,23 @@ git clone git@github.com:RepreZen/KaiZen-OpenAPI-Editor.git
 ``` 
 
 ## 2. Import to Eclipse IDE
-Open Eclipse and select `File > Import... > Maven > Existing Maven Project`. Then select the folder KaiZen-OpenAPI-Editor.
-This will add the project into your current workspace. 
+Open Eclipse and select `File > Import... > Maven > Existing Maven Project`. Then select the folder KaiZen-OpenAPI-Editor, 
+and add the following projects into your current workspace:
 
-## 3. Launch: From development Eclipse as Eclipse Application
+<img width="663" alt="screen shot 2017-05-09 at 11 28 15 am" src="https://cloud.githubusercontent.com/assets/644582/25858815/b3248a80-34aa-11e7-826b-e6b5547a01ed.png">
+
+## 3. Set the Target Platform
+
+The target platform provides some third-party dependencies, e.g. JSON Schema validator.
+
+TO BE COMPLETED...
+
+## 4. Launch: From development Eclipse as Eclipse Application
 From Eclipse with the KaiZen-OpenAPI-Editor source project, open the "Launch configurations..." dialog, then right-click on the "Eclipse Application" located in the left side and choose "New". 
 
 Make sure that KaiZen-OpenAPI-Editor plugins are included to the configuration, for example, you can select the "All workspace and enabled target plag-ins" in the "Plug-ins" tab:
 
-## 3. Launch: using a local update site built from sources
+## 4. Launch: using a local update site built from sources
 
 From inside your KaiZen-OpenAPI-Editor folder, run the following command:
 
@@ -45,7 +53,7 @@ Please import [RepreZen Java Code Formatter](https://raw.githubusercontent.com/R
 Validation, code assist, outline, and quick outline are built based on JSON Schema which is analyzed by our model. You can find more details in [#198 KaiZen OpenAPI Editor Model](https://github.com/RepreZen/KaiZen-OpenAPI-Editor/issues/198).
 ![JSON Schema Model](http://i.imgur.com/h38zU2C.png)
 ### Validation
-See `com.reprezen.swagedit.validation.Validator.isSchemaDefinition(AbstractNode)`
+See `com.reprezen.swagedit.core.validation.Validator.isSchemaDefinition(AbstractNode)`
 * Severity: warning vs error
 * Message
 * Line in the document
