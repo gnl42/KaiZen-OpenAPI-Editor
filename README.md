@@ -1,8 +1,9 @@
-# SwagEdit - Eclipse Editor for Swagger–OpenAPI
+<img src="https://cdn2.hubspot.net/hubfs/597611/Assets_Swagger/KZOE.png" alt="KaiZen OpenAPI Editor Logo" height="50%" width="50%"/>
+# KaiZen OpenAPI Editor for Eclipse
 
-SwagEdit is an Eclipse Editor for the [Swagger](http://swagger.io) API Description Language, now known as the [OpenAPI Specification](http://openapis.org).
+KaiZen OpenAPI Editor is an Eclipse Editor for the [Swagger](http://swagger.io) API Description Language, now known as the [OpenAPI Specification](http://openapis.org). The editor supports Swagger-OpenAPI version 2.0, with OpenAPI 3.0 support coming soon. 
 
-SwagEdit was developed for [RepreZen API Studio](http://reprezen.com/swagger-tools), a comprehensive solution for API modeling, documentation, visualization, testing and code generation, built on Eclipse. Swagger–OpenAPI.
+KaiZen Editor was developed for [RepreZen API Studio](http://reprezen.com/swagger-tools), a comprehensive solution for API modeling, documentation, visualization, testing and code generation, built on Eclipse.
 
 We welcome your suggestions and contributions!
 
@@ -35,34 +36,37 @@ Quick Outline can be invoked with Ctrl+O. Similar to code assist for references,
 Outline View reflects the open Swagger model:  
 <img src="http://i.imgur.com/iv49CLn.png" alt="Navigation_to_references" width="400">
 
-## Install SwagEdit
+## Installing KaiZen OpenAPI Editor
+
+### Installing from Eclipse Marketplace
+The easiest way to install KaiZen Editor into an Eclipse IDE is using the [Eclipse Marketplace solution](https://marketplace.eclipse.org/content/kaizen-openapi-editor). You can drag-and-drop the Install button into your Eclipse IDE, or use the built-in Eclipse Marketplace Client.
+
 ### Via an update site 
-You can now install SwagEdit into your Eclipse by clicking on `Help > Install New Software... > Add...`
+You can now install KaiZen OpenAPI Editor into your Eclipse by clicking on `Help > Install New Software... > Add...`
 This will show a dialog box from where you can select the location of the update site.
 Use the update site from [http://products.modelsolv.com/swagedit/0.1.0/latest/](http://products.modelsolv.com/swagedit/0.1.0/latest/) as URL.
 
-### Eclipse Marketplace
-SwagEdit is not on Marketplace yet, but we are working on it, see [issue 65](https://github.com/RepreZen/SwagEdit/issues/65)
-
-## User Documentation
-Read more about SwagEdit features on http://www.reprezen.com/swagger-tools
+### In RepreZen API Studio
+KaiZen Editor is fully functional inside RepreZen API Studio, which adds live documentation and diagram views, sandbox testing with the built-in mock service and Swagger-UI, powerful code generation, and other features. See the RepreZen API Studio [video and feature tour](http://www.reprezen.com/swagger-tools) to learn more and download a free trial.
 
 ## Troubleshooting
 See [Troubleshooting](https://github.com/RepreZen/SwagEdit/blob/master/TROUBLESHOOTING.md)
 
-## Contributing to SwagEdit
+## Contributing to KaiZen OpenAPI Editor
 We welcome contributions - documentation, bug reports or bug fixes.
-If you are interested in contributing to SwagEdit please see [Development Page](https://github.com/RepreZen/SwagEdit/blob/master/DEVELOPERS_GUIDE.md), we created a list of [good first bugs](https://github.com/RepreZen/SwagEdit/labels/Good%20First%20Bug) that are relatively easy to fix.
+If you are interested in contributing to KaiZen Editor please see the [Developer's Guide](https://github.com/RepreZen/SwagEdit/blob/master/DEVELOPERS_GUIDE.md). 
+
+We also created a list of [good first bugs](https://github.com/RepreZen/SwagEdit/labels/Good%20First%20Bug)
+that are relatively easy to fix.
 
 ## License
-SwagEdit is provided under the Eclipse Public License (https://www.eclipse.org/legal/epl-v10.html)
+KaiZen OpenAPI Editor is provided under the Eclipse Public License (https://www.eclipse.org/legal/epl-v10.html)
 
-## Video: SwagEdit in RepreZen API Studio
-RepreZen API Studio is built on top of SwagEdit and provides more cool features, such as mock service and live views. Watch :vhs: here: 
+## Video: KaiZen Editor in RepreZen API Studio
 
 [![Editing Swagger-OpenAPI in RepreZen API Studio](http://img.youtube.com/vi/KX_tHp_KQkE/0.jpg)](https://www.youtube.com/watch?v=KX_tHp_KQkE)
 
-_**Note:** SwagEdit includes code assist, real-time validation, syntax highlighting, and outline view.<br/>
+_**Note:** KaiZen Editor includes code assist, real-time validation, syntax highlighting, and outline view.<br/>
 [Eclipse Color Theme](https://marketplace.eclipse.org/content/eclipse-color-theme) and [EditBox](http://marketplace.eclipse.org/content/nodeclipse-editbox-background-colors-themes-highlight-code-blocks-c-java-javascript-python) are available as separate plugins.<br/>
-[RepreZen API Studio](http://reprezen.com/swagger-tools) includes the mock service, live Swagger-UI & other features that are not part of SwagEdit._
+[RepreZen API Studio](http://reprezen.com/swagger-tools) includes the mock service, live Swagger-UI & other features that are not part of KaiZen Editor._
 
