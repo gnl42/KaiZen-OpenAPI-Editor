@@ -18,16 +18,28 @@ and add the following projects into your current workspace:
 
 ## 3. Set the Target Platform
 
-The target platform provides some third-party dependencies, e.g. JSON Schema validator.
+The target platform provides some third-party dependencies. Eclipse will show compilation errors if these dependencies are not resolved in the target platform. 
 
-TO BE COMPLETED...
+To activate the target platform, open `com.reprezen.swagedit.target/com.reprezen.swagedit.target.target` and click on "Set as Target Platform":
 
-## 4. Launch: From development Eclipse as Eclipse Application
-From Eclipse with the KaiZen-OpenAPI-Editor source project, open the "Launch configurations..." dialog, then right-click on the "Eclipse Application" located in the left side and choose "New". 
+<img width="1042" alt="kaizen_targetplatform" src="https://cloud.githubusercontent.com/assets/644582/25860442/8cb79cf2-34af-11e7-931b-e87259e79fbe.png">
 
-Make sure that KaiZen-OpenAPI-Editor plugins are included to the configuration, for example, you can select the "All workspace and enabled target plag-ins" in the "Plug-ins" tab:
+## 4. Launch the Solution
 
-## 4. Launch: using a local update site built from sources
+There are two ways to launch the KaiZen Editor solution:
+
+### 4a: Launching from Sources
+
+This is the fastest and easiest way to launch the solution from within the Eclipse IDE. It also provides debugging capabilities.
+
+1. From Eclipse with the KaiZen-OpenAPI-Editor source project, open the **Launch configurations...** dialog, then right-click on the **Eclipse Application** located in the left side and choose **New**. 
+2. Make sure that KaiZen-OpenAPI-Editor plugins are included to the configuration. You can do this by selecting **All workspace and enabled target plug-ins** in the **Plug-ins** tab.
+
+### 4b. Launching with a Local Update Site
+
+The previous option, launching from the source projects in Eclipse, may not faithfully reproduce the same runtime dependencies that end users will be working with. When launching in this manner, Eclipse often ignores `build.properties`, or includes additional resources that are not explicitly included in `build.properties`.  For example, icons can be displayed correctly when launched from Eclipse, but shown as red rectangles in the product. It happens if the containing folder was not added to the `build.properties`.
+
+The other option is to launch the solution with a local update site, built from source code. This option allows us to test exactly what end users will get. Another advantage of using a locally built update site is that you can easily share it with other people.
 
 From inside your KaiZen-OpenAPI-Editor folder, run the following command:
 
@@ -35,7 +47,8 @@ From inside your KaiZen-OpenAPI-Editor folder, run the following command:
 mvn clean verify
 ```
 
-This command will build the project and generate an update site under the folder `KaiZen-OpenAPI-Editor/com.reprezen.swagedit.repository/target/repository`.
+This command will build the project and generate an update site under the folder 
+`KaiZen-OpenAPI-Editor/com.reprezen.swagedit.repository/target/repository`.
 
 You can now install KaiZen OpenAPI Editor into your Eclipse by clicking on `Help > Install New Software... > Add...`
 This will show a dialog box where you can select the location of the update site.
