@@ -22,8 +22,15 @@ Keywords and values:
 <img src="http://i.imgur.com/3uZ5bQa.gif" alt="CodeAssist_keys_and_values" width="400">
 
 ### Code Assist for References
-Code assist for references has several scopes which can be viewed in sequence using the assigned hotkey (`Ctrl`+`Space` on Windows). The first scope shows only elements from the current document; the second expands it to elements from the containing project; and the third shows elements from the entire workspace:  
+Code assist for references has several scopes which can be viewed in sequence by pressing `Ctrl`+`Space` repeatedly:
+
+* The first scope shows only elements from the current document.
+* The second expands it to elements from the containing project.
+* The third shows elements from the entire workspace.
+
 <img src="http://i.imgur.com/P0IWIEt.gif" alt="CodeAssist_for_references" width="400">
+
+Pressing the hotkey a fourth time starts the cycle over again, with document scope.
 
 ### Navigation to a Reference
 You can navigate to a reference using `Ctrl`+`Click`:  
@@ -38,9 +45,10 @@ Outline View shows the contents of the active OpenAPI spec:
 <img src="http://i.imgur.com/iv49CLn.png" alt="Navigation_to_references" width="400">
 
 ## Installing KaiZen OpenAPI Editor
+KaiZen OpenAPI Editor requires Eclipse Mars.2 or higher.
 
 ### Installing from Eclipse Marketplace
-The [Eclipse Marketplace solution](https://marketplace.eclipse.org/content/kaizen-openapi-editor) is the easiest way to install KaiZen Editor into an Eclipse IDE. You can drag-and-drop the Install button into your Eclipse IDE, or use the built-in Eclipse Marketplace Client.
+The [Eclipse Marketplace solution](https://marketplace.eclipse.org/content/kaizen-openapi-editor) is the easiest way to install KaiZen Editor into an Eclipse IDE. You can drag-and-drop the Install button from the browser into your Eclipse IDE, or use the built-in Eclipse Marketplace Client.
 
 ### Installing from the Update Site 
 You can install KaiZen OpenAPI Editor into your Eclipse IDE by clicking on `Help > Install New Software... > Add...`
