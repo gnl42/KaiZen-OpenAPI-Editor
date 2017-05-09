@@ -28,7 +28,7 @@ To activate the target platform, open `com.reprezen.swagedit.target/com.reprezen
 
 There are two ways to launch the KaiZen Editor solution:
 
-### 4a: Launching from Sources
+### 4a. Launching from Sources
 
 This is the fastest and easiest way to launch the solution from within the Eclipse IDE. It also provides debugging capabilities.
 
