@@ -1,0 +1,41 @@
+<templates>
+	<template name="OpenApi version" 
+       id="com.reprezen.swagedit.openapi3.templates.openapi_template" 
+       description="OpenAPI version declaration" 
+       context="com.reprezen.swagedit.openapi3.templates.openapi.root" 
+       enabled="true">openapi: "3.0"</template>
+
+	<template name="OpenApi info" 
+       id="com.reprezen.swagedit.openapi3.templates.info_template" 
+       description="Provides descriptive metadata about this API specification" 
+       context="com.reprezen.swagedit.openapi3.templates.openapi.root" 
+       enabled="true">info:
+  version: 1.0
+  title: ${API_title}
+  description: ${API_description}
+  termsOfService: ${terms}
+  contact:
+    name: ${contact_name}
+    url: ${contact_url}
+    email: ${contact_email}
+  license:
+    name: ${MIT}
+    url: http://opensource.org/licenses/MIT</template>
+
+<template name="OpenApi contact" 
+       id="com.reprezen.swagedit.openapi3.templates.info_contact_template" 
+       description="Provides contact metadata about this API specification" 
+       context="com.reprezen.swagedit.openapi3.templates.openapi.info.contact" 
+       enabled="true">name: ${contact_name}
+    url: ${contact_url}
+    email: ${contact_email}</template>
+
+	<template name="OpenApi servers" 
+       id="com.reprezen.swagedit.openapi3.templates.servers_template" 
+       description="OpenAPI servers declaration" 
+       context="com.reprezen.swagedit.openapi3.templates.openapi.root" 
+       enabled="true">servers:
+  - uri: ${uri}
+    description: ${description}</template>
+
+</templates>

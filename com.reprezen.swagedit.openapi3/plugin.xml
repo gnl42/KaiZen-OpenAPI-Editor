@@ -101,5 +101,22 @@
            pluginId="com.reprezen.swagedit.openapi3"
            xml="resources/com.reprezen.swagedit.openapi3.xml"/>
     </extension>
+
+   <extension
+         point="org.eclipse.ui.editors.templates">
+      <include
+            file="resources/templates.xml">
+      </include>
+      <contextType
+            class="com.reprezen.swagedit.openapi3.templates.OpenApi3ContextType$RootContextType"
+            id="com.reprezen.swagedit.openapi3.templates.openapi.root"
+            name="Root Context">
+      </contextType>
+      <contextType
+            class="com.reprezen.swagedit.openapi3.templates.OpenApi3ContextType$ContactContextType"
+            id="com.reprezen.swagedit.openapi3.templates.openapi.info.contact"
+            name="Contact Context">
+      </contextType>      
+   </extension>
    
 </plugin>

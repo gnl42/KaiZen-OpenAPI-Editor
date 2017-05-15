@@ -1,9 +1,17 @@
 package com.reprezen.swagedit.openapi3;
 
+import java.io.IOException;
+
+import org.dadacoalition.yedit.YEditLog;
+import org.eclipse.jface.text.templates.ContextTypeRegistry;
+import org.eclipse.jface.text.templates.persistence.TemplateStore;
+import org.eclipse.ui.editors.text.templates.ContributionContextTypeRegistry;
+import org.eclipse.ui.editors.text.templates.ContributionTemplateStore;
 import org.eclipse.ui.plugin.AbstractUIPlugin;
 import org.osgi.framework.BundleContext;
 
 import com.reprezen.swagedit.openapi3.schema.OpenApi3Schema;
+import com.reprezen.swagedit.openapi3.templates.OpenApi3ContextType;
 
 /**
  * The activator class controls the plug-in life cycle
@@ -12,11 +20,14 @@ public class Activator extends AbstractUIPlugin {
 
 	// The plug-in ID
 	public static final String PLUGIN_ID = "com.reprezen.swagedit.openapi3"; //$NON-NLS-1$
+    public static final String TEMPLATE_STORE_ID = PLUGIN_ID + ".templates"; //$NON-NLS-1$
 
 	// The shared instance
 	private static Activator plugin;
 
 	private OpenApi3Schema schema;
+    private ContributionContextTypeRegistry contextTypeRegistry;
+    private ContributionTemplateStore templateStore;
 	
 	/**
 	 * The constructor
@@ -56,6 +67,29 @@ public class Activator extends AbstractUIPlugin {
             schema = new OpenApi3Schema();
         }
         return schema;
+    }
+
+    public ContextTypeRegistry getContextTypeRegistry() {
+        if (contextTypeRegistry == null) {
+            contextTypeRegistry = new ContributionContextTypeRegistry();
+            for (String contextType : OpenApi3ContextType.allContextTypes()) {
+                contextTypeRegistry.addContextType(contextType);
+            }
+        }
+        return contextTypeRegistry;
+    }
+
+    public TemplateStore getTemplateStore() {
+        if (templateStore == null) {
+            templateStore = new ContributionTemplateStore(getContextTypeRegistry(), getDefault().getPreferenceStore(),
+                    TEMPLATE_STORE_ID);
+            try {
+                templateStore.load();
+            } catch (IOException e) {
+                YEditLog.logException(e);
+            }
+        }
+        return templateStore;
     }
 
 }
