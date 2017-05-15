@@ -32,19 +32,20 @@ import com.google.common.base.Strings;
 
 public class SwaggerError {
 
-    public String schema;
-    public String schemaPointer;
-    public String instancePointer;
-    public String keyword;
-    public String message;
+    private final String message;
 
-    public int level;
-    public int line;
-    public int indent = 0;
+    private final int level;
+    private final int line;
+    private final int indent;
 
     public SwaggerError(int line, int level, String message) {
+        this(line, level, 0, message);
+    }
+    
+    public SwaggerError(int line, int level, int indent, String message) {
         this.line = line;
         this.level = level;
+        this.indent = indent;
         this.message = message;
     }
 
@@ -55,6 +56,7 @@ public class SwaggerError {
     public SwaggerError(YAMLException exception) {
         this.level = IMarker.SEVERITY_ERROR;
         this.message = exception.getMessage();
+        this.indent = 0;
 
         if (exception instanceof MarkedYAMLException) {
             this.line = ((MarkedYAMLException) exception).getProblemMark().getLine() + 1;
@@ -65,6 +67,7 @@ public class SwaggerError {
 
     public SwaggerError(JsonProcessingException exception) {
         this.level = IMarker.SEVERITY_ERROR;
+        this.indent = 0;
         this.message = exception.getMessage();
 
         if (exception.getLocation() != null) {
@@ -98,6 +101,10 @@ public class SwaggerError {
         }
 
         return message;
+    }
+    
+    protected int getIndent() {
+        return indent;
     }
 
     @Override
@@ -134,9 +141,11 @@ public class SwaggerError {
     public static class MultipleSwaggerError extends SwaggerError {
 
         private final Map<String, Set<SwaggerError>> errors = new HashMap<>();
+        private final JsonNode jsonSchema;
 
-        public MultipleSwaggerError(int line, int level) {
-            super(line, level, null);
+        public MultipleSwaggerError(int line, int level, int indent, JsonNode JsonSchema) {
+            super(line, level, indent, null);
+            jsonSchema = JsonSchema;
         }
 
         public void put(String path, Set<SwaggerError> errors) {
@@ -166,7 +175,7 @@ public class SwaggerError {
             orderedErrorLocations.addAll(errors.keySet());
 
             final StringBuilder builder = new StringBuilder();
-            final String tabs = Strings.repeat("\t", indent);
+            final String tabs = Strings.repeat("\t", getIndent());
 
             builder.append(tabs);
             builder.append("Failed to match exactly one schema:");
@@ -188,13 +197,13 @@ public class SwaggerError {
         }
 
         public String getHumanFriendlyText(String location) {
-            JsonNode swaggerSchemaNode = findNode(location);
+            JsonNode swaggerSchemaNode = ValidationUtil.findNode(location, jsonSchema);
             if (swaggerSchemaNode == null) {
                 return location;
             }
             return getHumanFriendlyText(swaggerSchemaNode, location);
         }
-
+        
         public String getHumanFriendlyText(JsonNode swaggerSchemaNode, final String defaultValue) {
             JsonNode title = swaggerSchemaNode.get("title");
             if (title != null) {
@@ -231,13 +240,6 @@ public class SwaggerError {
 
         /* package */String getLabelForRef(String refValue) {
             return refValue.substring(refValue.lastIndexOf("/") + 1);
-        }
-
-        protected JsonNode findNode(String path) {
-            // TODO
-            // JsonNode result = findNode(Lists.newLinkedList(Arrays.asList(path.split("/"))), swaggerSchema);
-            JsonNode result = ValidationUtil.findNode(path, null);
-            return result;
         }
 
         @Override

@@ -75,7 +75,7 @@ class MultipleSwaggerErrorMessageTest {
 	}
 
 	def void assertHumanFriendlyTextForNodeEquals(CharSequence json, String expectedLabel, String defaultValue) {
-		val swaggerError = new SwaggerError.MultipleSwaggerError(0, 0);
+		val swaggerError = new SwaggerError.MultipleSwaggerError(0, 0, 0, null);
 		val JsonNode arrayOfSchemasNode = Json.mapper().readTree(json.toString);
 		assertNotNull(arrayOfSchemasNode)
 		val label = swaggerError.getHumanFriendlyText(arrayOfSchemasNode, defaultValue);
@@ -84,7 +84,7 @@ class MultipleSwaggerErrorMessageTest {
 
 	def void testCombinedSchemas(String propertyName) throws Exception {
 		val JsonNode swaggerSchema = new SwaggerSchema().asJson
-		val swaggerError = new SwaggerError.MultipleSwaggerError(0, 0);
+		val swaggerError = new SwaggerError.MultipleSwaggerError(0, 0, 0, null);
 		val List<JsonNode> combinedSchemas = newArrayList();
 		// oneOf and anyOf are usually ArrayNodes
 		swaggerSchema.findValues(propertyName).forEach [

@@ -32,9 +32,11 @@ import com.reprezen.swagedit.core.validation.SwaggerError.MultipleSwaggerError;
 public class ErrorProcessor {
 
     private final Node document;
-
-    public ErrorProcessor(Node document) {
+    private final JsonNode jsonSchema;
+   
+    public ErrorProcessor(Node document, JsonNode jsonSchema) {
         this.document = document;
+        this.jsonSchema = jsonSchema;
     }
 
     /**
@@ -102,17 +104,15 @@ public class ErrorProcessor {
     }
 
     private SwaggerError createUnique(JsonNode error, int indent) {
-        final SwaggerError schemaError = new SwaggerError(getLine(error, document), getLevel(error),
+        final SwaggerError schemaError = new SwaggerError(getLine(error, document), getLevel(error), indent,
                 rewriteError(error));
-        schemaError.indent = indent;
-
+     
         return schemaError;
     }
 
     private SwaggerError createMultiple(JsonNode error, int indent) {
-        final MultipleSwaggerError schemaError = new MultipleSwaggerError(getLine(error, document), getLevel(error));
-        schemaError.indent = indent;
-
+        final MultipleSwaggerError schemaError = new MultipleSwaggerError(getLine(error, document), getLevel(error), indent, jsonSchema);
+ 
         final JsonNode reports = error.get("reports");
         for (Iterator<Entry<String, JsonNode>> it = reports.fields(); it.hasNext();) {
             Entry<String, JsonNode> next = it.next();

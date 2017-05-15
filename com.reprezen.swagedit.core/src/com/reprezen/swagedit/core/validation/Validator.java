@@ -95,7 +95,8 @@ public class Validator {
             if (yaml != null) {
                 URI baseURI = editorInput != null ? editorInput.getFile().getLocationURI() : null;
 
-                errors.addAll(validateAgainstSchema(new ErrorProcessor(yaml), document));
+                errors.addAll(validateAgainstSchema(
+                        new ErrorProcessor(yaml, document.getSchema().getRootType().getContent()), document));
                 errors.addAll(validateModel(document.getModel()));
                 errors.addAll(checkDuplicateKeys(yaml));
                 errors.addAll(referenceValidator.validate(baseURI, document));
