@@ -133,6 +133,9 @@
     "server": {
       "type": "object",
       "description": "An object representing a Server.",
+      "required": [
+        "url"
+      ],
       "additionalProperties": false,
       "patternProperties": {
         "^x-": {
@@ -180,12 +183,12 @@
         "enum": {
           "type": "array",
           "items": {
-            "$ref": "#/definitions/primitive"
+            "type": "string"
           },
           "uniqueItems": true
         },
         "default": {
-          "$ref": "#/definitions/primitive"
+          "type": "string"
         },
         "description": {
           "type": "string"
@@ -288,7 +291,11 @@
           "$ref": "#/definitions/operation"
         },
         "servers": {
-          "$ref": "#/definitions/server"
+          "type": "array",
+          "items": {
+            "$ref": "#/definitions/server"
+          },
+          "uniqueItems": true
         },
         "parameters": {
           "type": "array",
@@ -358,7 +365,11 @@
           "uniqueItems": true
         },
         "servers": {
-          "$ref": "#/definitions/server"
+          "type": "array",
+          "items": {
+            "$ref": "#/definitions/server"
+          },
+          "uniqueItems": true
         }
       }
     },
@@ -427,15 +438,11 @@
         "schema": {
           "$ref": "#/definitions/schemaOrReference"
         },
-        "examples": {
-          "type": "array",
-          "items": {
-            "$ref": "#/definitions/exampleOrReference"
-          },
-          "uniqueItems": true
-        },
         "example": {
-          "$ref": "#/definitions/exampleOrReference"
+          "$ref": "#/definitions/any"
+        },
+        "examples": {
+          "$ref": "#/definitions/examplesOrReferences"
         },
         "content": {
           "$ref": "#/definitions/content"
@@ -445,6 +452,9 @@
     "requestBody": {
       "type": "object",
       "description": "Describes a single request body.",
+      "required": [
+        "content"
+      ],
       "additionalProperties": false,
       "patternProperties": {
         "^x-": {
@@ -465,7 +475,7 @@
     },
     "content": {
       "type": "object",
-      "description": "Describes a set of supported media types. A Content Object can be used in Request Body Object, Parameter Objects, Header Objects, and Response Objects.  Each key in the Content Object is the media type of the Media Type Object.",
+      "description": "Describes a set of supported media types. A Content Object can be used in Request Body Object, Parameter Objects, Header Objects, and Response Objects.",
       "additionalProperties": false,
       "patternProperties": {
         "^": {
@@ -486,15 +496,11 @@
         "schema": {
           "$ref": "#/definitions/schemaOrReference"
         },
-        "examples": {
-          "type": "array",
-          "items": {
-            "$ref": "#/definitions/exampleOrReference"
-          },
-          "uniqueItems": true
-        },
         "example": {
-          "$ref": "#/definitions/exampleOrReference"
+          "$ref": "#/definitions/any"
+        },
+        "examples": {
+          "$ref": "#/definitions/examplesOrReferences"
         },
         "encoding": {
           "$ref": "#/definitions/encoding"
@@ -532,12 +538,15 @@
         },
         "explode": {
           "type": "boolean"
+        },
+        "allowReserved": {
+          "type": "boolean"
         }
       }
     },
     "responses": {
       "type": "object",
-      "description": "A container for the expected responses of an operation. The container maps a HTTP response code to the expected response. It is not expected from the documentation to necessarily cover all possible HTTP response codes, since they may not be known in advance. However, it is expected  from the documentation to cover a successful operation response and any  known errors.  The `default` MAY be used as a default response object for all HTTP codes  that are not covered individually by the specification.  The `Responses Object` MUST contain at least one response code, and it  SHOULD be the response for a successful operation call.",
+      "description": "A container for the expected responses of an operation. The container maps a HTTP response code to the expected response.  It is not expected for the documentation to necessarily cover all possible HTTP response codes, since they may not be known in advance. However, it is expected for the documentation to cover a successful operation response and any known errors.  The `default` MAY be used as a default response object for all HTTP codes  that are not covered individually by the specification.  The `Responses Object` MUST contain at least one response code, and it  SHOULD be the response for a successful operation call.",
       "additionalProperties": false,
       "patternProperties": {
         "^([0-9]{3})$": {
@@ -618,8 +627,27 @@
     },
     "example": {
       "type": "object",
-      "description": "Allows sharing examples for operation requests and responses. This object can either be a freeform object, array or primitive value.  To represent examples of media types that cannot naturally represented in the OpenAPI definition, a string value can be used to contain the example with escaping where necessary.",
-      "additionalProperties": false
+      "description": "",
+      "additionalProperties": false,
+      "patternProperties": {
+        "^x-": {
+          "$ref": "#/definitions/specificationExtension"
+        }
+      },
+      "properties": {
+        "summary": {
+          "type": "string"
+        },
+        "description": {
+          "type": "string"
+        },
+        "value": {
+          "$ref": "#/definitions/any"
+        },
+        "externalValue": {
+          "type": "string"
+        }
+      }
     },
     "links": {
       "type": "object",
@@ -641,7 +669,7 @@
         }
       },
       "properties": {
-        "href": {
+        "operationRef": {
           "type": "string"
         },
         "operationId": {
@@ -655,6 +683,9 @@
         },
         "description": {
           "type": "string"
+        },
+        "server": {
+          "$ref": "#/definitions/server"
         }
       }
     },
@@ -703,15 +734,11 @@
         "schema": {
           "$ref": "#/definitions/schemaOrReference"
         },
-        "examples": {
-          "type": "array",
-          "items": {
-            "$ref": "#/definitions/exampleOrReference"
-          },
-          "uniqueItems": true
-        },
         "example": {
-          "$ref": "#/definitions/exampleOrReference"
+          "$ref": "#/definitions/any"
+        },
+        "examples": {
+          "$ref": "#/definitions/examplesOrReferences"
         },
         "content": {
           "$ref": "#/definitions/content"
@@ -789,9 +816,6 @@
           "$ref": "#/definitions/externalDocs"
         },
         "example": {
-          "$ref": "#/definitions/any"
-        },
-        "examples": {
           "$ref": "#/definitions/any"
         },
         "deprecated": {
@@ -889,8 +913,21 @@
         "properties": {
           "type": "object",
           "additionalProperties": {
-            "$ref": "#/definitions/schema"
+            "$ref": "#/definitions/schemaOrReference"
           }
+        },
+        "additionalProperties": {
+          "oneOf": [
+            {
+              "$ref": "#/definitions/schemaOrReference"
+            },
+            {
+              "type": "boolean"
+            }
+          ]
+        },
+        "default": {
+          "$ref": "#/definitions/defaultType"
         },
         "description": {
           "type": "string"
@@ -958,7 +995,7 @@
         "bearerFormat": {
           "type": "string"
         },
-        "flow": {
+        "flows": {
           "$ref": "#/definitions/oauthFlows"
         },
         "openIdConnectUrl": {
@@ -1131,6 +1168,12 @@
         }
       ]
     },
+    "examplesOrReferences": {
+      "type": "object",
+      "additionalProperties": {
+        "$ref": "#/definitions/exampleOrReference"
+      }
+    },
     "parameters": {
       "type": "object",
       "additionalProperties": {
@@ -1173,7 +1216,7 @@
       "description": "Any property starting with x- is valid.",
       "oneOf": [
         {
-          "type": "integer"
+          "type": "null"
         },
         {
           "type": "number"
@@ -1192,10 +1235,16 @@
         }
       ]
     },
-    "primitive": {
+    "defaultType": {
       "oneOf": [
         {
-          "type": "integer"
+          "type": "null"
+        },
+        {
+          "type": "array"
+        },
+        {
+          "type": "object"
         },
         {
           "type": "number"
