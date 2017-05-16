@@ -15,6 +15,8 @@ import org.eclipse.jface.text.templates.persistence.TemplateStore;
 
 import com.reprezen.swagedit.core.assist.JsonContentAssistProcessor;
 import com.reprezen.swagedit.core.assist.JsonProposalProvider;
+import com.reprezen.swagedit.openapi3.Activator;
+import com.reprezen.swagedit.openapi3.templates.OpenApi3ContextType;
 
 public class OpenApi3ContentAssistProcessor extends JsonContentAssistProcessor {
 
@@ -24,17 +26,17 @@ public class OpenApi3ContentAssistProcessor extends JsonContentAssistProcessor {
 
 	@Override
 	protected TemplateStore getTemplateStore() {
-		return null;
+        return Activator.getDefault().getTemplateStore();
 	}
 
 	@Override
 	protected ContextTypeRegistry getContextTypeRegistry() {
-		return null;
+        return Activator.getDefault().getContextTypeRegistry();
 	}
 
 	@Override
 	protected String getContextTypeId(String path) {
-		return null;
+        return OpenApi3ContextType.getContextType(path);
 	}
 
 }
