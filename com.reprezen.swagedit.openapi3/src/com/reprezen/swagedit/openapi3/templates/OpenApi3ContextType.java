@@ -9,6 +9,8 @@ import com.google.common.collect.Lists;
 
 public class OpenApi3ContextType extends TemplateContextType {
 
+    private static final String PATH_ITEM_REGEX = "/paths/~1[^/]+";
+
     public OpenApi3ContextType() {
         addGlobalResolvers();
     }
@@ -25,17 +27,32 @@ public class OpenApi3ContextType extends TemplateContextType {
     }
 
     public static class RootContextType extends OpenApi3ContextType {
-        public static final String CONTEXT_ID = "com.reprezen.swagedit.openapi3.templates.openapi.root";
+        public static final String CONTEXT_ID = "com.reprezen.swagedit.openapi3.templates.root";
     }
 
     public static class ContactContextType extends OpenApi3ContextType {
-        public static final String CONTEXT_ID = "com.reprezen.swagedit.openapi3.templates.openapi.info.contact";
+        public static final String CONTEXT_ID = "com.reprezen.swagedit.openapi3.templates.info.contact";
+    }
+
+    public static class PathsContextType extends OpenApi3ContextType {
+        public static final String CONTEXT_ID = "com.reprezen.swagedit.openapi3.templates.paths";
+    }
+
+    public static class PathItemContextType extends OpenApi3ContextType {
+        public static final String CONTEXT_ID = "com.reprezen.swagedit.openapi3.templates.path_item";
+    }
+
+    public static class SchemaContextType extends OpenApi3ContextType {
+        public static final String CONTEXT_ID = "com.reprezen.swagedit.openapi3.templates.components.schemas";
     }
 
     public static List<String> allContextTypes() {
         return Lists.newArrayList( //
                 RootContextType.CONTEXT_ID, //
-                ContactContextType.CONTEXT_ID);
+                ContactContextType.CONTEXT_ID, //
+                PathsContextType.CONTEXT_ID, //
+                PathItemContextType.CONTEXT_ID, //
+                SchemaContextType.CONTEXT_ID);
     }
 
     public static String getContextType(String path) {
@@ -48,7 +65,16 @@ public class OpenApi3ContextType extends TemplateContextType {
         if (path.matches("/info/contact")) {
             return ContactContextType.CONTEXT_ID;
         }
-
+        if (path.matches("/paths")) {
+            return PathsContextType.CONTEXT_ID;
+        }
+        if (path.matches(PATH_ITEM_REGEX + "$")) { // /paths/[pathItem]/
+            return PathItemContextType.CONTEXT_ID;
+        }
+        System.out.println(path);
+        if (path.matches("/components/schemas")) {
+            return SchemaContextType.CONTEXT_ID;
+        }
         return null;
     }
 

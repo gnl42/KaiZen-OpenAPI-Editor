@@ -2,13 +2,17 @@
 	<template name="OpenApi version" 
        id="com.reprezen.swagedit.openapi3.templates.openapi_template" 
        description="OpenAPI version declaration" 
-       context="com.reprezen.swagedit.openapi3.templates.openapi.root" 
+       context="com.reprezen.swagedit.openapi3.templates.root" 
        enabled="true">openapi: "3.0"</template>
+
+<!--
+	INFO  
+ -->
 
 	<template name="OpenApi info" 
        id="com.reprezen.swagedit.openapi3.templates.info_template" 
        description="Provides descriptive metadata about this API specification" 
-       context="com.reprezen.swagedit.openapi3.templates.openapi.root" 
+       context="com.reprezen.swagedit.openapi3.templates.root" 
        enabled="true">info:
   version: 1.0
   title: ${API_title}
@@ -22,20 +26,227 @@
     name: ${MIT}
     url: http://opensource.org/licenses/MIT</template>
 
-<template name="OpenApi contact" 
+	<template name="OpenApi contact" 
        id="com.reprezen.swagedit.openapi3.templates.info_contact_template" 
        description="Provides contact metadata about this API specification" 
-       context="com.reprezen.swagedit.openapi3.templates.openapi.info.contact" 
+       context="com.reprezen.swagedit.openapi3.templates.info.contact" 
        enabled="true">name: ${contact_name}
     url: ${contact_url}
     email: ${contact_email}</template>
 
+<!--
+	SERVERS 
+ -->
+
 	<template name="OpenApi servers" 
        id="com.reprezen.swagedit.openapi3.templates.servers_template" 
        description="OpenAPI servers declaration" 
-       context="com.reprezen.swagedit.openapi3.templates.openapi.root" 
+       context="com.reprezen.swagedit.openapi3.templates.root" 
        enabled="true">servers:
   - uri: ${uri}
     description: ${description}</template>
+ 
+ <!--
+ 	PATHS 
+  -->
+
+     <template name="Object resource" 
+       id="com.reprezen.swagedit.openapi3.templates.collection_resource_template" 
+       description="object resource template" 
+       context="com.reprezen.swagedit.openapi3.templates.paths" 
+       enabled="true">/${resource}:
+  get:
+    responses:
+      '${200}':
+        description: OK
+        schema:
+          $$ref: ${model}</template>
+
+<!--
+	PATH ITEMS 
+ -->
+ 
+	<template name="get" 
+       id="com.reprezen.swagedit.openapi3.templates.path_get_template" 
+       description="GET template" 
+       context="com.reprezen.swagedit.openapi3.templates.path_item" 
+       enabled="true">get:
+      summary: Read
+      description: Provide details for the entire list (for collection resources) or an item (for object resources)
+      responses:
+        '${200}':
+          description: ${OK}
+          schema:
+            $$ref: ${model}</template>
+
+     <template name="post" 
+       id="com.reprezen.swagedit.openapi3.templates.path_post_template" 
+       description="POST template" 
+       context="com.reprezen.swagedit.openapi3.templates.path_item" 
+       enabled="true">post:
+      summary: Create
+      description: Create a new item
+      parameters:
+        - name: ${request}
+          in: body
+          required: true
+          schema:
+            $$ref: ${model}  
+      responses:
+        '${200}':
+          description: OK
+          schema:
+            $$ref: ${model}</template>
+
+     <template name="put" 
+       id="com.reprezen.swagedit.openapi3.templates.path_put_template" 
+       description="PUT template" 
+       context="com.reprezen.swagedit.openapi3.templates.path_item" 
+       enabled="true">put:
+      summary: Update
+      description: Update the entire list (for collection resources) or an item (for object resources)
+      parameters:
+        - name: ${request}
+          in: body
+          required: true
+          schema:
+            $$ref: ${model}  
+      responses:
+        '${200}':
+          description: OK</template>
+
+     <template name="delete" 
+       id="com.reprezen.swagedit.openapi3.templates.path_delete_template" 
+       description="DELETE template" 
+       context="com.reprezen.swagedit.openapi3.templates.path_item" 
+       enabled="true">delete:
+      summary: Delete 
+      description: Delete the entire list (for collection resources) or an item (for object resources)
+      responses:
+        '${200}':
+          description: OK
+          schema:
+            $$ref: ${model}</template>
+    
+    <template name="patch" 
+       id="com.reprezen.swagedit.openapi3.templates.path_patch_template" 
+       description="PATCH template" 
+       context="com.reprezen.swagedit.openapi3.templates.path_item" 
+       enabled="true">patch:
+      summary: Partial update
+      description: ${Update}
+      parameters:
+        - name: ${request}
+          in: body
+          required: true
+          schema:
+           $$ref: ${model}  
+      responses:
+        '${200}':
+          description: OK
+          schema:
+            $$ref: ${model}</template>
+
+    <template name="options" 
+       id="com.reprezen.swagedit.openapi3.templates.path_options_template" 
+       description="OPTIONS template" 
+       context="com.reprezen.swagedit.openapi3.templates.path_item" 
+       enabled="true">options:
+      summary: Request resource options
+      description: Request information about methods available for resource manipulation 
+      responses:
+        '${200}':
+          description: OK</template>
+
+    <template name="head" 
+       id="com.reprezen.swagedit.openapi3.templates.path_head_template" 
+       description="HEAD template" 
+       context="com.reprezen.swagedit.openapi3.templates.path_item" 
+       enabled="true">head:
+      summary: Query a resource in the server
+      description: HEAD sends request and get the response only in the header, the body should not be used
+      responses:
+        '${200}':
+          description: OK</template>
+          
+<!--
+	PARAMETERS 
+ -->
+ 
+ <template name="path parameter" 
+       id="com.reprezen.swagedit.templates.path_parameter_object" 
+       description="path parameter template" 
+       context="com.reprezen.swagedit.templates.swagger.parameter_object" 
+       enabled="true">name: ${name}
+in: path
+description: ${ID}
+required: true
+type: ${integer}
+format: int64
+</template>
+
+     <template name="header parameter" 
+       id="com.reprezen.swagedit.templates.header_parameter_object" 
+       description="header parameter template" 
+       context="com.reprezen.swagedit.templates.swagger.parameter_object" 
+       enabled="true">name: ${name}
+in: header
+description: ${ID}
+required: true
+type: ${integer}
+format: int64
+</template>
+
+     <template name="query parameter" 
+       id="com.reprezen.swagedit.templates.query_parameter_object" 
+       description="query parameter template" 
+       context="com.reprezen.swagedit.templates.swagger.parameter_object" 
+       enabled="true">name: ${name}
+in: query
+description: ${ID}
+required: true
+type: ${integer}
+format: int64
+</template>
+
+     <template name="form data parameter" 
+       id="com.reprezen.swagedit.templates.formdata_parameter_object" 
+       description="form data parameter template" 
+       context="com.reprezen.swagedit.templates.swagger.parameter_object" 
+       enabled="true">name: ${name}
+in: formData
+description: ${ID}
+required: true
+type: ${integer}
+format: int64
+</template>
+
+     <template name="body parameter (request)" 
+       id="com.reprezen.swagedit.templates.body_parameter_object" 
+       description="body parameter (request) template" 
+       context="com.reprezen.swagedit.templates.swagger.parameter_object" 
+       enabled="true">name: ${name}
+in: body
+description: ${ID}
+required: true
+schema:
+  $$ref: ${model}
+</template>
+ 
+<!--
+	SCHEMA 
+ -->
+ 
+	<template name="schema" 
+       id="com.reprezen.swagedit.openapi3.templates.schema" 
+       description="Schema definition template" 
+       context="com.reprezen.swagedit.openapi3.templates.components.schemas" 
+       enabled="true">${type}:
+      required:
+        - ${property}
+      properties:
+        ${property}:
+          type: integer
+          format: int64</template>
 
 </templates>

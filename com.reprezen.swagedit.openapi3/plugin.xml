@@ -109,14 +109,29 @@
       </include>
       <contextType
             class="com.reprezen.swagedit.openapi3.templates.OpenApi3ContextType$RootContextType"
-            id="com.reprezen.swagedit.openapi3.templates.openapi.root"
+            id="com.reprezen.swagedit.openapi3.templates.root"
             name="Root Context">
       </contextType>
       <contextType
             class="com.reprezen.swagedit.openapi3.templates.OpenApi3ContextType$ContactContextType"
-            id="com.reprezen.swagedit.openapi3.templates.openapi.info.contact"
+            id="com.reprezen.swagedit.openapi3.templates.info.contact"
             name="Contact Context">
-      </contextType>      
+      </contextType>
+      <contextType
+            class="com.reprezen.swagedit.openapi3.templates.OpenApi3ContextType$PathsContextType"
+            id="com.reprezen.swagedit.openapi3.templates.paths"
+            name="Paths Context">
+      </contextType>
+      <contextType
+            class="com.reprezen.swagedit.openapi3.templates.OpenApi3ContextType$PathItemContextType"
+            id="com.reprezen.swagedit.openapi3.templates.path_item"
+            name="Path Item Context">
+      </contextType>
+      <contextType
+            class="com.reprezen.swagedit.openapi3.templates.OpenApi3ContextType$SchemaContextType"
+            id="com.reprezen.swagedit.openapi3.templates.components.schemas"
+            name="Schema Context">
+      </contextType>  
    </extension>
-   
+
 </plugin>
