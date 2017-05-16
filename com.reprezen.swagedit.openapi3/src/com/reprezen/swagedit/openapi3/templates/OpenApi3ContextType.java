@@ -10,6 +10,9 @@ import com.google.common.collect.Lists;
 public class OpenApi3ContextType extends TemplateContextType {
 
     private static final String PATH_ITEM_REGEX = "/paths/~1[^/]+";
+    // we can use a ? here as both 'PATH_ITEM_REGEX + "/parameters$"' and
+    // 'PATH_ITEM_REGEX + "/[^/]+/parameters$"' are supported
+    private static final String PARAMETERS_LIST_REGEX = PATH_ITEM_REGEX + "/([^/]+/)?parameters";
 
     public OpenApi3ContextType() {
         addGlobalResolvers();
@@ -46,13 +49,38 @@ public class OpenApi3ContextType extends TemplateContextType {
         public static final String CONTEXT_ID = "com.reprezen.swagedit.openapi3.templates.components.schemas";
     }
 
+    public static class ParameterObjectContextType extends OpenApi3ContextType {
+        public static final String CONTEXT_ID = "com.reprezen.swagedit.openapi3.templates.parameter_object";
+    }
+
+    public static class ResponseObjectContextType extends OpenApi3ContextType {
+        public static final String CONTEXT_ID = "com.reprezen.swagedit.openapi3.templates.responses";
+    }
+
+    public static class ResponseContentContextType extends OpenApi3ContextType {
+        public static final String CONTEXT_ID = "com.reprezen.swagedit.openapi3.templates.response";
+    }
+
+    public static class ComponentsObjectContextType extends OpenApi3ContextType {
+        public static final String CONTEXT_ID = "com.reprezen.swagedit.openapi3.templates.components";
+    }
+
+    public static class CallbackObjectContextType extends OpenApi3ContextType {
+        public static final String CONTEXT_ID = "com.reprezen.swagedit.openapi3.templates.callback";
+    }
+
     public static List<String> allContextTypes() {
         return Lists.newArrayList( //
                 RootContextType.CONTEXT_ID, //
                 ContactContextType.CONTEXT_ID, //
                 PathsContextType.CONTEXT_ID, //
                 PathItemContextType.CONTEXT_ID, //
-                SchemaContextType.CONTEXT_ID);
+                SchemaContextType.CONTEXT_ID, //
+                ParameterObjectContextType.CONTEXT_ID, //
+                ResponseObjectContextType.CONTEXT_ID, //
+                ResponseContentContextType.CONTEXT_ID, //
+                ComponentsObjectContextType.CONTEXT_ID, //
+                CallbackObjectContextType.CONTEXT_ID);
     }
 
     public static String getContextType(String path) {
@@ -71,9 +99,25 @@ public class OpenApi3ContextType extends TemplateContextType {
         if (path.matches(PATH_ITEM_REGEX + "$")) { // /paths/[pathItem]/
             return PathItemContextType.CONTEXT_ID;
         }
-        System.out.println(path);
         if (path.matches("/components/schemas")) {
             return SchemaContextType.CONTEXT_ID;
+        }
+        if (path.matches(PARAMETERS_LIST_REGEX + "/\\d+$")//
+                || path.matches("/components/parameters/[^/]+$")) {
+            return ParameterObjectContextType.CONTEXT_ID;
+        }
+        if (path.equals("/components/responses")//
+                || path.matches(PATH_ITEM_REGEX + "/[^/]+/responses$")) {
+            return ResponseObjectContextType.CONTEXT_ID;
+        }
+        if (path.matches(PATH_ITEM_REGEX + "/[^/]+/responses/\\d\\d\\d")) {
+            return ResponseContentContextType.CONTEXT_ID;
+        }
+        if (path.matches("/components")) {
+            return ComponentsObjectContextType.CONTEXT_ID;
+        }
+        if (path.matches("/components/callbacks")) {
+            return CallbackObjectContextType.CONTEXT_ID;
         }
         return null;
     }

@@ -170,13 +170,50 @@
           description: OK</template>
           
 <!--
+	RESPONSES
+ -->
+ 
+	<template name="OK response" 
+       id="com.reprezen.swagedit.openapi3.templates.200_response" 
+       description="OK template" 
+       context="com.reprezen.swagedit.openapi3.templates.responses" 
+       enabled="true">2${00}:
+      description: ${OK}</template>
+
+    <template name="client error response" 
+       id="com.reprezen.swagedit.openapi3.templates.400_response" 
+       description="client error response template" 
+       context="com.reprezen.swagedit.openapi3.templates.responses" 
+       enabled="true">4${00}:
+      description: ${Client} error</template>
+
+    <template name="server error response" 
+       id="com.reprezen.swagedit.openapi3.templates.500_response" 
+       description="server error response template" 
+       context="com.reprezen.swagedit.openapi3.templates.responses" 
+       enabled="true">5${00}:
+      description: ${Server} error</template>
+
+<!--
+	LINKS 
+ -->
+
+ 	<template name="response link" 
+       id="com.reprezen.swagedit.openapi3.templates.response_link" 
+       description="server response link template" 
+       context="com.reprezen.swagedit.openapi3.templates.response" 
+       enabled="true">links:
+            ${name}:
+              $$ref: ${ref}</template>
+
+<!--
 	PARAMETERS 
  -->
  
  <template name="path parameter" 
-       id="com.reprezen.swagedit.templates.path_parameter_object" 
+       id="com.reprezen.swagedit.openapi3.templates.path_parameter_object" 
        description="path parameter template" 
-       context="com.reprezen.swagedit.templates.swagger.parameter_object" 
+       context="com.reprezen.swagedit.openapi3.templates.parameter_object" 
        enabled="true">name: ${name}
 in: path
 description: ${ID}
@@ -186,9 +223,9 @@ format: int64
 </template>
 
      <template name="header parameter" 
-       id="com.reprezen.swagedit.templates.header_parameter_object" 
+       id="com.reprezen.swagedit.openapi3.templates.header_parameter_object" 
        description="header parameter template" 
-       context="com.reprezen.swagedit.templates.swagger.parameter_object" 
+       context="com.reprezen.swagedit.openapi3.templates.parameter_object" 
        enabled="true">name: ${name}
 in: header
 description: ${ID}
@@ -198,9 +235,9 @@ format: int64
 </template>
 
      <template name="query parameter" 
-       id="com.reprezen.swagedit.templates.query_parameter_object" 
+       id="com.reprezen.swagedit.openapi3.templates.query_parameter_object" 
        description="query parameter template" 
-       context="com.reprezen.swagedit.templates.swagger.parameter_object" 
+       context="com.reprezen.swagedit.openapi3.templates.parameter_object" 
        enabled="true">name: ${name}
 in: query
 description: ${ID}
@@ -210,9 +247,9 @@ format: int64
 </template>
 
      <template name="form data parameter" 
-       id="com.reprezen.swagedit.templates.formdata_parameter_object" 
+       id="com.reprezen.swagedit.openapi3.templates.formdata_parameter_object" 
        description="form data parameter template" 
-       context="com.reprezen.swagedit.templates.swagger.parameter_object" 
+       context="com.reprezen.swagedit.openapi3.templates.parameter_object" 
        enabled="true">name: ${name}
 in: formData
 description: ${ID}
@@ -222,9 +259,9 @@ format: int64
 </template>
 
      <template name="body parameter (request)" 
-       id="com.reprezen.swagedit.templates.body_parameter_object" 
+       id="com.reprezen.swagedit.openapi3.templates.body_parameter_object" 
        description="body parameter (request) template" 
-       context="com.reprezen.swagedit.templates.swagger.parameter_object" 
+       context="com.reprezen.swagedit.openapi3.templates.parameter_object" 
        enabled="true">name: ${name}
 in: body
 description: ${ID}
@@ -248,5 +285,44 @@ schema:
         ${property}:
           type: integer
           format: int64</template>
+
+<!--
+	CALLBACKS 
+ -->
+ 
+ 	<template name="callbacks" 
+       id="com.reprezen.swagedit.openapi3.templates.callbacks" 
+       description="Callback definition template" 
+       context="com.reprezen.swagedit.openapi3.templates.components" 
+       enabled="true">callbacks:
+      ${name}:
+         '${url}':
+    	   post:
+      	     requestBody:
+        	   description: callback payload
+        	   content: 
+                 'application/json':
+                    schema:
+                      $$ref: '${schema}'
+             responses:
+               '200':
+                 description: response description</template>
+
+     <template name="callback" 
+       id="com.reprezen.swagedit.openapi3.templates.callback" 
+       description="Callback definition template"
+       context="com.reprezen.swagedit.openapi3.templates.callback" 
+       enabled="true">${name}:
+         '${url}':
+    	   post:
+      	     requestBody:
+        	   description: callback payload
+        	   content: 
+                 'application/json':
+                    schema:
+                      $$ref: '${schema}'
+             responses:
+               '200':
+                 description: response description</template>
 
 </templates>

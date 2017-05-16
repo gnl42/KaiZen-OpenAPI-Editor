@@ -131,7 +131,32 @@
             class="com.reprezen.swagedit.openapi3.templates.OpenApi3ContextType$SchemaContextType"
             id="com.reprezen.swagedit.openapi3.templates.components.schemas"
             name="Schema Context">
-      </contextType>  
+      </contextType>
+      <contextType
+            class="com.reprezen.swagedit.openapi3.templates.OpenApi3ContextType$ParameterObjectContextType"
+            id="com.reprezen.swagedit.openapi3.templates.parameter_object"
+            name="Parameter Object Context">
+      </contextType>
+      <contextType
+            class="com.reprezen.swagedit.openapi3.templates.OpenApi3ContextType$ResponseObjectContextType"
+            id="com.reprezen.swagedit.openapi3.templates.responses"
+            name="Response Object Context">
+      </contextType>
+      <contextType
+            class="com.reprezen.swagedit.openapi3.templates.OpenApi3ContextType$ResponseContentContextType"
+            id="com.reprezen.swagedit.openapi3.templates.response"
+            name="Response Context">
+      </contextType>
+      <contextType
+            class="com.reprezen.swagedit.openapi3.templates.OpenApi3ContextType$ComponentsObjectContextType"
+            id="com.reprezen.swagedit.openapi3.templates.components"
+            name="Components Context">
+      </contextType>
+      <contextType
+            class="com.reprezen.swagedit.openapi3.templates.OpenApi3ContextType$CallbackObjectContextType"
+            id="com.reprezen.swagedit.openapi3.templates.callback"
+            name="Callback Context">
+      </contextType>
    </extension>
 
 </plugin>
