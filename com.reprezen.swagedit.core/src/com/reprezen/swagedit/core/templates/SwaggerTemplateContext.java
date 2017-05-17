@@ -1,4 +1,4 @@
-package com.reprezen.swagedit.templates;
+package com.reprezen.swagedit.core.templates;
 
 /*******************************************************************************
  * Copyright (c) 2008, 2016 itemis AG (http://www.itemis.eu) and others.
