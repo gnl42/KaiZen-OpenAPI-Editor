@@ -14,17 +14,17 @@
        description="Provides descriptive metadata about this API specification" 
        context="com.reprezen.swagedit.openapi3.templates.root" 
        enabled="true">info:
-version: "1.0.0"
-title: ${API_title}
-description: ${API_description}
-termsOfService: ${terms}
-contact:
-  name: ${contact_name}
-  url: ${contact_url}
-  email: ${contact_email}
-license:
-  name: ${MIT}
-  url: http://opensource.org/licenses/MIT</template>
+  version: "1.0.0"
+  title: ${API_title}
+  description: ${API_description}
+  termsOfService: ${terms}
+  contact:
+    name: ${contact_name}
+    url: ${contact_url}
+    email: ${contact_email}
+  license:
+    name: ${MIT}
+    url: http://opensource.org/licenses/MIT</template>
 
 	<template name="OpenAPI contact" 
        id="com.reprezen.swagedit.openapi3.templates.info_contact_template" 
@@ -55,23 +55,23 @@ email: ${contact_email}</template>
        description="object resource template" 
        context="com.reprezen.swagedit.openapi3.templates.paths" 
        enabled="true">/${resource}:
-get:
-  description: ${description}
-  responses:
-    '200':
-      description: Ok
-      content:
-        application/json:
-          schema:
-            type: array
-            items:
-              $$ref: '${responseModel}'
-    default:
-      description: Error
-      content:
-        'text/html':
-          schema:
-            $$ref: '${errorModel}'</template>
+  get:
+    description: ${description}
+    responses:
+      '200':
+        description: Ok
+        content:
+          application/json:
+            schema:
+              type: array
+              items:
+                $$ref: '${responseModel}'
+      default:
+        description: Error
+        content:
+          'text/html':
+            schema:
+              $$ref: '${errorModel}'</template>
 
 <!--
 	PATH ITEMS 
@@ -82,11 +82,11 @@ get:
        description="GET template" 
        context="com.reprezen.swagedit.openapi3.templates.path_item" 
        enabled="true">get:
-summary: Read
-description: Provide details for the entire list (for collection resources) or an item (for object resources)
-responses:
-  '${200}':
-    description: ${OK}
+  summary: Read
+  description: Provide details for the entire list (for collection resources) or an item (for object resources)
+  responses:
+    '${200}':
+      description: ${OK}
       content:
         application/json:
           schema:
@@ -97,76 +97,80 @@ responses:
        description="POST template" 
        context="com.reprezen.swagedit.openapi3.templates.path_item" 
        enabled="true">post:
-summary: Create
-description: Create a new item
-requestBody:
-  description: description
-  content: 
-    "application/json":
-      schema:
-        $$ref: "${input}"
-responses:
-  '${200}':
-    description: OK</template>
+  summary: Create
+  description: Create a new item
+  requestBody:
+    description: description
+    content: 
+      "application/json":
+        schema:
+          $$ref: "${input}"
+  responses:
+    '${200}':
+      description: OK</template>
 
      <template name="put" 
        id="com.reprezen.swagedit.openapi3.templates.path_put_template" 
        description="PUT template" 
        context="com.reprezen.swagedit.openapi3.templates.path_item" 
        enabled="true">put:
-summary: Update
-description: Update the entire list (for collection resources) or an item (for object resources)   
-responses:
-  '${200}':
-    description: OK</template>
+  summary: Update
+  description: Update the entire list (for collection resources) or an item (for object resources)   
+  responses:
+    '${200}':
+      description: OK</template>
 
      <template name="delete" 
        id="com.reprezen.swagedit.openapi3.templates.path_delete_template" 
        description="DELETE template" 
        context="com.reprezen.swagedit.openapi3.templates.path_item" 
        enabled="true">delete:
-summary: Delete 
-description: Delete the entire list (for collection resources) or an item (for object resources)
-responses:
-  '${200}':
-    description: OK
-      schema:
-        $$ref: ${model}</template>
+  summary: Delete 
+  description: Delete the entire list (for collection resources) or an item (for object resources)
+  responses:
+    '${200}':
+      description: ${OK}
+      content:
+        application/json:
+          schema:
+            $$ref: ${model}</template>
     
     <template name="patch" 
        id="com.reprezen.swagedit.openapi3.templates.path_patch_template" 
        description="PATCH template" 
        context="com.reprezen.swagedit.openapi3.templates.path_item" 
        enabled="true">patch:
-summary: Partial update
-description: ${Update}   
-responses:
-  '${200}':
-    description: OK
-    schema:
-      $$ref: ${model}</template>
+  summary: Partial update
+  description: ${Update}   
+  responses:
+    '${200}':
+      description: ${OK}
+      content:
+        application/json:
+          schema:
+            $$ref: ${model}</template>
 
     <template name="options" 
        id="com.reprezen.swagedit.openapi3.templates.path_options_template" 
        description="OPTIONS template" 
        context="com.reprezen.swagedit.openapi3.templates.path_item" 
        enabled="true">options:
-summary: Request resource options
-description: Request information about methods available for resource manipulation 
-responses:
-  '${200}':
-    description: OK</template>
+  summary: Request resource options
+  description: Request information about methods available for resource manipulation 
+  responses:
+    '${200}':
+      description: OK</template>
 
     <template name="head" 
        id="com.reprezen.swagedit.openapi3.templates.path_head_template" 
        description="HEAD template" 
        context="com.reprezen.swagedit.openapi3.templates.path_item" 
        enabled="true">head:
-summary: Query a resource in the server
-description: HEAD sends request and get the response only in the header, the body should not be used
-responses:
-  '${200}':
-    description: OK</template>
+  summary: Query a resource in the server
+  description: HEAD sends request and get the response only in the header, the body should not be used
+  responses:
+    '${200}':
+      description: OK</template>
           
 <!--
 	RESPONSES
@@ -176,22 +180,22 @@ responses:
        id="com.reprezen.swagedit.openapi3.templates.200_response" 
        description="OK template" 
        context="com.reprezen.swagedit.openapi3.templates.responses" 
-       enabled="true">2${00}:
-description: ${OK}</template>
+       enabled="true">'2${00}':
+  description: ${OK}</template>
 
     <template name="client error response" 
        id="com.reprezen.swagedit.openapi3.templates.400_response" 
        description="client error response template" 
        context="com.reprezen.swagedit.openapi3.templates.responses" 
-       enabled="true">4${00}:
-description: ${Client} error</template>
+       enabled="true">'4${00}':
+  description: ${Client} error</template>
 
     <template name="server error response" 
        id="com.reprezen.swagedit.openapi3.templates.500_response" 
        description="server error response template" 
        context="com.reprezen.swagedit.openapi3.templates.responses" 
-       enabled="true">5${00}:
-description: ${Server} error</template>
+       enabled="true">'5${00}':
+  description: ${Server} error</template>
 
 <!--
 	LINKS 
@@ -202,8 +206,8 @@ description: ${Server} error</template>
        description="server response link template" 
        context="com.reprezen.swagedit.openapi3.templates.response" 
        enabled="true">links:
-${name}:
-  $$ref: ${ref}</template>
+  ${name}:
+    $$ref: "${ref}"</template>
 
 <!--
 	PARAMETERS 
@@ -265,11 +269,7 @@ Request Body
 content: 
   "application/json":
     schema:
-      $$ref: ${model}
-    examples:
-      ${name}:
-        summary: ${summary}
-        externalValue: ${exampleLink}</template>
+      $$ref: ${model}</template>
  
 <!--
 	SCHEMA 
@@ -280,12 +280,12 @@ content:
        description="Schema definition template" 
        context="com.reprezen.swagedit.openapi3.templates.components.schemas" 
        enabled="true">${type}:
-required:
-  - ${property}
-properties:
-  ${property}:
-    type: integer
-    format: int64</template>
+  required:
+    - ${property}
+  properties:
+    ${property}:
+      type: integer
+      format: int64</template>
 
 <!--
 	CALLBACKS 
@@ -296,32 +296,32 @@ properties:
        description="Callback definition template" 
        context="com.reprezen.swagedit.openapi3.templates.components" 
        enabled="true">callbacks:
-${name}:
-  '${url}':
-    post:
-      requestBody:
-        description: callback payload
+  ${name}:
+    '${url}':
+      post:
+        requestBody:
+          description: callback payload
           content: 
             'application/json':
               schema:
                 $$ref: '${schema}'
-      responses:
-        '200':
-          description: response description</template>
+        responses:
+          '200':
+            description: response description</template>
 
      <template name="callback" 
        id="com.reprezen.swagedit.openapi3.templates.callback" 
        description="Callback definition template"
        context="com.reprezen.swagedit.openapi3.templates.callback" 
        enabled="true">${name}:
-'${url}':
-  post:
-    requestBody:
-      description: callback payload
-      content: 
-        'application/json':
-          schema:
-            $$ref: '${schema}'
+  '${url}':
+    post:
+      requestBody:
+        description: callback payload
+        content: 
+          'application/json':
+            schema:
+              $$ref: '${schema}'
       responses:
         '200':
           description: response description</template>
