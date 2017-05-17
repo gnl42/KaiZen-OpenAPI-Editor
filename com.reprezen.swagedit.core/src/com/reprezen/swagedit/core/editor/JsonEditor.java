@@ -465,10 +465,10 @@ public abstract class JsonEditor extends YEdit implements IShowInSource, IShowIn
 
     protected void validateYaml(IFile file, JsonDocument document) {
         if (document.getYamlError() instanceof YAMLException) {
-            addMarker(new SwaggerError((YAMLException) document.getYamlError()), file, document);
+            addMarker(SwaggerError.newYamlError((YAMLException) document.getYamlError()), file, document);
         }
         if (document.getJsonError() instanceof JsonProcessingException) {
-            addMarker(new SwaggerError((JsonProcessingException) document.getJsonError()), file, document);
+            addMarker(SwaggerError.newJsonError((JsonProcessingException) document.getJsonError()), file, document);
         }
     }
 

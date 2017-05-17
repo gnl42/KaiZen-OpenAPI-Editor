@@ -34,7 +34,7 @@ public class ErrorProcessorTest {
     @Before
     public void setUp() {
         Node document = null;
-        processor = new ErrorProcessor(document);
+        processor = new ErrorProcessor(document, null);
     }
 
     @Test
