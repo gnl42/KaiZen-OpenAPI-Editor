@@ -155,8 +155,13 @@
       <contextType
             class="com.reprezen.swagedit.openapi3.templates.OpenApi3ContextType$CallbackObjectContextType"
             id="com.reprezen.swagedit.openapi3.templates.callback"
-            name="Callback Context">
+            name="Callback Context">            
       </contextType>
+      <contextType
+            class="com.reprezen.swagedit.openapi3.templates.OpenApi3ContextType$RequestBodyObjectContextType"
+            id="com.reprezen.swagedit.openapi3.templates.requestBody"
+            name="RequestBody Context">            
+      </contextType>      
    </extension>
 
 </plugin>

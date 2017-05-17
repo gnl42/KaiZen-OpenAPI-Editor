@@ -69,6 +69,10 @@ public class OpenApi3ContextType extends TemplateContextType {
         public static final String CONTEXT_ID = "com.reprezen.swagedit.openapi3.templates.callback";
     }
 
+    public static class RequestBodyObjectContextType extends OpenApi3ContextType {
+        public static final String CONTEXT_ID = "com.reprezen.swagedit.openapi3.templates.requestBody";
+    }
+
     public static List<String> allContextTypes() {
         return Lists.newArrayList( //
                 RootContextType.CONTEXT_ID, //
@@ -80,7 +84,8 @@ public class OpenApi3ContextType extends TemplateContextType {
                 ResponseObjectContextType.CONTEXT_ID, //
                 ResponseContentContextType.CONTEXT_ID, //
                 ComponentsObjectContextType.CONTEXT_ID, //
-                CallbackObjectContextType.CONTEXT_ID);
+                CallbackObjectContextType.CONTEXT_ID, //
+                RequestBodyObjectContextType.CONTEXT_ID);
     }
 
     public static String getContextType(String path) {
@@ -118,6 +123,9 @@ public class OpenApi3ContextType extends TemplateContextType {
         }
         if (path.matches("/components/callbacks")) {
             return CallbackObjectContextType.CONTEXT_ID;
+        }
+        if (path.endsWith("/requestBody")) {
+            return RequestBodyObjectContextType.CONTEXT_ID;
         }
         return null;
     }

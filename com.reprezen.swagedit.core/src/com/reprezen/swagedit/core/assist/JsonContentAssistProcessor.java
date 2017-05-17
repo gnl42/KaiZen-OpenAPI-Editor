@@ -29,6 +29,7 @@ import org.eclipse.jface.text.contentassist.IContentAssistProcessor;
 import org.eclipse.jface.text.contentassist.IContextInformation;
 import org.eclipse.jface.text.contentassist.IContextInformationValidator;
 import org.eclipse.jface.text.templates.ContextTypeRegistry;
+import org.eclipse.jface.text.templates.DocumentTemplateContext;
 import org.eclipse.jface.text.templates.Template;
 import org.eclipse.jface.text.templates.TemplateCompletionProcessor;
 import org.eclipse.jface.text.templates.TemplateContext;
@@ -54,6 +55,7 @@ import com.reprezen.swagedit.core.editor.JsonDocument;
 import com.reprezen.swagedit.core.json.references.JsonReference;
 import com.reprezen.swagedit.core.json.references.Messages;
 import com.reprezen.swagedit.core.model.Model;
+import com.reprezen.swagedit.core.templates.SwaggerTemplateContext;
 import com.reprezen.swagedit.core.utils.SwaggerFileFinder.Scope;
 
 /**
@@ -258,6 +260,9 @@ public abstract class JsonContentAssistProcessor extends TemplateCompletionProce
 	@Override
 	protected ICompletionProposal createProposal(Template template, TemplateContext context, IRegion region,
 			int relevance) {
+        if (context instanceof DocumentTemplateContext) {
+            context = new SwaggerTemplateContext((DocumentTemplateContext) context);
+        }
 		return new StyledTemplateProposal(template, context, region, getImage(template), getTemplateLabel(template),
 				relevance);
 	}
