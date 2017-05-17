@@ -21,12 +21,29 @@ public class OpenApi3ReferenceProposalProvider extends JsonReferenceProposalProv
 
 	protected static final String SCHEMA_DEFINITION_REGEX = "^/components/schemas/(\\w+/)+\\$ref|.*schema/(\\w+/)?\\$ref";
 	protected static final String PATH_ITEM_REGEX = "/paths/~1[^/]+/\\$ref";
+    protected static final String PARAMETER_REGEX = ".*/parameters/\\d+/\\$ref";
+    protected static final String RESPONSE_REGEX = ".*/responses/\\d+/\\$ref";
+    protected static final String REQUEST_BODY_REGEX = ".*/requestBody/\\$ref";
+    protected static final String LINK_REGEX = ".*/links/\\w+/\\$ref";
 
 	public static final ContextType SCHEMA_DEFINITION = new ContextType("components/schemas", "schemas",
 			SCHEMA_DEFINITION_REGEX);
 	public static final ContextType PATH_ITEM = new ContextType("paths", "path items", PATH_ITEM_REGEX);
+    public static final ContextType PATH_PARAMETER = new ContextType("components/parameters", "parameters",
+            PARAMETER_REGEX);
+    public static final ContextType PATH_RESPONSE = new ContextType("components/responses", "responses",
+            RESPONSE_REGEX);
+    public static final ContextType PATH_REQUEST_BODY = new ContextType("components/requestBodies", "requestBody",
+            REQUEST_BODY_REGEX);
+    public static final ContextType PATH_LINK = new ContextType("components/links", "link", LINK_REGEX);
 
-	public static final ContextTypeCollection OPEN_API3_CONTEXT_TYPES = ContextType
-			.newContentTypeCollection(Lists.newArrayList(SCHEMA_DEFINITION, PATH_ITEM));
+    public static final ContextTypeCollection OPEN_API3_CONTEXT_TYPES = ContextType
+            .newContentTypeCollection(Lists.newArrayList( //
+                    SCHEMA_DEFINITION, //
+                    PATH_ITEM, //
+                    PATH_PARAMETER, //
+                    PATH_RESPONSE, //
+                    PATH_REQUEST_BODY, //
+                    PATH_LINK));
 
 }
