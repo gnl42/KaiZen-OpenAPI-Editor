@@ -18,15 +18,17 @@ public class OpenApi3ReferenceProposalProvider extends JsonReferenceProposalProv
 	public OpenApi3ReferenceProposalProvider() {
 		super(OPEN_API3_CONTEXT_TYPES);
 	}
-
+    
+	protected static final String COMPONENT_NAME_REGEX = "[\\w\\.\\-]+";
+	
 	protected static final String SCHEMA_DEFINITION_REGEX = "^/components/schemas/(\\w+/)+\\$ref|.*schema/(\\w+/)?\\$ref";
 	protected static final String PATH_ITEM_REGEX = "/paths/~1[^/]+/\\$ref";
     protected static final String PARAMETER_REGEX = ".*/parameters/\\d+/\\$ref";
     protected static final String RESPONSE_REGEX = ".*/responses/\\d+/\\$ref";
     protected static final String REQUEST_BODY_REGEX = ".*/requestBody/\\$ref";
     protected static final String LINK_REGEX = ".*/links/\\w+/\\$ref";
-    protected static final String EXAMPLE_REGEX = ".*/examples/[\\w\\.\\-]+/\\$ref";
-    protected static final String HEADER_REGEX = ".*/headers/\\w+/\\$ref";
+    protected static final String EXAMPLE_REGEX = ".*/examples/"+COMPONENT_NAME_REGEX +"/\\$ref";
+    protected static final String HEADER_REGEX = ".*/headers/"+COMPONENT_NAME_REGEX +"/\\$ref";
     protected static final String CALLBACK_REGEX = ".*/callbacks/\\w+/\\$ref";
     protected static final String SECURITY_SCHEME_REGEX = ".*/security/\\w+/\\$ref";
 
