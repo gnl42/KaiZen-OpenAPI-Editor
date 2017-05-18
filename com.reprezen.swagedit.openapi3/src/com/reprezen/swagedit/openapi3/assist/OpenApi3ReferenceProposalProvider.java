@@ -21,13 +21,17 @@ public class OpenApi3ReferenceProposalProvider extends JsonReferenceProposalProv
     
 	protected static final String COMPONENT_NAME_REGEX = "[\\w\\.\\-]+";
 	
-	protected static final String SCHEMA_DEFINITION_REGEX = "^/components/schemas/(\\w+/)+\\$ref|.*schema/(\\w+/)?\\$ref";
+    protected static final String SCHEMA_COMPONENT_REGEX = "^/components/schemas/(\\w+/)+";
+    protected static final String INLINE_SCHEMA_REGEX = ".*schema/(\\w+/)?";
+	protected static final String SCHEMA_DEFINITION_REGEX = SCHEMA_COMPONENT_REGEX + "\\$ref" + "|" + INLINE_SCHEMA_REGEX + "\\$ref";
 	protected static final String PATH_ITEM_REGEX = "/paths/~1[^/]+/\\$ref";
     protected static final String PARAMETER_REGEX = ".*/parameters/\\d+/\\$ref";
     protected static final String RESPONSE_REGEX = ".*/responses/\\d+/\\$ref";
     protected static final String REQUEST_BODY_REGEX = ".*/requestBody/\\$ref";
     protected static final String LINK_REGEX = ".*/links/\\w+/\\$ref";
     protected static final String EXAMPLE_REGEX = ".*/examples/"+COMPONENT_NAME_REGEX +"/\\$ref";
+    protected static final String SCHEMA_EXAMPLE_REGEX = SCHEMA_COMPONENT_REGEX + ".*/example/\\$ref" + "|"
+            + INLINE_SCHEMA_REGEX + ".*/example/\\$ref";
     protected static final String HEADER_REGEX = ".*/headers/"+COMPONENT_NAME_REGEX +"/\\$ref";
     protected static final String CALLBACK_REGEX = ".*/callbacks/"+COMPONENT_NAME_REGEX +"/\\$ref";
    
@@ -41,12 +45,14 @@ public class OpenApi3ReferenceProposalProvider extends JsonReferenceProposalProv
     public static final ContextType PATH_REQUEST_BODY = new ContextType("components/requestBodies", "requestBody",
             REQUEST_BODY_REGEX);
     public static final ContextType PATH_LINK = new ContextType("components/links", "link", LINK_REGEX);
-    public static final ContextType EXAMPLE = new ContextType("components/examples", "example", EXAMPLE_REGEX);
+    public static final ContextType EXAMPLE = new ContextType("components/examples", "examples", EXAMPLE_REGEX);
+    public static final ContextType SCHEMA_EXAMPLE = new ContextType("components/examples", "example", SCHEMA_EXAMPLE_REGEX);
     public static final ContextType HEADER = new ContextType("components/headers", "header", HEADER_REGEX);
     public static final ContextType CALLBACK = new ContextType("components/callbacks", "callback", CALLBACK_REGEX);
    
     public static final ContextTypeCollection OPEN_API3_CONTEXT_TYPES = ContextType
             .newContentTypeCollection(Lists.newArrayList( //
+                    SCHEMA_EXAMPLE, // should go before schema definition
                     SCHEMA_DEFINITION, //
                     PATH_ITEM, //
                     PATH_PARAMETER, //
