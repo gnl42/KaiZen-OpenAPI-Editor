@@ -25,6 +25,10 @@ public class OpenApi3ReferenceProposalProvider extends JsonReferenceProposalProv
     protected static final String RESPONSE_REGEX = ".*/responses/\\d+/\\$ref";
     protected static final String REQUEST_BODY_REGEX = ".*/requestBody/\\$ref";
     protected static final String LINK_REGEX = ".*/links/\\w+/\\$ref";
+    protected static final String EXAMPLE_REGEX = ".*/examples/[\\w\\.\\-]+/\\$ref";
+    protected static final String HEADER_REGEX = ".*/headers/\\w+/\\$ref";
+    protected static final String CALLBACK_REGEX = ".*/callbacks/\\w+/\\$ref";
+    protected static final String SECURITY_SCHEME_REGEX = ".*/security/\\w+/\\$ref";
 
 	public static final ContextType SCHEMA_DEFINITION = new ContextType("components/schemas", "schemas",
 			SCHEMA_DEFINITION_REGEX);
@@ -36,6 +40,10 @@ public class OpenApi3ReferenceProposalProvider extends JsonReferenceProposalProv
     public static final ContextType PATH_REQUEST_BODY = new ContextType("components/requestBodies", "requestBody",
             REQUEST_BODY_REGEX);
     public static final ContextType PATH_LINK = new ContextType("components/links", "link", LINK_REGEX);
+    public static final ContextType EXAMPLE = new ContextType("components/examples", "example", EXAMPLE_REGEX);
+    public static final ContextType HEADER = new ContextType("components/headers", "header", HEADER_REGEX);
+    public static final ContextType CALLBACK = new ContextType("components/callbacks", "callback", CALLBACK_REGEX);
+    public static final ContextType SECURITY_SCHEME = new ContextType("components/securitySchemes", "security scheme", SECURITY_SCHEME_REGEX);
 
     public static final ContextTypeCollection OPEN_API3_CONTEXT_TYPES = ContextType
             .newContentTypeCollection(Lists.newArrayList( //
@@ -44,6 +52,11 @@ public class OpenApi3ReferenceProposalProvider extends JsonReferenceProposalProv
                     PATH_PARAMETER, //
                     PATH_RESPONSE, //
                     PATH_REQUEST_BODY, //
-                    PATH_LINK));
+                    PATH_LINK, //
+                    EXAMPLE, //
+                    HEADER, //
+                    CALLBACK, //
+                    SECURITY_SCHEME //
+                    ));
 
 }
