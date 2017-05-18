@@ -206,31 +206,31 @@
       },
       "properties": {
         "schemas": {
-          "$ref": "#/definitions/schemas"
+          "$ref": "#/definitions/schemasOrReferences"
         },
         "responses": {
-          "$ref": "#/definitions/responses"
+          "$ref": "#/definitions/responsesOrReferences"
         },
         "parameters": {
-          "$ref": "#/definitions/parameters"
+          "$ref": "#/definitions/parametersOrReferences"
         },
         "examples": {
-          "$ref": "#/definitions/examples"
+          "$ref": "#/definitions/examplesOrReferences"
         },
         "requestBodies": {
-          "$ref": "#/definitions/requestBodies"
+          "$ref": "#/definitions/requestBodiesOrReferences"
         },
         "headers": {
-          "$ref": "#/definitions/headers"
+          "$ref": "#/definitions/headersOrReferences"
         },
         "securitySchemes": {
-          "$ref": "#/definitions/securitySchemes"
+          "$ref": "#/definitions/securitySchemesOrReferences"
         },
         "links": {
-          "$ref": "#/definitions/links"
+          "$ref": "#/definitions/linksOrReferences"
         },
         "callbacks": {
-          "$ref": "#/definitions/callbacks"
+          "$ref": "#/definitions/callbacksOrReferences"
         }
       }
     },
@@ -549,7 +549,7 @@
       "description": "A container for the expected responses of an operation. The container maps a HTTP response code to the expected response.  It is not expected for the documentation to necessarily cover all possible HTTP response codes, since they may not be known in advance. However, it is expected for the documentation to cover a successful operation response and any known errors.  The `default` MAY be used as a default response object for all HTTP codes  that are not covered individually by the specification.  The `Responses Object` MUST contain at least one response code, and it  SHOULD be the response for a successful operation call.",
       "additionalProperties": false,
       "patternProperties": {
-        "^([0-9]{3})$": {
+        "^([0-9X]{3})$": {
           "$ref": "#/definitions/responseOrReference"
         },
         "^x-": {
@@ -1056,7 +1056,7 @@
       "description": "Lists the available scopes for an OAuth2 security scheme.",
       "additionalProperties": false,
       "patternProperties": {
-        "^[a-zA-Z0-9\\.\\-_]+$": {
+        "^": {
           "type": "string"
         },
         "^x-": {
@@ -1168,49 +1168,80 @@
         }
       ]
     },
+    "securitySchemeOrReference": {
+      "oneOf": [
+        {
+          "$ref": "#/definitions/securityScheme"
+        },
+        {
+          "$ref": "#/definitions/reference"
+        }
+      ]
+    },
+    "callbacksOrReferences": {
+      "type": "object",
+      "additionalProperties": {
+        "$ref": "#/definitions/callbackOrReference"
+      }
+    },
     "examplesOrReferences": {
       "type": "object",
       "additionalProperties": {
         "$ref": "#/definitions/exampleOrReference"
       }
     },
-    "parameters": {
+    "headersOrReferences": {
       "type": "object",
       "additionalProperties": {
-        "$ref": "#/definitions/parameter"
+        "$ref": "#/definitions/headerOrReference"
       }
     },
-    "requestBodies": {
+    "linksOrReferences": {
       "type": "object",
       "additionalProperties": {
-        "$ref": "#/definitions/requestBody"
+        "$ref": "#/definitions/linkOrReference"
       }
     },
-    "schemas": {
+    "parametersOrReferences": {
       "type": "object",
       "additionalProperties": {
-        "$ref": "#/definitions/schema"
+        "$ref": "#/definitions/parameterOrReference"
       }
     },
-    "securitySchemes": {
+    "requestBodiesOrReferences": {
       "type": "object",
       "additionalProperties": {
-        "$ref": "#/definitions/securityScheme"
+        "$ref": "#/definitions/requestBodyOrReference"
+      }
+    },
+    "responsesOrReferences": {
+      "type": "object",
+      "additionalProperties": {
+        "$ref": "#/definitions/responseOrReference"
+      }
+    },
+    "schemasOrReferences": {
+      "type": "object",
+      "additionalProperties": {
+        "$ref": "#/definitions/schemaOrReference"
+      }
+    },
+    "securitySchemesOrReferences": {
+      "type": "object",
+      "additionalProperties": {
+        "$ref": "#/definitions/securitySchemeOrReference"
       }
     },
     "object": {
       "type": "object",
-      "additionalProperties": true,
-      "additionalItems": true
+      "additionalProperties": true
     },
     "any": {
-      "additionalProperties": true,
-      "additionalItems": true
+      "additionalProperties": true
     },
     "expression": {
       "type": "object",
-      "additionalProperties": true,
-      "additionalItems": true
+      "additionalProperties": true
     },
     "specificationExtension": {
       "description": "Any property starting with x- is valid.",
