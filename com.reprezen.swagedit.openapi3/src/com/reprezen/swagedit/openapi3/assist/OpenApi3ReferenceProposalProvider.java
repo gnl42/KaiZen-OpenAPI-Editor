@@ -30,8 +30,7 @@ public class OpenApi3ReferenceProposalProvider extends JsonReferenceProposalProv
     protected static final String EXAMPLE_REGEX = ".*/examples/"+COMPONENT_NAME_REGEX +"/\\$ref";
     protected static final String HEADER_REGEX = ".*/headers/"+COMPONENT_NAME_REGEX +"/\\$ref";
     protected static final String CALLBACK_REGEX = ".*/callbacks/"+COMPONENT_NAME_REGEX +"/\\$ref";
-    protected static final String SECURITY_SCHEME_REGEX = ".*/security/\\w+/\\$ref";
-
+   
 	public static final ContextType SCHEMA_DEFINITION = new ContextType("components/schemas", "schemas",
 			SCHEMA_DEFINITION_REGEX);
 	public static final ContextType PATH_ITEM = new ContextType("paths", "path items", PATH_ITEM_REGEX);
@@ -45,8 +44,7 @@ public class OpenApi3ReferenceProposalProvider extends JsonReferenceProposalProv
     public static final ContextType EXAMPLE = new ContextType("components/examples", "example", EXAMPLE_REGEX);
     public static final ContextType HEADER = new ContextType("components/headers", "header", HEADER_REGEX);
     public static final ContextType CALLBACK = new ContextType("components/callbacks", "callback", CALLBACK_REGEX);
-    public static final ContextType SECURITY_SCHEME = new ContextType("components/securitySchemes", "security scheme", SECURITY_SCHEME_REGEX);
-
+   
     public static final ContextTypeCollection OPEN_API3_CONTEXT_TYPES = ContextType
             .newContentTypeCollection(Lists.newArrayList( //
                     SCHEMA_DEFINITION, //
@@ -57,8 +55,7 @@ public class OpenApi3ReferenceProposalProvider extends JsonReferenceProposalProv
                     PATH_LINK, //
                     EXAMPLE, //
                     HEADER, //
-                    CALLBACK, //
-                    SECURITY_SCHEME //
+                    CALLBACK//
                     ));
 
 }
