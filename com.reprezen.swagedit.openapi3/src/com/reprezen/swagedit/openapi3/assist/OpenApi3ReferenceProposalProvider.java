@@ -29,7 +29,7 @@ public class OpenApi3ReferenceProposalProvider extends JsonReferenceProposalProv
     protected static final String LINK_REGEX = ".*/links/\\w+/\\$ref";
     protected static final String EXAMPLE_REGEX = ".*/examples/"+COMPONENT_NAME_REGEX +"/\\$ref";
     protected static final String HEADER_REGEX = ".*/headers/"+COMPONENT_NAME_REGEX +"/\\$ref";
-    protected static final String CALLBACK_REGEX = ".*/callbacks/\\w+/\\$ref";
+    protected static final String CALLBACK_REGEX = ".*/callbacks/"+COMPONENT_NAME_REGEX +"/\\$ref";
     protected static final String SECURITY_SCHEME_REGEX = ".*/security/\\w+/\\$ref";
 
 	public static final ContextType SCHEMA_DEFINITION = new ContextType("components/schemas", "schemas",
