@@ -135,6 +135,7 @@ public class JsonReferenceProposalProvider {
     	}
 		
 		public ContextType get(String path) {
+		    System.out.println("TANYA: " + path);
 			if (Strings.emptyToNull(path) == null) {
 				return ContextType.UNKNOWN;
 			}

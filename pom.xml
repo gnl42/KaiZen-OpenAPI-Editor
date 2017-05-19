@@ -14,6 +14,7 @@
 		<module>com.reprezen.swagedit.openapi3</module>
 		<module>com.reprezen.swagedit.feature</module>
 		<module>com.reprezen.swagedit.tests</module>
+        <module>com.reprezen.swagedit.openapi3.tests</module>
 		<module>com.reprezen.swagedit.repository</module>
 		<module>com.reprezen.swagedit.target</module>
 		<module>com.reprezen.swagedit.target.kepler</module>

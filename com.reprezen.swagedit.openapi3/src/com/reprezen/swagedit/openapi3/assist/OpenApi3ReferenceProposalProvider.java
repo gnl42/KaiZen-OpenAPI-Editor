@@ -22,7 +22,7 @@ public class OpenApi3ReferenceProposalProvider extends JsonReferenceProposalProv
 	protected static final String COMPONENT_NAME_REGEX = "[\\w\\.\\-]+";
 	
     protected static final String SCHEMA_COMPONENT_REGEX = "^/components/schemas/(\\w+/)+";
-    protected static final String INLINE_SCHEMA_REGEX = ".*schema/(\\w+/)?";
+    protected static final String INLINE_SCHEMA_REGEX = ".*schema/(\\w+/)*";
 	protected static final String SCHEMA_DEFINITION_REGEX = SCHEMA_COMPONENT_REGEX + "\\$ref" + "|" + INLINE_SCHEMA_REGEX + "\\$ref";
 	protected static final String PATH_ITEM_REGEX = "/paths/~1[^/]+/\\$ref";
     protected static final String PARAMETER_REGEX = ".*/parameters/\\d+/\\$ref";
@@ -30,8 +30,8 @@ public class OpenApi3ReferenceProposalProvider extends JsonReferenceProposalProv
     protected static final String REQUEST_BODY_REGEX = ".*/requestBody/\\$ref";
     protected static final String LINK_REGEX = ".*/links/\\w+/\\$ref";
     protected static final String EXAMPLE_REGEX = ".*/examples/"+COMPONENT_NAME_REGEX +"/\\$ref";
-    protected static final String SCHEMA_EXAMPLE_REGEX = SCHEMA_COMPONENT_REGEX + ".*/example/\\$ref" + "|"
-            + INLINE_SCHEMA_REGEX + ".*/example/\\$ref";
+    protected static final String SCHEMA_EXAMPLE_REGEX = SCHEMA_COMPONENT_REGEX + "example/\\$ref" + "|"
+            + INLINE_SCHEMA_REGEX + "example/\\$ref";
     protected static final String HEADER_REGEX = ".*/headers/"+COMPONENT_NAME_REGEX +"/\\$ref";
     protected static final String CALLBACK_REGEX = ".*/callbacks/"+COMPONENT_NAME_REGEX +"/\\$ref";
    
