@@ -63,4 +63,21 @@ class JsonReferenceContextTest {
 			"/components/schemas/Pet/properties/name/example/$ref".matches(
 				OpenApi3ReferenceProposalProvider.SCHEMA_EXAMPLE_REGEX))
 	}
+	
+
+	@Test
+	def void link_in_response() {
+		assertTrue(
+			"/paths/~12.0~1users~1{username}/get/responses/200/links/userRepositories/$ref".matches(
+				OpenApi3ReferenceProposalProvider.LINK_REGEX))
+		assertTrue(
+			"/paths/~12.0~1repositories~1{username}/get/responses/200/links/userRepository/$ref".matches(
+				OpenApi3ReferenceProposalProvider.LINK_REGEX))
+		assertTrue(
+			"/paths/~12.0~1repositories~1{username}~1{slug}/get/responses/200/links/repositoryPullRequests/$ref".matches(
+				OpenApi3ReferenceProposalProvider.LINK_REGEX))
+		assertTrue(
+			"/paths/~12.0~1repositories~1{username}~1{slug}~1pullrequests~1{pid}/get/responses/200/links/pullRequst/$ref".matches(
+				OpenApi3ReferenceProposalProvider.LINK_REGEX))
+	}	
 }
