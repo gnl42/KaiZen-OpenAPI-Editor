@@ -46,13 +46,13 @@ public class OpenApi3ReferenceProposalProvider extends JsonReferenceProposalProv
             REQUEST_BODY_REGEX);
     public static final ContextType PATH_LINK = new ContextType("components/links", "link", LINK_REGEX);
     public static final ContextType EXAMPLE = new ContextType("components/examples", "examples", EXAMPLE_REGEX);
-    public static final ContextType SCHEMA_EXAMPLE = new ContextType("components/examples", "example", SCHEMA_EXAMPLE_REGEX);
+    //public static final ContextType SCHEMA_EXAMPLE = new ContextType("its/not/example/component", "example", SCHEMA_EXAMPLE_REGEX);
     public static final ContextType HEADER = new ContextType("components/headers", "header", HEADER_REGEX);
     public static final ContextType CALLBACK = new ContextType("components/callbacks", "callback", CALLBACK_REGEX);
    
     public static final ContextTypeCollection OPEN_API3_CONTEXT_TYPES = ContextType
             .newContentTypeCollection(Lists.newArrayList( //
-                    SCHEMA_EXAMPLE, // should go before schema definition
+                  //  SCHEMA_EXAMPLE, // should go before schema definition
                     SCHEMA_DEFINITION, //
                     PATH_ITEM, //
                     PATH_PARAMETER, //
