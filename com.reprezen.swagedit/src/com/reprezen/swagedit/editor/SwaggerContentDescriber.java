@@ -10,13 +10,19 @@
  *******************************************************************************/
 package com.reprezen.swagedit.editor;
 
+import java.util.regex.Pattern;
+
 import com.reprezen.swagedit.core.editor.TextContentDescriber;
 
 public class SwaggerContentDescriber extends TextContentDescriber {
+	
+	public static final String CONTENT_TYPE_ID = "com.reprezen.swagedit.contenttype.swagger.yaml";
+
+    private final Pattern swaggerV2Regex = Pattern.compile(".*swagger:\\s+([\"'])2\\.0\\1.+", Pattern.DOTALL);
 
     @Override
     protected boolean isSupported(String content) {
-        return content.contains("swagger: \"2.0\"") || content.contains("swagger: '2.0'");
+        return swaggerV2Regex.matcher(content).matches();
     }
 
 }

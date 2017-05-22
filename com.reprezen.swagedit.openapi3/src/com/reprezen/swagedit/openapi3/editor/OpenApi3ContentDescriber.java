@@ -10,14 +10,19 @@
  *******************************************************************************/
 package com.reprezen.swagedit.openapi3.editor;
 
+import java.util.regex.Pattern;
+
 import com.reprezen.swagedit.core.editor.TextContentDescriber;
 
 public class OpenApi3ContentDescriber extends TextContentDescriber {
+	
+	public static final String CONTENT_TYPE_ID = "com.reprezen.swagedit.contenttype.openapi3.yaml";
+	private final Pattern openApiV3Regex = Pattern.compile(".*openapi:\\s+[\"']3\\.0\\..+", Pattern.DOTALL);
 
     @Override
     protected boolean isSupported(String content) {
         // should support arbitrary patch versions, e.g. `openapi: "3.0.0-RC0"`
-        return content.contains("openapi: \"3.0.") || content.contains("openapi: '3.0");
+        return openApiV3Regex.matcher(content).matches();
     }
 
 }

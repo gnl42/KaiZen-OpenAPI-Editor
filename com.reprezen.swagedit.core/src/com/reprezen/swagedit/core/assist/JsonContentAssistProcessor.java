@@ -87,9 +87,9 @@ public abstract class JsonContentAssistProcessor extends TemplateCompletionProce
 
     private String[] textMessages;
     
-	public JsonContentAssistProcessor(ContentAssistant ca) {
+	public JsonContentAssistProcessor(ContentAssistant ca, String fileContentType) {
 		this(ca, new JsonProposalProvider(),
-				new JsonReferenceProposalProvider(ContextType.emptyContentTypeCollection()));
+				new JsonReferenceProposalProvider(ContextType.emptyContentTypeCollection(), fileContentType));
 	}
     
     public JsonContentAssistProcessor(ContentAssistant ca, JsonProposalProvider proposalProvider, JsonReferenceProposalProvider referenceProposalProvider) {
