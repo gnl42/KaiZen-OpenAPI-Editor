@@ -1,0 +1,68 @@
+openapi: "3.0.0"
+info:
+  title: Headers Object
+  version: "1.0.0"
+servers:
+  - url: https://api.uber.com/v1
+  
+paths: 
+
+  /pets:
+    parameters:
+     - $ref: "#/components/parameters/username"
+    get:
+      parameters:
+        - $ref: "#/components/parameters/id"
+      summary: Read
+      description: Provide details for the entire list (for collection resources) or an item (for object resources)
+      responses:
+        '200':
+          description: A simple string response
+          
+components: 
+
+  parameters:
+    # header parameter
+    token:
+      name: token
+      in: header
+      description: token to be passed as a header
+      required: true
+      schema:
+        type: array
+        items:
+          type: integer
+          format: int64
+      style: commaDelimited  
+
+# path parameter      
+    username:
+      name: username
+      in: path
+      description: username to fetch
+      required: true
+      schema:
+        type: string 
+        
+   # query parameter
+    id:
+      name: id
+      in: query
+      description: ID of the object to fetch
+      required: false
+      schema:
+        type: array
+        items:
+          type: string
+      style: form
+      explode: true        
+      
+      # freeform query parameter
+    freeform:
+      in: query
+      name: freeForm
+      schema:
+        type: object
+        additionalProperties:
+          type: integer
+      style: form

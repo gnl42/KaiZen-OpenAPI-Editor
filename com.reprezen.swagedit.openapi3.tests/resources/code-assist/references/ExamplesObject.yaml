@@ -1,0 +1,93 @@
+openapi: "3.0.0"
+info:
+  title: Examples Object
+  version: "1.0.0"
+servers:
+  - url: https://api.uber.com/v1
+  
+paths: 
+
+  /pets/{id}:
+# in a parameter
+    parameters:
+      - name: 'zipCode'
+        in: 'query'
+        schema:
+          type: 'string'
+          format: 'zip-code'
+          # KaiZen code-assist shows examples here
+          example: 
+            $ref: 'http://foo.bar#/examples/zip-example'
+        
+    put:
+      description: bla
+      operationId: sd
+      responses: {}
+      requestBody:  
+        description: description
+        content: 
+          "application/json":
+            schema:
+              $ref: model
+            examples:
+              tanya:
+                 summary: summary
+                 externalValue: link
+               
+    post:
+      description: Creates a new pet in the store.  Duplicates are allowed
+      operationId: addPet
+    # in a request body:
+      requestBody:
+        content:
+          'application/json':
+            schema:
+              $ref: '#/components/schemas/Address'
+            examples: 
+              foo:
+                summary: A foo example
+                value: {"foo": "bar"}
+              bar:
+                summary: A bar example
+                value: {"bar": "baz"}
+                # KaiZen code assist OK here
+              pizza:
+                $ref: "#/components/examples/confirmation-success"           
+                   
+          'application/xml':
+            examples: 
+              xmlExample:
+                summary: This is an example in XML
+                externalValue: 'http://example.org/examples/address-example.xml'
+          'text/plain':
+            examples:
+              textExample: 
+                summary: This is a text example
+                externalValue: 'http://foo.bar/examples/address-example.txt' 
+    # in a response
+      responses:
+        200:
+          description: your car appointment has been booked
+          content: 
+            application/json:
+              schema:
+                $ref: '#/components/schemas/SuccessResponse'
+              examples:
+                confirmation-success:
+                # KaiZen: code-assist OK here
+                  $ref: '#/components/examples/confirmation-success'
+      
+components:
+
+  schemas:
+    Pet:
+      properties:
+        name:
+          type: string
+          example:
+        # KaiZen: code-assist OK here
+             $ref: http://foo.bar#/examples/name-example
+            
+  examples: 
+    confirmation-success:
+      summary: this is confirmation success example

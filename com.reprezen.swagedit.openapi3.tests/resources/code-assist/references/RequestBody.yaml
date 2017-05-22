@@ -1,0 +1,140 @@
+openapi: "3.0.0"
+info:
+  title: Headers Object
+  version: "1.0.0"
+servers:
+  - url: https://api.uber.com/v1
+  
+paths: 
+
+  /pets:
+    post:
+      summary: Create
+      description: Create a new item
+      requestBody:
+        $ref: "#/components/requestBodies/forPost"
+      responses:
+        '200':
+          description: OK
+          
+components: 
+
+  callbacks:
+    myWebhook:
+      '$request.body#/url':
+        post:
+          requestBody:
+            $ref: "#/components/requestBodies/www-form-urlencoded"
+          responses: {}
+              
+  requestBodies:
+  
+    forPost:
+      content:
+        application/octet-stream:
+          # any media type is accepted, functionally equivalent to `*/*`
+          schema:
+            # a binary file of any type
+            type: string
+            format: binary
+        'image/png, image/jpeg':
+          # a binary file of type png or jpeg
+          schema:
+            type: string
+            format: binary        
+        
+    www-form-urlencoded:
+      content:
+        x-www-form-urlencoded:
+          schema:
+            type: object
+            properties:
+              id:
+                type: string
+                format: uuid
+              address:
+                # complex types are stringified to support RFC 1866
+                type: object
+                properties: {}
+
+    multipart:
+       content: 
+         multipart/form-data:
+           schema:
+             type: object
+             properties:
+                id:
+                  type: string
+                  format: uuid
+                address:
+                  # default Content-Type for objects is `application/json`
+                  type: object
+                  properties: {}
+                profileImage:
+                  # default Content-Type for string/binary is `application/octet-stream`
+                  type: string
+                  format: binary
+                children:
+                  # default Content-Type for arrays is based on the `inner` type (text/plain here)
+                  type: array
+                  items:
+                    type: string
+                addresses:
+                  # default Content-Type for arrays is based on the `inner` type (object shown, so `application/json` in this example)
+                  type: array
+                  items:
+                    type: '#/components/schemas/Address'    
+                    
+    withEncoding:
+      content:
+        multipart/mixed:
+          schema:
+            type: object
+            properties:
+              id:
+                # default is text/plain
+                type: string
+                format: uuid
+              address:
+                # default is application/json
+                type: object
+                properties: {}
+              historyMetadata:
+                # need to declare XML format!
+                description: metadata in XML format
+                type: object
+                properties: {}
+              profileImage:
+                # default is application/octet-stream, need to declare an image type only!
+                type: string
+                format: binary
+          encoding:
+            historyMetadata:
+              # require XML Content-Type in utf-8 encoding
+              contentType: application/xml; charset=utf-8
+            profileImage:
+              # only accept png/jpeg
+              contentType: image/png, image/jpeg
+              headers:
+                X-Rate-Limit-Limit:
+                description: The number of allowed requests in the current period
+                type: integer                        
+                
+    # FIXME: fix examples in requestBody
+    withExamples:
+  # in a request body, note the plural `examples` as the Content-Type is set to `*`:
+      content:
+        'application/json':
+          schema:
+            $ref: '#/components/schemas/Address'
+#          examples: 
+#            - {"foo": "bar"}
+#            - {"bar": "baz"}
+#        'application/xml':
+#          examples: 
+#            - $ref: 'http://foo.bar#/examples/address-example.xml' 
+#        'text/plain':
+#          examples: 
+#            - $ref: 'http://foo.bar#/examples/address-example.txt'                 
+                    
+                    
