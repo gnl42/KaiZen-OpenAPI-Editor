@@ -27,6 +27,16 @@ class JsonReferenceContextTest {
 	}
 
 	@Test
+	def void requestBody_in_callback() {
+		assertTrue("/components/callbacks/myWebhook/$request.body#~1url/post/requestBody/$ref".matches(OpenApi3ReferenceProposalProvider.PARAMETER_REGEX))
+	}
+
+	@Test
+	def void requestBody_in_operation() {
+		assertTrue("/paths/~1pets/post/requestBody/$ref".matches(OpenApi3ReferenceProposalProvider.PARAMETER_REGEX))
+	}
+
+	@Test
 	def void path_item_in_paths_object() {
 		assertTrue("/paths/~1pets/$ref".matches(OpenApi3ReferenceProposalProvider.PATH_ITEM_REGEX))
 	}
