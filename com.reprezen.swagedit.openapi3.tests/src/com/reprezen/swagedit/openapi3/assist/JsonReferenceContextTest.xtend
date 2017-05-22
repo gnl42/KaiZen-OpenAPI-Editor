@@ -17,6 +17,20 @@ import static org.junit.Assert.*
 class JsonReferenceContextTest {
 
 	@Test
+	def void path_item_in_paths_object() {
+		assertTrue(
+			"/paths/~1pets/$ref".matches(
+				OpenApi3ReferenceProposalProvider.PATH_ITEM_REGEX))
+	}
+
+	@Test
+	def void path_item_in_callback() {
+		assertTrue(
+			"/components/callbacks/myWebhook/$request.body#~1url/$ref".matches(
+				OpenApi3ReferenceProposalProvider.PATH_ITEM_REGEX))
+	}
+	
+	@Test
 	def void headers_in_response() {
 		assertTrue(
 			"/paths/~1pets/get/responses/200/headers/X-Rate-Limit-Reset/$ref".matches(

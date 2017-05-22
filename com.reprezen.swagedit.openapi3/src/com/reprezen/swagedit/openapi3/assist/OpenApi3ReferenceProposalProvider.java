@@ -24,7 +24,9 @@ public class OpenApi3ReferenceProposalProvider extends JsonReferenceProposalProv
     protected static final String SCHEMA_COMPONENT_REGEX = "^/components/schemas/(\\w+/)+";
     protected static final String INLINE_SCHEMA_REGEX = ".*schema/(\\w+/)*";
 	protected static final String SCHEMA_DEFINITION_REGEX = SCHEMA_COMPONENT_REGEX + "\\$ref" + "|" + INLINE_SCHEMA_REGEX + "\\$ref";
-	protected static final String PATH_ITEM_REGEX = "/paths/~1[^/]+/\\$ref";
+    protected static final String PATH_ITEM_REGEX = "/paths/~1[^/]+/\\$ref"// in paths object
+            // e.g. "/components/callbacks/myWebhook/$request.body#~1url/$ref"
+            + "|/components/callbacks/" + COMPONENT_NAME_REGEX + "/[^/]+/\\$ref"; // in callbacks
     protected static final String PARAMETER_REGEX = ".*/parameters/\\d+/\\$ref";
     protected static final String RESPONSE_REGEX = ".*/responses/\\d+/\\$ref";
     protected static final String REQUEST_BODY_REGEX = ".*/requestBody/\\$ref";
