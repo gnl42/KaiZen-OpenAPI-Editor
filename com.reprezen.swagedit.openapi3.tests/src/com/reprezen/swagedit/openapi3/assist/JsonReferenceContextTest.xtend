@@ -17,10 +17,18 @@ import static org.junit.Assert.*
 class JsonReferenceContextTest {
 
 	@Test
+	def void parameter_in_path_item() {
+		assertTrue("/paths/~1pets/parameters/0/$ref".matches(OpenApi3ReferenceProposalProvider.PARAMETER_REGEX))
+	}
+
+	@Test
+	def void parameter_in_operation() {
+		assertTrue("/paths/~1pets/get/parameters/0/$ref".matches(OpenApi3ReferenceProposalProvider.PARAMETER_REGEX))
+	}
+
+	@Test
 	def void path_item_in_paths_object() {
-		assertTrue(
-			"/paths/~1pets/$ref".matches(
-				OpenApi3ReferenceProposalProvider.PATH_ITEM_REGEX))
+		assertTrue("/paths/~1pets/$ref".matches(OpenApi3ReferenceProposalProvider.PATH_ITEM_REGEX))
 	}
 
 	@Test
