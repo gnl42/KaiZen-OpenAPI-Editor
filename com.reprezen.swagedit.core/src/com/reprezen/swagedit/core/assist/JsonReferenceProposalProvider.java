@@ -21,6 +21,7 @@ import org.eclipse.core.runtime.IPath;
 import com.fasterxml.jackson.core.JsonPointer;
 import com.fasterxml.jackson.databind.JsonNode;
 import com.google.common.base.Strings;
+import com.google.common.collect.Iterators;
 import com.google.common.collect.Lists;
 import com.reprezen.swagedit.core.json.references.JsonDocumentManager;
 import com.reprezen.swagedit.core.utils.DocumentUtils;
@@ -194,9 +195,15 @@ public class JsonReferenceProposalProvider {
             }
 
             for (JsonNode node : parameters) {
-                String key = node.asText();
-
-                results.add(new Proposal(key, key, null, key));
+                if (node.isTextual()) {
+                    String key = node.asText();
+                    results.add(new Proposal(key, key, null, key));
+                } else if (node.isObject()) {
+                    String key = Iterators.get(node.fieldNames(), 0, null);
+                    if (key != null) {
+                        results.add(new Proposal(key, key, null, key));
+                    }
+                }
             }
 
             return results;
