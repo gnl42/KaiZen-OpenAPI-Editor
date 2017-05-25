@@ -27,7 +27,7 @@ class SchemaValidationTest {
 	@Parameters(name = "{index}: {1}")
 	def static Collection<Object[]> data() {
 		val Iterator<URL> specFiles = Iterators::forEnumeration(
-			Platform.getBundle("com.reprezen.swagedit.openapi3.tests").findEntries("/resources/code-assist/", "*.yaml",
+			Platform.getBundle("com.reprezen.swagedit.openapi3.tests").findEntries("/resources/", "*.yaml",
 				true))
 		return Lists.<Object[]>newArrayList(specFiles.map[#[it, it.file] as Object[]])
 	}
