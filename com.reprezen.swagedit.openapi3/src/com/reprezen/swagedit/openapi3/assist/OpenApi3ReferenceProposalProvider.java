@@ -29,7 +29,7 @@ public class OpenApi3ReferenceProposalProvider extends JsonReferenceProposalProv
             // e.g. "/components/callbacks/myWebhook/$request.body#~1url/$ref"
             + "|/components/callbacks/" + COMPONENT_NAME_REGEX + "/[^/]+/\\$ref"; // in callbacks
     protected static final String PARAMETER_REGEX = ".*/parameters/\\d+/\\$ref";
-    protected static final String RESPONSE_REGEX = ".*/responses/((\\d{3}|\\dXX)|default)/\\$ref";
+    protected static final String RESPONSE_REGEX = ".*/responses/([0-9X]{3}|default)/\\$ref";
     protected static final String REQUEST_BODY_REGEX = ".*/requestBody/\\$ref";
     protected static final String LINK_REGEX = ".*/links/"+COMPONENT_NAME_REGEX +"/\\$ref";
     protected static final String EXAMPLE_REGEX = ".*/examples/"+COMPONENT_NAME_REGEX +"/\\$ref";
