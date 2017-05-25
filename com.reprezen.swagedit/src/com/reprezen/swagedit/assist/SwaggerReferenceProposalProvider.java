@@ -24,7 +24,7 @@ public class SwaggerReferenceProposalProvider extends JsonReferenceProposalProvi
 	}
 
 	protected static final String SCHEMA_DEFINITION_REGEX = "^/definitions/(\\w+/)+\\$ref|.*schema/(\\w+/)?\\$ref";
-	protected static final String RESPONSE_REGEX = ".*responses/(\\d+|default)/\\$ref";
+    protected static final String RESPONSE_REGEX = ".*responses/(\\d{3}|default)/\\$ref";
 	protected static final String PARAMETER_REGEX = ".*/parameters/\\d+/\\$ref";
 	protected static final String PATH_ITEM_REGEX = "/paths/~1[^/]+/\\$ref";
 	
@@ -35,6 +35,11 @@ public class SwaggerReferenceProposalProvider extends JsonReferenceProposalProvi
 	public static final ContextType PATH_PARAMETER = new ContextType("parameters", "parameters", PARAMETER_REGEX);
 	public static final ContextType PATH_RESPONSE = new ContextType("responses", "responses", RESPONSE_REGEX);
 
-	public static final ContextTypeCollection SWAGGER_CONTEXT_TYPES = ContextType.newContentTypeCollection(Lists.newArrayList(SCHEMA_DEFINITION, PATH_ITEM, PATH_PARAMETER, PATH_RESPONSE));
+    public static final ContextTypeCollection SWAGGER_CONTEXT_TYPES = ContextType
+            .newContentTypeCollection(Lists.newArrayList( //
+                    SCHEMA_DEFINITION, //
+                    PATH_ITEM, //
+                    PATH_PARAMETER, //
+                    PATH_RESPONSE));
 
 }

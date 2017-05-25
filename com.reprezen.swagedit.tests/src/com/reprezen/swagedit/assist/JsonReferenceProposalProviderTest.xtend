@@ -136,8 +136,9 @@ class JsonReferenceProposalProviderTest {
 				SwaggerReferenceProposalProvider.SCHEMA_DEFINITION_REGEX))
 
 		// responses
-		assertTrue("/paths/~1foo/get/responses/200/$ref".matches(SwaggerReferenceProposalProvider.RESPONSE_REGEX))
-		assertTrue("/paths/~1foo/get/responses/default/$ref".matches(SwaggerReferenceProposalProvider.RESPONSE_REGEX))
+		assertTrue("/paths/~1foo/get/responses/200/$ref".matches(SwaggerReferenceProposalProvider.RESPONSE_REGEX))		
+		assertTrue("/paths/~1foo/get/responses/default/$ref".matches(SwaggerReferenceProposalProvider.RESPONSE_REGEX))		
+		assertFalse("/paths/~1foo/get/responses/2XX/$ref".matches(SwaggerReferenceProposalProvider.RESPONSE_REGEX))		
 
 		// parameters
 		assertTrue("/paths/~1/get/parameters/0/$ref".matches(SwaggerReferenceProposalProvider.PARAMETER_REGEX))
