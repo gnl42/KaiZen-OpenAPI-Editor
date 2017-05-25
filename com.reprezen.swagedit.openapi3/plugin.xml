@@ -91,7 +91,7 @@
    <extension point="org.eclipse.ui.ide.markerResolution">
       <markerResolutionGenerator
          markerType="org.eclipse.core.resources.problemmarker"
-         class="com.reprezen.swagedit.openapi3.validation.OpenApi3QuickFixer"/>
+         class="com.reprezen.swagedit.openapi3.quickfix.OpenApi3QuickFixer"/>
    </extension>
    
    <extension point="com.github.eclipsecolortheme.mapper">
