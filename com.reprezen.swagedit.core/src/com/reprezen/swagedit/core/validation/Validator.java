@@ -81,6 +81,11 @@ public class Validator {
      * @throws ParserException
      */
     public Set<SwaggerError> validate(JsonDocument document, IFileEditorInput editorInput) {
+        URI baseURI = editorInput != null ? editorInput.getFile().getLocationURI() : null;
+        return validate(document, baseURI);
+    }
+    
+    public Set<SwaggerError> validate(JsonDocument document, URI baseURI) {
         Set<SwaggerError> errors = Sets.newHashSet();
 
         JsonNode jsonContent = null;
@@ -93,8 +98,6 @@ public class Validator {
         if (jsonContent != null) {
             Node yaml = document.getYaml();
             if (yaml != null) {
-                URI baseURI = editorInput != null ? editorInput.getFile().getLocationURI() : null;
-
                 errors.addAll(validateAgainstSchema(
                         new ErrorProcessor(yaml, document.getSchema().getRootType().getContent()), document));
                 errors.addAll(validateModel(document.getModel()));
@@ -105,7 +108,7 @@ public class Validator {
 
         return errors;
     }
-
+    
     /**
      * Validates the YAML document against the Swagger schema
      * 
@@ -114,19 +117,23 @@ public class Validator {
      * @return error
      */
     protected Set<SwaggerError> validateAgainstSchema(ErrorProcessor processor, JsonDocument document) {
+        return validateAgainstSchema(processor, document.getSchema().asJson(), document.asJson());
+    }
+    
+    public Set<SwaggerError> validateAgainstSchema(ErrorProcessor processor, JsonNode schemaAsJson, JsonNode documentAsJson) {
         final JsonSchemaFactory factory = JsonSchemaFactory.newBuilder().freeze();
         final Set<SwaggerError> errors = Sets.newHashSet();
 
         JsonSchema schema = null;
         try {
-            schema = factory.getJsonSchema(document.getSchema().asJson());
+            schema = factory.getJsonSchema(schemaAsJson);
         } catch (ProcessingException e) {
             YEditLog.logException(e);
             return errors;
         }
 
         try {
-            ProcessingReport report = schema.validate(document.asJson(), true);
+            ProcessingReport report = schema.validate(documentAsJson, true);
 
             errors.addAll(processor.processReport(report));
         } catch (ProcessingException e) {
