@@ -17,6 +17,19 @@ import static org.junit.Assert.*
 class JsonReferenceContextTest {
 
 	@Test
+	def void responses() {
+		assertTrue("/paths/~1foo/get/responses/200/$ref".matches(OpenApi3ReferenceProposalProvider.RESPONSE_REGEX))
+		assertTrue("/paths/~1foo/get/responses/2XX/$ref".matches(OpenApi3ReferenceProposalProvider.RESPONSE_REGEX))
+		assertTrue("/paths/~1foo/get/responses/3XX/$ref".matches(OpenApi3ReferenceProposalProvider.RESPONSE_REGEX))
+		assertTrue("/paths/~1foo/get/responses/3X0/$ref".matches(OpenApi3ReferenceProposalProvider.RESPONSE_REGEX))
+		assertTrue("/paths/~1foo/get/responses/30X/$ref".matches(OpenApi3ReferenceProposalProvider.RESPONSE_REGEX))
+		assertTrue("/paths/~1foo/get/responses/XXX/$ref".matches(OpenApi3ReferenceProposalProvider.RESPONSE_REGEX))
+		assertTrue("/paths/~1foo/get/responses/default/$ref".matches(OpenApi3ReferenceProposalProvider.RESPONSE_REGEX))
+		assertFalse("/paths/~1foo/get/responses/2xx/$ref".matches(OpenApi3ReferenceProposalProvider.RESPONSE_REGEX))
+		assertFalse("/paths/~1foo/get/responses/3yz/$ref".matches(OpenApi3ReferenceProposalProvider.RESPONSE_REGEX))
+	}
+	
+	@Test
 	def void parameter_in_path_item() {
 		assertTrue("/paths/~1pets/parameters/0/$ref".matches(OpenApi3ReferenceProposalProvider.PARAMETER_REGEX))
 	}
