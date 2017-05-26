@@ -8,7 +8,7 @@
  * Contributors:
  *    ModelSolv, Inc. - initial API and implementation and/or initial documentation
  *******************************************************************************/
-package com.reprezen.swagedit.core.validation;
+package com.reprezen.swagedit.core.quickfix;
 
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
@@ -26,6 +26,7 @@ import org.eclipse.ui.IMarkerResolution;
 import org.eclipse.ui.IMarkerResolutionGenerator2;
 
 import com.google.common.base.Strings;
+import com.reprezen.swagedit.core.validation.Messages;
 
 public class QuickFixer implements IMarkerResolutionGenerator2 {
 
