@@ -50,9 +50,8 @@ import com.google.common.base.Strings;
 import com.google.common.collect.Lists;
 import com.reprezen.swagedit.core.Activator;
 import com.reprezen.swagedit.core.Activator.Icons;
-import com.reprezen.swagedit.core.assist.JsonReferenceProposalProvider.ContextType;
+import com.reprezen.swagedit.core.assist.contexts.ContextType;
 import com.reprezen.swagedit.core.editor.JsonDocument;
-import com.reprezen.swagedit.core.json.references.JsonReference;
 import com.reprezen.swagedit.core.json.references.Messages;
 import com.reprezen.swagedit.core.model.Model;
 import com.reprezen.swagedit.core.templates.SwaggerTemplateContext;
@@ -134,13 +133,12 @@ public abstract class JsonContentAssistProcessor extends TemplateCompletionProce
 
         Model model = document.getModel(documentOffset - prefix.length());
         currentPath = model.getPath(line, column);
-
-        isRefCompletion = currentPath != null && currentPath.toString().endsWith(JsonReference.PROPERTY);
+        isRefCompletion = referenceProposalProvider.canProvideProposal(currentPath);
 
         Collection<Proposal> p;
         if (isRefCompletion) {
             updateStatus();
-            p = referenceProposalProvider.getProposals(currentPath, document.asJson(), currentScope);
+            p = referenceProposalProvider.getProposals(currentPath, document, currentScope);
         } else {
             clearStatus();
             p = proposalProvider.getProposals(currentPath, model, prefix);
