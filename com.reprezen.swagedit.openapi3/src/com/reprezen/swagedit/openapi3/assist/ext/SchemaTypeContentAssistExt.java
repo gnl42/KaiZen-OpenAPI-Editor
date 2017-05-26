@@ -24,7 +24,7 @@ public class SchemaTypeContentAssistExt implements ContentAssistExt {
                 new Proposal("array", "array", null, "enum"), //
                 new Proposal("boolean", "boolean", null, "enum"), //
                 new Proposal("integer", "integer", null, "enum"), //
-                new Proposal("null", "null", null, "enum"), //
+                new Proposal("\"null\"", "null", null, "enum"), //
                 new Proposal("number", "number", null, "enum"), //
                 new Proposal("object", "object", null, "enum"), //
                 new Proposal("string", "string", null, "enum"));
