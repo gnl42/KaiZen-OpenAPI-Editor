@@ -8,9 +8,9 @@
  * Contributors:
  *    ModelSolv, Inc. - initial API and implementation and/or initial documentation
  *******************************************************************************/
-package com.reprezen.swagedit.validation;
+package com.reprezen.swagedit.quickfix;
 
-import com.reprezen.swagedit.core.validation.QuickFixer;
+import com.reprezen.swagedit.core.quickfix.QuickFixer;
 
 public class SwaggerQuickFixer extends QuickFixer {
 
