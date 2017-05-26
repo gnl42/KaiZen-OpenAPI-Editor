@@ -153,10 +153,10 @@
             name="Components Context">
       </contextType>
       <contextType
-            class="com.reprezen.swagedit.openapi3.templates.OpenApi3ContextType$CallbackObjectContextType"
-            id="com.reprezen.swagedit.openapi3.templates.callback"
-            name="Callback Context">            
-      </contextType>
+            class="com.reprezen.swagedit.openapi3.templates.OpenApi3ContextType$CallbacksObjectContextType"
+            id="com.reprezen.swagedit.openapi3.templates.callbacks"
+            name="Callbacks Context">            
+      </contextType>      
       <contextType
             class="com.reprezen.swagedit.openapi3.templates.OpenApi3ContextType$RequestBodyObjectContextType"
             id="com.reprezen.swagedit.openapi3.templates.requestBody"
