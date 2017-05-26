@@ -12,6 +12,8 @@ package com.reprezen.swagedit.assist;
 
 import com.google.common.collect.Lists;
 import com.reprezen.swagedit.core.assist.JsonReferenceProposalProvider;
+import com.reprezen.swagedit.core.assist.contexts.ContextType;
+import com.reprezen.swagedit.core.assist.contexts.ContextTypeCollection;
 import com.reprezen.swagedit.editor.SwaggerContentDescriber;
 
 /**

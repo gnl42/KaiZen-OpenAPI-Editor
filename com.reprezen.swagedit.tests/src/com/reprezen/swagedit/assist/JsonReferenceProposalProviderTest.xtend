@@ -20,6 +20,7 @@ import static org.hamcrest.core.IsCollectionContaining.*
 import static org.junit.Assert.*
 import com.reprezen.swagedit.core.utils.SwaggerFileFinder.Scope
 import com.reprezen.swagedit.core.assist.Proposal
+import com.reprezen.swagedit.core.assist.contexts.ContextType
 
 class JsonReferenceProposalProviderTest {
 
@@ -58,7 +59,7 @@ class JsonReferenceProposalProviderTest {
 		val document = new SwaggerDocument
 		document.set(text)
 
-		val proposals = provider.getProposals("/paths/~1foo/get/responses/200/schema/$ref".ptr, document.asJson, Scope.LOCAL)
+		val proposals = provider.getProposals("/paths/~1foo/get/responses/200/schema/$ref".ptr, document, Scope.LOCAL)
 
 		assertThat(proposals, hasItems(
 			new Proposal("\"#/definitions/Valid\"", "Valid", null, "#/definitions/Valid")
@@ -85,7 +86,7 @@ class JsonReferenceProposalProviderTest {
 		val document = new SwaggerDocument
 		document.set(text)
 
-		val proposals = provider.getProposals("/definitions/Bar/properties/foo/$ref".ptr, document.asJson, Scope.LOCAL)
+		val proposals = provider.getProposals("/definitions/Bar/properties/foo/$ref".ptr, document, Scope.LOCAL)
 
 		assertThat(proposals, hasItems(
 			new Proposal("\"#/definitions/Foo\"", "Foo", null, "#/definitions/Foo")
@@ -112,7 +113,8 @@ class JsonReferenceProposalProviderTest {
 		document.set(text)
 
 		val path = Mocks.mockPath("../Path With Spaces/Other  Spaces.yaml")
-		val proposals = provider.collectProposals(document.asJson, "paths", path)
+		val contextType = new ContextType("paths", "paths", "")
+		val proposals = contextType.collectProposals(document.asJson, path)
 
 		assertThat(proposals, hasItems(
 			new Proposal(
