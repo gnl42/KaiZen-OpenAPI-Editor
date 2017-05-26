@@ -290,13 +290,12 @@ content:
 <!--
 	CALLBACKS 
  -->
- 
+
  	<template name="callbacks" 
        id="com.reprezen.swagedit.openapi3.templates.callbacks" 
        description="Callback definition template" 
-       context="com.reprezen.swagedit.openapi3.templates.components" 
-       enabled="true">callbacks:
-  ${name}:
+       context="com.reprezen.swagedit.openapi3.templates.callbacks" 
+       enabled="true">${name}:
     '${url}':
       post:
         requestBody:
@@ -308,22 +307,5 @@ content:
         responses:
           '200':
             description: response description</template>
-
-     <template name="callback" 
-       id="com.reprezen.swagedit.openapi3.templates.callback" 
-       description="Callback definition template"
-       context="com.reprezen.swagedit.openapi3.templates.callback" 
-       enabled="true">${name}:
-  '${url}':
-    post:
-      requestBody:
-        description: callback payload
-        content: 
-          'application/json':
-            schema:
-              $$ref: '${schema}'
-      responses:
-        '200':
-          description: response description</template>
 
 </templates>
