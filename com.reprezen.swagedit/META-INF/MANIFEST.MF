@@ -26,8 +26,8 @@ Export-Package: com.reprezen.swagedit,
  com.reprezen.swagedit.editor,
  com.reprezen.swagedit.editor.hyperlinks,
  com.reprezen.swagedit.preferences,
+ com.reprezen.swagedit.quickfix,
  com.reprezen.swagedit.templates,
- com.reprezen.swagedit.validation,
  com.reprezen.swagedit.wizards
 Bundle-Vendor: ModelSolv, Inc. d.b.a. RepreZen
 Import-Package: com.fasterxml.jackson.core,

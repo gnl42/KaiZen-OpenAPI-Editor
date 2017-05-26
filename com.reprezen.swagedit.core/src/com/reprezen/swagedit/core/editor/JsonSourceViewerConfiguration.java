@@ -40,8 +40,8 @@ import org.eclipse.swt.widgets.Shell;
 import com.reprezen.swagedit.core.assist.JsonContentAssistProcessor;
 import com.reprezen.swagedit.core.assist.JsonQuickAssistProcessor;
 import com.reprezen.swagedit.core.editor.outline.QuickOutline;
+import com.reprezen.swagedit.core.quickfix.QuickFixer;
 import com.reprezen.swagedit.core.schema.CompositeSchema;
-import com.reprezen.swagedit.core.validation.QuickFixer;
 
 public abstract class JsonSourceViewerConfiguration extends YEditSourceViewerConfiguration {
 

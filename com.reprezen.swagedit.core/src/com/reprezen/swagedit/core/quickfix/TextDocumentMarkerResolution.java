@@ -1,4 +1,4 @@
-package com.reprezen.swagedit.core.validation;
+package com.reprezen.swagedit.core.quickfix;
 
 import org.eclipse.core.resources.IFile;
 import org.eclipse.core.resources.IMarker;

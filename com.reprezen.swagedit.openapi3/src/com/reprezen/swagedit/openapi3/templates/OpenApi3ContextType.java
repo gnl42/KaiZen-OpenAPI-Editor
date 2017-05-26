@@ -65,8 +65,8 @@ public class OpenApi3ContextType extends TemplateContextType {
         public static final String CONTEXT_ID = "com.reprezen.swagedit.openapi3.templates.components";
     }
 
-    public static class CallbackObjectContextType extends OpenApi3ContextType {
-        public static final String CONTEXT_ID = "com.reprezen.swagedit.openapi3.templates.callback";
+    public static class CallbacksObjectContextType extends OpenApi3ContextType {
+        public static final String CONTEXT_ID = "com.reprezen.swagedit.openapi3.templates.callbacks";
     }
 
     public static class RequestBodyObjectContextType extends OpenApi3ContextType {
@@ -84,7 +84,7 @@ public class OpenApi3ContextType extends TemplateContextType {
                 ResponseObjectContextType.CONTEXT_ID, //
                 ResponseContentContextType.CONTEXT_ID, //
                 ComponentsObjectContextType.CONTEXT_ID, //
-                CallbackObjectContextType.CONTEXT_ID, //
+                CallbacksObjectContextType.CONTEXT_ID, //
                 RequestBodyObjectContextType.CONTEXT_ID);
     }
 
@@ -118,11 +118,14 @@ public class OpenApi3ContextType extends TemplateContextType {
         if (path.matches(PATH_ITEM_REGEX + "/[^/]+/responses/\\d\\d\\d")) {
             return ResponseContentContextType.CONTEXT_ID;
         }
+        if (path.matches(PATH_ITEM_REGEX + "/[^/]+/callbacks")) {
+            return CallbacksObjectContextType.CONTEXT_ID;
+        }
         if (path.matches("/components")) {
             return ComponentsObjectContextType.CONTEXT_ID;
         }
         if (path.matches("/components/callbacks")) {
-            return CallbackObjectContextType.CONTEXT_ID;
+            return CallbacksObjectContextType.CONTEXT_ID;
         }
         if (path.endsWith("/requestBody")) {
             return RequestBodyObjectContextType.CONTEXT_ID;
