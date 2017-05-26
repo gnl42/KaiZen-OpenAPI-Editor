@@ -16,12 +16,13 @@ import org.eclipse.jface.text.templates.persistence.TemplateStore;
 import com.reprezen.swagedit.core.assist.JsonContentAssistProcessor;
 import com.reprezen.swagedit.core.assist.JsonProposalProvider;
 import com.reprezen.swagedit.openapi3.Activator;
+import com.reprezen.swagedit.openapi3.assist.ext.CallbacksContentAssistExt;
 import com.reprezen.swagedit.openapi3.templates.OpenApi3ContextType;
 
 public class OpenApi3ContentAssistProcessor extends JsonContentAssistProcessor {
 
 	public OpenApi3ContentAssistProcessor(ContentAssistant ca) {
-		super(ca, new JsonProposalProvider(), new OpenApi3ReferenceProposalProvider());
+        super(ca, new JsonProposalProvider(new CallbacksContentAssistExt()), new OpenApi3ReferenceProposalProvider());
 	}
 
 	@Override
