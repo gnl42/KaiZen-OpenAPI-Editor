@@ -10,6 +10,7 @@
  *******************************************************************************/
 package com.reprezen.swagedit.core.model;
 
+import java.util.Collection;
 import java.util.LinkedHashMap;
 import java.util.Map;
 
@@ -37,6 +38,10 @@ public class ObjectNode extends AbstractNode {
     public AbstractNode put(String property, AbstractNode value) {
         this.elements.put(property, value);
         return this;
+    }
+
+    public Collection<String> fieldNames() {
+        return elements.keySet();
     }
 
     @Override

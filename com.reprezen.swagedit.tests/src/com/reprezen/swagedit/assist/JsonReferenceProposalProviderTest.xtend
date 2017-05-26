@@ -59,7 +59,7 @@ class JsonReferenceProposalProviderTest {
 		val document = new SwaggerDocument
 		document.set(text)
 
-		val proposals = provider.getProposals("/paths/~1foo/get/responses/200/schema/$ref".ptr, document.asJson, Scope.LOCAL)
+		val proposals = provider.getProposals("/paths/~1foo/get/responses/200/schema/$ref".ptr, document, Scope.LOCAL)
 
 		assertThat(proposals, hasItems(
 			new Proposal("\"#/definitions/Valid\"", "Valid", null, "#/definitions/Valid")
@@ -86,7 +86,7 @@ class JsonReferenceProposalProviderTest {
 		val document = new SwaggerDocument
 		document.set(text)
 
-		val proposals = provider.getProposals("/definitions/Bar/properties/foo/$ref".ptr, document.asJson, Scope.LOCAL)
+		val proposals = provider.getProposals("/definitions/Bar/properties/foo/$ref".ptr, document, Scope.LOCAL)
 
 		assertThat(proposals, hasItems(
 			new Proposal("\"#/definitions/Foo\"", "Foo", null, "#/definitions/Foo")

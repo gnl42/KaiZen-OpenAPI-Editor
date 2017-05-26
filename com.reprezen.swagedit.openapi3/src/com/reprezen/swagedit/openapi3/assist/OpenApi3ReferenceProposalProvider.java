@@ -12,6 +12,12 @@ package com.reprezen.swagedit.openapi3.assist;
 
 import com.google.common.collect.Lists;
 import com.reprezen.swagedit.core.assist.JsonReferenceProposalProvider;
+import com.reprezen.swagedit.core.assist.contexts.ContextType;
+import com.reprezen.swagedit.core.assist.contexts.ContextTypeCollection;
+import com.reprezen.swagedit.openapi3.Activator;
+import com.reprezen.swagedit.openapi3.assist.contexts.OperationContextType;
+import com.reprezen.swagedit.openapi3.assist.contexts.OperationIdContextType;
+import com.reprezen.swagedit.openapi3.assist.contexts.SecuritySchemeContextType;
 import com.reprezen.swagedit.openapi3.editor.OpenApi3ContentDescriber;
 
 public class OpenApi3ReferenceProposalProvider extends JsonReferenceProposalProvider {
@@ -33,12 +39,14 @@ public class OpenApi3ReferenceProposalProvider extends JsonReferenceProposalProv
     protected static final String REQUEST_BODY_REGEX = ".*/requestBody/\\$ref";
     protected static final String LINK_REGEX = ".*/links/"+COMPONENT_NAME_REGEX +"/\\$ref";
     protected static final String LINK_OPERATIONID_REGEX = ".*/links/" + COMPONENT_NAME_REGEX + "/operationId";
+    protected static final String LINK_OPERATIONREF_REGEX = ".*/links/" + COMPONENT_NAME_REGEX + "/operationRef";
     protected static final String EXAMPLE_REGEX = ".*/examples/"+COMPONENT_NAME_REGEX +"/\\$ref";
     protected static final String SCHEMA_EXAMPLE_REGEX = SCHEMA_COMPONENT_REGEX + "example/\\$ref" + "|"
             + INLINE_SCHEMA_REGEX + "example/\\$ref";
     protected static final String HEADER_REGEX = ".*/headers/"+COMPONENT_NAME_REGEX +"/\\$ref";
     protected static final String CALLBACK_REGEX = ".*/callbacks/"+COMPONENT_NAME_REGEX +"/\\$ref";
     protected static final String SECURITY_REGEX = ".*/security/\\d+";
+
    
 	public static final ContextType SCHEMA_DEFINITION = new ContextType("components/schemas", "schemas",
 			SCHEMA_DEFINITION_REGEX);
@@ -56,9 +64,11 @@ public class OpenApi3ReferenceProposalProvider extends JsonReferenceProposalProv
     public static final ContextType CALLBACK = new ContextType("components/callbacks", "callback", CALLBACK_REGEX);
     public static final ContextType PATH_LINK_OPERATION_ID = new ContextType("components/links/", "operationId",
             CALLBACK_REGEX);
-    public static final ContextType LINK_OPERATIONID = new ContextTypeValue("operationId", "operationId",
-            LINK_OPERATIONID_REGEX, true);
-    public static final ContextType PATH_SECURITY = new ContextTypeValue("securitySchemes", "security",
+    public static final ContextType LINK_OPERATIONID = new OperationIdContextType(Activator.getDefault().getSchema(),
+            LINK_OPERATIONID_REGEX);
+    public static final ContextType LINK_OPERATIONREF = new OperationContextType(Activator.getDefault().getSchema(),
+            LINK_OPERATIONREF_REGEX);
+    public static final ContextType PATH_SECURITY = new SecuritySchemeContextType(Activator.getDefault().getSchema(),
             SECURITY_REGEX);
 
     public static final ContextTypeCollection OPEN_API3_CONTEXT_TYPES = ContextType
@@ -74,6 +84,7 @@ public class OpenApi3ReferenceProposalProvider extends JsonReferenceProposalProv
                     HEADER, //
                     CALLBACK, //
                     PATH_SECURITY, //
-                    LINK_OPERATIONID));
+                    LINK_OPERATIONID, //
+                    LINK_OPERATIONREF));
 
 }

@@ -24,6 +24,8 @@ import org.eclipse.core.resources.IFile;
 import org.eclipse.core.runtime.IPath;
 
 import com.fasterxml.jackson.core.JsonPointer;
+import com.fasterxml.jackson.core.JsonProcessingException;
+import com.fasterxml.jackson.databind.JsonNode;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import com.fasterxml.jackson.databind.ObjectReader;
 import com.fasterxml.jackson.databind.module.SimpleModule;
@@ -90,6 +92,18 @@ public class Model {
         }
 
         return model;
+    }
+
+    public static Model parse(CompositeSchema schema, JsonNode document) {
+        ObjectMapper mapper = new ObjectMapper(new YAMLFactory());
+        String text = null;
+        try {
+            text = mapper.writeValueAsString(document);
+        } catch (JsonProcessingException e) {
+            e.printStackTrace();
+        }
+
+        return parseYaml(schema, text);
     }
 
     /**
