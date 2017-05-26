@@ -34,7 +34,7 @@ import org.eclipse.ui.texteditor.MarkerAnnotation;
 
 import com.google.common.collect.Lists;
 import com.reprezen.swagedit.core.Activator;
-import com.reprezen.swagedit.core.validation.TextDocumentMarkerResolution;
+import com.reprezen.swagedit.core.quickfix.TextDocumentMarkerResolution;
 
 public class JsonQuickAssistProcessor implements IQuickAssistProcessor {
     private final IMarkerResolutionGenerator2 quickFixer;

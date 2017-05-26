@@ -91,7 +91,7 @@
    <extension point="org.eclipse.ui.ide.markerResolution">
       <markerResolutionGenerator
          markerType="org.eclipse.core.resources.problemmarker"
-         class="com.reprezen.swagedit.openapi3.validation.OpenApi3QuickFixer"/>
+         class="com.reprezen.swagedit.openapi3.quickfix.OpenApi3QuickFixer"/>
    </extension>
    
    <extension point="com.github.eclipsecolortheme.mapper">
@@ -153,10 +153,10 @@
             name="Components Context">
       </contextType>
       <contextType
-            class="com.reprezen.swagedit.openapi3.templates.OpenApi3ContextType$CallbackObjectContextType"
-            id="com.reprezen.swagedit.openapi3.templates.callback"
-            name="Callback Context">            
-      </contextType>
+            class="com.reprezen.swagedit.openapi3.templates.OpenApi3ContextType$CallbacksObjectContextType"
+            id="com.reprezen.swagedit.openapi3.templates.callbacks"
+            name="Callbacks Context">            
+      </contextType>      
       <contextType
             class="com.reprezen.swagedit.openapi3.templates.OpenApi3ContextType$RequestBodyObjectContextType"
             id="com.reprezen.swagedit.openapi3.templates.requestBody"
