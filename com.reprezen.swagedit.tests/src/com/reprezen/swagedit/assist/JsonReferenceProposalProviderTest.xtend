@@ -20,7 +20,7 @@ import static org.hamcrest.core.IsCollectionContaining.*
 import static org.junit.Assert.*
 import com.reprezen.swagedit.core.utils.SwaggerFileFinder.Scope
 import com.reprezen.swagedit.core.assist.Proposal
-import com.reprezen.swagedit.core.assist.JsonReferenceProposalProvider.ContextType
+import com.reprezen.swagedit.core.assist.contexts.ContextType
 
 class JsonReferenceProposalProviderTest {
 
