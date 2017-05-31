@@ -20,6 +20,10 @@ import org.junit.runners.Parameterized.Parameters
 
 import static org.junit.Assert.*
 import org.junit.Test
+import com.google.common.collect.Maps
+import java.util.Map
+import com.reprezen.swagedit.core.json.references.JsonReferenceValidator
+import com.reprezen.swagedit.core.json.references.JsonReferenceFactory
 
 @RunWith(typeof(Parameterized))
 class SchemaValidationTest {
@@ -57,6 +61,10 @@ class SchemaValidationTest {
 				return super.fromNode(error, indent)
 			}
 		}
-		new Validator().validateAgainstSchema(processor, schemaAsJson, documentAsJson)
+		val Map<String, JsonNode> preloadedSchemas = Maps.newHashMap();
+		preloadedSchemas.put("http://openapis.org/v3/schema.json",
+			Activator.getDefault().getSchema().getRootType().asJson());
+		new Validator(new JsonReferenceValidator(new JsonReferenceFactory()), preloadedSchemas).
+			validateAgainstSchema(processor, schemaAsJson, documentAsJson)
 	}
 }
