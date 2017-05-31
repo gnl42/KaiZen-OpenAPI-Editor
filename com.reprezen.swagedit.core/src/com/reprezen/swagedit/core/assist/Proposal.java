@@ -21,6 +21,8 @@ import org.eclipse.swt.graphics.TextStyle;
 import org.eclipse.swt.widgets.Display;
 
 import com.google.common.base.Strings;
+import com.reprezen.swagedit.core.utils.StringUtils;
+import com.reprezen.swagedit.core.utils.StringUtils.QuoteStyle;
 
 public class Proposal {
 
@@ -59,11 +61,41 @@ public class Proposal {
             styledString.append(": ", typeStyler).append(type, typeStyler);
         }
 
+        // If the replacement string has quotes
+        // we should know which kind is it
+        QuoteStyle quote = QuoteStyle.INVALID;
+        if (StringUtils.isQuoted(replacementString)) {
+            quote = StringUtils.QuoteStyle.parse(replacementString.charAt(0));
+        }
+
+        // If prefix is a quote, which kind is it
+        QuoteStyle prefixQuote = QuoteStyle.INVALID;
+        if (StringUtils.isQuoted(prefix)) {
+            prefixQuote = StringUtils.QuoteStyle.parse(prefix.charAt(0));
+        }
+
+        // Handle quotes
+        String rString = replacementString;
+        if (quote != QuoteStyle.INVALID && prefixQuote != QuoteStyle.INVALID) {
+            if (quote != prefixQuote) {
+                // If quotes are not same, replace quotes from replacement
+                // string with one from prefix
+                rString = rString.substring(1);
+                if (rString.endsWith(quote.getValue())) {
+                    rString = rString.substring(0, rString.length() - 1);
+                }
+                rString = prefixQuote.getValue() + rString;
+            } else {
+                // remove last quote to avoid duplicates
+                rString = rString.substring(0, rString.length() - 1);
+            }
+        }
+
         StyledCompletionProposal proposal = null;
         if (Strings.emptyToNull(prefix) == null) {
             proposal = new StyledCompletionProposal(replacementString, styledString, null, description, offset);
-        } else if (replacementString.toLowerCase().contains(prefix.toLowerCase())) {
-            proposal = new StyledCompletionProposal(replacementString, styledString, prefix, description, offset);
+        } else if (rString.toLowerCase().contains(prefix.toLowerCase())) {
+            proposal = new StyledCompletionProposal(rString, styledString, prefix, description, offset);
         }
 
         return proposal;
