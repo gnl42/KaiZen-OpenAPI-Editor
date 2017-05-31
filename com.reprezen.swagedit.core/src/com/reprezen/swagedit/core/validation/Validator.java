@@ -47,6 +47,8 @@ import com.reprezen.swagedit.core.model.ArrayNode;
 import com.reprezen.swagedit.core.model.Model;
 import com.reprezen.swagedit.core.model.ObjectNode;
 import com.reprezen.swagedit.core.model.ValueNode;
+import com.reprezen.swagedit.core.schema.ReferenceTypeDefinition;
+import com.reprezen.swagedit.core.schema.TypeDefinition;
 
 /**
  * This class contains methods for validating a Swagger YAML document.
@@ -149,6 +151,7 @@ public class Validator {
             for (AbstractNode node : model.allNodes()) {
                 checkArrayTypeDefinition(errors, node);
                 checkObjectTypeDefinition(errors, node);
+                checkReferenceType(errors, node);
             }
         }
         return errors;
@@ -262,6 +265,31 @@ public class Validator {
                         }
                     }
                 }
+            }
+        }
+    }
+
+    /**
+     * This method checks that referenced objects are of expected type as defined in the schema.
+     * 
+     * @param errors
+     * @param node
+     */
+    protected void checkReferenceType(Set<SwaggerError> errors, AbstractNode node) {
+        if (JsonReference.isReference(node)) {
+            Model model = node.getModel();
+            TypeDefinition type = node.getType();
+
+            if (type instanceof ReferenceTypeDefinition) {
+                type = ((ReferenceTypeDefinition) type).resolve();
+            }
+
+            AbstractNode nodeValue = node.get(JsonReference.PROPERTY);
+            AbstractNode valueNode = model.find((String) nodeValue.asValue().getValue());
+
+            if (valueNode != null && type.getPointer() != null && valueNode.getType() != null
+                    && !type.getPointer().equals(valueNode.getType().getPointer())) {
+                errors.add(error(nodeValue, IMarker.SEVERITY_ERROR, Messages.error_invalid_reference_type));
             }
         }
     }

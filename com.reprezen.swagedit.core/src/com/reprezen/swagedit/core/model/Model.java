@@ -213,6 +213,12 @@ public class Model {
     }
 
     public AbstractNode find(String pointer) {
+        if (Strings.emptyToNull(pointer) == null) {
+            return null;
+        }
+        if (pointer.startsWith("#")) {
+            pointer = pointer.substring(1);
+        }
         return nodes.get(JsonPointer.valueOf(pointer));
     }
     
