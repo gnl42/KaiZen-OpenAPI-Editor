@@ -91,7 +91,7 @@ public abstract class JsonEditor extends YEdit implements IShowInSource, IShowIn
 
     public static final String CONTEXT = "com.reprezen.swagedit.context";
 
-    private final Validator validator = new Validator();
+    private final Validator validator = createValidator();
     private ProjectionSupport projectionSupport;
     private Annotation[] oldAnnotations;
     private ProjectionAnnotationModel annotationModel;
@@ -568,6 +568,10 @@ public abstract class JsonEditor extends YEdit implements IShowInSource, IShowIn
     @Override
     public ShowInContext getShowInContext() {
         return new ShowInContext(getEditorInput(), new StructuredSelection());
+    }
+    
+    protected Validator createValidator() {
+        return new Validator();
     }
     
     public class JsonPreferenceChangeListener implements IPropertyChangeListener {
