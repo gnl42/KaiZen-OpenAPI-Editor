@@ -83,6 +83,20 @@
 					</execution>
 				</executions>
 			</plugin>
+            <plugin>
+                <artifactId>maven-clean-plugin</artifactId>
+                <version>2.6.1</version>
+                <configuration>
+                    <filesets>
+                        <fileset>
+                            <directory>xtend-gen</directory>
+                            <includes>
+                                <include>**</include>
+                            </includes>
+                        </fileset>
+                    </filesets>
+                </configuration>
+            </plugin>            
 		</plugins>
 	</build>
 	
@@ -170,7 +184,7 @@
                         <configuration>
                             <defaultP2Metadata>false</defaultP2Metadata>
                         </configuration>
-                    </plugin>
+                    </plugin>                    
                 </plugins>
             </build>
         </profile>
