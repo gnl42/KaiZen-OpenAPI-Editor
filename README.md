@@ -12,9 +12,7 @@ We welcome your suggestions and contributions!
 
 ### NEW! OpenAPI 3.0 Editing (Experimental)
 
-KaiZen OpenAPI Editor now features experimental support for the current [OpenAPI 3.0.0-rc2](https://github.com/RepreZen/KaiZen-OpenAPI-Editor/edit/master/README.md) draft specification.
-
-[See here for details.](https://github.com/RepreZen/KaiZen-OpenAPI-Editor/blob/master/OPEN_API_V3_SUPPORT.md)
+KaiZen OpenAPI Editor now features experimental support for the current [OpenAPI 3.0.0-rc2](https://github.com/RepreZen/KaiZen-OpenAPI-Editor/edit/master/README.md) draft specification.<br/>[See here for details.](https://github.com/RepreZen/KaiZen-OpenAPI-Editor/blob/master/OPEN_API_V3_SUPPORT.md)
  
 <img src="/etc/img/ContentAssistQuickOutline.png" alt="Drawing" width="400" />
 
