@@ -22,3 +22,7 @@ Please use the *OpenAPI v3 Spec* wizard from the *KaiZen OpenAPI Editor* categor
 
 ## The editor for Swagger v2 uses an underlying JSON Schema. There's no official JSON Schema for OpenAPI v3, so what are you using?
 We use a modification of the JSON Schema provided by [googleapis/gnostic](https://github.com/googleapis/gnostic). We use the [SwagEdit branch](https://github.com/RepreZen/gnostic/tree/SwagEdit) to generate our JSON Schema. Thanks to @timburks and @MikeRalphson for the contribution!
+
+## When will the final OpenAPI 3.0 specification be released?
+
+In just a few weeks! See the [announcement on the OpenAPI blog](https://www.openapis.org/blog/2017/05/25/the-open-api-initiative-is-sending-you-a-save-the-date-card) for more information. Now is your chance to try out OpenAPI 3.0, and provide your feedback to the OAI Technical Developer Community.
