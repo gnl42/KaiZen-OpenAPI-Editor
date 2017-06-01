@@ -117,8 +117,9 @@ components:
               contentType: image/png, image/jpeg
               headers:
                 X-Rate-Limit-Limit:
-                description: The number of allowed requests in the current period
-                type: integer                        
+                  description: The number of allowed requests in the current period
+                  schema:
+                    type: integer
                 
     # FIXME: fix examples in requestBody
     withExamples:
