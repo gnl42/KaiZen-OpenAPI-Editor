@@ -1,4 +1,4 @@
-# NEW! Open API v3 Support (*Experimental*)
+# NEW! OpenAPI 3.0 Editing Support (*Experimental*)
 We are really excited to announce that KaiZen OpenAPI Editor now supports [OpenAPI v3](https://github.com/OAI/OpenAPI-Specification/blob/OpenAPI.next/versions/3.0.md). The new feature is still under active development, but it already allows you to do really cool stuff with OpenAPI v3 specs.
 
 ## Validation
