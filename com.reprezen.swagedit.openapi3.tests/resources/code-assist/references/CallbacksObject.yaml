@@ -13,7 +13,7 @@ paths:
       callbacks:
         myWebhook:
          # Operation: KaiZen code assist OK
-          $ref: "#/components/callbacks/myWebho ok"
+          $ref: "#/components/callbacks/myWebhook"
 
 components: 
 
