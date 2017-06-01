@@ -1,0 +1,146 @@
+openapi: "3.0.0"
+info:
+  title: Schema Object
+  version: "1.0.0"
+  
+paths:  {}
+          
+components:
+  schemas:
+  
+    SimpleObject:
+      type: object
+      required:
+      - name
+      properties:
+        name:
+          type: string
+        address:
+          $ref: "#/components/schemas/Pet"
+        age:
+          type: integer
+          format: int32
+          minimum: 0    
+          
+    MapObject:
+      type: object
+      additionalProperties:
+        type: string
+        
+    StringToModelMappingObject:
+      type: object
+      additionalProperties:
+        $ref: "#/components/schemas/Dog"
+        
+    ModelWithExamples:
+      type: object
+      properties:
+        id:
+          type: integer
+          format: int64
+        name:
+          type: string
+      required:
+      - name
+      example:
+        name: Puma
+        id: 1        
+            
+  # Models with composition (https://github.com/OAI/OpenAPI-Specification/blob/OpenAPI.next/versions/3.0.md#models-with-composition)
+    ErrorModel:
+      type: object
+      required:
+      - message
+      - code
+      properties:
+        message:
+          type: string
+        code:
+          type: integer
+          minimum: 100
+          maximum: 600
+    ExtendedErrorModel:
+      allOf:
+      - $ref: '#/components/schemas/ErrorModel'
+      - type: object
+        required:
+        - rootCause
+        properties:
+          rootCause:
+            type: string
+            
+    # Models with Polymorphism Support (https://github.com/OAI/OpenAPI-Specification/blob/OpenAPI.next/versions/3.0.md#models-with-polymorphism-support)    
+    Pet:
+      type: object
+      discriminator:
+        propertyName: petType
+      properties:
+        name:
+          type: string
+        petType:
+          type: string
+      required:
+      - name
+      - petType
+    Cat:  ## "Cat" will be used as the discriminator value
+      description: A representation of a cat
+      allOf:
+      - $ref: '#/components/schemas/Pet'
+      - type: object
+        properties:
+          huntingSkill:
+            type: string
+            description: The measured skill for hunting
+            enum:
+            - clueless
+            - lazy
+            - adventurous
+            - aggressive
+        required:
+        - huntingSkill
+    Dog:  ## "Dog" will be used as the discriminator value
+      description: A representation of a dog
+      allOf:
+      - $ref: '#/components/schemas/Pet'
+      - type: object
+        properties:
+          packSize:
+            type: integer
+            format: int32
+            description: the size of the pack the dog is from
+            default: 0
+            minimum: 0
+        required:
+        - packSize        
+        
+    # Discrinimator Object
+    MyResponseType:
+      oneOf:
+        - $ref: '#/components/schemas/Cat'
+        - $ref: '#/components/schemas/Dog'
+        - $ref: '#/components/schemas/Lizard'
+      discriminator:
+          propertyName: pet_type       
+                    
+    MyResponseType2:
+      oneOf:
+      - $ref: '#/components/schemas/Cat'
+      - $ref: '#/components/schemas/Dog'
+      - $ref: '#/components/schemas/Lizard'
+      - $ref: 'https://gigantic-server.com/schemas/Monster/schema.json'
+      discriminator:
+        propertyName: pet_type
+        mapping:
+          dog: '#/components/schemas/Dog'
+          monster: 'https://gigantic-server.com/schemas/Monster/schema.json'    
+          
+          
+    Lizard:
+      allOf:
+      - $ref: '#/components/schemas/Pet'
+      - type: object
+        # all other properties specific to a `Lizard`
+        properties:
+          lovesRocks:
+            type: boolean          
+                    
