@@ -13,6 +13,7 @@ package com.reprezen.swagedit.core.validation;
 import java.io.IOException;
 import java.net.URI;
 import java.util.HashSet;
+import java.util.Map;
 import java.util.Objects;
 import java.util.Set;
 
@@ -32,10 +33,13 @@ import com.fasterxml.jackson.core.JsonPointer;
 import com.fasterxml.jackson.databind.JsonNode;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import com.github.fge.jsonschema.core.exceptions.ProcessingException;
+import com.github.fge.jsonschema.core.load.configuration.LoadingConfiguration;
+import com.github.fge.jsonschema.core.load.configuration.LoadingConfigurationBuilder;
 import com.github.fge.jsonschema.core.report.ProcessingReport;
 import com.github.fge.jsonschema.main.JsonSchema;
 import com.github.fge.jsonschema.main.JsonSchemaFactory;
 import com.google.common.collect.HashMultimap;
+import com.google.common.collect.Maps;
 import com.google.common.collect.Multimap;
 import com.google.common.collect.Sets;
 import com.reprezen.swagedit.core.editor.JsonDocument;
@@ -61,13 +65,23 @@ public class Validator {
 
     private final JsonReferenceValidator referenceValidator;
     private JsonNode schemaRefTemplate = new ObjectMapper().createObjectNode().put("$ref", "#/definitions/schema");
-
-    public Validator(JsonReferenceValidator referenceValidator) {
-        this.referenceValidator = referenceValidator;
-    }
+    private LoadingConfiguration loadingConfiguration;
 
     public Validator() {
-        this.referenceValidator = new JsonReferenceValidator(new JsonReferenceFactory());
+        this(new JsonReferenceValidator(new JsonReferenceFactory()));
+    }
+
+    public Validator(JsonReferenceValidator referenceValidator) {
+        this(referenceValidator, Maps.<String, JsonNode> newHashMap());
+    }
+
+    public Validator(JsonReferenceValidator referenceValidator, Map<String, JsonNode> preloadSchemas) {
+        this.referenceValidator = referenceValidator;
+        LoadingConfigurationBuilder loadingConfigurationBuilder = LoadingConfiguration.newBuilder();
+        for (String nextSchemaUri : preloadSchemas.keySet()) {
+            loadingConfigurationBuilder.preloadSchema(nextSchemaUri, preloadSchemas.get(nextSchemaUri));
+        }
+        this.loadingConfiguration = loadingConfigurationBuilder.freeze();
     }
 
     /**
@@ -116,7 +130,8 @@ public class Validator {
      * @return error
      */
     protected Set<SwaggerError> validateAgainstSchema(ErrorProcessor processor, JsonDocument document) {
-        final JsonSchemaFactory factory = JsonSchemaFactory.newBuilder().freeze();
+        final JsonSchemaFactory factory = JsonSchemaFactory.newBuilder().setLoadingConfiguration(loadingConfiguration)
+                .freeze();
         final Set<SwaggerError> errors = Sets.newHashSet();
 
         JsonSchema schema = null;
