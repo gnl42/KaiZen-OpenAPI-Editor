@@ -51,7 +51,6 @@ import com.reprezen.swagedit.core.model.ArrayNode;
 import com.reprezen.swagedit.core.model.Model;
 import com.reprezen.swagedit.core.model.ObjectNode;
 import com.reprezen.swagedit.core.model.ValueNode;
-import com.reprezen.swagedit.core.schema.ReferenceTypeDefinition;
 import com.reprezen.swagedit.core.schema.TypeDefinition;
 
 /**
@@ -302,15 +301,10 @@ public class Validator {
             Model model = node.getModel();
             TypeDefinition type = node.getType();
 
-            if (type instanceof ReferenceTypeDefinition) {
-                type = ((ReferenceTypeDefinition) type).resolve();
-            }
-
             AbstractNode nodeValue = node.get(JsonReference.PROPERTY);
             AbstractNode valueNode = model.find((String) nodeValue.asValue().getValue());
 
-            if (valueNode != null && type.getPointer() != null && valueNode.getType() != null
-                    && !type.getPointer().equals(valueNode.getType().getPointer())) {
+            if (!type.validate(valueNode)) {
                 errors.add(error(nodeValue, IMarker.SEVERITY_ERROR, Messages.error_invalid_reference_type));
             }
         }
