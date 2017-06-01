@@ -531,7 +531,7 @@
           "type": "string"
         },
         "headers": {
-          "$ref": "#/definitions/object"
+          "$ref": "#/definitions/headers"
         },
         "style": {
           "type": "string"
@@ -617,7 +617,7 @@
     },
     "headers": {
       "type": "object",
-      "description": "Lists the headers that can be sent in a response or forwarded via a link. Note that RFC 7230 states header names are case insensitive.",
+      "description": "Lists the headers that can be sent in a response or forwarded via a link. Note that RFC7230 states header names are case insensitive.",
       "additionalProperties": false,
       "patternProperties": {
         "^[a-zA-Z0-9\\.\\-_]+$": {
@@ -703,6 +703,11 @@
       "type": "object",
       "description": "The Header Object follows the structure of the Parameter Object, with the following changes:  1. `name` MUST NOT be specified, it is given in the Headers Object. 1. `in` MUST NOT be specified, it is implicitly in `header`. 1. All traits that are affected by the location MUST be applicable to a location of `header` (for example, `style`).",
       "additionalProperties": false,
+      "patternProperties": {
+        "^x-": {
+          "$ref": "#/definitions/specificationExtension"
+        }
+      },
       "properties": {
         "name": {
           "type": "string"
@@ -801,7 +806,7 @@
           "type": "boolean"
         },
         "discriminator": {
-          "type": "string"
+          "$ref": "#/definitions/discriminator"
         },
         "readOnly": {
           "type": "boolean"
@@ -934,6 +939,19 @@
         },
         "format": {
           "type": "string"
+        }
+      }
+    },
+    "discriminator": {
+      "type": "object",
+      "description": "When request bodies or response payloads may be one of a number of different schemas, a `discriminator` object can be used to aid in serialization, deserialization, and validation.  The discriminator is a specific object in a schema which is used to inform the consumer of the specification of an alternative schema based on the value associated with it.  Note, when using the discriminator, _inline_ schemas will not be considered when using the discriminator.",
+      "additionalProperties": false,
+      "properties": {
+        "propertyName": {
+          "type": "string"
+        },
+        "mapping": {
+          "$ref": "#/definitions/strings"
         }
       }
     },
@@ -1230,6 +1248,12 @@
       "type": "object",
       "additionalProperties": {
         "$ref": "#/definitions/securitySchemeOrReference"
+      }
+    },
+    "strings": {
+      "type": "object",
+      "additionalProperties": {
+        "type": "string"
       }
     },
     "object": {
