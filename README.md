@@ -8,12 +8,12 @@ KaiZen Editor, formerly known as SwagEdit, was developed for [RepreZen API Studi
 
 We welcome your suggestions and contributions!
 
-## Feature Highlights
-
-### NEW! OpenAPI 3.0 Editing (Experimental)
+## NEW! OpenAPI 3.0 Editing (Experimental)
 
 KaiZen OpenAPI Editor now features experimental support for the current [OpenAPI 3.0.0-rc2](https://github.com/RepreZen/KaiZen-OpenAPI-Editor/edit/master/README.md) draft specification.<br/>[See here for details.](https://github.com/RepreZen/KaiZen-OpenAPI-Editor/blob/master/OPEN_API_V3_SUPPORT.md)
  
+## Feature Highlights
+
 <img src="/etc/img/ContentAssistQuickOutline.png" alt="Drawing" width="400" />
 
 ### Validation
