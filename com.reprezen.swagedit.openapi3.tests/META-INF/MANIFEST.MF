@@ -14,3 +14,4 @@ Bundle-ClassPath: .,
  lib/mockito-core-1.10.19.jar,
  lib/objenesis-2.1.jar
 Bundle-Vendor: ModelSolv, Inc. d.b.a. RepreZen
+Import-Package: com.fasterxml.jackson.dataformat.yaml

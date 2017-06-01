@@ -70,7 +70,7 @@ public class ErrorProcessor {
         return fromNode(value, 0);
     }
 
-    private Set<SwaggerError> fromNode(JsonNode error, int indent) {
+    protected Set<SwaggerError> fromNode(JsonNode error, int indent) {
         final Set<SwaggerError> errors = new HashSet<>();
 
         if (error.isArray()) {
