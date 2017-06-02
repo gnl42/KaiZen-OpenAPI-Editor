@@ -72,7 +72,7 @@ public class Activator extends AbstractUIPlugin {
     public ContextTypeRegistry getContextTypeRegistry() {
         if (contextTypeRegistry == null) {
             contextTypeRegistry = new ContributionContextTypeRegistry();
-            for (String contextType : OpenApi3ContextType.allContextTypes()) {
+            for (String contextType : OpenApi3ContextType.allContextTypeIds()) {
                 contextTypeRegistry.addContextType(contextType);
             }
         }
