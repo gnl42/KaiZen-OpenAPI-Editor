@@ -126,5 +126,29 @@ class ValidatorTest {
 		assertEquals(1, errors.size())
 		assertTrue(errors.map[message].forall[it.equals(Messages.error_invalid_reference_type)])
 	}
+	
+	@Test
+	def void testValidationShouldFail_ForInvalidPointers() {
+		val content = '''
+			openapi: "3.0.0"
+			info:
+			  title: Broken links Object
+			  version: "1.0.0"
+			  
+			paths: {}
+			components: 
+			  schemas:
+			  
+			    MyType1:
+			      properties:
+			        property:
+			          $ref: "INVALID"
+		'''
+
+		document.set(content)
+		val errors = validator.validate(document, null as URI)		
+		assertEquals(1, errors.size())
+		assertTrue(errors.map[message].forall[it.equals(Messages.error_invalid_reference)])
+	}	
 
 }
