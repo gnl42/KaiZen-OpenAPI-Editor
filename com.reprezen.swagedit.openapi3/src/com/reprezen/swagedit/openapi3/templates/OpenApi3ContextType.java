@@ -101,7 +101,7 @@ public class OpenApi3ContextType extends TemplateContextType {
 
     public static class RequestBodyObjectContextType extends OpenApi3ContextType {
         public RequestBodyObjectContextType() {
-            super("requestBody", "/requestBody");
+            super("requestBody", ".*/requestBody");
         }
     }
 
