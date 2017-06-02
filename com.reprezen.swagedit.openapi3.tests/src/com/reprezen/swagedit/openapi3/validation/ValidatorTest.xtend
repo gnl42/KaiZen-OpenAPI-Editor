@@ -150,5 +150,52 @@ class ValidatorTest {
 		assertEquals(1, errors.size())
 		assertTrue(errors.map[message].forall[it.equals(Messages.error_invalid_reference)])
 	}	
+	
+	@Test
+	def void testValidationShouldFail_refNotJson() {
+		val content = '''
+			openapi: "3.0.0"
+			info:
+			  title: Broken links Object
+			  version: "1.0.0"
+			  
+			paths: {}
+			components: 
+			  schemas:
+			  
+			    MyType1:
+			      properties:
+			        property:
+			          $ref: "https://www.reprezen.com/#"
+		'''
+
+		document.set(content)
+		val errors = validator.validate(document, null as URI)		
+		assertEquals(1, errors.size())
+		assertTrue(errors.map[message].forall[it.equals(Messages.error_invalid_reference)])
+	}
+	
+	@Test
+	def void testValidationShouldFail_pathInNotJson() {
+		val content = '''
+			openapi: "3.0.0"
+			info:
+			  title: Broken links Object
+			  version: "1.0.0"
+			  
+			paths: {}
+			components: 
+			  schemas:
+			  
+			    MyType1:
+			      properties:
+			        property:
+			          $ref: "https://www.reprezen.com/#components/schemas/Pet"
+		'''
+
+		document.set(content)
+		val errors = validator.validate(document, null as URI)
+	// should not throw an exception
+	}	
 
 }
