@@ -61,7 +61,7 @@ This will show a dialog box where you can select the location of the update site
 Use the update site http://products.reprezen.com/swagedit/latest/ as the URL.
 
 ### Installing with RepreZen API Studio
-KaiZen Editor is fully functional inside RepreZen API Studio, which adds live documentation and diagram views, sandbox testing with the built-in mock service and Swagger-UI, powerful code generation, and other features. See the RepreZen API Studio [video and feature tour](http://www.reprezen.com/swagger-tools) to learn more and download a free trial.
+KaiZen Editor is fully functional inside RepreZen API Studio, which adds live documentation and diagram views, sandbox testing with the built-in mock service and Swagger-UI, powerful code generation, and other features. See the RepreZen API Studio [video and feature tour](http://www.reprezen.com/OpenAPI) to learn more and download a free trial.
 
 ## Troubleshooting
 See the [Troubleshooting Guide](https://github.com/RepreZen/SwagEdit/blob/master/TROUBLESHOOTING.md) for solutions to common problems.
