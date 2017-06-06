@@ -12,6 +12,7 @@ paths:
       summary: Create
       description: Create a new item
       requestBody:
+        #KZOE-ref name="requestBody in operation", value="components/requestBodies"
         $ref: "#/components/requestBodies/forPost"
       responses:
         '200':
@@ -24,6 +25,7 @@ components:
       '$request.body#/url':
         post:
           requestBody:
+            #KZOE-ref name="requestBody in callback", value="components/requestBodies"
             $ref: "#/components/requestBodies/www-form-urlencoded"
           responses: {}
               

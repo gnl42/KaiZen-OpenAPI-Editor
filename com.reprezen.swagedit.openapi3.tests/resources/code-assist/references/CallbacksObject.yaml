@@ -12,12 +12,15 @@ paths:
       responses: {}
       callbacks:
         myWebhook:
-         # Operation: KaiZen code assist OK
+          #KZOE-ref name="callback in operation", value="components/callbacks"
           $ref: "#/components/callbacks/myWebhook"
 
 components: 
 
   callbacks:
+    MyWebhooWithRef:
+      #KZOE-ref name="callback in components/callback", value="components/callbacks"
+      $ref: "#/components/callbacks/myWebhook"
     myWebhook:
       '$request.body#/url':
         post:

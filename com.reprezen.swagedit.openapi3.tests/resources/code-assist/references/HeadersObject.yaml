@@ -29,7 +29,7 @@ paths:
               schema:
                 type: integer
             X-Rate-Limit-Reset:
-            # In Responses: KaiZen code assist OK
+              #KZOE-ref name="header in response", value="components/headers"
               $ref: "#/components/headers/X-Rate-Limit-Reset"   
 
 components: 
@@ -45,6 +45,6 @@ components:
       operationId: getRepositoriesByOwner
       headers:
         X-Rate-Limit-Reset:
-          # In Links: KaiZen code assist OK
+          #KZOE-ref name="header in links", value="components/headers"
           $ref: "#/components/headers/X-Rate-Limit-Reset"
  

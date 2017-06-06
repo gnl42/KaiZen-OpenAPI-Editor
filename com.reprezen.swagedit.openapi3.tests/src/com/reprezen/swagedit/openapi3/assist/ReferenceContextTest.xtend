@@ -10,58 +10,70 @@
  *******************************************************************************/
 package com.reprezen.swagedit.openapi3.assist
 
+import com.google.common.base.Charsets
 import com.reprezen.swagedit.openapi3.editor.OpenApi3Document
+import com.reprezen.swagedit.openapi3.schema.OpenApi3Schema
+import java.io.File
+import java.io.FilenameFilter
+import java.nio.file.Files
+import java.nio.file.Paths
+import java.util.ArrayList
+import java.util.Collection
+import java.util.List
+import java.util.regex.Pattern
 import org.junit.Test
+import org.junit.runner.RunWith
+import org.junit.runners.Parameterized
+import org.junit.runners.Parameterized.Parameter
+import org.junit.runners.Parameterized.Parameters
 
 import static org.junit.Assert.*
-import java.util.regex.Pattern
-import com.reprezen.swagedit.openapi3.schema.OpenApi3Schema
 
+@RunWith(typeof(Parameterized))
 class ReferenceContextTest {
-	val KZOEref = "#KZOE-ref"
-	val testNamePattern = Pattern::compile(".*name=\"([\\w\\s]+)\".*")
-	val refValuePattern = Pattern::compile(".*value=\"([\\w/]+)\".*")
+
+	val static KZOEref = "#KZOE-ref"
+	val static testNamePattern = Pattern::compile(".*name=\"([\\w\\s/]+)\".*")
+	val static refValuePattern = Pattern::compile(".*value=\"([\\w/]+)\".*")
+
+	@Parameters(name="{index}: {1} - {3}")
+	def static Collection<Object[]> data() {
+		val resourcesDir = Paths.get("resources", "code-assist", "references").toFile();
+		val specFiles = resourcesDir.listFiles(new FilenameFilter() {
+
+			override accept(File dir, String name) {
+				name.endsWith(".yaml")
+			}
+
+		})
+		val Collection<Object[]> result = new ArrayList<Object[]>()
+		for (File specFile : specFiles) {
+			val fileContents = fileContents(specFile)
+			val indices = getAllIndicesOf(fileContents, KZOEref)
+			indices.forEach[result.add(#[specFile, specFile.name, it, getTestName(fileContents, it)] as Object[])]
+
+		}
+		return result
+	}
+
+	@Parameter
+	var public File specFile
+
+	@Parameter(1)
+	var public String fileName // for test name only
+	
+	@Parameter(2)
+	var public int offset // for test name only
+	
+	@Parameter(3)
+	var public String testName // for test name only
 
 	@Test
-	def void testCallbackRef_in_operation() {
-		val text = '''
-openapi: "3.0.0"
-info:
-  title: Callbacks Object
-  version: "1.0.0"  
-  
-paths: 
-
-  /pets:
-    get:
-      summary: Read
-      description: Provide details for the entire list (for collection resources) or an item (for object resources)
-      responses: {}
-      callbacks:
-        myWebhook:
-          #KZOE-ref name="callback in operation", value="components/callbacks"
-          $ref: "#/components/callbacks/myWebhook"
-
-components: 
-
-  callbacks:
-    myWebhook:
-      '$request.body#/url':
-        post:
-          requestBody:
-            description: Callback payload
-            content: 
-              'application/json':
-                schema:
-                  $ref: '#/components/schemas/SomePayload'
-          responses:
-            '200':
-              description: webhook successfully processed and no retries will be performed
-		'''
-
+	def void test_reference_context() {
 		val document = new OpenApi3Document(new OpenApi3Schema())
+		val text = specFile.fileContents()
 		document.set(text)
-		val offset = text.indexOf(KZOEref)
+
 		val region = document.getLineInformationOfOffset(offset)
 		val line = document.getLineOfOffset(offset)
 
@@ -77,5 +89,28 @@ components:
 		} else {
 			fail("Invalid test annotation line: " + annotationLine)
 		}
+	}
+
+	def public static List<Integer> getAllIndicesOf(String str, String substring) {
+		val result = newArrayList()
+		var index = str.indexOf(substring)
+		while (index > 0) {
+			result.add(index)
+			index = str.indexOf(substring, index + 1)
+		}
+		return result
+	}
+
+	def public static String fileContents(File file) {
+		return new String(Files.readAllBytes(Paths.get(file.getPath)), Charsets.UTF_8);
+	}
+	
+	def public static String getTestName(String spec, int offset) {
+		val input = spec.substring(offset, spec.indexOf("\n", offset))
+		val matcher = testNamePattern.matcher(input)
+		if (matcher.matches) {
+			return matcher.group(1)
+		}
+		return "" + offset
 	}
 }

@@ -23,7 +23,7 @@ paths:
                 $ref: '#/components/schemas/user'
           links:
             userRepositories:
-             ## KaiZen code-assist OK
+              #KZOE-ref name="link in response", value="components/links"
               $ref: '#/components/links/UserRepositories'
               
   /2.0/repositories/{username}:
@@ -46,7 +46,7 @@ paths:
                   $ref: '#/components/schemas/repository'
           links:
             userRepository:
-              ## KaiZen code-assist OK
+              #KZOE-ref name="link in response 2", value="components/links"
               $ref: '#/components/links/UserRepository'
               
   /2.0/repositories/{username}/{slug}: 
@@ -72,7 +72,7 @@ paths:
                   $ref: '#/components/schemas/repository'
           links:
             repositoryPullRequests:
-               # KaiZen code-assist OK
+              #KZOE-ref name="link in response 3", value="components/links"
               $ref: '#/components/links/RepositoryPullRequests'
               
   /2.0/repositories/{username}/{slug}/pullrequests: 
@@ -164,6 +164,9 @@ paths:
 components:
 
   links:
+    linkWithRef:
+      #KZOE-ref name="link in components/links", value="components/links"
+      $ref: ""
     UserRepositories:
       # returns array of '#/components/schemas/repository'
       operationId: getRepositoriesByOwner
