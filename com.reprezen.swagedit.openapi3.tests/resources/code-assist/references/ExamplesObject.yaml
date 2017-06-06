@@ -15,8 +15,11 @@ paths:
         schema:
           type: 'string'
           format: 'zip-code'
-          example: 
-            $ref: 'http://foo.bar#/examples/zip-example'
+        examples:
+          pizza:
+            #KZOE-ref name="example in parameter", value="components/examples"
+            $ref: "#/components/examples/confirmation-success"
+           
         
     put:
       description: bla
@@ -51,7 +54,7 @@ paths:
                 value: {"bar": "baz"}
                 # KaiZen code assist OK here
               pizza:
-                #KZOE-ref name="example in requestBody content schema", value="components/examples"
+                #KZOE-ref name="example in requestBody content", value="components/examples"
                 $ref: "#/components/examples/confirmation-success"           
                    
           'application/xml':
@@ -74,7 +77,7 @@ paths:
                 $ref: '#/components/schemas/SuccessResponse'
               examples:
                 confirmation-success:
-                  #KZOE-ref name="example in response content schema", value="components/examples"
+                  #KZOE-ref name="example in response content", value="components/examples"
                   $ref: '#/components/examples/confirmation-success'
       
 components:
