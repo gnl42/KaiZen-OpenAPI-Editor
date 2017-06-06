@@ -6,7 +6,7 @@ info:
 paths: 
 
   /pets:
-    #KZOE-ref name="path item in paths in components/links", value="paths"
+    #KZOE-ref name="path item in paths", value="paths"
     $ref: "HeadersObject.yaml#/paths/~1pets"
       
 components: 

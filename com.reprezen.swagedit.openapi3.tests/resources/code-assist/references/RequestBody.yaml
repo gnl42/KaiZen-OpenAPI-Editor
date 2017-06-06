@@ -12,7 +12,7 @@ paths:
       summary: Create
       description: Create a new item
       requestBody:
-        #KZOE-ref name="requestBody in operation", value="components/requestBodies"
+        #KZOE-ref name="requestBody in path item operation", value="components/requestBodies"
         $ref: "#/components/requestBodies/forPost"
       responses:
         '200':
