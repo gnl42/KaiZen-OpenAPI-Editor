@@ -33,8 +33,12 @@ paths:
               $ref: "#/components/headers/X-Rate-Limit-Reset"   
 
 components: 
-
   headers:
+  
+    refed:
+      #KZOE-ref name="header in components/headers", value="components/headers"
+      $ref: "#/components/headers/X-Rate-Limit-Reset"
+
     X-Rate-Limit-Reset:
       description: The number of seconds left in the current period
       schema:

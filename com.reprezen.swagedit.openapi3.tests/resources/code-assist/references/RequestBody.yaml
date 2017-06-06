@@ -30,6 +30,9 @@ components:
           responses: {}
               
   requestBodies:
+    refed:
+      #KZOE-ref name="requestBody in components/requestBodies", value="components/requestBodies"
+      $ref: "#/components/requestBodies/www-form-urlencoded"
   
     forPost:
       content:

@@ -38,7 +38,8 @@ public class OpenApi3ReferenceProposalProvider extends JsonReferenceProposalProv
             + "|/components/parameters/"+COMPONENT_NAME_REGEX+"/\\$ref";
     protected static final String RESPONSE_REGEX = ".*/responses/([0-9X]{3}|default)/\\$ref"//
             + "|/components/responses/"+COMPONENT_NAME_REGEX+"/\\$ref";
-    protected static final String REQUEST_BODY_REGEX = ".*/requestBody/\\$ref";
+    protected static final String REQUEST_BODY_REGEX = ".*/requestBody/\\$ref"//
+            + "|/components/requestBodies/"+COMPONENT_NAME_REGEX+"/\\$ref";
     protected static final String LINK_REGEX = ".*/links/"+COMPONENT_NAME_REGEX +"/\\$ref";
     protected static final String LINK_OPERATIONID_REGEX = ".*/links/" + COMPONENT_NAME_REGEX + "/operationId";
     protected static final String LINK_OPERATIONREF_REGEX = ".*/links/" + COMPONENT_NAME_REGEX + "/operationRef";

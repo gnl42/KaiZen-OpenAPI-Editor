@@ -89,5 +89,8 @@ components:
              $ref: http://foo.bar#/examples/name-example
             
   examples: 
+    refed:
+      #KZOE-ref name="example in components/examples", value="components/examples"
+      $ref: '#/components/examples/confirmation-success'
     confirmation-success:
       summary: this is confirmation success example
