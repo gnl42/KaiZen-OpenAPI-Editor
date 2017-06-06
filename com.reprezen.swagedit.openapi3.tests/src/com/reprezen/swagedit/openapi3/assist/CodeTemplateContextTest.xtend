@@ -20,36 +20,36 @@ import org.junit.runners.Parameterized
 import org.junit.runners.Parameterized.Parameters
 
 import static org.junit.Assert.*
+import com.reprezen.swagedit.openapi3.templates.OpenApi3ContextType
 
 @RunWith(typeof(Parameterized))
-class ReferenceContextTest extends CodeAssistContextTest{
+class CodeTemplateContextTest extends CodeAssistContextTest{
 
-	val static KZOEref = "#KZOE-ref"
+	val static KZOEref = "#KZOE-template"
 
 	@Parameters(name="{index}: {1} - {3}")
 	def static Collection<Object[]> data() {
-		val resourcesDir = Paths.get("resources", "code-assist", "references").toFile();
+		val resourcesDir = Paths.get("resources", "code-assist", "code-templates").toFile();
 		return data(resourcesDir, KZOEref)
 	}
 
 	@Test
-	def void test_reference_context() {
+	def void test_code_template_context() {
 		val document = new OpenApi3Document(new OpenApi3Schema())
 		val text = specFile.fileContents()
 		document.set(text)
 
 		val region = document.getLineInformationOfOffset(offset)
 		val line = document.getLineOfOffset(offset)
+		val annotationLine = document.get(region.offset, region.getLength())
 
 		val path = document.getModel(offset).getPath(line, document.getColumnOfOffset(line, region))
-		val allContextTypes = OpenApi3ReferenceProposalProvider.OPEN_API3_CONTEXT_TYPES
-		val contextType = allContextTypes.get(path.toString + "/$ref")
-
-		val annotationLine = document.get(region.offset, region.getLength())
+		val templateContext = OpenApi3ContextType.getContextType(path.toString)
 		val matcher = refValuePattern.matcher(annotationLine)
 		if (matcher.matches) {
 			val String refValue = matcher.group(1);
-			assertEquals(refValue, contextType.value);
+			assertNotNull("Code-template context is null, but expected: " + refValue, templateContext)
+			assertEquals(refValue, templateContext.name);
 		} else {
 			fail("Invalid test annotation line: " + annotationLine)
 		}

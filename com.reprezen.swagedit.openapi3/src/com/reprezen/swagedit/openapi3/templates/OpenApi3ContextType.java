@@ -20,7 +20,7 @@ public class OpenApi3ContextType extends TemplateContextType {
     private final String regex;
 
     public OpenApi3ContextType(String name, String regex) {
-        super("com.reprezen.swagedit.openapi3.templates." + name);
+        super("com.reprezen.swagedit.openapi3.templates." + name, name);
         this.regex = regex;
         addGlobalResolvers();
     }
@@ -95,7 +95,7 @@ public class OpenApi3ContextType extends TemplateContextType {
 
     public static class CallbacksObjectContextType extends OpenApi3ContextType {
         public CallbacksObjectContextType() {
-            super("callbacks", PATH_ITEM_REGEX + "/[^/]+/callbacks");
+            super("callbacks", PATH_ITEM_REGEX + "/[^/]+/callbacks|/components/callbacks");
         }
     }
 
