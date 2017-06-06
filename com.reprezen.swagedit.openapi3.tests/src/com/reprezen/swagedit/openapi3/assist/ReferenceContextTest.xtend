@@ -25,6 +25,7 @@ import static org.junit.Assert.*
 class ReferenceContextTest extends CodeAssistContextTest{
 
 	val static KZOEref = "#KZOE-ref"
+	val arrayItemMarker = "kzoe-arrayItem"
 
 	@Parameters(name="{index}: {1} - {3}")
 	def static Collection<Object[]> data() {
@@ -40,12 +41,14 @@ class ReferenceContextTest extends CodeAssistContextTest{
 
 		val region = document.getLineInformationOfOffset(offset)
 		val line = document.getLineOfOffset(offset)
+		val annotationLine = document.get(region.offset, region.getLength())
 
 		val path = document.getModel(offset).getPath(line, document.getColumnOfOffset(line, region))
 		val allContextTypes = OpenApi3ReferenceProposalProvider.OPEN_API3_CONTEXT_TYPES
-		val contextType = allContextTypes.get(path.toString + "/$ref")
+		val isArrayItem = annotationLine.contains(" " + arrayItemMarker + " ")
+		val maybeArrayPrefix = if (isArrayItem) "/0" else ""
+		val contextType = allContextTypes.get(path.toString + maybeArrayPrefix + "/$ref")
 
-		val annotationLine = document.get(region.offset, region.getLength())
 		val matcher = refValuePattern.matcher(annotationLine)
 		if (matcher.matches) {
 			val String refValue = matcher.group(1);
