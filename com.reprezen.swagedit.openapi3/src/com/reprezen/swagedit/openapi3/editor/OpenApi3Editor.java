@@ -1,6 +1,5 @@
 package com.reprezen.swagedit.openapi3.editor;
 
-import java.util.HashMap;
 import java.util.Map;
 
 import org.dadacoalition.yedit.editor.YEditSourceViewerConfiguration;

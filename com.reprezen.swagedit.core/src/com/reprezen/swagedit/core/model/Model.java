@@ -219,9 +219,14 @@ public class Model {
         if (pointer.startsWith("#")) {
             pointer = pointer.substring(1);
         }
-        return nodes.get(JsonPointer.valueOf(pointer));
+
+        try {
+            return nodes.get(JsonPointer.valueOf(pointer));
+        } catch (Exception e) {
+            return null;
+        }
     }
-    
+
     private AbstractNode add(AbstractNode node) {
         if (node != null && node.getPointer() != null) {
             nodes.put(node.getPointer(), node);

@@ -8,13 +8,39 @@ import java.net.URI
 import org.junit.Test
 
 import static org.junit.Assert.*
+import static org.hamcrest.CoreMatchers.*
 import com.reprezen.swagedit.core.json.references.JsonReferenceValidator
 import com.google.common.collect.ImmutableMap
 import com.reprezen.swagedit.core.json.references.JsonReferenceFactory
+import com.reprezen.swagedit.core.model.AbstractNode
+import com.reprezen.swagedit.core.json.references.JsonDocumentManager
+import com.reprezen.swagedit.core.validation.SwaggerError
+import org.eclipse.core.resources.IMarker
 
 class ValidatorTest {
 
-	val validator = new Validator(new JsonReferenceValidator(new JsonReferenceFactory), 
+	val docManager = new JsonDocumentManager() {		
+		override getFile(URI uri) {
+			null
+		}
+	}
+	val factory = new JsonReferenceFactory() {	
+		override create(AbstractNode node) {
+			val reference = super.create(node)
+			if (reference != null) {
+				reference.documentManager = docManager
+			}
+			reference
+		}
+		override createSimpleReference(URI baseURI, AbstractNode valueNode) {		
+			val reference = super.createSimpleReference(baseURI, valueNode)			
+			if (reference != null) {				
+				reference.documentManager = docManager			
+			}
+			reference
+		}
+	}
+	val validator = new Validator(new JsonReferenceValidator(factory), 
 		ImmutableMap.of("http://openapis.org/v3/schema.json", new OpenApi3Schema().asJson)
 	)
 	val document = new OpenApi3Document(new OpenApi3Schema)
@@ -42,8 +68,7 @@ class ValidatorTest {
 		'''
 
 		document.set(content)
-		val errors = validator.validate(document, null as URI)
-		println(errors.map[message])
+		val errors = validator.validate(document, null as URI)		
 		assertEquals(0, errors.size())
 	}
 
@@ -146,11 +171,15 @@ class ValidatorTest {
 		'''
 
 		document.set(content)
-		val errors = validator.validate(document, null as URI)		
-		assertEquals(1, errors.size())
-		assertTrue(errors.map[message].forall[it.equals(Messages.error_invalid_reference)])
-	}	
-	
+		val errors = validator.validate(document, null as URI)
+		assertEquals(2, errors.size())		
+		assertThat(errors, hasItems(
+				new SwaggerError(13, IMarker.SEVERITY_ERROR, Messages.error_invalid_reference_type),
+				new SwaggerError(13, IMarker.SEVERITY_WARNING, Messages.error_missing_reference)
+			)
+		)
+	}
+
 	@Test
 	def void testValidationShouldFail_refNotJson() {
 		val content = '''
@@ -171,10 +200,14 @@ class ValidatorTest {
 
 		document.set(content)
 		val errors = validator.validate(document, null as URI)		
-		assertEquals(1, errors.size())
-		assertTrue(errors.map[message].forall[it.equals(Messages.error_invalid_reference)])
+		assertEquals(2, errors.size())		
+		assertThat(errors, hasItems(
+				new SwaggerError(13, IMarker.SEVERITY_ERROR, Messages.error_invalid_reference_type),
+				new SwaggerError(13, IMarker.SEVERITY_WARNING, Messages.error_missing_reference)
+			)
+		)
 	}
-	
+
 	@Test
 	def void testValidationShouldFail_pathInNotJson() {
 		val content = '''
@@ -195,7 +228,12 @@ class ValidatorTest {
 
 		document.set(content)
 		val errors = validator.validate(document, null as URI)
-	// should not throw an exception
-	}	
+		assertEquals(2, errors.size())		
+		assertThat(errors, hasItems(
+				new SwaggerError(13, IMarker.SEVERITY_ERROR, Messages.error_invalid_reference_type),
+				new SwaggerError(13, IMarker.SEVERITY_ERROR, Messages.error_invalid_reference)
+			)
+		)
+	}
 
 }
