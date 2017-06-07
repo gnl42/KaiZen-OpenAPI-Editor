@@ -2,7 +2,7 @@
 
 # KaiZen OpenAPI Editor for Eclipse
 
-KaiZen OpenAPI Editor is an Eclipse editor for the [Swagger](http://swagger.io) API Description Language, now known as the [OpenAPI Specification](http://openapis.org). The editor supports Swagger-OpenAPI version 2.0, with experimental support for the OpenAPI 3.0 draft specification.
+KaiZen OpenAPI Editor is an Eclipse editor for the [Swagger](http://swagger.io) API Description Language, now known as the [OpenAPI Specification](http://openapis.org). The editor supports Swagger-OpenAPI version 2.0, with experimental support for the OpenAPI 3.0 draft specification.  KaiZen OpenAPI Editor is available on [Eclipse Marketplace](https://marketplace.eclipse.org/content/kaizen-openapi-editor).
 
 KaiZen Editor, formerly known as SwagEdit, was developed for [RepreZen API Studio](http://reprezen.com/swagger-tools), a comprehensive solution for API modeling, documentation, visualization, testing and code generation, built on Eclipse.
 
@@ -58,10 +58,10 @@ The [Eclipse Marketplace solution](https://marketplace.eclipse.org/content/kaize
 ### Installing from the Update Site 
 You can install KaiZen OpenAPI Editor into your Eclipse IDE by clicking on `Help > Install New Software... > Add...`
 This will show a dialog box where you can select the location of the update site.
-Use the update site from (http://products.reprezen.com/swagedit/latest/) as the URL.
+Use the update site http://products.reprezen.com/swagedit/latest/ as the URL.
 
 ### Installing with RepreZen API Studio
-KaiZen Editor is fully functional inside RepreZen API Studio, which adds live documentation and diagram views, sandbox testing with the built-in mock service and Swagger-UI, powerful code generation, and other features. See the RepreZen API Studio [video and feature tour](http://www.reprezen.com/swagger-tools) to learn more and download a free trial.
+KaiZen Editor is fully functional inside RepreZen API Studio, which adds live documentation and diagram views, sandbox testing with the built-in mock service and Swagger-UI, powerful code generation, and other features. See the RepreZen API Studio [video and feature tour](http://www.reprezen.com/OpenAPI) to learn more and download a free trial.
 
 ## Troubleshooting
 See the [Troubleshooting Guide](https://github.com/RepreZen/SwagEdit/blob/master/TROUBLESHOOTING.md) for solutions to common problems.
