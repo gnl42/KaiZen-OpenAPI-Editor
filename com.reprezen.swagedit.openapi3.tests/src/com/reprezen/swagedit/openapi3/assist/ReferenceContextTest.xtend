@@ -20,12 +20,15 @@ import org.junit.runners.Parameterized
 import org.junit.runners.Parameterized.Parameters
 
 import static org.junit.Assert.*
+import com.fasterxml.jackson.core.JsonPointer
 
 @RunWith(typeof(Parameterized))
 class ReferenceContextTest extends CodeAssistContextTest{
 
 	val static KZOEref = "#KZOE-ref"
 	val arrayItemMarker = "kzoe-arrayItem"
+
+	val allContextTypes = OpenApi3ReferenceProposalProvider.OPEN_API3_CONTEXT_TYPES
 
 	@Parameters(name="{index}: {1} - {3}")
 	def static Collection<Object[]> data() {
@@ -44,10 +47,9 @@ class ReferenceContextTest extends CodeAssistContextTest{
 		val annotationLine = document.get(region.offset, region.getLength())
 
 		val path = document.getModel(offset).getPath(line, document.getColumnOfOffset(line, region))
-		val allContextTypes = OpenApi3ReferenceProposalProvider.OPEN_API3_CONTEXT_TYPES
 		val isArrayItem = annotationLine.contains(" " + arrayItemMarker + " ")
 		val maybeArrayPrefix = if (isArrayItem) "/0" else ""
-		val contextType = allContextTypes.get(path.toString + maybeArrayPrefix + "/$ref")
+		val contextType = allContextTypes.get(path.append(JsonPointer.compile(maybeArrayPrefix + "/$ref")))
 
 		val matcher = refValuePattern.matcher(annotationLine)
 		if (matcher.matches) {
