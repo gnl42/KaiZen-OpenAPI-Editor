@@ -1,6 +1,6 @@
 package com.reprezen.swagedit.core.assist.contexts;
 
-import com.google.common.base.Strings;
+import com.fasterxml.jackson.core.JsonPointer;
 
 public class ContextTypeCollection {
 
@@ -10,12 +10,9 @@ public class ContextTypeCollection {
         this.contextTypes = contextTypes;
     }
 
-    public ContextType get(String path) {
-        if (Strings.emptyToNull(path) == null) {
-            return ContextType.UNKNOWN;
-        }
+    public ContextType get(JsonPointer pointer) {
         for (ContextType next : contextTypes) {
-            if (path.matches(next.regex)) {
+            if (next.canProvideProposal(pointer)) {
                 return next;
             }
         }
