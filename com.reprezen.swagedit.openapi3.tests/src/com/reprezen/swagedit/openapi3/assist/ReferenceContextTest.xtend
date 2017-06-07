@@ -21,6 +21,7 @@ import org.junit.runners.Parameterized.Parameters
 
 import static org.junit.Assert.*
 import com.fasterxml.jackson.core.JsonPointer
+import com.reprezen.swagedit.openapi3.assist.OpenApi3ReferenceProposalProvider.OpenApi3ContextTypeCollection
 
 @RunWith(typeof(Parameterized))
 class ReferenceContextTest extends CodeAssistContextTest{
@@ -28,7 +29,7 @@ class ReferenceContextTest extends CodeAssistContextTest{
 	val static KZOEref = "#KZOE-ref"
 	val arrayItemMarker = "kzoe-arrayItem"
 
-	val allContextTypes = OpenApi3ReferenceProposalProvider.OPEN_API3_CONTEXT_TYPES
+	val allContextTypes = new OpenApi3ContextTypeCollection(new OpenApi3Schema)
 
 	@Parameters(name="{index}: {1} - {3}")
 	def static Collection<Object[]> data() {
