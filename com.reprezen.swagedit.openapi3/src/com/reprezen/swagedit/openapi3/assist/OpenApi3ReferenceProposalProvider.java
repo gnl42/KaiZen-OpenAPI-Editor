@@ -35,34 +35,14 @@ public class OpenApi3ReferenceProposalProvider extends JsonReferenceProposalProv
     protected static final String PATH_ITEM_REGEX = "/paths/~1[^/]+/\\$ref"// in paths object
             // e.g. "/components/callbacks/myWebhook/$request.body#~1url/$ref"
             + "|/components/callbacks/" + COMPONENT_NAME_REGEX + "/[^/]+/\\$ref"; // in callbacks
-    protected static final String PARAMETER_REGEX = ".*/parameters/\\d+/\\$ref"//
-            + "|/components/parameters/" + COMPONENT_NAME_REGEX + "/\\$ref";
-    protected static final String RESPONSE_REGEX = ".*/responses/([0-9X]{3}|default)/\\$ref"//
-            + "|/components/responses/" + COMPONENT_NAME_REGEX + "/\\$ref";
-    protected static final String REQUEST_BODY_REGEX = ".*/requestBody/\\$ref"//
-            + "|/components/requestBodies/" + COMPONENT_NAME_REGEX + "/\\$ref";
-    protected static final String LINK_REGEX = ".*/links/" + COMPONENT_NAME_REGEX + "/\\$ref";
     protected static final String LINK_OPERATIONID_REGEX = ".*/links/" + COMPONENT_NAME_REGEX + "/operationId";
     protected static final String LINK_OPERATIONREF_REGEX = ".*/links/" + COMPONENT_NAME_REGEX + "/operationRef";
-    protected static final String EXAMPLE_REGEX = ".*/examples/" + COMPONENT_NAME_REGEX + "/\\$ref";
     protected static final String SCHEMA_EXAMPLE_REGEX = SCHEMA_COMPONENT_REGEX + "example/\\$ref" + "|"
             + INLINE_SCHEMA_REGEX + "example/\\$ref";
-    protected static final String HEADER_REGEX = ".*/headers/" + COMPONENT_NAME_REGEX + "/\\$ref";
     protected static final String CALLBACK_REGEX = ".*/callbacks/" + COMPONENT_NAME_REGEX + "/\\$ref";
     protected static final String SECURITY_REGEX = ".*/security/\\d+";
 
     public static final ContextType PATH_ITEM = new ContextType("paths", "path items", PATH_ITEM_REGEX);
-    public static final ContextType PATH_PARAMETER = new ContextType("components/parameters", "parameters",
-            PARAMETER_REGEX);
-    public static final ContextType PATH_RESPONSE = new ContextType("components/responses", "responses",
-            RESPONSE_REGEX);
-    public static final ContextType PATH_REQUEST_BODY = new ContextType("components/requestBodies", "requestBody",
-            REQUEST_BODY_REGEX);
-    public static final ContextType PATH_LINK = new ContextType("components/links", "link", LINK_REGEX);
-    public static final ContextType EXAMPLE = new ContextType("components/examples", "examples", EXAMPLE_REGEX);
-    // public static final ContextType SCHEMA_EXAMPLE = new ContextType("its/not/example/component", "example",
-    // SCHEMA_EXAMPLE_REGEX);
-    public static final ContextType HEADER = new ContextType("components/headers", "header", HEADER_REGEX);
     public static final ContextType CALLBACK = new ContextType("components/callbacks", "callback", CALLBACK_REGEX);
     public static final ContextType PATH_LINK_OPERATION_ID = new ContextType("components/links/", "operationId",
             CALLBACK_REGEX);
@@ -73,14 +53,14 @@ public class OpenApi3ReferenceProposalProvider extends JsonReferenceProposalProv
             super(Lists.newArrayList( //
                     // SCHEMA_EXAMPLE, // should go before schema definition
                     new ComponentContextType("components/schemas", "schemas", "schemaOrReference"), //
-                    PATH_ITEM, //
-                    PATH_PARAMETER, //
-                    PATH_RESPONSE, //
-                    PATH_REQUEST_BODY, //
-                    PATH_LINK, //
-                    EXAMPLE, //
-                    HEADER, //
+                    new ComponentContextType("components/parameters", "parameters", "parameterOrReference"), //
+                    new ComponentContextType("components/responses", "responses", "responseOrReference"), //
+                    new ComponentContextType("components/requestBodies", "requestBody", "requestBodyOrReference"), //
+                    new ComponentContextType("components/links", "link", "linkOrReference"), //
+                    new ComponentContextType("components/examples", "examples", "exampleOrReference"), //
+                    new ComponentContextType("components/headers", "header", "headerOrReference"), //
                     CALLBACK, //
+                    PATH_ITEM, //
                     new SecuritySchemeContextType(schema, OpenApi3ReferenceProposalProvider.SECURITY_REGEX), //
                     new OperationIdContextType(schema, OpenApi3ReferenceProposalProvider.LINK_OPERATIONID_REGEX), //
                     new OperationContextType(schema, OpenApi3ReferenceProposalProvider.LINK_OPERATIONREF_REGEX)));
