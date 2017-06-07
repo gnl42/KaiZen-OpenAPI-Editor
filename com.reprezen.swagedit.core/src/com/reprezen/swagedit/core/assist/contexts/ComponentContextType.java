@@ -17,12 +17,14 @@ import com.fasterxml.jackson.databind.ObjectMapper;
 import com.fasterxml.jackson.databind.node.ObjectNode;
 import com.reprezen.swagedit.core.model.Model;
 import com.reprezen.swagedit.core.schema.ComplexTypeDefinition;
+import com.reprezen.swagedit.core.schema.MultipleTypeDefinition;
 import com.reprezen.swagedit.core.schema.TypeDefinition;
 
 public class ComponentContextType extends ContextType {
 
     private final ObjectNode componentRef;
-    
+    private final static String REFERENCE_POINTER = "/definitions/reference/properties/$ref";
+
     public ComponentContextType(String value, String label, String componentSchemaPath) {
         super(value, label, null);
         componentRef = new ObjectMapper().createObjectNode().put("$ref", "#/definitions/" + componentSchemaPath);
@@ -37,11 +39,20 @@ public class ComponentContextType extends ContextType {
         if (model == null) {
             return false;
         }
-        JsonPointer pointerToType = model.find(pointer).getType().getPointer();
+        TypeDefinition type = model.find(pointer).getType();
+        if (type instanceof MultipleTypeDefinition) {
+            // MultipleTypeDefinition is a special case, it happens when several properties match a property
+            for (TypeDefinition nestedType : ((MultipleTypeDefinition) type).getMultipleTypes()) {
+                if (REFERENCE_POINTER.equals(nestedType.getPointer().toString())) {
+                    return true;
+                }
+            }
+        }
+        JsonPointer pointerToType = type.getPointer();
         if (pointerToType == null) {
             return false;
         }
-        return "/definitions/reference/properties/$ref".equals(pointerToType.toString());
+        return REFERENCE_POINTER.equals(pointerToType.toString());
     }
 
     protected boolean isReferenceToComponent(Model model, JsonPointer pointer) {

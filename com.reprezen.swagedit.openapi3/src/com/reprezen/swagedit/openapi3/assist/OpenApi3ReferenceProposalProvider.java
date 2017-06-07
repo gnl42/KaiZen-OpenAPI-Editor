@@ -39,13 +39,11 @@ public class OpenApi3ReferenceProposalProvider extends JsonReferenceProposalProv
     protected static final String LINK_OPERATIONREF_REGEX = ".*/links/" + COMPONENT_NAME_REGEX + "/operationRef";
     protected static final String SCHEMA_EXAMPLE_REGEX = SCHEMA_COMPONENT_REGEX + "example/\\$ref" + "|"
             + INLINE_SCHEMA_REGEX + "example/\\$ref";
-    protected static final String CALLBACK_REGEX = ".*/callbacks/" + COMPONENT_NAME_REGEX + "/\\$ref";
     protected static final String SECURITY_REGEX = ".*/security/\\d+";
 
     public static final ContextType PATH_ITEM = new ContextType("paths", "path items", PATH_ITEM_REGEX);
-    public static final ContextType CALLBACK = new ContextType("components/callbacks", "callback", CALLBACK_REGEX);
     public static final ContextType PATH_LINK_OPERATION_ID = new ContextType("components/links/", "operationId",
-            CALLBACK_REGEX);
+            ".*/callbacks/" + COMPONENT_NAME_REGEX + "/\\$ref");
 
     public static class OpenApi3ContextTypeCollection extends ContextTypeCollection {
 
@@ -59,7 +57,7 @@ public class OpenApi3ReferenceProposalProvider extends JsonReferenceProposalProv
                     new ComponentContextType("components/links", "link", "linkOrReference"), //
                     new ComponentContextType("components/examples", "examples", "exampleOrReference"), //
                     new ComponentContextType("components/headers", "header", "headerOrReference"), //
-                    CALLBACK, //
+                    new ComponentContextType("components/callbacks", "callback", "callbackOrReference"), //
                     PATH_ITEM, //
                     new SecuritySchemeContextType(schema, OpenApi3ReferenceProposalProvider.SECURITY_REGEX), //
                     new OperationIdContextType(schema, OpenApi3ReferenceProposalProvider.LINK_OPERATIONID_REGEX), //
