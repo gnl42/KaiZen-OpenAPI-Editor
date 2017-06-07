@@ -12,6 +12,7 @@ package com.reprezen.swagedit.openapi3.assist;
 
 import com.google.common.collect.Lists;
 import com.reprezen.swagedit.core.assist.JsonReferenceProposalProvider;
+import com.reprezen.swagedit.core.assist.contexts.ComponentContextType;
 import com.reprezen.swagedit.core.assist.contexts.ContextType;
 import com.reprezen.swagedit.core.assist.contexts.ContextTypeCollection;
 import com.reprezen.swagedit.core.schema.CompositeSchema;
@@ -31,8 +32,6 @@ public class OpenApi3ReferenceProposalProvider extends JsonReferenceProposalProv
 
     protected static final String SCHEMA_COMPONENT_REGEX = "^/components/schemas/(\\w+/)+";
     protected static final String INLINE_SCHEMA_REGEX = ".*schema/(\\w+/)*";
-    protected static final String SCHEMA_DEFINITION_REGEX = SCHEMA_COMPONENT_REGEX + "\\$ref" + "|"
-            + INLINE_SCHEMA_REGEX + "\\$ref";
     protected static final String PATH_ITEM_REGEX = "/paths/~1[^/]+/\\$ref"// in paths object
             // e.g. "/components/callbacks/myWebhook/$request.body#~1url/$ref"
             + "|/components/callbacks/" + COMPONENT_NAME_REGEX + "/[^/]+/\\$ref"; // in callbacks
@@ -52,8 +51,6 @@ public class OpenApi3ReferenceProposalProvider extends JsonReferenceProposalProv
     protected static final String CALLBACK_REGEX = ".*/callbacks/" + COMPONENT_NAME_REGEX + "/\\$ref";
     protected static final String SECURITY_REGEX = ".*/security/\\d+";
 
-    public static final ContextType SCHEMA_DEFINITION = new ContextType("components/schemas", "schemas",
-            SCHEMA_DEFINITION_REGEX);
     public static final ContextType PATH_ITEM = new ContextType("paths", "path items", PATH_ITEM_REGEX);
     public static final ContextType PATH_PARAMETER = new ContextType("components/parameters", "parameters",
             PARAMETER_REGEX);
@@ -69,12 +66,13 @@ public class OpenApi3ReferenceProposalProvider extends JsonReferenceProposalProv
     public static final ContextType CALLBACK = new ContextType("components/callbacks", "callback", CALLBACK_REGEX);
     public static final ContextType PATH_LINK_OPERATION_ID = new ContextType("components/links/", "operationId",
             CALLBACK_REGEX);
+
     public static class OpenApi3ContextTypeCollection extends ContextTypeCollection {
 
         protected OpenApi3ContextTypeCollection(CompositeSchema schema) {
             super(Lists.newArrayList( //
                     // SCHEMA_EXAMPLE, // should go before schema definition
-                    SCHEMA_DEFINITION, //
+                    new ComponentContextType("components/schemas", "schemas", "schemaOrReference"), //
                     PATH_ITEM, //
                     PATH_PARAMETER, //
                     PATH_RESPONSE, //

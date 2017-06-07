@@ -80,8 +80,8 @@ components:
       anyOf:
       - type: object
         properties:
-          huntingSkill:
-            #KZOE-ref name="schema in anyOf", value="components/schemas" kzoe-arrayItem
+          huntingSkill: 
+            #KZOE-ref name="schema in anyOf 2", value="components/schemas"
             $ref: "#/components/schemas/SimpleObject"
                 
     # Discrinimator Object
@@ -98,8 +98,8 @@ components:
     SchemaItems:
       type: array
       items:
-        #KZOE-ref name="schema in items", value="components/schemas" kzoe-arrayItem
-        $ref: ""
+        #KZOE-ref name="schema in items", value="components/schemas"
+        $ref: "#/components/schemas/SimpleObject"
 
   parameters:
     username:

@@ -1,3 +1,13 @@
+/*******************************************************************************
+ * Copyright (c) 2016 ModelSolv, Inc. and others.
+ * All rights reserved. This program and the accompanying materials
+ * are made available under the terms of the Eclipse Public License v1.0
+ * which accompanies this distribution, and is available at
+ * http://www.eclipse.org/legal/epl-v10.html
+ *
+ * Contributors:
+ *    ModelSolv, Inc. - initial API and implementation and/or initial documentation
+ *******************************************************************************/
 package com.reprezen.swagedit.core.assist.contexts;
 
 import java.util.Collection;
@@ -11,6 +21,7 @@ import com.fasterxml.jackson.databind.JsonNode;
 import com.google.common.collect.Lists;
 import com.reprezen.swagedit.core.assist.Proposal;
 import com.reprezen.swagedit.core.editor.JsonDocument;
+import com.reprezen.swagedit.core.model.Model;
 import com.reprezen.swagedit.core.utils.URLUtils;
 import com.reprezen.swagedit.core.validation.ValidationUtil;
 
@@ -40,7 +51,7 @@ public class ContextType {
         this.isLocalOnly = isLocalOnly;
     }
     
-    public boolean canProvideProposal(JsonPointer pointer) {
+    public boolean canProvideProposal(Model model, JsonPointer pointer) {
         if (pointer != null && regex != null) {
             return pointer.toString().matches(regex);
         }
@@ -58,7 +69,7 @@ public class ContextType {
     public boolean isLocalOnly() {
         return isLocalOnly;
     }
-
+    
     public Collection<Proposal> collectProposals(JsonDocument document, IPath path) {
         return collectProposals(document.asJson(), path);
     }

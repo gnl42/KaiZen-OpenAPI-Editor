@@ -133,7 +133,7 @@ public abstract class JsonContentAssistProcessor extends TemplateCompletionProce
 
         Model model = document.getModel(documentOffset - prefix.length());
         currentPath = model.getPath(line, column);
-        isRefCompletion = referenceProposalProvider.canProvideProposal(currentPath);
+        isRefCompletion = referenceProposalProvider.canProvideProposal(model, currentPath);
 
         Collection<Proposal> p;
         if (isRefCompletion) {
@@ -183,8 +183,8 @@ public abstract class JsonContentAssistProcessor extends TemplateCompletionProce
 	protected String[] initTextMessages() {
 		IBindingService bindingService = (IBindingService) PlatformUI.getWorkbench().getAdapter(IBindingService.class);
 		String bindingKey = bindingService.getBestActiveBindingFormattedFor(EDIT_CONTENT_ASSIST);
-
-		ContextType contextType = referenceProposalProvider.getContextTypes().get(getCurrentPath());
+        // FIXME fix null for model
+		ContextType contextType = referenceProposalProvider.getContextTypes().get(null, getCurrentPath());
 		String context = contextType != null ? contextType.label() : "";
 
 		return new String[] { //
