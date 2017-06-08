@@ -49,7 +49,7 @@ public class JsonReferenceProposalProvider {
     }
 
     public boolean canProvideProposal(JsonPointer pointer) {
-        return pointer != null && contextTypes.get(pointer.toString()) != ContextType.UNKNOWN;
+        return pointer != null && contextTypes.get(pointer) != ContextType.UNKNOWN;
     }
 
     /**
@@ -69,7 +69,7 @@ public class JsonReferenceProposalProvider {
      * @return proposals
      */
     public Collection<Proposal> getProposals(JsonPointer pointer, JsonDocument document, Scope scope) {
-        final ContextType type = contextTypes.get(pointer.toString());
+        final ContextType type = contextTypes.get(pointer);
         final IFile currentFile = getActiveFile();
         final IPath basePath = currentFile.getParent().getFullPath();
         final List<Proposal> proposals = Lists.newArrayList();

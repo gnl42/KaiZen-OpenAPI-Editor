@@ -184,7 +184,7 @@ public abstract class JsonContentAssistProcessor extends TemplateCompletionProce
 		IBindingService bindingService = (IBindingService) PlatformUI.getWorkbench().getAdapter(IBindingService.class);
 		String bindingKey = bindingService.getBestActiveBindingFormattedFor(EDIT_CONTENT_ASSIST);
 
-		ContextType contextType = referenceProposalProvider.getContextTypes().get(getCurrentPath() != null ? getCurrentPath().toString() : "");
+		ContextType contextType = referenceProposalProvider.getContextTypes().get(getCurrentPath());
 		String context = contextType != null ? contextType.label() : "";
 
 		return new String[] { //

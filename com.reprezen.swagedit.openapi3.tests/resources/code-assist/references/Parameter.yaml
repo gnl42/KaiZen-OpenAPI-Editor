@@ -9,9 +9,11 @@ paths:
 
   /pets:
     parameters:
+      #KZOE-ref name="parameter in path item", value="components/parameters" kzoe-arrayItem 
      - $ref: "#/components/parameters/username"
     get:
       parameters:
+        #KZOE-ref name="parameter in operation", value="components/parameters" kzoe-arrayItem 
         - $ref: "#/components/parameters/id"
       summary: Read
       description: Provide details for the entire list (for collection resources) or an item (for object resources)
@@ -22,6 +24,9 @@ paths:
 components: 
 
   parameters:
+    test:
+      #KZOE-ref name="parameter in components/parameters", value="components/parameters"
+      $ref: "#/components/parameters/id"
     # header parameter
     token:
       name: token
