@@ -1,30 +1,29 @@
 package com.reprezen.swagedit.openapi3.validation
 
+import com.google.common.collect.ImmutableMap
+import com.reprezen.swagedit.core.json.references.JsonDocumentManager
+import com.reprezen.swagedit.core.json.references.JsonReferenceFactory
+import com.reprezen.swagedit.core.json.references.JsonReferenceValidator
+import com.reprezen.swagedit.core.model.AbstractNode
 import com.reprezen.swagedit.core.validation.Messages
-import com.reprezen.swagedit.core.validation.Validator
+import com.reprezen.swagedit.core.validation.SwaggerError
 import com.reprezen.swagedit.openapi3.editor.OpenApi3Document
 import com.reprezen.swagedit.openapi3.schema.OpenApi3Schema
 import java.net.URI
+import org.eclipse.core.resources.IMarker
 import org.junit.Test
 
-import static org.junit.Assert.*
 import static org.hamcrest.CoreMatchers.*
-import com.reprezen.swagedit.core.json.references.JsonReferenceValidator
-import com.google.common.collect.ImmutableMap
-import com.reprezen.swagedit.core.json.references.JsonReferenceFactory
-import com.reprezen.swagedit.core.model.AbstractNode
-import com.reprezen.swagedit.core.json.references.JsonDocumentManager
-import com.reprezen.swagedit.core.validation.SwaggerError
-import org.eclipse.core.resources.IMarker
+import static org.junit.Assert.*
 
 class ValidatorTest {
 
-	val docManager = new JsonDocumentManager() {		
+	val docManager = new JsonDocumentManager() {
 		override getFile(URI uri) {
 			null
 		}
 	}
-	val factory = new JsonReferenceFactory() {	
+	val factory = new JsonReferenceFactory() {
 		override create(AbstractNode node) {
 			val reference = super.create(node)
 			if (reference != null) {
@@ -32,15 +31,17 @@ class ValidatorTest {
 			}
 			reference
 		}
-		override createSimpleReference(URI baseURI, AbstractNode valueNode) {		
-			val reference = super.createSimpleReference(baseURI, valueNode)			
-			if (reference != null) {				
-				reference.documentManager = docManager			
+
+		override createSimpleReference(URI baseURI, AbstractNode valueNode) {
+			val reference = super.createSimpleReference(baseURI, valueNode)
+			if (reference != null) {
+				reference.documentManager = docManager
 			}
 			reference
 		}
 	}
-	val validator = new Validator(new JsonReferenceValidator(factory), 
+	val validator = new OpenApi3Validator(
+		new JsonReferenceValidator(factory),
 		ImmutableMap.of("http://openapis.org/v3/schema.json", new OpenApi3Schema().asJson)
 	)
 	val document = new OpenApi3Document(new OpenApi3Schema)
@@ -68,7 +69,7 @@ class ValidatorTest {
 		'''
 
 		document.set(content)
-		val errors = validator.validate(document, null as URI)		
+		val errors = validator.validate(document, null as URI)
 		assertEquals(0, errors.size())
 	}
 
@@ -120,7 +121,7 @@ class ValidatorTest {
 		'''
 
 		document.set(content)
-		val errors = validator.validate(document, null as URI)		
+		val errors = validator.validate(document, null as URI)
 		assertEquals(0, errors.size())
 	}
 
@@ -147,11 +148,11 @@ class ValidatorTest {
 		'''
 
 		document.set(content)
-		val errors = validator.validate(document, null as URI)		
+		val errors = validator.validate(document, null as URI)
 		assertEquals(1, errors.size())
 		assertTrue(errors.map[message].forall[it.equals(Messages.error_invalid_reference_type)])
 	}
-	
+
 	@Test
 	def void testValidationShouldFail_ForInvalidPointers() {
 		val content = '''
@@ -172,8 +173,10 @@ class ValidatorTest {
 
 		document.set(content)
 		val errors = validator.validate(document, null as URI)
-		assertEquals(2, errors.size())		
-		assertThat(errors, hasItems(
+		assertEquals(2, errors.size())
+		assertThat(
+			errors,
+			hasItems(
 				new SwaggerError(13, IMarker.SEVERITY_ERROR, Messages.error_invalid_reference_type),
 				new SwaggerError(13, IMarker.SEVERITY_WARNING, Messages.error_missing_reference)
 			)
@@ -199,9 +202,11 @@ class ValidatorTest {
 		'''
 
 		document.set(content)
-		val errors = validator.validate(document, null as URI)		
-		assertEquals(2, errors.size())		
-		assertThat(errors, hasItems(
+		val errors = validator.validate(document, null as URI)
+		assertEquals(2, errors.size())
+		assertThat(
+			errors,
+			hasItems(
 				new SwaggerError(13, IMarker.SEVERITY_ERROR, Messages.error_invalid_reference_type),
 				new SwaggerError(13, IMarker.SEVERITY_WARNING, Messages.error_missing_reference)
 			)
@@ -228,12 +233,177 @@ class ValidatorTest {
 
 		document.set(content)
 		val errors = validator.validate(document, null as URI)
-		assertEquals(2, errors.size())		
-		assertThat(errors, hasItems(
+		assertEquals(2, errors.size())
+		assertThat(
+			errors,
+			hasItems(
 				new SwaggerError(13, IMarker.SEVERITY_ERROR, Messages.error_invalid_reference_type),
 				new SwaggerError(13, IMarker.SEVERITY_ERROR, Messages.error_invalid_reference)
 			)
 		)
 	}
 
+	@Test
+	def void testValidationShouldPass_LinksOperationIdIsOperation() {
+		val content = '''
+			openapi: "3.0.0"
+			info:
+			  title: Broken links Object
+			  version: "1.0.0"
+			paths:
+			  /:
+			    get:
+			      operationId: opId
+			      responses:
+			        200:
+			          description: Ok
+			components: 
+			  links:
+			    myLink:
+			      operationId: opId
+		'''
+
+		document.set(content)
+		val errors = validator.validate(document, null as URI)
+		assertEquals(0, errors.size())
+	}
+
+	@Test
+	def void testValidationShouldFail_LinksOperationIdNotOperation() {
+		val content = '''
+			openapi: "3.0.0"
+			info:
+			  title: Broken links Object
+			  version: "1.0.0"
+			paths:
+			  /:
+			    get:
+			      operationId: opId
+			      responses:
+			        200:
+			          description: Ok
+			components: 
+			  links:
+			    myLink:
+			      operationId: fail
+		'''
+
+		document.set(content)
+		val errors = validator.validate(document, null as URI)
+		assertEquals(1, errors.size())
+	}
+
+	@Test
+	def void testValidationShouldPass_LinksOperationRefIsOperation() {
+		val content = '''
+			openapi: "3.0.0"
+			info:
+			  title: Broken links Object
+			  version: "1.0.0"
+			paths:
+			  /:
+			    get:
+			      operationId: opId
+			      responses:
+			        200:
+			          description: Ok
+			components: 
+			  links:
+			    myLink:
+			      operationRef: "#/paths/~1/get/"
+		'''
+
+		document.set(content)
+		val errors = validator.validate(document, null as URI)
+		assertEquals(0, errors.size())
+	}
+
+	@Test
+	def void testValidationShouldFail_LinksOperationRefNotOperation() {
+		val content = '''
+			openapi: "3.0.0"
+			info:
+			  title: Broken links Object
+			  version: "1.0.0"
+			paths:
+			  /:
+			    get:
+			      operationId: opId
+			      responses:
+			        200:
+			          description: Ok
+			components: 
+			  links:
+			    myLink:
+			      operationRef: "#/paths/~1"
+		'''
+
+		document.set(content)
+		val errors = validator.validate(document, null as URI)
+		assertEquals(1, errors.size())
+		assertThat(errors, hasItems(
+				new SwaggerError(15, IMarker.SEVERITY_ERROR, Messages.error_invalid_reference_type)		
+			)
+		)
+	}
+
+	@Test
+	def void testValidationShouldPass_SecuritySchemes() {
+		val content = '''
+			openapi: "3.0.0"
+			info:
+			  title: Broken links Object
+			  version: "1.0.0"
+			paths:
+			  /:
+			    get:
+			      operationId: opId
+			      security:
+			        - open:
+			          - a:a
+			      responses:
+			        200:
+			          description: Ok
+			components: 
+			  securitySchemes:
+			    open:
+			      type: a
+		'''
+
+		document.set(content)
+		val errors = validator.validate(document, null as URI)
+		assertEquals(0, errors.size())
+	}
+	
+	@Test
+	def void testValidationShouldFail_SecuritySchemes() {
+		val content = '''
+			openapi: "3.0.0"
+			info:
+			  title: Broken links Object
+			  version: "1.0.0"
+			paths:
+			  /:
+			    get:
+			      operationId: opId
+			      security:
+			        - foo:
+			          - a:a
+			      responses:
+			        200:
+			          description: Ok
+			components: 
+			  securitySchemes:
+			    open:
+			      type: a
+		'''
+
+		document.set(content)
+		val errors = validator.validate(document, null as URI)
+		assertEquals(1, errors.size())
+		assertThat(errors, hasItems(
+				new SwaggerError(10, IMarker.SEVERITY_ERROR, Messages.error_invalid_reference_type)		
+			)
+		)
+	}
 }

@@ -219,6 +219,9 @@ public class Model {
         if (pointer.startsWith("#")) {
             pointer = pointer.substring(1);
         }
+        if (pointer.length() > 1 && pointer.endsWith("/")) {
+            pointer = pointer.substring(0, pointer.length() - 1);
+        }
 
         try {
             return nodes.get(JsonPointer.valueOf(pointer));
@@ -371,6 +374,23 @@ public class Model {
         }
 
         return (property.length() + 1) + n.getStart().getColumn();
+    }
+
+    /**
+     * Returns all the nodes whose type match the given pointer.
+     * 
+     * @param typePointer
+     *            pointer of a type present in the schema
+     * @return list of nodes being instance of the type
+     */
+    public List<AbstractNode> findByType(JsonPointer typePointer) {
+        List<AbstractNode> instances = Lists.newArrayList();
+        for (AbstractNode node : allNodes()) {
+            if (node.getType() != null && typePointer.equals(node.getType().getPointer())) {
+                instances.add(node);
+            }
+        }
+        return instances;
     }
 
 }

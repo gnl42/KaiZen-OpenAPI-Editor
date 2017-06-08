@@ -27,12 +27,7 @@ public class OperationIdContextType extends SchemaContextType {
     @Override
     public Collection<Proposal> collectProposals(Model model, IPath path) {
         final Collection<Proposal> results = Lists.newArrayList();
-        final List<AbstractNode> nodes = Lists.newArrayList();
-        for (AbstractNode node : model.allNodes()) {
-            if (node.getType() != null && operationPointer.equals(node.getType().getPointer())) {
-                nodes.add(node);
-            }
-        }
+        final List<AbstractNode> nodes = model.findByType(operationPointer);
 
         for (AbstractNode node : nodes) {
             AbstractNode value = node.get("operationId");
