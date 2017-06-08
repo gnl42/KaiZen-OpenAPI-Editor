@@ -9,11 +9,12 @@ import static com.reprezen.swagedit.openapi3.utils.Cursors.*
 import static org.hamcrest.core.IsCollectionContaining.*
 import static org.junit.Assert.*
 import com.reprezen.swagedit.openapi3.schema.OpenApi3Schema
+import com.reprezen.swagedit.core.model.Model
 
 class OpenApi3ContentAssistProcessorTest {
 
 	val processor = new OpenApi3ContentAssistProcessor(null) {
-		override protected initTextMessages() { new ArrayList }
+		override protected initTextMessages(Model model) { new ArrayList }
 
 		override protected getContextTypeRegistry() { null }
 

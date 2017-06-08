@@ -32,13 +32,14 @@ public class ComponentContextType extends ContextType {
 
     @Override
     public boolean canProvideProposal(Model model, JsonPointer pointer) {
+        if (model == null) {
+            // model can be null when initTextMessages called in new JsonContentAssistProcessor()
+            return false;
+        }
         return isReference(model, pointer) && isReferenceToComponent(model, pointer);
     }
 
     protected boolean isReference(Model model, JsonPointer pointer) {
-        if (model == null) {
-            return false;
-        }
         TypeDefinition type = model.find(pointer).getType();
         if (type instanceof MultipleTypeDefinition) {
             // MultipleTypeDefinition is a special case, it happens when several properties match a property
