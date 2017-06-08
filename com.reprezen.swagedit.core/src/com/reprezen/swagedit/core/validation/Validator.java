@@ -308,6 +308,12 @@ public class Validator {
             AbstractNode nodeValue = node.get(JsonReference.PROPERTY);
             AbstractNode valueNode = model.find((String) nodeValue.asValue().getValue());
 
+            if (valueNode == null) {
+                // probably external node,
+                // do not validate for now.
+                return;
+            }
+
             if (!type.validate(valueNode)) {
                 errors.add(error(nodeValue, IMarker.SEVERITY_ERROR, Messages.error_invalid_reference_type));
             }
