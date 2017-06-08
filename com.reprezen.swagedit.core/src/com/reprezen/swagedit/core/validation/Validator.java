@@ -315,7 +315,7 @@ public class Validator {
             }
 
             if (!type.validate(valueNode)) {
-                errors.add(error(nodeValue, IMarker.SEVERITY_ERROR, Messages.error_invalid_reference_type));
+                errors.add(error(nodeValue, IMarker.SEVERITY_WARNING, Messages.error_invalid_reference_type));
             }
         }
     }
