@@ -37,9 +37,10 @@ public class OpenApi3ContentAssistProcessor extends JsonContentAssistProcessor {
         return Activator.getDefault().getContextTypeRegistry();
 	}
 
-	@Override
-	protected String getContextTypeId(String path) {
-        return OpenApi3ContextType.getContextType(path);
-	}
+    @Override
+    protected String getContextTypeId(String path) {
+        OpenApi3ContextType contextType = OpenApi3ContextType.getContextType(path);
+        return contextType != null ? contextType.getId() : null;
+    }
 
 }
