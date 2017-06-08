@@ -23,11 +23,14 @@ import com.reprezen.swagedit.core.schema.TypeDefinition;
 public class ComponentContextType extends ContextType {
 
     private final ObjectNode componentRef;
-    private final static String REFERENCE_POINTER = "/definitions/reference/properties/$ref";
-
+    
     public ComponentContextType(String value, String label, String componentSchemaPath) {
         super(value, label, null);
         componentRef = new ObjectMapper().createObjectNode().put("$ref", "#/definitions/" + componentSchemaPath);
+    }
+    
+    protected String getReferencePointerString() {
+        return "/definitions/reference/properties/$ref";
     }
 
     @Override
@@ -44,7 +47,7 @@ public class ComponentContextType extends ContextType {
         if (type instanceof MultipleTypeDefinition) {
             // MultipleTypeDefinition is a special case, it happens when several properties match a property
             for (TypeDefinition nestedType : ((MultipleTypeDefinition) type).getMultipleTypes()) {
-                if (REFERENCE_POINTER.equals(nestedType.getPointer().toString())) {
+                if (getReferencePointerString().equals(nestedType.getPointer().toString())) {
                     return true;
                 }
             }
@@ -53,7 +56,7 @@ public class ComponentContextType extends ContextType {
         if (pointerToType == null) {
             return false;
         }
-        return REFERENCE_POINTER.equals(pointerToType.toString());
+        return getReferencePointerString().equals(pointerToType.toString());
     }
 
     protected boolean isReferenceToComponent(Model model, JsonPointer pointer) {

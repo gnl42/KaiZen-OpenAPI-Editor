@@ -10,11 +10,13 @@
  *******************************************************************************/
 package com.reprezen.swagedit.openapi3.assist;
 
+import com.fasterxml.jackson.core.JsonPointer;
 import com.google.common.collect.Lists;
 import com.reprezen.swagedit.core.assist.JsonReferenceProposalProvider;
 import com.reprezen.swagedit.core.assist.contexts.ComponentContextType;
 import com.reprezen.swagedit.core.assist.contexts.ContextType;
 import com.reprezen.swagedit.core.assist.contexts.ContextTypeCollection;
+import com.reprezen.swagedit.core.model.Model;
 import com.reprezen.swagedit.core.schema.CompositeSchema;
 import com.reprezen.swagedit.openapi3.Activator;
 import com.reprezen.swagedit.openapi3.assist.contexts.OperationContextType;
@@ -32,16 +34,12 @@ public class OpenApi3ReferenceProposalProvider extends JsonReferenceProposalProv
 
     protected static final String SCHEMA_COMPONENT_REGEX = "^/components/schemas/(\\w+/)+";
     protected static final String INLINE_SCHEMA_REGEX = ".*schema/(\\w+/)*";
-    protected static final String PATH_ITEM_REGEX = "/paths/~1[^/]+/\\$ref"// in paths object
-            // e.g. "/components/callbacks/myWebhook/$request.body#~1url/$ref"
-            + "|/components/callbacks/" + COMPONENT_NAME_REGEX + "/[^/]+/\\$ref"; // in callbacks
     protected static final String LINK_OPERATIONID_REGEX = ".*/links/" + COMPONENT_NAME_REGEX + "/operationId";
     protected static final String LINK_OPERATIONREF_REGEX = ".*/links/" + COMPONENT_NAME_REGEX + "/operationRef";
     protected static final String SCHEMA_EXAMPLE_REGEX = SCHEMA_COMPONENT_REGEX + "example/\\$ref" + "|"
             + INLINE_SCHEMA_REGEX + "example/\\$ref";
     protected static final String SECURITY_REGEX = ".*/security/\\d+";
 
-    public static final ContextType PATH_ITEM = new ContextType("paths", "path items", PATH_ITEM_REGEX);
     public static final ContextType PATH_LINK_OPERATION_ID = new ContextType("components/links/", "operationId",
             ".*/callbacks/" + COMPONENT_NAME_REGEX + "/\\$ref");
 
@@ -58,7 +56,13 @@ public class OpenApi3ReferenceProposalProvider extends JsonReferenceProposalProv
                     new ComponentContextType("components/examples", "examples", "exampleOrReference"), //
                     new ComponentContextType("components/headers", "header", "headerOrReference"), //
                     new ComponentContextType("components/callbacks", "callback", "callbackOrReference"), //
-                    PATH_ITEM, //
+                    new ComponentContextType("paths", "path items", "pathItem") {
+                        
+                        @Override
+                        protected String getReferencePointerString() {
+                            return "/definitions/pathItem/properties/$ref";
+                        }
+                    }, //
                     new SecuritySchemeContextType(schema, OpenApi3ReferenceProposalProvider.SECURITY_REGEX), //
                     new OperationIdContextType(schema, OpenApi3ReferenceProposalProvider.LINK_OPERATIONID_REGEX), //
                     new OperationContextType(schema, OpenApi3ReferenceProposalProvider.LINK_OPERATIONREF_REGEX)));
