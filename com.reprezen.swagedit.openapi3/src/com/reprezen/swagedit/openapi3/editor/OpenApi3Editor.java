@@ -1,6 +1,5 @@
 package com.reprezen.swagedit.openapi3.editor;
 
-import java.util.HashMap;
 import java.util.Map;
 
 import org.dadacoalition.yedit.editor.YEditSourceViewerConfiguration;
@@ -22,6 +21,7 @@ import com.reprezen.swagedit.core.validation.Validator;
 import com.reprezen.swagedit.openapi3.Activator;
 import com.reprezen.swagedit.openapi3.assist.OpenApi3ContentAssistProcessor;
 import com.reprezen.swagedit.openapi3.hyperlinks.OpenApi3ReferenceHyperlinkDetector;
+import com.reprezen.swagedit.openapi3.validation.OpenApi3Validator;
 
 public class OpenApi3Editor extends JsonEditor {
 
@@ -71,7 +71,7 @@ public class OpenApi3Editor extends JsonEditor {
         Map<String, JsonNode> preloadedSchemas = Maps.newHashMap();
         preloadedSchemas.put("http://openapis.org/v3/schema.json",
                 Activator.getDefault().getSchema().getRootType().asJson());
-        return new Validator(new JsonReferenceValidator(new JsonReferenceFactory()), preloadedSchemas);
+        return new OpenApi3Validator(new JsonReferenceValidator(new JsonReferenceFactory()), preloadedSchemas);
     }
 
 }

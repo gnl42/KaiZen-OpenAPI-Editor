@@ -52,6 +52,7 @@ class ReferenceContextTest extends CodeAssistContextTest{
 		val maybeArrayPrefix = if (isArrayItem) "/0" else ""
 		val contextType = allContextTypes.get(document.getModel(), path.append(JsonPointer.compile(maybeArrayPrefix + "/$ref")))
 
+
 		val matcher = refValuePattern.matcher(annotationLine)
 		if (matcher.matches) {
 			val String refValue = matcher.group(1);

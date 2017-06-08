@@ -10,7 +10,7 @@
  *******************************************************************************/
 package com.reprezen.swagedit.validation
 
-import com.reprezen.swagedit.Messages
+import com.reprezen.swagedit.core.validation.Messages
 import com.reprezen.swagedit.editor.SwaggerDocument
 import java.io.IOException
 import org.eclipse.core.resources.IMarker
@@ -460,6 +460,7 @@ class ValidatorTest {
 		document.onChange()
 
 		assertThat(document.yamlError, notNullValue)
+		println(document.yamlError)
 		assertThat(document.yamlError.message,
 			equalTo(
 				"found undefined alias scope_values_BROKEN\n in 'reader', line 26, column 11:\n        enum: *scope_values_BROKEN\n              ^\n"))
@@ -703,5 +704,111 @@ class ValidatorTest {
 
 		val errors = validator.validate(document, null as URI)		
 		assertEquals(0, errors.size())
+	}
+	
+	@Test
+	def void testValidationShouldPass_IfRefIsCorrectType() {
+		val content = '''
+			swagger: '2.0'
+			info:
+			  version: 0.0.0
+			  title: Simple API
+			paths:
+			  /:
+			    get:
+			      responses:
+			        '200':
+			          $ref: "#/responses/ok"
+
+			responses:
+			  ok:
+			    description: Ok
+			definitions:
+			  Foo:
+			    type: object
+		'''
+
+		document.set(content)
+		val errors = validator.validate(document, null as URI)
+		assertEquals(0, errors.size())
+	}
+
+	@Test
+	def void testValidationShouldFail_IfRefIsNotCorrectType() {
+		val content = '''
+			swagger: '2.0'
+			info:
+			  version: 0.0.0
+			  title: Simple API
+			paths:
+			  /:
+			    get:
+			      responses:
+			        '200':
+			          $ref: "#/definitions/Foo"
+			
+			responses:
+			  ok:
+			    description: Ok
+			definitions:
+			  Foo:
+			    type: object
+		'''
+
+		document.set(content)
+		val errors = validator.validate(document, null as URI)
+		assertEquals(1, errors.size())
+		assertTrue(errors.map[message].forall[it.equals(Messages.error_invalid_reference_type)])
+	}
+
+	@Test
+	def void testValidationShouldPass_ForArrays() {
+		val content = '''
+			swagger: '2.0'
+			info:
+			  version: 0.0.0
+			  title: Simple API
+			paths:
+			  {}
+			definitions:
+			  Foo:
+			    type: array
+			    items:
+			      $ref: "#/definitions/Bar"
+			  Bar:
+			    type: object
+		'''
+
+		document.set(content)
+		val errors = validator.validate(document, null as URI)		
+		assertEquals(0, errors.size())
+	}
+	
+	@Test
+	def void testValidationShouldFail_ForArraysInWrongItemType() {
+		val content = '''
+			swagger: '2.0'
+			info:
+			  version: 0.0.0
+			  title: Simple API
+			paths:
+			  {}
+			
+			responses:
+			  ok:
+			    description: Ok
+			definitions:
+			  Foo:
+			    type: array
+			    items:
+			      $ref: "#/responses/ok"
+			  Bar:
+			    type: object
+		'''
+
+		document.set(content)
+		val errors = validator.validate(document, null as URI)		
+		assertEquals(1, errors.size())
+		assertTrue(errors.map[message].forall[it.equals(Messages.error_invalid_reference_type)])
 	}
 }

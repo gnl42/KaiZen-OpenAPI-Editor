@@ -105,7 +105,7 @@ public class OpenApi3ContextType extends TemplateContextType {
         }
     }
 
-    private static List<OpenApi3ContextType> allContextTypes = Lists.<OpenApi3ContextType> newArrayList( //
+    private static List<OpenApi3ContextType> allContextTypes = Lists.newArrayList( //
             new RootContextType(), //
             new ContactContextType(), //
             new PathsContextType(), //
