@@ -118,6 +118,10 @@ public class OpenApi3ContextType extends TemplateContextType {
             new CallbacksObjectContextType(), //
             new RequestBodyObjectContextType());
 
+    public static List<OpenApi3ContextType> allContextTypes() {
+        return allContextTypes;
+    }
+    
     public static List<String> allContextTypeIds() {
         return Lists.transform(allContextTypes, new Function<OpenApi3ContextType, String>() {
 
