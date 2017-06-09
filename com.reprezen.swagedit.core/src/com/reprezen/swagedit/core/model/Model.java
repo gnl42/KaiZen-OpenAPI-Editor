@@ -33,6 +33,7 @@ import com.fasterxml.jackson.dataformat.yaml.YAMLFactory;
 import com.google.common.base.Strings;
 import com.google.common.collect.Iterables;
 import com.google.common.collect.Lists;
+import com.reprezen.swagedit.core.Activator;
 import com.reprezen.swagedit.core.schema.CompositeSchema;
 
 /**
@@ -84,7 +85,7 @@ public class Model {
         try {
             reader(model).readValue(text);
         } catch (IllegalArgumentException | IOException e) {
-            e.printStackTrace();
+            Activator.getDefault().logError(e.getMessage(), e);
         }
 
         for (AbstractNode node : model.allNodes()) {
@@ -145,7 +146,7 @@ public class Model {
                 .withAttribute(ATTRIBUTE_MODEL, model) //
                 .withAttribute(ATTRIBUTE_PARENT, null) //
                 .withAttribute(ATTRIBUTE_POINTER, JsonPointer.compile("")) //
-                .withType(AbstractNode.class);
+                .forType(AbstractNode.class);
     }
 
     /**
@@ -215,7 +216,7 @@ public class Model {
     public AbstractNode find(String pointer) {
         return nodes.get(JsonPointer.valueOf(pointer));
     }
-    
+
     private AbstractNode add(AbstractNode node) {
         if (node != null && node.getPointer() != null) {
             nodes.put(node.getPointer(), node);

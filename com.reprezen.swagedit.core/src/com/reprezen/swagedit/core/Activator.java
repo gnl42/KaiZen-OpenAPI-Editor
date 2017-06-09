@@ -1,10 +1,8 @@
 package com.reprezen.swagedit.core;
 
 import org.eclipse.core.runtime.FileLocator;
-import org.eclipse.core.runtime.IStatus;
 import org.eclipse.core.runtime.Path;
 import org.eclipse.core.runtime.Platform;
-import org.eclipse.core.runtime.Status;
 import org.eclipse.jface.resource.ImageDescriptor;
 import org.eclipse.swt.graphics.Image;
 import org.eclipse.swt.widgets.Display;
@@ -97,7 +95,7 @@ public class Activator extends AbstractUIPlugin {
 	}
 	
 	public void logError(String message, Exception e) {
-		getLog().log(new Status(IStatus.ERROR, PLUGIN_ID, message, e));
+        // getLog().log(new Status(IStatus.ERROR, PLUGIN_ID, message, e));
 	}
 
 }

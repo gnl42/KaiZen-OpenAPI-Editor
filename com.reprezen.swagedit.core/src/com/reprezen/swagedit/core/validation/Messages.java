@@ -45,6 +45,7 @@ public class Messages extends NLS {
     public static String error_missing_properties;
     public static String warning_simple_reference;
 
+    public static String error_yaml_parser_indentation;
 
     static {
         NLS.initializeMessages(BUNDLE_NAME, Messages.class);

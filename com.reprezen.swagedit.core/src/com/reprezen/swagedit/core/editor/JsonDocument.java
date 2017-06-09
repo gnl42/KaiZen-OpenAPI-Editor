@@ -162,10 +162,10 @@ public class JsonDocument extends Document {
     }
 
     private void parseModel() {
+        System.out.println("parse...");
         try {
             model = Model.parseYaml(schema, get());
         } catch (Exception e) {
-            e.printStackTrace();
             model = null;
         }
     }
