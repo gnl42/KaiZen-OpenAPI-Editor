@@ -9,23 +9,33 @@
  *    ModelSolv, Inc. - initial API and implementation and/or initial documentation
  *******************************************************************************/
 package com.reprezen.swagedit.core.assist.contexts;
+
 import com.fasterxml.jackson.core.JsonPointer;
 import com.reprezen.swagedit.core.model.Model;
 
-public class ContextTypeCollection {
+/**
+ * 
+ * The context type is determined by the pointer (path) on which the completion proposal has been activated.
+ */
+public class RegexContextType extends ContextType {
 
-    private final Iterable<ContextType> contextTypes;
+    private final String regex;
 
-    protected ContextTypeCollection(Iterable<ContextType> contextTypes) {
-        this.contextTypes = contextTypes;
+    public RegexContextType(String value, String label, String regex) {
+        super(value, label);
+        this.regex = regex;
     }
 
-    public ContextType get(Model model, JsonPointer pointer) {
-        for (ContextType next : contextTypes) {
-            if (next.canProvideProposal(model, pointer)) {
-                return next;
-            }
+    public RegexContextType(String value, String label, String regex, boolean isLocalOnly) {
+        super(value, label, isLocalOnly);
+        this.regex = regex;
+    }
+    
+    public boolean canProvideProposal(Model model, JsonPointer pointer) {
+        if (pointer != null && regex != null) {
+            return pointer.toString().matches(regex);
         }
-        return ContextType.UNKNOWN;
+        return false;
     }
+
 }

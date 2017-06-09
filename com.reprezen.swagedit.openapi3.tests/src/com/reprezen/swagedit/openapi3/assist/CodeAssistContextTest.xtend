@@ -27,7 +27,7 @@ import org.junit.runners.Parameterized.Parameter
 abstract class CodeAssistContextTest {
 	
 	val static testNamePattern = Pattern::compile(".*name=\"([\\w\\s/]+)\".*")
-	val protected static refValuePattern = Pattern::compile(".*value=\"([\\w\\s/]+)\".*")
+	val protected static refValuePattern = Pattern::compile(".*value=\"([\\w\\s./]+)\".*")
 
 	def static protected Collection<Object[]> data(File resourcesDir, String contextMarker) {
 		val specFiles = resourcesDir.listFiles(new FilenameFilter() {

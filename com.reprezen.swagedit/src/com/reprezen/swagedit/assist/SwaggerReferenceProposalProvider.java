@@ -14,6 +14,7 @@ import com.google.common.collect.Lists;
 import com.reprezen.swagedit.core.assist.JsonReferenceProposalProvider;
 import com.reprezen.swagedit.core.assist.contexts.ContextType;
 import com.reprezen.swagedit.core.assist.contexts.ContextTypeCollection;
+import com.reprezen.swagedit.core.assist.contexts.RegexContextType;
 import com.reprezen.swagedit.editor.SwaggerContentDescriber;
 
 /**
@@ -31,11 +32,11 @@ public class SwaggerReferenceProposalProvider extends JsonReferenceProposalProvi
 	protected static final String PATH_ITEM_REGEX = "/paths/~1[^/]+/\\$ref";
 	
 
-	public static final ContextType SCHEMA_DEFINITION = new ContextType("definitions", "schemas",
+	public static final ContextType SCHEMA_DEFINITION = new RegexContextType("definitions", "schemas",
 			SCHEMA_DEFINITION_REGEX);
-	public static final ContextType PATH_ITEM = new ContextType("paths", "path items", PATH_ITEM_REGEX);
-	public static final ContextType PATH_PARAMETER = new ContextType("parameters", "parameters", PARAMETER_REGEX);
-	public static final ContextType PATH_RESPONSE = new ContextType("responses", "responses", RESPONSE_REGEX);
+	public static final ContextType PATH_ITEM = new RegexContextType("paths", "path items", PATH_ITEM_REGEX);
+	public static final ContextType PATH_PARAMETER = new RegexContextType("parameters", "parameters", PARAMETER_REGEX);
+	public static final ContextType PATH_RESPONSE = new RegexContextType("responses", "responses", RESPONSE_REGEX);
 
     public static final ContextTypeCollection SWAGGER_CONTEXT_TYPES = ContextType
             .newContentTypeCollection(Lists.newArrayList( //

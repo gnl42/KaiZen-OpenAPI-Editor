@@ -95,7 +95,7 @@ public abstract class JsonContentAssistProcessor extends TemplateCompletionProce
         this.contentAssistant = ca;
         this.proposalProvider = proposalProvider;
         this.referenceProposalProvider = referenceProposalProvider;
-        this.textMessages = initTextMessages();
+        this.textMessages = initTextMessages(null);
     }
     
     protected abstract TemplateStore getTemplateStore();
@@ -133,11 +133,11 @@ public abstract class JsonContentAssistProcessor extends TemplateCompletionProce
 
         Model model = document.getModel(documentOffset - prefix.length());
         currentPath = model.getPath(line, column);
-        isRefCompletion = referenceProposalProvider.canProvideProposal(currentPath);
+        isRefCompletion = referenceProposalProvider.canProvideProposal(model, currentPath);
 
         Collection<Proposal> p;
         if (isRefCompletion) {
-            updateStatus();
+            updateStatus(model);
             p = referenceProposalProvider.getProposals(currentPath, document, currentScope);
         } else {
             clearStatus();
@@ -164,10 +164,10 @@ public abstract class JsonContentAssistProcessor extends TemplateCompletionProce
         currentOffset = documentOffset;
     }
 
-    protected void updateStatus() {
+    protected void updateStatus(Model model) {
         if (contentAssistant != null) {
             if (textMessages == null) {
-                textMessages = initTextMessages();
+                textMessages = initTextMessages(model);
             }
             contentAssistant.setStatusLineVisible(true);
             contentAssistant.setStatusMessage(textMessages[currentScope.getValue()]);
@@ -180,11 +180,10 @@ public abstract class JsonContentAssistProcessor extends TemplateCompletionProce
         }
     }
 
-	protected String[] initTextMessages() {
+	protected String[] initTextMessages(Model model) {
 		IBindingService bindingService = (IBindingService) PlatformUI.getWorkbench().getAdapter(IBindingService.class);
 		String bindingKey = bindingService.getBestActiveBindingFormattedFor(EDIT_CONTENT_ASSIST);
-
-		ContextType contextType = referenceProposalProvider.getContextTypes().get(getCurrentPath());
+     	ContextType contextType = referenceProposalProvider.getContextTypes().get(model, getCurrentPath());
 		String context = contextType != null ? contextType.label() : "";
 
 		return new String[] { //
