@@ -22,10 +22,12 @@ import com.google.common.base.Strings;
 
 public class SwaggerError {
     
+    private static YamlErrorProcessor processor = new YamlErrorProcessor();
+
     public static SwaggerError newYamlError(YAMLException exception) {
         int line = (exception instanceof MarkedYAMLException)
                 ? ((MarkedYAMLException) exception).getProblemMark().getLine() + 1 : 1;
-        return new SwaggerError(line, IMarker.SEVERITY_ERROR, 0, exception.getMessage());
+        return new SwaggerError(line, IMarker.SEVERITY_ERROR, 0, processor.rewriteMessage(exception));
     }
 
     public static SwaggerError newJsonError(JsonProcessingException exception) {
