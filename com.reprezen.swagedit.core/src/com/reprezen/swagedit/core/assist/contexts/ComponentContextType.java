@@ -25,7 +25,7 @@ public class ComponentContextType extends ContextType {
     private final ObjectNode componentRef;
     
     public ComponentContextType(String value, String label, String componentSchemaPath) {
-        super(value, label, null);
+        super(value, label);
         componentRef = new ObjectMapper().createObjectNode().put("$ref", "#/definitions/" + componentSchemaPath);
     }
     

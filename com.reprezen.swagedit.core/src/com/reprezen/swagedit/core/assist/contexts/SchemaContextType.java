@@ -20,7 +20,7 @@ import com.reprezen.swagedit.core.editor.JsonDocument;
 import com.reprezen.swagedit.core.model.Model;
 import com.reprezen.swagedit.core.schema.CompositeSchema;
 
-public abstract class SchemaContextType extends ContextType {
+public abstract class SchemaContextType extends RegexContextType {
 
     private final CompositeSchema schema;
 

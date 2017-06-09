@@ -27,36 +27,33 @@ import com.reprezen.swagedit.core.validation.ValidationUtil;
 
 /**
  * Represents the different contexts for which a JSON reference may be computed. <br/>
- * The context type is determined by the pointer (path) on which the completion proposal has been activated.
  */
-public class ContextType {
-    public static final ContextType UNKNOWN = new ContextType(null, "", null);
+public abstract class ContextType {
+    public static final ContextType UNKNOWN = new ContextType(null, "") {
+
+        @Override
+        public boolean canProvideProposal(Model model, JsonPointer pointer) {
+            return false;
+        }
+    };
 
     private final String value;
     private final String label;
-    private final String regex;
     private final boolean isLocalOnly;
 
-    public ContextType(String value, String label, String regex) {
+    public ContextType(String value, String label) {
         this.value = value;
         this.label = label;
-        this.regex = regex;
         this.isLocalOnly = false;
     }
 
-    public ContextType(String value, String label, String regex, boolean isLocalOnly) {
+    public ContextType(String value, String label,  boolean isLocalOnly) {
         this.value = value;
         this.label = label;
-        this.regex = regex;
         this.isLocalOnly = isLocalOnly;
     }
     
-    public boolean canProvideProposal(Model model, JsonPointer pointer) {
-        if (pointer != null && regex != null) {
-            return pointer.toString().matches(regex);
-        }
-        return false;
-    }
+    public abstract boolean canProvideProposal(Model model, JsonPointer pointer);
 
     public String value() {
         return value;

@@ -21,6 +21,7 @@ import static org.junit.Assert.*
 import com.reprezen.swagedit.core.utils.SwaggerFileFinder.Scope
 import com.reprezen.swagedit.core.assist.Proposal
 import com.reprezen.swagedit.core.assist.contexts.ContextType
+import com.reprezen.swagedit.core.assist.contexts.RegexContextType
 
 class JsonReferenceProposalProviderTest {
 
@@ -113,7 +114,7 @@ class JsonReferenceProposalProviderTest {
 		document.set(text)
 
 		val path = Mocks.mockPath("../Path With Spaces/Other  Spaces.yaml")
-		val contextType = new ContextType("paths", "paths", "")
+		val contextType = new RegexContextType("paths", "paths", "")
 		val proposals = contextType.collectProposals(document.asJson, path)
 
 		assertThat(proposals, hasItems(
