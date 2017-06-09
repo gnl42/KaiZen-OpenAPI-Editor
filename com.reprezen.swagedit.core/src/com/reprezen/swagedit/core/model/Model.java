@@ -394,4 +394,13 @@ public class Model {
         return instances;
     }
 
+    /**
+     * Returns the schema associated to this model.
+     * 
+     * @return schema
+     */
+    public CompositeSchema getSchema() {
+        return schema;
+    }
+
 }

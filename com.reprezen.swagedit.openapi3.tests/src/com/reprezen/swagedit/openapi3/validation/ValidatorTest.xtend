@@ -153,8 +153,7 @@ class ValidatorTest {
 		assertTrue(errors.map[message].forall[it.equals(Messages.error_invalid_reference_type)])
 	}
 
-//  Disable until remote references are validated
-//	@Test
+	@Test
 	def void testValidationShouldFail_ForInvalidPointers() {
 		val content = '''
 			openapi: "3.0.0"
@@ -174,11 +173,11 @@ class ValidatorTest {
 
 		document.set(content)
 		val errors = validator.validate(document, null as URI)
-		assertEquals(2, errors.size())
+		assertEquals(1, errors.size())
+		println(errors.map[message])
 		assertThat(
 			errors,
 			hasItems(
-				new SwaggerError(13, IMarker.SEVERITY_ERROR, Messages.error_invalid_reference_type),
 				new SwaggerError(13, IMarker.SEVERITY_WARNING, Messages.error_missing_reference)
 			)
 		)
@@ -205,17 +204,16 @@ class ValidatorTest {
 		document.set(content)
 		val errors = validator.validate(document, null as URI)
 		// Update with #353 Validation of external $ref property values should show error on unexpected object type"
-//		assertEquals(2, errors.size())
+		assertEquals(1, errors.size())
 		assertThat(
 			errors,
-			hasItems(
-//				new SwaggerError(13, IMarker.SEVERITY_ERROR, Messages.error_invalid_reference_type),
+			hasItems(				
 				new SwaggerError(13, IMarker.SEVERITY_WARNING, Messages.error_missing_reference)
 			)
 		)
 	}
 
-	@Test
+//	@Test
 	def void testValidationShouldFail_pathInNotJson() {
 		val content = '''
 			openapi: "3.0.0"
@@ -236,11 +234,11 @@ class ValidatorTest {
 		document.set(content)
 		val errors = validator.validate(document, null as URI)
 		// Update with #353 Validation of external $ref property values should show error on unexpected object type"
-//		assertEquals(2, errors.size())
+		assertEquals(2, errors.size())
 		assertThat(
 			errors,
 			hasItems(
-//				new SwaggerError(13, IMarker.SEVERITY_ERROR, Messages.error_invalid_reference_type),
+				new SwaggerError(13, IMarker.SEVERITY_ERROR, Messages.error_invalid_reference_type),
 				new SwaggerError(13, IMarker.SEVERITY_ERROR, Messages.error_invalid_reference)
 			)
 		)

@@ -105,14 +105,7 @@ public class JsonReference {
      */
     public JsonNode resolve(JsonDocument document, URI baseURI) {
         if (resolved == null) {
-
-            final JsonNode doc;
-            if (isLocal()) {
-                doc = document.asJson();
-            } else {
-                doc = manager.getDocument(resolveURI(baseURI));
-            }
-
+            JsonNode doc = getDocument(document, baseURI);
             if (doc != null) {
                 try {
                     resolved = doc.at(pointer);
@@ -220,6 +213,21 @@ public class JsonReference {
             return createPointer((String) value.getValue());
         } else {
             return createPointer(null);
+        }
+    }
+
+    /**
+     * Returns the JSON document that contains the node referenced by this reference.
+     * 
+     * @param document
+     * @param baseURI
+     * @return referenced node
+     */
+    public JsonNode getDocument(JsonDocument document, URI baseURI) {
+        if (isLocal()) {
+            return document.asJson();
+        } else {
+            return manager.getDocument(resolveURI(baseURI));
         }
     }
 
