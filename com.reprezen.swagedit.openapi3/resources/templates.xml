@@ -272,12 +272,12 @@ content:
       $$ref: ${model}</template>
  
 <!--
-	SCHEMA 
+	NAMED SCHEMA 
  -->
  
-	<template name="schema" 
-       id="com.reprezen.swagedit.openapi3.templates.schema" 
-       description="Schema definition template" 
+	<template name="named schema" 
+       id="com.reprezen.swagedit.openapi3.templates.schemas.named_schema_required_property" 
+       description="Schema definition with a required property" 
        context="com.reprezen.swagedit.openapi3.templates.components.schemas" 
        enabled="true">${type}:
   required:
@@ -286,7 +286,63 @@ content:
     ${property}:
       type: integer
       format: int64</template>
+      
+<!--
+	SCHEMA OBJECT
+ -->
+ 
+	<template name="simple schema" 
+       id="com.reprezen.swagedit.openapi3.templates.schema.simple" 
+       description="Schema definition with a required property" 
+       context="com.reprezen.swagedit.openapi3.templates.schema" 
+       enabled="true">properties:
+  ${property}:
+    type: integer
+    format: int64</template>    
+    
+    <template name="schema with a required property" 
+       id="com.reprezen.swagedit.openapi3.templates.schema.schema_with_property" 
+       description="Schema definition with a required property" 
+       context="com.reprezen.swagedit.openapi3.templates.schema" 
+       enabled="true">required:
+  - ${property}
+properties:
+  ${property}:
+    type: integer
+    format: int64</template>      
 
+	<template name="allOf schema" 
+       id="com.reprezen.swagedit.openapi3.templates.schema.allOf_schema" 
+       description="ALL OF schema definition" 
+       context="com.reprezen.swagedit.openapi3.templates.schema" 
+       enabled="true">allOf:
+- $$ref: '${schema1}'
+- type: object
+  properties:
+    ${name}:
+      type: string</template>    
+
+	<template name="anyOf schema" 
+       id="com.reprezen.swagedit.openapi3.templates.schema.anyOf_schema" 
+       description="ANY OF schema definition" 
+       context="com.reprezen.swagedit.openapi3.templates.schema" 
+       enabled="true">anyOf:
+- $$ref: '${schema1}'
+- type: object
+  properties:
+    ${name}:
+      type: string</template>    
+      
+	<template name="oneOf schema" 
+       id="com.reprezen.swagedit.openapi3.templates.schema.oneOf_schema" 
+       description="ONE OF schema definition" 
+       context="com.reprezen.swagedit.openapi3.templates.schema" 
+       enabled="true">oneOf:
+- $$ref: '${schema1}'
+- type: object
+  properties:
+    ${name}:
+      type: string</template>          
 <!--
 	CALLBACKS 
  -->
