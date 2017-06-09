@@ -102,7 +102,7 @@ public abstract class JsonContentAssistProcessor extends TemplateCompletionProce
 
     protected abstract ContextTypeRegistry getContextTypeRegistry();
     
-    protected abstract String getContextTypeId(String path);
+    protected abstract String getContextTypeId(Model model, String path);
 
 
     @Override
@@ -271,7 +271,11 @@ public abstract class JsonContentAssistProcessor extends TemplateCompletionProce
 
     @Override
     protected TemplateContextType getContextType(ITextViewer viewer, IRegion region) {
-        String contextType = getContextTypeId(currentPath.toString());
+        Model model = null;
+        if (viewer.getDocument() instanceof JsonDocument) {
+            model = ((JsonDocument)viewer.getDocument()).getModel();
+        }
+        String contextType = getContextTypeId(model, currentPath.toString());
         ContextTypeRegistry registry = getContextTypeRegistry();
         if (registry != null) {
             return registry.getContextType(contextType);

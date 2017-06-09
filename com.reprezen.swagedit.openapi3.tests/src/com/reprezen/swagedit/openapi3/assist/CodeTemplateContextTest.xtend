@@ -44,7 +44,11 @@ class CodeTemplateContextTest extends CodeAssistContextTest{
 		val annotationLine = document.get(region.offset, region.getLength())
 
 		val path = document.getModel(offset).getPath(line, document.getColumnOfOffset(line, region))
-		val templateContext = OpenApi3ContextType.getContextType(path.toString)
+		
+		val isArrayItem = annotationLine.contains(" " + arrayItemMarker)
+		val maybeArrayPrefix = if (isArrayItem) "/0" else ""
+		
+		val templateContext = OpenApi3ContextType.getContextType(document.getModel(), path.toString + maybeArrayPrefix)
 		val matcher = refValuePattern.matcher(annotationLine)
 		if (matcher.matches) {
 			val String refValue = matcher.group(1);

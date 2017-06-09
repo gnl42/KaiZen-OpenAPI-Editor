@@ -27,7 +27,6 @@ import com.reprezen.swagedit.openapi3.assist.OpenApi3ReferenceProposalProvider.O
 class ReferenceContextTest extends CodeAssistContextTest{
 
 	val static KZOEref = "#KZOE-ref"
-	val arrayItemMarker = "kzoe-arrayItem"
 
 	val allContextTypes = new OpenApi3ContextTypeCollection(new OpenApi3Schema)
 
