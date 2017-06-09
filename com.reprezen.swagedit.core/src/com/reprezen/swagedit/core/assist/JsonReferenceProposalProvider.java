@@ -23,7 +23,6 @@ import com.reprezen.swagedit.core.assist.contexts.ContextTypeCollection;
 import com.reprezen.swagedit.core.editor.JsonDocument;
 import com.reprezen.swagedit.core.json.references.JsonDocumentManager;
 import com.reprezen.swagedit.core.model.Model;
-import com.reprezen.swagedit.core.schema.TypeDefinition;
 import com.reprezen.swagedit.core.utils.DocumentUtils;
 import com.reprezen.swagedit.core.utils.SwaggerFileFinder;
 import com.reprezen.swagedit.core.utils.SwaggerFileFinder.Scope;
@@ -76,10 +75,6 @@ public class JsonReferenceProposalProvider {
         final IPath basePath = currentFile.getParent().getFullPath();
         final List<Proposal> proposals = Lists.newArrayList();
         
-        TypeDefinition schemaType = document.getModel().find(pointer).getType();
-        System.out.println("SCHEMA TYPE: " + schemaType.getPointer());
-        
-
         if (scope == Scope.LOCAL) {
             proposals.addAll(type.collectProposals(document, null));
         } else if (!type.isLocalOnly()) {

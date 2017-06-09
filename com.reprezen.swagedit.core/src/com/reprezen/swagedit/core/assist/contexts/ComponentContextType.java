@@ -15,6 +15,7 @@ import java.util.Collection;
 import com.fasterxml.jackson.core.JsonPointer;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import com.fasterxml.jackson.databind.node.ObjectNode;
+import com.reprezen.swagedit.core.model.AbstractNode;
 import com.reprezen.swagedit.core.model.Model;
 import com.reprezen.swagedit.core.schema.ComplexTypeDefinition;
 import com.reprezen.swagedit.core.schema.MultipleTypeDefinition;
@@ -43,7 +44,11 @@ public class ComponentContextType extends ContextType {
     }
 
     protected boolean isReference(Model model, JsonPointer pointer) {
-        TypeDefinition type = model.find(pointer).getType();
+        AbstractNode contextNode = model.find(pointer);
+        if (contextNode == null) {
+            return false;
+        }
+        TypeDefinition type = contextNode.getType();
         if (type instanceof MultipleTypeDefinition) {
             // MultipleTypeDefinition is a special case, it happens when several properties match a property
             for (TypeDefinition nestedType : ((MultipleTypeDefinition) type).getMultipleTypes()) {
@@ -60,7 +65,11 @@ public class ComponentContextType extends ContextType {
     }
 
     protected boolean isReferenceToComponent(Model model, JsonPointer pointer) {
-        TypeDefinition parentType = model.find(pointer.head()).getType();
+        AbstractNode parentNode = model.find(pointer.head());
+        if (parentNode == null) {
+            return false;
+        }
+        TypeDefinition parentType = parentNode.getType();
         if (parentType instanceof ComplexTypeDefinition) {
             Collection<TypeDefinition> types = ((ComplexTypeDefinition) parentType).getComplexTypes();
             for (TypeDefinition type : types) {
