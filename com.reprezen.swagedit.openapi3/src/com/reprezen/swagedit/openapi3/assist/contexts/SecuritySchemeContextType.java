@@ -1,7 +1,6 @@
 package com.reprezen.swagedit.openapi3.assist.contexts;
 
 import java.util.Collection;
-import java.util.List;
 
 import org.eclipse.core.runtime.IPath;
 
@@ -27,18 +26,11 @@ public class SecuritySchemeContextType extends SchemaContextType {
     @Override
     public Collection<Proposal> collectProposals(Model model, IPath path) {
         final Collection<Proposal> results = Lists.newArrayList();
-        final List<AbstractNode> nodes = Lists.newArrayList();
-        for (AbstractNode node : model.allNodes()) {
-            if (securityPointer.equals(node.getPointer())) {
-                nodes.add(node);
-            }
-        }
+        AbstractNode securitySchemes = model.find(securityPointer);
 
-        for (AbstractNode node : nodes) {
-            if (node.isObject()) {
-                for (String key : node.asObject().fieldNames()) {
-                    results.add(new Proposal(key, key, null, node.getProperty()));
-                }
+        if (securitySchemes != null && securitySchemes.isObject()) {
+            for (String key : securitySchemes.asObject().fieldNames()) {
+                results.add(new Proposal(key, key, null, securitySchemes.getProperty()));
             }
         }
 

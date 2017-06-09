@@ -6,6 +6,7 @@ import java.util.Iterator;
 
 import org.eclipse.core.runtime.IPath;
 
+import com.fasterxml.jackson.core.JsonPointer;
 import com.fasterxml.jackson.databind.JsonNode;
 import com.google.common.collect.Lists;
 import com.reprezen.swagedit.core.assist.Proposal;
@@ -22,7 +23,7 @@ public class ContextType {
 
     private final String value;
     private final String label;
-    final String regex;
+    private final String regex;
     private final boolean isLocalOnly;
 
     public ContextType(String value, String label, String regex) {
@@ -37,6 +38,13 @@ public class ContextType {
         this.label = label;
         this.regex = regex;
         this.isLocalOnly = isLocalOnly;
+    }
+    
+    public boolean canProvideProposal(JsonPointer pointer) {
+        if (pointer != null && regex != null) {
+            return pointer.toString().matches(regex);
+        }
+        return false;
     }
 
     public String value() {

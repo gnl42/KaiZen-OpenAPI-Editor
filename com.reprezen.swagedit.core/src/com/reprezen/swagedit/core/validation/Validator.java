@@ -51,6 +51,7 @@ import com.reprezen.swagedit.core.model.ArrayNode;
 import com.reprezen.swagedit.core.model.Model;
 import com.reprezen.swagedit.core.model.ObjectNode;
 import com.reprezen.swagedit.core.model.ValueNode;
+import com.reprezen.swagedit.core.schema.TypeDefinition;
 
 /**
  * This class contains methods for validating a Swagger YAML document.
@@ -169,11 +170,16 @@ public class Validator {
 
         if (model != null && model.getRoot() != null) {
             for (AbstractNode node : model.allNodes()) {
-                checkArrayTypeDefinition(errors, node);
-                checkObjectTypeDefinition(errors, node);
+                executeModelValidation(model, node, errors);
             }
         }
         return errors;
+    }
+
+    protected void executeModelValidation(Model model, AbstractNode node, Set<SwaggerError> errors) {
+        checkArrayTypeDefinition(errors, node);
+        checkObjectTypeDefinition(errors, node);
+        checkReferenceType(errors, node);
     }
 
     /**
@@ -284,6 +290,32 @@ public class Validator {
                         }
                     }
                 }
+            }
+        }
+    }
+
+    /**
+     * This method checks that referenced objects are of expected type as defined in the schema.
+     * 
+     * @param errors
+     * @param node
+     */
+    protected void checkReferenceType(Set<SwaggerError> errors, AbstractNode node) {
+        if (JsonReference.isReference(node)) {
+            Model model = node.getModel();
+            TypeDefinition type = node.getType();
+
+            AbstractNode nodeValue = node.get(JsonReference.PROPERTY);
+            AbstractNode valueNode = model.find((String) nodeValue.asValue().getValue());
+
+            if (valueNode == null) {
+                // probably external node,
+                // do not validate for now.
+                return;
+            }
+
+            if (!type.validate(valueNode)) {
+                errors.add(error(nodeValue, IMarker.SEVERITY_WARNING, Messages.error_invalid_reference_type));
             }
         }
     }

@@ -214,7 +214,21 @@ public class Model {
     }
 
     public AbstractNode find(String pointer) {
-        return nodes.get(JsonPointer.valueOf(pointer));
+        if (Strings.emptyToNull(pointer) == null) {
+            return null;
+        }
+        if (pointer.startsWith("#")) {
+            pointer = pointer.substring(1);
+        }
+        if (pointer.length() > 1 && pointer.endsWith("/")) {
+            pointer = pointer.substring(0, pointer.length() - 1);
+        }
+
+        try {
+            return nodes.get(JsonPointer.valueOf(pointer));
+        } catch (Exception e) {
+            return null;
+        }
     }
 
     private AbstractNode add(AbstractNode node) {
@@ -361,6 +375,23 @@ public class Model {
         }
 
         return (property.length() + 1) + n.getStart().getColumn();
+    }
+
+    /**
+     * Returns all the nodes whose type match the given pointer.
+     * 
+     * @param typePointer
+     *            pointer of a type present in the schema
+     * @return list of nodes being instance of the type
+     */
+    public List<AbstractNode> findByType(JsonPointer typePointer) {
+        List<AbstractNode> instances = Lists.newArrayList();
+        for (AbstractNode node : allNodes()) {
+            if (node.getType() != null && typePointer.equals(node.getType().getPointer())) {
+                instances.add(node);
+            }
+        }
+        return instances;
     }
 
 }

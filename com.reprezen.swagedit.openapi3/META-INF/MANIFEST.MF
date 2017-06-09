@@ -20,4 +20,15 @@ Bundle-ActivationPolicy: lazy
 Import-Package: com.fasterxml.jackson.core,
  com.fasterxml.jackson.databind,
  io.swagger.util
-Export-Package: com.reprezen.swagedit.openapi3.editor
+Export-Package: com.reprezen.swagedit.openapi3,
+ com.reprezen.swagedit.openapi3.assist,
+ com.reprezen.swagedit.openapi3.assist.contexts,
+ com.reprezen.swagedit.openapi3.assist.ext,
+ com.reprezen.swagedit.openapi3.editor,
+ com.reprezen.swagedit.openapi3.editor.wizard,
+ com.reprezen.swagedit.openapi3.hyperlinks,
+ com.reprezen.swagedit.openapi3.preferences,
+ com.reprezen.swagedit.openapi3.quickfix,
+ com.reprezen.swagedit.openapi3.schema,
+ com.reprezen.swagedit.openapi3.templates,
+ com.reprezen.swagedit.openapi3.validation
