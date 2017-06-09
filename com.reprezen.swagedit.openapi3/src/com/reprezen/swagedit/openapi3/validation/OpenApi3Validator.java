@@ -27,8 +27,8 @@ public class OpenApi3Validator extends Validator {
     }
 
     @Override
-    protected void executeModelValidation(Model model, AbstractNode node, Set<SwaggerError> errors) {
-        super.executeModelValidation(model, node, errors);
+    protected void validateNode(Model model, AbstractNode node, Set<SwaggerError> errors) {
+        super.validateNode(model, node, errors);
         validateOperationIdReferences(model, node, errors);
         validateOperationRefReferences(model, node, errors);
         validateSecuritySchemeReferences(model, node, errors);

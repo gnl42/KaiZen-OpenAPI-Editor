@@ -170,13 +170,13 @@ public class Validator {
 
         if (model != null && model.getRoot() != null) {
             for (AbstractNode node : model.allNodes()) {
-                executeModelValidation(model, node, errors);
+                validateNode(model, node, errors);
             }
         }
         return errors;
     }
 
-    protected void executeModelValidation(Model model, AbstractNode node, Set<SwaggerError> errors) {
+    protected void validateNode(Model model, AbstractNode node, Set<SwaggerError> errors) {
         checkArrayTypeDefinition(errors, node);
         checkObjectTypeDefinition(errors, node);
         checkReferenceType(errors, node);
