@@ -34,7 +34,7 @@ paths:
 
 components: 
   headers:
-  
+    #KZOE-template name="headers in components/headers", value="headers"
     refed:
       #KZOE-template name="header in components/headers", value="header"
       $ref: "#/components/headers/X-Rate-Limit-Reset"

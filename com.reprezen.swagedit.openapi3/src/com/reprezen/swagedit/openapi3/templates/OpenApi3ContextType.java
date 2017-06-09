@@ -26,9 +26,6 @@ public class OpenApi3ContextType extends TemplateContextType {
     
     private static final String TEMPLATE_ID_PREFIX = "com.reprezen.swagedit.openapi3.templates.";
     private static final String PATH_ITEM_REGEX = "/paths/~1[^/]+";
-    // we can use a ? here as both 'PATH_ITEM_REGEX + "/parameters$"' and
-    // 'PATH_ITEM_REGEX + "/[^/]+/parameters$"' are supported
-    private static final String PARAMETERS_LIST_REGEX = PATH_ITEM_REGEX + "/([^/]+/)?parameters";
 
     private final String regex;
 
@@ -74,41 +71,25 @@ public class OpenApi3ContextType extends TemplateContextType {
         }
     }
 
-    public static class SchemasContextType extends OpenApi3ContextType {
-        public SchemasContextType() {
-            super("components.schemas", "/components/schemas");
-        }
-    }
-
-    public static class ComponentsObjectContextType extends OpenApi3ContextType {
-        public ComponentsObjectContextType() {
-            super("components", "/components");
-        }
-    }
-
-    public static class CallbacksObjectContextType extends OpenApi3ContextType {
-        public CallbacksObjectContextType() {
-            super("callbacks", PATH_ITEM_REGEX + "/[^/]+/callbacks|/components/callbacks");
-        }
-    }
-    
-    public static class ResponseObjectContextType extends OpenApi3ContextType {
-        public ResponseObjectContextType() {
-            super("responses", "/components/responses|" + //
-                    PATH_ITEM_REGEX + "/[^/]+/responses$");
-        }
-    }
-
     private static List<TemplateContextType> allContextTypes = Lists.<TemplateContextType>newArrayList( //
             new RootContextType(), //
             new ContactContextType(), //
             new PathsContextType(), //
             new PathItemContextType(), //
-            new SchemasContextType(), //
-            new ComponentsObjectContextType(), //
-            new CallbacksObjectContextType(), //
-            new ResponseObjectContextType(), //
+            // Components
+            new SchemaBasedTemplateContextType(TEMPLATE_ID_PREFIX + "components", "components", "/definitions/components"),
+            // Component Object Maps
+            new SchemaBasedTemplateContextType(TEMPLATE_ID_PREFIX + "schemas", "schemas", "/definitions/schemasOrReferences"),
+            new SchemaBasedTemplateContextType(TEMPLATE_ID_PREFIX + "callbacks", "callbacks", "/definitions/callbacksOrReferences", "/definitions/callbacks"),
+            new SchemaBasedTemplateContextType(TEMPLATE_ID_PREFIX + "links", "links", "/definitions/linksOrReferences"),
+            new SchemaBasedTemplateContextType(TEMPLATE_ID_PREFIX + "parameters", "parameters", "/definitions/parametersOrReferences"),
+            new SchemaBasedTemplateContextType(TEMPLATE_ID_PREFIX + "requestBodies", "requestBodies", "/definitions/requestBodiesOrReferences"),
+            new SchemaBasedTemplateContextType(TEMPLATE_ID_PREFIX + "responses", "responses", "/definitions/responsesOrReferences"),
+            new SchemaBasedTemplateContextType(TEMPLATE_ID_PREFIX + "securitySchemes", "securitySchemes", "/definitions/securitySchemesOrReferences"),
+            new SchemaBasedTemplateContextType(TEMPLATE_ID_PREFIX + "headers", "headers", "/definitions/headersOrReferences"),
+            // Component Objects
             new SchemaBasedTemplateContextType(TEMPLATE_ID_PREFIX + "schema", "schema", "/definitions/schema"),
+            new SchemaBasedTemplateContextType(TEMPLATE_ID_PREFIX + "callback", "callback", "/definitions/callback"),
             new SchemaBasedTemplateContextType(TEMPLATE_ID_PREFIX + "link", "link", "/definitions/link"),
             new SchemaBasedTemplateContextType(TEMPLATE_ID_PREFIX + "parameter", "parameter", "/definitions/parameter"),
             new SchemaBasedTemplateContextType(TEMPLATE_ID_PREFIX + "requestBody", "requestBody", "/definitions/requestBody"),

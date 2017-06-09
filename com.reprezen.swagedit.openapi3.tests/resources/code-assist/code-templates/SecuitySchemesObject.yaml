@@ -18,6 +18,7 @@ paths:
 components: 
 
   securitySchemes:
+    #KZOE-template name="securitySchemes in components/securitySchemes", value="securitySchemes"
     api_key:
       #KZOE-template name="security scheme object in components", value="securityScheme"
       type: apiKey 

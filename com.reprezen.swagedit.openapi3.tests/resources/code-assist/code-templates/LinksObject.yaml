@@ -164,6 +164,7 @@ paths:
 components:
 
   links:
+    #KZOE-template name="links in components/links", value="links"
     linkWithRef:
       #KZOE-template name="link in components/links", value="link"
       $ref: ""

@@ -278,7 +278,7 @@ content:
 	<template name="named schema" 
        id="com.reprezen.swagedit.openapi3.templates.schemas.named_schema_required_property" 
        description="Schema definition with a required property" 
-       context="com.reprezen.swagedit.openapi3.templates.components.schemas" 
+       context="com.reprezen.swagedit.openapi3.templates.schemas" 
        enabled="true">${type}:
   required:
     - ${property}

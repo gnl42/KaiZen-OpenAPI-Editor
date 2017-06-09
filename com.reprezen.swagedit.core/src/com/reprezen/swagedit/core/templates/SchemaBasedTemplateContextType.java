@@ -10,7 +10,9 @@
  *******************************************************************************/
 package com.reprezen.swagedit.core.templates;
 
+import java.util.Arrays;
 import java.util.Collection;
+import java.util.List;
 
 import org.eclipse.jface.text.templates.GlobalTemplateVariables;
 import org.eclipse.jface.text.templates.TemplateContextType;
@@ -22,11 +24,11 @@ import com.reprezen.swagedit.core.schema.TypeDefinition;
 
 public class SchemaBasedTemplateContextType extends TemplateContextType {
 
-    private final String pathToSchemaType;
+    private final List<String> pathToSchemaType;
 
-    public SchemaBasedTemplateContextType(String id, String name, String pathToSchemaType) {
+    public SchemaBasedTemplateContextType(String id, String name, String... pathToSchemaType) {
         super(id, name);
-        this.pathToSchemaType = pathToSchemaType;
+        this.pathToSchemaType = Arrays.asList(pathToSchemaType);
         addGlobalResolvers();
     }
 
@@ -48,7 +50,7 @@ public class SchemaBasedTemplateContextType extends TemplateContextType {
             }
 
         }
-        return pathToSchemaType.equals(type.getPointer().toString());
+        return pathToSchemaType.contains(type.getPointer().toString());
     }
 
     private void addGlobalResolvers() {

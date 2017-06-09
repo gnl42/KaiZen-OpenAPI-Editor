@@ -24,7 +24,7 @@ paths:
           
 components:
   schemas:
-    #KZOE-template name="named schema in components", value="components.schemas"
+    #KZOE-template name="named schema in components", value="schemas"
     SimpleObject:
       #KZOE-template name="schema in a named schema", value="schema"
       type: object
