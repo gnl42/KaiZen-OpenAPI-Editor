@@ -106,7 +106,6 @@ public class Validator {
         try {
             jsonContent = document.asJson();
         } catch (Exception e) {
-            System.out.println("Loggg");
             YEditLog.logException(e);
         }
 
