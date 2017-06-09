@@ -214,9 +214,9 @@ email: ${contact_email}</template>
  -->
  
  <template name="path parameter" 
-       id="com.reprezen.swagedit.openapi3.templates.path_parameter_object" 
+       id="com.reprezen.swagedit.openapi3.templates.path_parameter" 
        description="path parameter template" 
-       context="com.reprezen.swagedit.openapi3.templates.parameter_object" 
+       context="com.reprezen.swagedit.openapi3.templates.parameter" 
        enabled="true">name: ${name}
 in: path
 description: ${ID}
@@ -226,9 +226,9 @@ schema:
 </template>
 
      <template name="header parameter" 
-       id="com.reprezen.swagedit.openapi3.templates.header_parameter_object" 
+       id="com.reprezen.swagedit.openapi3.templates.header_parameter" 
        description="header parameter template" 
-       context="com.reprezen.swagedit.openapi3.templates.parameter_object" 
+       context="com.reprezen.swagedit.openapi3.templates.parameter" 
        enabled="true">name: ${name}
 in: header
 description: ${ID}
@@ -242,9 +242,9 @@ style: commaDelimited
 </template>
 
      <template name="query parameter" 
-       id="com.reprezen.swagedit.openapi3.templates.query_parameter_object" 
+       id="com.reprezen.swagedit.openapi3.templates.query_parameter" 
        description="query parameter template" 
-       context="com.reprezen.swagedit.openapi3.templates.parameter_object" 
+       context="com.reprezen.swagedit.openapi3.templates.parameter" 
        enabled="true">name: ${name}
 in: query
 description: ${ID}

@@ -1,0 +1,28 @@
+openapi: "3.0.0"
+info:
+  title: Response Object
+  version: "1.0.0"
+  
+paths: 
+
+  /pets:
+    get:
+      summary: Read
+      description: Provide
+      responses:
+        '200':
+          #KZOE-template name="response operation 200", value="response"
+          $ref: "#/components/responses/clientErrorResponse"
+        default:
+           #KZOE-template name="response in operation default", value="response"
+          $ref: "#/components/responses/clientErrorResponse"
+          
+components:
+  #KZOE-template name="components in components", value="components"
+  responses:
+    #KZOE-template name="responses in components/responses", value="responses"
+    clientErrorResponse:
+      description: Client error
+    circular:
+       #KZOE-template name="response in components/responses", value="response"
+      $ref: "#/components/responses/clientErrorResponse"

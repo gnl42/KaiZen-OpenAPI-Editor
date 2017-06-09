@@ -24,6 +24,7 @@ import com.reprezen.swagedit.core.templates.SchemaBasedTemplateContextType;
 
 public class OpenApi3ContextType extends TemplateContextType {
     
+    private static final String TEMPLATE_ID_PREFIX = "com.reprezen.swagedit.openapi3.templates.";
     private static final String PATH_ITEM_REGEX = "/paths/~1[^/]+";
     // we can use a ? here as both 'PATH_ITEM_REGEX + "/parameters$"' and
     // 'PATH_ITEM_REGEX + "/[^/]+/parameters$"' are supported
@@ -32,7 +33,7 @@ public class OpenApi3ContextType extends TemplateContextType {
     private final String regex;
 
     public OpenApi3ContextType(String name, String regex) {
-        super("com.reprezen.swagedit.openapi3.templates." + name, name);
+        super(TEMPLATE_ID_PREFIX + name, name);
         this.regex = regex;
         addGlobalResolvers();
     }
@@ -79,32 +80,6 @@ public class OpenApi3ContextType extends TemplateContextType {
         }
     }
 
-    public static class SchemaContextType extends SchemaBasedTemplateContextType {
-        public SchemaContextType() {
-            super("com.reprezen.swagedit.openapi3.templates.schema", "schema", "/definitions/schema");
-        }
-    }
-    
-    public static class ParameterObjectContextType extends OpenApi3ContextType {
-        public ParameterObjectContextType() {
-            super("parameter_object", PARAMETERS_LIST_REGEX + "/\\d+$" + "|"//
-                    + "/components/parameters/[^/]+$");
-        }
-    }
-
-    public static class ResponseObjectContextType extends OpenApi3ContextType {
-        public ResponseObjectContextType() {
-            super("responses", "/components/responses|" + //
-                    PATH_ITEM_REGEX + "/[^/]+/responses$");
-        }
-    }
-
-    public static class ResponseContentContextType extends OpenApi3ContextType {
-        public ResponseContentContextType() {
-            super("response", PATH_ITEM_REGEX + "/[^/]+/responses/\\d\\d\\d");
-        }
-    }
-
     public static class ComponentsObjectContextType extends OpenApi3ContextType {
         public ComponentsObjectContextType() {
             super("components", "/components");
@@ -116,10 +91,11 @@ public class OpenApi3ContextType extends TemplateContextType {
             super("callbacks", PATH_ITEM_REGEX + "/[^/]+/callbacks|/components/callbacks");
         }
     }
-
-    public static class RequestBodyObjectContextType extends OpenApi3ContextType {
-        public RequestBodyObjectContextType() {
-            super("requestBody", ".*/requestBody");
+    
+    public static class ResponseObjectContextType extends OpenApi3ContextType {
+        public ResponseObjectContextType() {
+            super("responses", "/components/responses|" + //
+                    PATH_ITEM_REGEX + "/[^/]+/responses$");
         }
     }
 
@@ -129,13 +105,17 @@ public class OpenApi3ContextType extends TemplateContextType {
             new PathsContextType(), //
             new PathItemContextType(), //
             new SchemasContextType(), //
-            new ParameterObjectContextType(), //
-            new ResponseObjectContextType(), //
-            new ResponseContentContextType(), //
             new ComponentsObjectContextType(), //
             new CallbacksObjectContextType(), //
-            new RequestBodyObjectContextType(), //
-            new SchemaContextType());
+            new ResponseObjectContextType(), //
+            new SchemaBasedTemplateContextType(TEMPLATE_ID_PREFIX + "schema", "schema", "/definitions/schema"),
+            new SchemaBasedTemplateContextType(TEMPLATE_ID_PREFIX + "link", "link", "/definitions/link"),
+            new SchemaBasedTemplateContextType(TEMPLATE_ID_PREFIX + "parameter", "parameter", "/definitions/parameter"),
+            new SchemaBasedTemplateContextType(TEMPLATE_ID_PREFIX + "requestBody", "requestBody", "/definitions/requestBody"),
+            new SchemaBasedTemplateContextType(TEMPLATE_ID_PREFIX + "response", "response", "/definitions/response"),
+            new SchemaBasedTemplateContextType(TEMPLATE_ID_PREFIX + "securityScheme", "securityScheme", "/definitions/securityScheme"),
+            new SchemaBasedTemplateContextType(TEMPLATE_ID_PREFIX + "header", "header", "/definitions/header")
+            );
 
     public static List<TemplateContextType> allContextTypes() {
         return allContextTypes;
