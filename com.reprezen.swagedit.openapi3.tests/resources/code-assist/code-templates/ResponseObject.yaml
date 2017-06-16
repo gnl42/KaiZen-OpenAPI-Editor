@@ -12,10 +12,12 @@ paths:
       responses:
         '200':
           #KZOE-template name="response operation 200", value="response"
-          $ref: "#/components/responses/clientErrorResponse"
+          
+          description: desc
         default:
-           #KZOE-template name="response in operation default", value="response"
-          $ref: "#/components/responses/clientErrorResponse"
+          #KZOE-template name="response in operation default", value="response"
+          
+          description: desc
           
 components:
   #KZOE-template name="components in components", value="components"
@@ -24,5 +26,6 @@ components:
     clientErrorResponse:
       description: Client error
     circular:
-       #KZOE-template name="response in components/responses", value="response"
-      $ref: "#/components/responses/clientErrorResponse"
+      #KZOE-template name="response in components/responses", value="response"
+      
+      description: desc

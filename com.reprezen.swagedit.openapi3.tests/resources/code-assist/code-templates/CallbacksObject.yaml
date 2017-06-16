@@ -12,6 +12,7 @@ paths:
       responses: {}
       callbacks:
         #KZOE-template name="callbacks in operation", value="callbacks"
+        
         myWebhook:
           #KZOE-template name="callback in operation", value="callback"
           $ref: "#/components/callbacks/myWebhook"
@@ -20,6 +21,7 @@ components:
 
   callbacks:
     #KZOE-template name="callbacks in components/callbacks", value="callbacks"
+    
     MyWebhooWithRef:
       #KZOE-template name="callback in components/callback", value="callback"
       $ref: "#/components/callbacks/myWebhook"

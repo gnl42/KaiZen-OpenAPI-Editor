@@ -49,7 +49,7 @@ components:
         
     ExtendedErrorModel:
       allOf:
-        #KZOE-template name="schema in allOf", value="schema" kzoe-arrayItem
+      #KZOE-template name="schema in allOf", value="schema" kzoe-arrayItem
       - $ref: '#/components/schemas/ErrorModel'
       - type: object
         required:
@@ -61,7 +61,7 @@ components:
     WithAnyOf:  ## 
       description: A representation of a cat
       anyOf:
-        #KZOE-template name="schema in anyOf", value="schema" kzoe-arrayItem
+      #KZOE-template name="schema in anyOf", value="schema" kzoe-arrayItem
       - $ref: '#/components/schemas/Pet'
       - type: object
         properties:

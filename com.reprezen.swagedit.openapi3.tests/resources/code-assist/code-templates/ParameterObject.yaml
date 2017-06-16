@@ -9,7 +9,7 @@ paths:
 
   /pets:
     parameters:
-      #KZOE-template name="parameter in path item", value="parameter" kzoe-arrayItem 
+     #KZOE-template name="parameter in path item", value="parameter" kzoe-arrayItem 
      - $ref: "#/components/parameters/username"
     get:
       parameters:
