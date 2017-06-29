@@ -33,7 +33,6 @@ import com.fasterxml.jackson.dataformat.yaml.YAMLFactory;
 import com.google.common.base.Strings;
 import com.google.common.collect.Iterables;
 import com.google.common.collect.Lists;
-import com.reprezen.swagedit.core.Activator;
 import com.reprezen.swagedit.core.schema.CompositeSchema;
 
 /**
@@ -85,7 +84,7 @@ public class Model {
         try {
             reader(model).readValue(text);
         } catch (IllegalArgumentException | IOException e) {
-            Activator.getDefault().logError(e.getMessage(), e);
+            return null;
         }
 
         for (AbstractNode node : model.allNodes()) {

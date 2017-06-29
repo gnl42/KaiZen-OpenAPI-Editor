@@ -107,7 +107,7 @@ public class Validator {
         try {
             jsonContent = document.asJson();
         } catch (Exception e) {
-            YEditLog.logException(e);
+            jsonContent = null;
         }
 
         if (jsonContent != null) {
