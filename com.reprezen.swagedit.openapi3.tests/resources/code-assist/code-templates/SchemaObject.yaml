@@ -1,0 +1,122 @@
+openapi: "3.0.0"
+info:
+  title: Schema Object
+  version: "1.0.0"
+  
+paths:
+  /resource:
+    get:
+      description: description
+      responses:
+        '200':
+          description: Ok
+          content:
+            application/json:
+              schema:
+                type: array
+                items:
+                  #KZOE-template name="schema in a content array", value="schema"
+                  $ref: '#/components/schemas/StringToModelMappingObject'
+            '*/*' :
+               schema: 
+                 #KZOE-template name="schema in schema", value="schema"
+                 $ref: "#/components/schemas/SimpleObject"
+          
+components:
+  schemas:
+    #KZOE-template name="named schema in components", value="schemas"
+    SimpleObject:
+      #KZOE-template name="schema in a named schema", value="schema"
+      type: object
+      required:
+      - name
+      properties:
+        name:
+          type: string
+        address:
+          #KZOE-template name="schema properties", value="schema"
+          $ref: "#/components/schemas/Pet"
+        age:
+          type: integer
+          format: int32
+          minimum: 0    
+        
+    StringToModelMappingObject:
+      type: object
+      additionalProperties:
+        #KZOE-template name="schema inadditionalProperties", value="schema"
+        $ref: "#/components/schemas/Dog"
+        
+    ExtendedErrorModel:
+      allOf:
+      #KZOE-template name="schema in allOf", value="schema" kzoe-arrayItem
+      - $ref: '#/components/schemas/ErrorModel'
+      - type: object
+        required:
+        - rootCause
+        properties:
+          rootCause:
+            type: string
+            
+    WithAnyOf:  ## 
+      description: A representation of a cat
+      anyOf:
+      #KZOE-template name="schema in anyOf", value="schema" kzoe-arrayItem
+      - $ref: '#/components/schemas/Pet'
+      - type: object
+        properties:
+          huntingSkill:
+            type: string
+            description: The measured skill for hunting
+            enum:
+            - clueless
+            - lazy
+            - adventurous
+            - aggressive
+        required:
+        - huntingSkill
+ 
+    AnyOfWithNestedSchema:  ## 
+      description: A representation of a cat
+      anyOf:
+      - type: object
+        properties:
+          huntingSkill: 
+            #KZOE-template name="schema in anyOf properties", value="schema"
+            $ref: "#/components/schemas/SimpleObject"
+                
+    # Discrinimator Object
+    MyResponseType:
+      oneOf:
+        #KZOE-template name="schema in oneOf", value="schema" kzoe-arrayItem
+        - $ref: '#/components/schemas/Cat'
+        - $ref: '#/components/schemas/Dog'
+        - $ref: '#/components/schemas/Lizard'
+      discriminator:
+          propertyName: pet_type       
+          
+          
+    SchemaItems:
+      type: array
+      items:
+        #KZOE-template name="schema in items", value="schema"
+        $ref: "#/components/schemas/SimpleObject"
+
+  parameters:
+    username:
+      name: username
+      in: path
+      description: username to fetch
+      required: true
+      schema:
+        #KZOE-template name="schema in parameter", value="schema"
+        $ref: "#/components/schemas/SimpleObject"
+           
+  headers:
+    X-Rate-Limit-Reset:
+      description: The number of seconds left in the current period
+      schema:
+        #KZOE-template name="schema in header", value="schema"
+        $ref: "#/components/schemas/SimpleObject"    
+                     
+  

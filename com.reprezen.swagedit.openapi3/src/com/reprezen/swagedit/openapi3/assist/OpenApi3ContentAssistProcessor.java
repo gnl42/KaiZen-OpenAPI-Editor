@@ -11,10 +11,12 @@ package com.reprezen.swagedit.openapi3.assist;
  *******************************************************************************/
 import org.eclipse.jface.text.contentassist.ContentAssistant;
 import org.eclipse.jface.text.templates.ContextTypeRegistry;
+import org.eclipse.jface.text.templates.TemplateContextType;
 import org.eclipse.jface.text.templates.persistence.TemplateStore;
 
 import com.reprezen.swagedit.core.assist.JsonContentAssistProcessor;
 import com.reprezen.swagedit.core.assist.JsonProposalProvider;
+import com.reprezen.swagedit.core.model.Model;
 import com.reprezen.swagedit.openapi3.Activator;
 import com.reprezen.swagedit.openapi3.assist.ext.CallbacksContentAssistExt;
 import com.reprezen.swagedit.openapi3.assist.ext.SchemaTypeContentAssistExt;
@@ -38,8 +40,8 @@ public class OpenApi3ContentAssistProcessor extends JsonContentAssistProcessor {
 	}
 
     @Override
-    protected String getContextTypeId(String path) {
-        OpenApi3ContextType contextType = OpenApi3ContextType.getContextType(path);
+    protected String getContextTypeId(Model model, String path) {
+        TemplateContextType contextType = OpenApi3ContextType.getContextType(model, path);
         return contextType != null ? contextType.getId() : null;
     }
 
