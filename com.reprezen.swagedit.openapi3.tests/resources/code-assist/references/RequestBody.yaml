@@ -27,7 +27,9 @@ components:
           requestBody:
             #KZOE-ref name="requestBody in callback", value="components/requestBodies"
             $ref: "#/components/requestBodies/www-form-urlencoded"
-          responses: {}
+          responses:
+            201:
+              description: Null response
               
   requestBodies:
     refed:

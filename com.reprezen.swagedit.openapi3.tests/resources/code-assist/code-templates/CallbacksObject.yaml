@@ -9,7 +9,9 @@ paths:
     get:
       summary: Read
       description: Provide details for the entire list (for collection resources) or an item (for object resources)
-      responses: {}
+      responses:
+        201:
+          description: Null response
       callbacks:
         #KZOE-template name="callbacks in operation", value="callbacks"
         

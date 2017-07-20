@@ -38,7 +38,7 @@ components:
         items:
           type: integer
           format: int64
-      style: commaDelimited  
+      style: simple  
 
 # path parameter      
     username:

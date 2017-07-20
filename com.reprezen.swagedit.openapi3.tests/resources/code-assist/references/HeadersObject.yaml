@@ -44,11 +44,23 @@ components:
       schema:
         type: integer         
     
-  links:
-    UserRepositories:
-      operationId: getRepositoriesByOwner
-      headers:
-        X-Rate-Limit-Reset:
-          #KZOE-ref name="header in links", value="components/headers"
-          $ref: "#/components/headers/X-Rate-Limit-Reset"
+  requestBodies:
+    requestBody:
+      content:
+        multipart/mixed:
+          schema:
+            type: string
+          encoding:
+            historyMetadata:
+              # require XML Content-Type in utf-8 encoding
+              contentType: application/xml; charset=utf-8
+            profileImage:
+              # only accept png/jpeg
+              contentType: image/png, image/jpeg
+              headers:
+                X-Rate-Limit-Limit:
+                  #KZOE-ref name="header in encoding", value="components/headers"
+                  $ref: "#/components/headers/X-Rate-Limit-Reset"
+                  
+
  
