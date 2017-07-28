@@ -10,6 +10,7 @@
  *******************************************************************************/
 package com.reprezen.swagedit.openapi3.editor;
 
+import com.fasterxml.jackson.dataformat.yaml.YAMLMapper;
 import com.reprezen.swagedit.core.editor.JsonDocument;
 import com.reprezen.swagedit.openapi3.Activator;
 import com.reprezen.swagedit.openapi3.schema.OpenApi3Schema;
@@ -21,7 +22,7 @@ public class OpenApi3Document extends JsonDocument {
 	}
 
     public OpenApi3Document(OpenApi3Schema schema) {
-        super(io.swagger.util.Yaml.mapper(), schema);
+        super(new YAMLMapper(), schema);
     }
 
 }
