@@ -10,7 +10,6 @@
  *******************************************************************************/
 package com.reprezen.swagedit.openapi3.editor;
 
-import com.fasterxml.jackson.dataformat.yaml.YAMLMapper;
 import com.reprezen.swagedit.core.editor.JsonDocument;
 import com.reprezen.swagedit.openapi3.Activator;
 import com.reprezen.swagedit.openapi3.schema.OpenApi3Schema;
@@ -22,7 +21,11 @@ public class OpenApi3Document extends JsonDocument {
 	}
 
     public OpenApi3Document(OpenApi3Schema schema) {
-        super(new YAMLMapper(), schema);
+        // FIXME We should be using com.fasterxml.jackson.dataformat.yaml.YAMLMapper here,
+        // but using it throws a java.lang.NoClassDefFoundError: com/fasterxml/jackson/databind/ObjectMapper
+        // Because com.fasterxml.jackson.dataformat.yaml does not define an OSGi dependency on com.fasterxml.jackson.databind
+        // in MANIFEST.MF => it can't load it
+        super(io.swagger.util.Yaml.mapper(), schema);
     }
 
 }
