@@ -1,8 +1,9 @@
 package com.reprezen.swagedit.openapi3.schema
 
+import com.fasterxml.jackson.databind.ObjectMapper
+import com.fasterxml.jackson.dataformat.yaml.YAMLFactory
 import com.google.common.collect.Lists
 import com.reprezen.swagedit.openapi3.validation.ValidationHelper
-import io.swagger.util.Yaml
 import java.io.File
 import java.io.FileFilter
 import java.io.FilenameFilter
@@ -42,7 +43,7 @@ class SchemaValidationTest {
 	@Parameter(1)
 	var public String fileName // for test name only
 
-	val mapper = Yaml.mapper()
+	val mapper = new ObjectMapper(new YAMLFactory())
 
 	@Test
 	def public validateSpec() {

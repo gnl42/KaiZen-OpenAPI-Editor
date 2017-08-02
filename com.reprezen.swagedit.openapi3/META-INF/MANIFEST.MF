@@ -35,6 +35,4 @@ Export-Package: com.reprezen.swagedit.openapi3,
  com.reprezen.swagedit.openapi3.schema,
  com.reprezen.swagedit.openapi3.templates,
  com.reprezen.swagedit.openapi3.validation
-Bundle-ClassPath: lib/swagger-core-1.5.14.jar,
- lib/swagger-models-1.5.14.jar,
- .
+Bundle-ClassPath: .
