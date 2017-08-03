@@ -1,7 +1,9 @@
 package com.reprezen.swagedit.openapi3.schema
 
-import com.fasterxml.jackson.dataformat.yaml.YAMLMapper
+import com.fasterxml.jackson.databind.ObjectMapper
+import com.fasterxml.jackson.dataformat.yaml.YAMLFactory
 import com.google.common.collect.Lists
+import com.reprezen.swagedit.openapi3.validation.ValidationHelper
 import java.io.File
 import java.io.FileFilter
 import java.io.FilenameFilter
@@ -13,7 +15,6 @@ import org.junit.runner.RunWith
 import org.junit.runners.Parameterized
 import org.junit.runners.Parameterized.Parameter
 import org.junit.runners.Parameterized.Parameters
-import com.reprezen.swagedit.openapi3.validation.ValidationHelper
 
 @RunWith(typeof(Parameterized))
 class SchemaValidationTest {
@@ -42,7 +43,7 @@ class SchemaValidationTest {
 	@Parameter(1)
 	var public String fileName // for test name only
 
-	val mapper = new YAMLMapper()
+	val mapper = new ObjectMapper(new YAMLFactory())
 
 	@Test
 	def public validateSpec() {

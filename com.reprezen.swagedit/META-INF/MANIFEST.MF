@@ -16,10 +16,17 @@ Require-Bundle: org.eclipse.ui,
  org.dadacoalition.yedit,
  com.github.eclipsecolortheme;resolution:=optional,
  com.reprezen.swagedit.core,
- com.google.guava;bundle-version="15.0.0"
+ com.google.guava;bundle-version="15.0.0",
+ com.fasterxml.jackson.core.jackson-annotations;bundle-version="2.5.0",
+ com.fasterxml.jackson.core.jackson-core;bundle-version="2.5.0",
+ com.fasterxml.jackson.core.jackson-databind;bundle-version="2.5.0",
+ com.fasterxml.jackson.dataformat.jackson-dataformat-yaml;bundle-version="2.5.0",
+ org.slf4j.api;bundle-version="1.7.2"
 Bundle-ActivationPolicy: lazy
 Bundle-RequiredExecutionEnvironment: JavaSE-1.7
-Bundle-ClassPath: .
+Bundle-ClassPath: .,
+ lib/swagger-core-1.5.14.jar,
+ lib/swagger-models-1.5.14.jar
 Bundle-Activator: com.reprezen.swagedit.Activator
 Export-Package: com.reprezen.swagedit,
  com.reprezen.swagedit.assist,
@@ -30,12 +37,3 @@ Export-Package: com.reprezen.swagedit,
  com.reprezen.swagedit.templates,
  com.reprezen.swagedit.wizards
 Bundle-Vendor: ModelSolv, Inc. d.b.a. RepreZen
-Import-Package: com.fasterxml.jackson.core,
- com.fasterxml.jackson.databind,
- com.fasterxml.jackson.databind.node,
- io.swagger.models,
- io.swagger.util,
- org.yaml.snakeyaml,
- org.yaml.snakeyaml.error,
- org.yaml.snakeyaml.nodes,
- org.yaml.snakeyaml.parser
