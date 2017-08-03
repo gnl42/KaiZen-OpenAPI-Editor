@@ -13,7 +13,7 @@ import com.reprezen.swagedit.core.model.Model
 
 class OpenApi3ContentAssistProcessorTest {
 
-	val processor = new OpenApi3ContentAssistProcessor(null) {
+	val processor = new OpenApi3ContentAssistProcessor(null, new OpenApi3Schema) {
 		override protected initTextMessages(Model model) { new ArrayList }
 
 		override protected getContextTypeRegistry() { null }
@@ -47,10 +47,108 @@ class OpenApi3ContentAssistProcessorTest {
 			    <1>
 		''', document)
 
-		val proposals = test.apply(processor, "1")		
+		val proposals = test.apply(processor, "1")
 		assertThat(proposals.map[(it as StyledCompletionProposal).replacementString], 
 			hasItems("_key_:")
 		)
 	}
 
+	@Test
+	def void testSchemaFormat_ForString() {
+		val document = new OpenApi3Document(new OpenApi3Schema)
+		val test = setUpContentAssistTest('''
+			components:
+			  schemas:
+			    Pet:
+			      properties:
+			        name:
+			          type: string
+			          format: <1>
+		''', document)
+		
+		val proposals = test.apply(processor, "1")
+		assertThat(proposals.map[(it as StyledCompletionProposal).replacementString], 
+			hasItems("byte", "binary", "date", "date-time", "password", "")
+		)
+	}
+	
+	@Test
+	def void testSchemaFormat_ForInteger() {
+		val document = new OpenApi3Document(new OpenApi3Schema)
+		val test = setUpContentAssistTest('''
+			components:
+			  schemas:
+			    Pet:
+			      properties:
+			        name:
+			          type: integer
+			          format: <1>
+		''', document)
+		
+		val proposals = test.apply(processor, "1")
+		assertThat(proposals.map[(it as StyledCompletionProposal).replacementString], 
+			hasItems("int32", "int64")
+		)
+	}
+
+	@Test
+	def void testSchemaFormat_ForNumber() {
+		val document = new OpenApi3Document(new OpenApi3Schema)
+		val test = setUpContentAssistTest('''
+			components:
+			  schemas:
+			    Pet:
+			      properties:
+			        name:
+			          type: number
+			          format: <1>
+		''', document)
+		
+		val proposals = test.apply(processor, "1")
+		assertThat(proposals.map[(it as StyledCompletionProposal).replacementString], 
+			hasItems("float", "double")
+		)
+	}
+
+	@Test
+	def void testSchemaFormat_ForOthers() {
+		val document = new OpenApi3Document(new OpenApi3Schema)
+		val test = setUpContentAssistTest('''
+			components:
+			  schemas:
+			    Pet:
+			      properties:
+			        name:
+			          type: boolean
+			          format: <1>
+			        name2:
+			          type: object
+			          format: <2>
+			        name2:
+			          type: array
+			          format: <3>
+			        name3:
+			          type: "null"
+			          format: <4>
+			        name4:
+			          format: <5>
+		''', document)
+
+		var proposals = test.apply(processor, "1")
+		assertThat(proposals.map[(it as StyledCompletionProposal).replacementString], hasItems())
+
+		proposals = test.apply(processor, "2")
+		assertThat(proposals.map[(it as StyledCompletionProposal).replacementString], hasItems())
+		
+		proposals = test.apply(processor, "3")
+		assertThat(proposals.map[(it as StyledCompletionProposal).replacementString], hasItems())
+		
+		proposals = test.apply(processor, "4")
+		assertThat(proposals.map[(it as StyledCompletionProposal).replacementString], hasItems())
+
+		proposals = test.apply(processor, "5")
+		assertThat(proposals.map[(it as StyledCompletionProposal).replacementString],  
+			hasItems("int32", "int64", "float", "double", "byte", "binary", "date", "date-time", "password", "")
+		)
+	}
 }

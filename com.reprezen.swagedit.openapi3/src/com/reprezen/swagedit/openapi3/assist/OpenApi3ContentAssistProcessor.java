@@ -17,17 +17,25 @@ import org.eclipse.jface.text.templates.persistence.TemplateStore;
 import com.reprezen.swagedit.core.assist.JsonContentAssistProcessor;
 import com.reprezen.swagedit.core.assist.JsonProposalProvider;
 import com.reprezen.swagedit.core.model.Model;
+import com.reprezen.swagedit.core.schema.CompositeSchema;
 import com.reprezen.swagedit.openapi3.Activator;
 import com.reprezen.swagedit.openapi3.assist.ext.CallbacksContentAssistExt;
+import com.reprezen.swagedit.openapi3.assist.ext.SchemaFormatContentAssistExt;
 import com.reprezen.swagedit.openapi3.assist.ext.SchemaTypeContentAssistExt;
 import com.reprezen.swagedit.openapi3.templates.OpenApi3ContextType;
 
 public class OpenApi3ContentAssistProcessor extends JsonContentAssistProcessor {
 
 	public OpenApi3ContentAssistProcessor(ContentAssistant ca) {
-        super(ca, new JsonProposalProvider(new CallbacksContentAssistExt(), new SchemaTypeContentAssistExt()),
+        super(ca, new JsonProposalProvider(new CallbacksContentAssistExt(), new SchemaTypeContentAssistExt(),
+                new SchemaFormatContentAssistExt()),
                 new OpenApi3ReferenceProposalProvider());
 	}
+
+    public OpenApi3ContentAssistProcessor(ContentAssistant ca, CompositeSchema schema) {
+        super(ca, new JsonProposalProvider(new CallbacksContentAssistExt(), new SchemaTypeContentAssistExt(),
+                new SchemaFormatContentAssistExt()), new OpenApi3ReferenceProposalProvider(schema));
+    }
 
 	@Override
 	protected TemplateStore getTemplateStore() {

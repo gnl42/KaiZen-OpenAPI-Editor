@@ -24,7 +24,11 @@ import com.reprezen.swagedit.openapi3.editor.OpenApi3ContentDescriber;
 public class OpenApi3ReferenceProposalProvider extends JsonReferenceProposalProvider {
 
     public OpenApi3ReferenceProposalProvider() {
-        super(new OpenApi3ContextTypeCollection(Activator.getDefault().getSchema()), OpenApi3ContentDescriber.CONTENT_TYPE_ID);
+        this(Activator.getDefault().getSchema());
+    }
+
+    public OpenApi3ReferenceProposalProvider(CompositeSchema schema) {
+        super(new OpenApi3ContextTypeCollection(schema), OpenApi3ContentDescriber.CONTENT_TYPE_ID);
     }
 
     private static final String COMPONENT_NAME_REGEX = "[\\w\\.\\-]+";
