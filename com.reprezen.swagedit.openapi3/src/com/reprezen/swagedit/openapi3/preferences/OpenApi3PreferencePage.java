@@ -16,7 +16,7 @@ import com.reprezen.swagedit.openapi3.Activator;
 public class OpenApi3PreferencePage extends KaizenPreferencePage {
 
     public OpenApi3PreferencePage() {
-        setDescription("KaiZen OpenAPI Editor preferences for OpenAPI v3 (experimental)");
+        setDescription("KaiZen OpenAPI Editor preferences for OpenAPI v3");
         setPreferenceStore(Activator.getDefault().getPreferenceStore());
     }
 
