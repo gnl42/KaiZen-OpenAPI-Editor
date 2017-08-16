@@ -33,7 +33,7 @@ public class OpenApi3Validator extends Validator {
         validateOperationIdReferences(model, node, errors);
         validateOperationRefReferences(model, node, errors);
         validateSecuritySchemeReferences(model, node, errors);
-        validateParamters(model, node, errors);
+        validateParameters(model, node, errors);
     }
 
     private void validateSecuritySchemeReferences(Model model, AbstractNode node, Set<SwaggerError> errors) {
@@ -88,7 +88,7 @@ public class OpenApi3Validator extends Validator {
         }
     }
 
-    protected void validateParamters(Model model, AbstractNode node, Set<SwaggerError> errors) {
+    protected void validateParameters(Model model, AbstractNode node, Set<SwaggerError> errors) {
         final JsonPointer pointer = JsonPointer.compile("/definitions/parameterOrReference");
 
         if (node != null && node.getType() != null && pointer.equals(node.getType().getPointer())) {
