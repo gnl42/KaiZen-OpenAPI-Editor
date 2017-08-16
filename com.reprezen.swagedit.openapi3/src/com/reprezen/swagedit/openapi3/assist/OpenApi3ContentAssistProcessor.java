@@ -20,6 +20,7 @@ import com.reprezen.swagedit.core.model.Model;
 import com.reprezen.swagedit.core.schema.CompositeSchema;
 import com.reprezen.swagedit.openapi3.Activator;
 import com.reprezen.swagedit.openapi3.assist.ext.CallbacksContentAssistExt;
+import com.reprezen.swagedit.openapi3.assist.ext.ParameterInContentAssistExt;
 import com.reprezen.swagedit.openapi3.assist.ext.SchemaFormatContentAssistExt;
 import com.reprezen.swagedit.openapi3.assist.ext.SchemaTypeContentAssistExt;
 import com.reprezen.swagedit.openapi3.templates.OpenApi3ContextType;
@@ -27,8 +28,11 @@ import com.reprezen.swagedit.openapi3.templates.OpenApi3ContextType;
 public class OpenApi3ContentAssistProcessor extends JsonContentAssistProcessor {
 
 	public OpenApi3ContentAssistProcessor(ContentAssistant ca) {
-        super(ca, new JsonProposalProvider(new CallbacksContentAssistExt(), new SchemaTypeContentAssistExt(),
-                new SchemaFormatContentAssistExt()),
+        super(ca, new JsonProposalProvider( //
+                new CallbacksContentAssistExt(), //
+                new SchemaTypeContentAssistExt(), //
+                new SchemaFormatContentAssistExt(), //
+                new ParameterInContentAssistExt()),
                 new OpenApi3ReferenceProposalProvider());
 	}
 

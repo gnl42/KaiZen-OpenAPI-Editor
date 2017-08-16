@@ -26,7 +26,7 @@ class ValidatorTest {
 	val factory = new JsonReferenceFactory() {
 		override create(AbstractNode node) {
 			val reference = super.create(node)
-			if (reference != null) {
+			if (reference !== null) {
 				reference.documentManager = docManager
 			}
 			reference
@@ -34,7 +34,7 @@ class ValidatorTest {
 
 		override createSimpleReference(URI baseURI, AbstractNode valueNode) {
 			val reference = super.createSimpleReference(baseURI, valueNode)
-			if (reference != null) {
+			if (reference !== null) {
 				reference.documentManager = docManager
 			}
 			reference
@@ -408,5 +408,63 @@ class ValidatorTest {
 				new SwaggerError(10, IMarker.SEVERITY_ERROR, Messages.error_invalid_reference_type)		
 			)
 		)
+	}
+
+	@Test
+	def void testValidationParameterIn_ShouldFail() {
+		val content = '''
+			openapi: 3.0.0
+			info: 
+			  title: Example
+			  version: 1.0.0
+			paths:
+			  /:
+			    post:
+			      parameters:
+			        - name: foo
+			          in: headerzzz
+			          required: true
+			          schema:
+			            type: string
+			      responses:
+			        '200':
+			          description: Ok
+		'''
+
+		document.set(content)
+		val errors = validator.validate(document, null as URI)
+
+		assertEquals(1, errors.size())
+		assertThat(errors, hasItems(
+				new SwaggerError(10, IMarker.SEVERITY_ERROR, Messages.error_invalid_parameter_location)		
+			)
+		)
+	}
+
+	@Test
+	def void testValidationParameterIn() {
+		val content = '''
+			openapi: 3.0.0
+			info: 
+			  title: Example
+			  version: 1.0.0
+			paths:
+			  /:
+			    post:
+			      parameters:
+			        - name: foo
+			          in: query
+			          required: true
+			          schema:
+			            type: string
+			      responses:
+			        '200':
+			          description: Ok
+		'''
+
+		document.set(content)
+		val errors = validator.validate(document, null as URI)
+
+		assertEquals(0, errors.size())		
 	}
 }
