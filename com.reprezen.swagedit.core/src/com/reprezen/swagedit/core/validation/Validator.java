@@ -241,7 +241,8 @@ public class Validator {
         // object
         if (node.get("properties") != null) {
             // bypass this node, it is a property whose name is `properties`
-            if (node.getProperty().equals("properties")) {
+
+            if ("properties".equals(node.getProperty())) {
                 return;
             }
 
