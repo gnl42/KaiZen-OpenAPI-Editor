@@ -18,6 +18,7 @@ import com.reprezen.swagedit.Activator;
 import com.reprezen.swagedit.assist.ext.MediaTypeContentAssistExt;
 import com.reprezen.swagedit.core.assist.JsonContentAssistProcessor;
 import com.reprezen.swagedit.core.assist.JsonProposalProvider;
+import com.reprezen.swagedit.core.model.Model;
 import com.reprezen.swagedit.templates.SwaggerContextType;
 
 /**
@@ -41,7 +42,7 @@ public class SwaggerContentAssistProcessor extends JsonContentAssistProcessor {
 	}
 
 	@Override
-	protected String getContextTypeId(String path) {
+	protected String getContextTypeId(Model model, String path) {
 		return SwaggerContextType.getContextType(path);
 	}
 

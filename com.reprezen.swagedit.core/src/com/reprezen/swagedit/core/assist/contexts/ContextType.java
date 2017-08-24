@@ -1,3 +1,13 @@
+/*******************************************************************************
+ * Copyright (c) 2016 ModelSolv, Inc. and others.
+ * All rights reserved. This program and the accompanying materials
+ * are made available under the terms of the Eclipse Public License v1.0
+ * which accompanies this distribution, and is available at
+ * http://www.eclipse.org/legal/epl-v10.html
+ *
+ * Contributors:
+ *    ModelSolv, Inc. - initial API and implementation and/or initial documentation
+ *******************************************************************************/
 package com.reprezen.swagedit.core.assist.contexts;
 
 import java.util.Collection;
@@ -11,41 +21,39 @@ import com.fasterxml.jackson.databind.JsonNode;
 import com.google.common.collect.Lists;
 import com.reprezen.swagedit.core.assist.Proposal;
 import com.reprezen.swagedit.core.editor.JsonDocument;
+import com.reprezen.swagedit.core.model.Model;
 import com.reprezen.swagedit.core.utils.URLUtils;
 import com.reprezen.swagedit.core.validation.ValidationUtil;
 
 /**
  * Represents the different contexts for which a JSON reference may be computed. <br/>
- * The context type is determined by the pointer (path) on which the completion proposal has been activated.
  */
-public class ContextType {
-    public static final ContextType UNKNOWN = new ContextType(null, "", null);
+public abstract class ContextType {
+    public static final ContextType UNKNOWN = new ContextType(null, "") {
+
+        @Override
+        public boolean canProvideProposal(Model model, JsonPointer pointer) {
+            return false;
+        }
+    };
 
     private final String value;
     private final String label;
-    private final String regex;
     private final boolean isLocalOnly;
 
-    public ContextType(String value, String label, String regex) {
+    public ContextType(String value, String label) {
         this.value = value;
         this.label = label;
-        this.regex = regex;
         this.isLocalOnly = false;
     }
 
-    public ContextType(String value, String label, String regex, boolean isLocalOnly) {
+    public ContextType(String value, String label,  boolean isLocalOnly) {
         this.value = value;
         this.label = label;
-        this.regex = regex;
         this.isLocalOnly = isLocalOnly;
     }
     
-    public boolean canProvideProposal(JsonPointer pointer) {
-        if (pointer != null && regex != null) {
-            return pointer.toString().matches(regex);
-        }
-        return false;
-    }
+    public abstract boolean canProvideProposal(Model model, JsonPointer pointer);
 
     public String value() {
         return value;
@@ -58,7 +66,7 @@ public class ContextType {
     public boolean isLocalOnly() {
         return isLocalOnly;
     }
-
+    
     public Collection<Proposal> collectProposals(JsonDocument document, IPath path) {
         return collectProposals(document.asJson(), path);
     }

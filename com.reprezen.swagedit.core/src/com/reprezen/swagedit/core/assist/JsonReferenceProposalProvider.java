@@ -22,6 +22,7 @@ import com.reprezen.swagedit.core.assist.contexts.ContextType;
 import com.reprezen.swagedit.core.assist.contexts.ContextTypeCollection;
 import com.reprezen.swagedit.core.editor.JsonDocument;
 import com.reprezen.swagedit.core.json.references.JsonDocumentManager;
+import com.reprezen.swagedit.core.model.Model;
 import com.reprezen.swagedit.core.utils.DocumentUtils;
 import com.reprezen.swagedit.core.utils.SwaggerFileFinder;
 import com.reprezen.swagedit.core.utils.SwaggerFileFinder.Scope;
@@ -48,8 +49,8 @@ public class JsonReferenceProposalProvider {
         return contextTypes;
     }
 
-    public boolean canProvideProposal(JsonPointer pointer) {
-        return pointer != null && contextTypes.get(pointer) != ContextType.UNKNOWN;
+    public boolean canProvideProposal(Model model, JsonPointer pointer) {
+        return pointer != null && contextTypes.get(model, pointer) != ContextType.UNKNOWN;
     }
 
     /**
@@ -69,11 +70,11 @@ public class JsonReferenceProposalProvider {
      * @return proposals
      */
     public Collection<Proposal> getProposals(JsonPointer pointer, JsonDocument document, Scope scope) {
-        final ContextType type = contextTypes.get(pointer);
+        final ContextType type = contextTypes.get(document.getModel(), pointer);
         final IFile currentFile = getActiveFile();
         final IPath basePath = currentFile.getParent().getFullPath();
         final List<Proposal> proposals = Lists.newArrayList();
-
+        
         if (scope == Scope.LOCAL) {
             proposals.addAll(type.collectProposals(document, null));
         } else if (!type.isLocalOnly()) {

@@ -106,7 +106,7 @@ public class Validator {
         try {
             jsonContent = document.asJson();
         } catch (Exception e) {
-            YEditLog.logException(e);
+            jsonContent = null;
         }
 
         if (jsonContent != null) {
@@ -239,7 +239,8 @@ public class Validator {
         // object
         if (node.get("properties") != null) {
             // bypass this node, it is a property whose name is `properties`
-            if (node.getProperty().equals("properties")) {
+
+            if ("properties".equals(node.getProperty())) {
                 return;
             }
 

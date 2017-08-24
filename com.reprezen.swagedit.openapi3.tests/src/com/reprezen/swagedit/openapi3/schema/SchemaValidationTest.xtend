@@ -1,32 +1,25 @@
 package com.reprezen.swagedit.openapi3.schema
 
-import com.fasterxml.jackson.databind.JsonNode
-import com.fasterxml.jackson.dataformat.yaml.YAMLMapper
+import com.fasterxml.jackson.databind.ObjectMapper
+import com.fasterxml.jackson.dataformat.yaml.YAMLFactory
 import com.google.common.collect.Lists
-import com.google.common.collect.Maps
-import com.reprezen.swagedit.core.json.references.JsonReferenceFactory
-import com.reprezen.swagedit.core.json.references.JsonReferenceValidator
-import com.reprezen.swagedit.core.validation.ErrorProcessor
-import com.reprezen.swagedit.core.validation.SwaggerError
-import com.reprezen.swagedit.core.validation.Validator
+import com.reprezen.swagedit.openapi3.validation.ValidationHelper
 import java.io.File
+import java.io.FileFilter
 import java.io.FilenameFilter
 import java.nio.file.Paths
 import java.util.Collection
-import java.util.Map
-import java.util.Set
+import java.util.List
 import org.junit.Test
 import org.junit.runner.RunWith
 import org.junit.runners.Parameterized
 import org.junit.runners.Parameterized.Parameter
 import org.junit.runners.Parameterized.Parameters
 
-import static org.junit.Assert.*
-import java.util.List
-import java.io.FileFilter
-
 @RunWith(typeof(Parameterized))
 class SchemaValidationTest {
+	
+	extension ValidationHelper validationHelper = new ValidationHelper
 
 	@Parameters(name = "{index}: {1}")
 	def static Collection<Object[]> data() {
@@ -50,38 +43,20 @@ class SchemaValidationTest {
 	@Parameter(1)
 	var public String fileName // for test name only
 
-	val mapper = new YAMLMapper()
+	val mapper = new ObjectMapper(new YAMLFactory())
 
 	@Test
 	def public validateSpec() {
-		validate(specFile)
+		validateFile(specFile)
 	}
 
-	def protected void validate(File specFile) {
+	def protected void validateFile(File specFile) {
 		validate(mapper.readTree(specFile))
 	}
 
-	def protected void validate(JsonNode documentAsJson) {
-		val JsonNode schemaAsJson = getSchema().asJson()
-		val ErrorProcessor processor = new ErrorProcessor(null, null) {
-			override protected Set<SwaggerError> fromNode(JsonNode error, int indent) {
-				fail('''JSON Schema validation error: «error.asText()»''')
-				return super.fromNode(error, indent)
-			}
-		}
-		val Map<String, JsonNode> preloadedSchemas = Maps.newHashMap();
-		preloadedSchemas.put("http://openapis.org/v3/schema.json", getSchema().getRootType().asJson());
-		new Validator(new JsonReferenceValidator(new JsonReferenceFactory()), preloadedSchemas).
-			validateAgainstSchema(processor, schemaAsJson, documentAsJson)
-	}
-	
-	def protected getSchema() {
-		return new OpenApi3Schema();
-	}
-	
-	def protected static getAllFolders(File dir, List<File> acc) {
+	def protected static void getAllFolders(File dir, List<File> acc) {
 		if (!dir.isDirectory) {
-			return acc;
+			return;
 		}
 		acc.add(dir);
 		val nested = dir.listFiles(new FileFilter() {
@@ -92,6 +67,6 @@ class SchemaValidationTest {
 			
 		})
 		nested.forEach[getAllFolders(it, acc)]
-		return acc;
+		return;
 	}
 }

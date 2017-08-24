@@ -15,17 +15,18 @@ paths:
               schema:
                 type: array
                 items:
-                  #KZOE-ref name="schema in content array", value="components/schemas"
+                  #KZOE-template name="schema in a content array", value="schema"
                   $ref: '#/components/schemas/StringToModelMappingObject'
             '*/*' :
                schema: 
-                 #KZOE-ref name="schema in content", value="components/schemas"
+                 #KZOE-template name="schema in schema", value="schema"
                  $ref: "#/components/schemas/SimpleObject"
           
 components:
   schemas:
-  
+    #KZOE-template name="named schema in components", value="schemas"
     SimpleObject:
+      #KZOE-template name="schema in a named schema", value="schema"
       type: object
       required:
       - name
@@ -33,7 +34,7 @@ components:
         name:
           type: string
         address:
-          #KZOE-ref name="schema in properties", value="components/schemas"
+          #KZOE-template name="schema properties", value="schema"
           $ref: "#/components/schemas/Pet"
         age:
           type: integer
@@ -43,12 +44,12 @@ components:
     StringToModelMappingObject:
       type: object
       additionalProperties:
-        #KZOE-ref name="schema in additionalProperties", value="components/schemas"
+        #KZOE-template name="schema inadditionalProperties", value="schema"
         $ref: "#/components/schemas/Dog"
         
     ExtendedErrorModel:
       allOf:
-        #KZOE-ref name="schema in allOf", value="components/schemas" kzoe-arrayItem
+      #KZOE-template name="schema in allOf", value="schema" kzoe-arrayItem
       - $ref: '#/components/schemas/ErrorModel'
       - type: object
         required:
@@ -60,7 +61,7 @@ components:
     WithAnyOf:  ## 
       description: A representation of a cat
       anyOf:
-        #KZOE-ref name="schema in anyOf", value="components/schemas" kzoe-arrayItem
+      #KZOE-template name="schema in anyOf", value="schema" kzoe-arrayItem
       - $ref: '#/components/schemas/Pet'
       - type: object
         properties:
@@ -81,13 +82,13 @@ components:
       - type: object
         properties:
           huntingSkill: 
-            #KZOE-ref name="schema in anyOf 2", value="components/schemas"
+            #KZOE-template name="schema in anyOf properties", value="schema"
             $ref: "#/components/schemas/SimpleObject"
                 
     # Discrinimator Object
     MyResponseType:
       oneOf:
-        #KZOE-ref name="schema in oneOf", value="components/schemas" kzoe-arrayItem
+        #KZOE-template name="schema in oneOf", value="schema" kzoe-arrayItem
         - $ref: '#/components/schemas/Cat'
         - $ref: '#/components/schemas/Dog'
         - $ref: '#/components/schemas/Lizard'
@@ -98,7 +99,7 @@ components:
     SchemaItems:
       type: array
       items:
-        #KZOE-ref name="schema in items", value="components/schemas"
+        #KZOE-template name="schema in items", value="schema"
         $ref: "#/components/schemas/SimpleObject"
 
   parameters:
@@ -108,14 +109,14 @@ components:
       description: username to fetch
       required: true
       schema:
-        #KZOE-ref name="schema in parameter", value="components/schemas"
+        #KZOE-template name="schema in parameter", value="schema"
         $ref: "#/components/schemas/SimpleObject"
            
   headers:
     X-Rate-Limit-Reset:
       description: The number of seconds left in the current period
       schema:
-        #KZOE-ref name="schema in header", value="components/schemas"
+        #KZOE-template name="schema in header", value="schema"
         $ref: "#/components/schemas/SimpleObject"    
                      
   

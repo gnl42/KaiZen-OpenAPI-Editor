@@ -40,7 +40,7 @@
             class="com.reprezen.swagedit.openapi3.editor.wizard.NewOpenApiV3SpecWizard"
             icon="icons/OpenAPI_32.png"
             id="com.reprezen.swagedit.openapi3.editor.wizard.NewOpenApiV3SpecWizard"
-            name="OpenAPI v3 Spec (experimental)">
+            name="OpenAPI v3 Spec">
             <description>Create an OpenAPI v3 spec</description>
       </wizard>
    </extension>
@@ -107,61 +107,6 @@
       <include
             file="resources/templates.xml">
       </include>
-      <contextType
-            class="com.reprezen.swagedit.openapi3.templates.OpenApi3ContextType$RootContextType"
-            id="com.reprezen.swagedit.openapi3.templates.root"
-            name="Root Context">
-      </contextType>
-      <contextType
-            class="com.reprezen.swagedit.openapi3.templates.OpenApi3ContextType$ContactContextType"
-            id="com.reprezen.swagedit.openapi3.templates.info.contact"
-            name="Contact Context">
-      </contextType>
-      <contextType
-            class="com.reprezen.swagedit.openapi3.templates.OpenApi3ContextType$PathsContextType"
-            id="com.reprezen.swagedit.openapi3.templates.paths"
-            name="Paths Context">
-      </contextType>
-      <contextType
-            class="com.reprezen.swagedit.openapi3.templates.OpenApi3ContextType$PathItemContextType"
-            id="com.reprezen.swagedit.openapi3.templates.path_item"
-            name="Path Item Context">
-      </contextType>
-      <contextType
-            class="com.reprezen.swagedit.openapi3.templates.OpenApi3ContextType$SchemaContextType"
-            id="com.reprezen.swagedit.openapi3.templates.components.schemas"
-            name="Schema Context">
-      </contextType>
-      <contextType
-            class="com.reprezen.swagedit.openapi3.templates.OpenApi3ContextType$ParameterObjectContextType"
-            id="com.reprezen.swagedit.openapi3.templates.parameter_object"
-            name="Parameter Object Context">
-      </contextType>
-      <contextType
-            class="com.reprezen.swagedit.openapi3.templates.OpenApi3ContextType$ResponseObjectContextType"
-            id="com.reprezen.swagedit.openapi3.templates.responses"
-            name="Response Object Context">
-      </contextType>
-      <contextType
-            class="com.reprezen.swagedit.openapi3.templates.OpenApi3ContextType$ResponseContentContextType"
-            id="com.reprezen.swagedit.openapi3.templates.response"
-            name="Response Context">
-      </contextType>
-      <contextType
-            class="com.reprezen.swagedit.openapi3.templates.OpenApi3ContextType$ComponentsObjectContextType"
-            id="com.reprezen.swagedit.openapi3.templates.components"
-            name="Components Context">
-      </contextType>
-      <contextType
-            class="com.reprezen.swagedit.openapi3.templates.OpenApi3ContextType$CallbacksObjectContextType"
-            id="com.reprezen.swagedit.openapi3.templates.callbacks"
-            name="Callbacks Context">            
-      </contextType>      
-      <contextType
-            class="com.reprezen.swagedit.openapi3.templates.OpenApi3ContextType$RequestBodyObjectContextType"
-            id="com.reprezen.swagedit.openapi3.templates.requestBody"
-            name="RequestBody Context">            
-      </contextType>      
    </extension>
 
 </plugin>

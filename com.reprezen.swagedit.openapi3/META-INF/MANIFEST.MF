@@ -14,12 +14,15 @@ Require-Bundle: org.eclipse.ui,
  org.eclipse.ui.ide,
  org.eclipse.core.resources,
  com.github.eclipsecolortheme;resolution:=optional,
- com.google.guava;bundle-version="15.0.0"
+ com.google.guava;bundle-version="15.0.0",
+ com.fasterxml.jackson.core.jackson-annotations;bundle-version="2.5.0",
+ com.fasterxml.jackson.core.jackson-core;bundle-version="2.5.0",
+ com.fasterxml.jackson.core.jackson-databind;bundle-version="2.5.0",
+ com.fasterxml.jackson.dataformat.jackson-dataformat-yaml;bundle-version="2.5.0",
+ org.yaml.snakeyaml;bundle-version="1.14.0",
+ org.slf4j.api;bundle-version="1.7.2"
 Bundle-RequiredExecutionEnvironment: JavaSE-1.7
 Bundle-ActivationPolicy: lazy
-Import-Package: com.fasterxml.jackson.core,
- com.fasterxml.jackson.databind,
- io.swagger.util
 Export-Package: com.reprezen.swagedit.openapi3,
  com.reprezen.swagedit.openapi3.assist,
  com.reprezen.swagedit.openapi3.assist.contexts,
@@ -32,3 +35,4 @@ Export-Package: com.reprezen.swagedit.openapi3,
  com.reprezen.swagedit.openapi3.schema,
  com.reprezen.swagedit.openapi3.templates,
  com.reprezen.swagedit.openapi3.validation
+Bundle-ClassPath: .

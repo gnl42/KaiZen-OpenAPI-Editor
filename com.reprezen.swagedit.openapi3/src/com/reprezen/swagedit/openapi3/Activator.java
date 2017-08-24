@@ -4,8 +4,8 @@ import java.io.IOException;
 
 import org.dadacoalition.yedit.YEditLog;
 import org.eclipse.jface.text.templates.ContextTypeRegistry;
+import org.eclipse.jface.text.templates.TemplateContextType;
 import org.eclipse.jface.text.templates.persistence.TemplateStore;
-import org.eclipse.ui.editors.text.templates.ContributionContextTypeRegistry;
 import org.eclipse.ui.editors.text.templates.ContributionTemplateStore;
 import org.eclipse.ui.plugin.AbstractUIPlugin;
 import org.osgi.framework.BundleContext;
@@ -26,7 +26,7 @@ public class Activator extends AbstractUIPlugin {
 	private static Activator plugin;
 
 	private OpenApi3Schema schema;
-    private ContributionContextTypeRegistry contextTypeRegistry;
+    private ContextTypeRegistry contextTypeRegistry;
     private ContributionTemplateStore templateStore;
 	
 	/**
@@ -71,8 +71,8 @@ public class Activator extends AbstractUIPlugin {
 
     public ContextTypeRegistry getContextTypeRegistry() {
         if (contextTypeRegistry == null) {
-            contextTypeRegistry = new ContributionContextTypeRegistry();
-            for (String contextType : OpenApi3ContextType.allContextTypeIds()) {
+            contextTypeRegistry = new ContextTypeRegistry();
+            for (TemplateContextType contextType : OpenApi3ContextType.allContextTypes()) {
                 contextTypeRegistry.addContextType(contextType);
             }
         }

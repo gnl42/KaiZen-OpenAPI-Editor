@@ -22,35 +22,50 @@ import org.junit.runners.Parameterized.Parameters
 import static org.junit.Assert.*
 import com.fasterxml.jackson.core.JsonPointer
 import com.reprezen.swagedit.openapi3.assist.OpenApi3ReferenceProposalProvider.OpenApi3ContextTypeCollection
+import org.junit.runners.Parameterized.Parameter
+import java.io.File
+
+import static com.reprezen.swagedit.openapi3.assist.CodeAssistHelper.*
 
 @RunWith(typeof(Parameterized))
-class ReferenceContextTest extends CodeAssistContextTest{
+class ReferenceContextTest {
 
 	val static KZOEref = "#KZOE-ref"
-	val arrayItemMarker = "kzoe-arrayItem"
+	
+	@Parameter
+	var public File specFile
+
+	@Parameter(1)
+	var public String fileName // for test name only
+	
+	@Parameter(2)
+	var public int offset // for test name only
+	
+	@Parameter(3)
+	var public String testName // for test name only
+	
 
 	val allContextTypes = new OpenApi3ContextTypeCollection(new OpenApi3Schema)
 
 	@Parameters(name="{index}: {1} - {3}")
 	def static Collection<Object[]> data() {
 		val resourcesDir = Paths.get("resources", "code-assist", "references").toFile();
-		return data(resourcesDir, KZOEref)
+		return new CodeAssistHelper().extractTests(resourcesDir, KZOEref).map[#[it.file, it.file.name, it.offset, it.name] as Object[]]
 	}
 
 	@Test
 	def void test_reference_context() {
-		val document = new OpenApi3Document(new OpenApi3Schema())
-		val text = specFile.fileContents()
-		document.set(text)
+		val document = createOpenApi3Document(specFile) 
 
 		val region = document.getLineInformationOfOffset(offset)
 		val line = document.getLineOfOffset(offset)
 		val annotationLine = document.get(region.offset, region.getLength())
 
 		val path = document.getModel(offset).getPath(line, document.getColumnOfOffset(line, region))
-		val isArrayItem = annotationLine.contains(" " + arrayItemMarker + " ")
+		val isArrayItem = annotationLine.contains(" " + arrayItemMarker)
 		val maybeArrayPrefix = if (isArrayItem) "/0" else ""
-		val contextType = allContextTypes.get(path.append(JsonPointer.compile(maybeArrayPrefix + "/$ref")))
+		val contextType = allContextTypes.get(document.getModel(), path.append(JsonPointer.compile(maybeArrayPrefix + "/$ref")))
+
 
 		val matcher = refValuePattern.matcher(annotationLine)
 		if (matcher.matches) {

@@ -29,14 +29,14 @@ paths:
               schema:
                 type: integer
             X-Rate-Limit-Reset:
-              #KZOE-ref name="header in response", value="components/headers"
+              #KZOE-template name="header in response", value="header"
               $ref: "#/components/headers/X-Rate-Limit-Reset"   
 
 components: 
   headers:
-  
+    #KZOE-template name="headers in components/headers", value="headers"
     refed:
-      #KZOE-ref name="header in components/headers", value="components/headers"
+      #KZOE-template name="header in components/headers", value="header"
       $ref: "#/components/headers/X-Rate-Limit-Reset"
 
     X-Rate-Limit-Reset:
@@ -59,8 +59,5 @@ components:
               contentType: image/png, image/jpeg
               headers:
                 X-Rate-Limit-Limit:
-                  #KZOE-ref name="header in encoding", value="components/headers"
+                   #KZOE-template name="header in encoding", value="header"
                   $ref: "#/components/headers/X-Rate-Limit-Reset"
-                  
-
- 

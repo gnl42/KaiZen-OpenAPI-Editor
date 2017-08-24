@@ -24,7 +24,9 @@ paths:
     put:
       description: bla
       operationId: opId
-      responses: {}
+      responses:
+        201:
+          description: Null response
       requestBody:  
         description: description
         content: 

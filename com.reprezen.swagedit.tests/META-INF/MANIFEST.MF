@@ -9,7 +9,8 @@ Require-Bundle: org.junit;bundle-version="4.0.0",
  com.google.guava,
  org.eclipse.xtext.xbase.lib,
  org.eclipse.xtend.lib,
- org.eclipse.xtend.lib.macro
+ org.eclipse.xtend.lib.macro,
+ org.yaml.snakeyaml;bundle-version="1.14.0"
 Bundle-ClassPath: .,
  lib/mockito-core-1.10.19.jar,
  lib/objenesis-2.1.jar

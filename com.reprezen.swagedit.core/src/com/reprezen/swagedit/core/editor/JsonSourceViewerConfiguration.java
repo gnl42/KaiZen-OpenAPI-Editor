@@ -40,6 +40,7 @@ import org.eclipse.swt.widgets.Shell;
 import com.reprezen.swagedit.core.assist.JsonContentAssistProcessor;
 import com.reprezen.swagedit.core.assist.JsonQuickAssistProcessor;
 import com.reprezen.swagedit.core.editor.outline.QuickOutline;
+import com.reprezen.swagedit.core.model.Model;
 import com.reprezen.swagedit.core.quickfix.QuickFixer;
 import com.reprezen.swagedit.core.schema.CompositeSchema;
 
@@ -92,7 +93,7 @@ public abstract class JsonSourceViewerConfiguration extends YEditSourceViewerCon
 			}
 
 			@Override
-			protected String getContextTypeId(String path) {
+			protected String getContextTypeId(Model model, String path) {
 				return null;
 			}};
     }
