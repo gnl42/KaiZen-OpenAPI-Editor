@@ -14,6 +14,8 @@ import com.google.common.collect.Maps;
 import com.reprezen.swagedit.core.assist.JsonContentAssistProcessor;
 import com.reprezen.swagedit.core.editor.JsonEditor;
 import com.reprezen.swagedit.core.editor.JsonSourceViewerConfiguration;
+import com.reprezen.swagedit.core.hyperlinks.DefinitionHyperlinkDetector;
+import com.reprezen.swagedit.core.hyperlinks.PathParamHyperlinkDetector;
 import com.reprezen.swagedit.core.json.references.JsonReferenceFactory;
 import com.reprezen.swagedit.core.json.references.JsonReferenceValidator;
 import com.reprezen.swagedit.core.schema.CompositeSchema;
@@ -51,9 +53,12 @@ public class OpenApi3Editor extends JsonEditor {
 
 		@Override
 		public IHyperlinkDetector[] getHyperlinkDetectors(ISourceViewer sourceViewer) {
-			return new IHyperlinkDetector[] { new URLHyperlinkDetector(), new OpenApi3ReferenceHyperlinkDetector() };
+            return new IHyperlinkDetector[] { new URLHyperlinkDetector(), //
+                    new PathParamHyperlinkDetector(), //
+                    new DefinitionHyperlinkDetector(), //
+                    new OpenApi3ReferenceHyperlinkDetector() };
 		}
-		
+
 		@Override
 		protected CompositeSchema getSchema() {
 			return Activator.getDefault().getSchema();
