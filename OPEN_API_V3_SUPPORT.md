@@ -18,7 +18,7 @@ We are really pleased to inform you that KaiZen OpenAPI Editor now fully support
 Please use the *OpenAPI v3 Spec* wizard from the *KaiZen OpenAPI Editor* category:
 
 
-<img src="http://i.imgur.com/pTOQH8z.png" alt="File>New>Other" width="300">  <img src="http://i.imgur.com/4uKKvF0.png" alt="KaiZen OpenAPI Editor Category" width="400">
+<img src="http://i.imgur.com/pTOQH8z.png" alt="File>New>Other" width="300">  <img src="https://cdn2.hubspot.net/hubfs/597611/Assets_Swagger/NewOpenAPI3Doc.png.png" alt="KaiZen OpenAPI Editor Category" width="400">
 
 ## The editor for Swagger v2 uses an underlying JSON Schema. There's no official JSON Schema for OpenAPI v3, so what are you using?
 We use a modification of the JSON Schema provided by [googleapis/gnostic](https://github.com/googleapis/gnostic). We use the [SwagEdit branch](https://github.com/RepreZen/gnostic/tree/SwagEdit) to generate our JSON Schema. Thanks to @timburks and @MikeRalphson for the contribution!
