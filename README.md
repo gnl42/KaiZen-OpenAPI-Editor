@@ -2,15 +2,15 @@
 
 # KaiZen OpenAPI Editor for Eclipse
 
-KaiZen OpenAPI Editor is an Eclipse editor for the [Swagger](http://swagger.io) API Description Language, now known as the [OpenAPI Specification](http://openapis.org). The editor supports Swagger-OpenAPI version 2.0, with experimental support for the OpenAPI 3.0 draft specification.  KaiZen OpenAPI Editor is available on [Eclipse Marketplace](https://marketplace.eclipse.org/content/kaizen-openapi-editor).
+_KaiZen OpenAPI Editor_ is an Eclipse editor for the [industry standard API description language](http://openapis.org), formerly known as [Swagger](http://swagger.io). It now supports both [Swagger-OpenAPI version 2.0](https://github.com/OAI/OpenAPI-Specification/blob/master/versions/2.0.md) and [OpenAPI version 3.0](https://github.com/OAI/OpenAPI-Specification/blob/master/versions/3.0.0.md).  KaiZen OpenAPI Editor is available on [Eclipse Marketplace](https://marketplace.eclipse.org/content/kaizen-openapi-editor).
 
 KaiZen Editor, formerly known as SwagEdit, was developed for [RepreZen API Studio](http://reprezen.com/swagger-tools), a comprehensive solution for API modeling, documentation, visualization, testing and code generation, built on Eclipse.
 
 We welcome your suggestions and contributions!
 
-## NEW! OpenAPI 3.0 Editing (Experimental)
+## NEW! OpenAPI 3.0 Editing
 
-KaiZen OpenAPI Editor now features experimental support for the current [OpenAPI 3.0.0-rc2](https://github.com/RepreZen/KaiZen-OpenAPI-Editor/edit/master/README.md) draft specification.<br/>[See here for details.](https://github.com/RepreZen/KaiZen-OpenAPI-Editor/blob/master/OPEN_API_V3_SUPPORT.md)
+KaiZen OpenAPI Editor now features full support for the [OpenAPI version 3.0](https://github.com/OAI/OpenAPI-Specification/blob/master/versions/3.0.0.md) specification. [See here for further details.](https://github.com/RepreZen/KaiZen-OpenAPI-Editor/blob/master/OPEN_API_V3_SUPPORT.md)
  
 ## Feature Highlights
 
