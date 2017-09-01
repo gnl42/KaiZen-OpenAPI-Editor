@@ -1,5 +1,5 @@
-# NEW! OpenAPI 3.0 Editing Support (Experimental)
-We are really excited to announce that KaiZen OpenAPI Editor now supports [OpenAPI v3](https://github.com/OAI/OpenAPI-Specification/blob/OpenAPI.next/versions/3.0.md). The new feature is still under active development, but it already allows you to do really cool stuff with OpenAPI v3 specs.
+# NEW! Full OpenAPI 3.0 Editing Support
+We are really pleased to inform you that KaiZen OpenAPI Editor now fully supports the [OpenAPI 3.0 specification](https://github.com/OAI/OpenAPI-Specification/blob/master/versions/3.0.0.md). Here's some of the cool stuff that you can now do with OpenAPI v3 specs:
 
 ## Validation
 <img src="http://i.imgur.com/WSns2FY.png" alt="Validation: invalid 'kind' property" width="500"/></a>
@@ -23,6 +23,3 @@ Please use the *OpenAPI v3 Spec* wizard from the *KaiZen OpenAPI Editor* categor
 ## The editor for Swagger v2 uses an underlying JSON Schema. There's no official JSON Schema for OpenAPI v3, so what are you using?
 We use a modification of the JSON Schema provided by [googleapis/gnostic](https://github.com/googleapis/gnostic). We use the [SwagEdit branch](https://github.com/RepreZen/gnostic/tree/SwagEdit) to generate our JSON Schema. Thanks to @timburks and @MikeRalphson for the contribution!
 
-## When will the final OpenAPI 3.0 specification be released?
-
-In just a few weeks! See the [announcement on the OpenAPI blog](https://www.openapis.org/blog/2017/05/25/the-open-api-initiative-is-sending-you-a-save-the-date-card) for more information. Now is your chance to try out OpenAPI 3.0, and provide your feedback to the OAI Technical Developer Community.
