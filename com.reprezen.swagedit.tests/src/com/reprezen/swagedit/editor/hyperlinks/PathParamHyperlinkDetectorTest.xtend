@@ -11,6 +11,7 @@ import static org.hamcrest.core.IsCollectionContaining.hasItem
 import static org.hamcrest.core.IsCollectionContaining.hasItems
 import static org.junit.Assert.assertThat
 import com.reprezen.swagedit.core.hyperlinks.SwaggerHyperlink
+import com.reprezen.swagedit.core.hyperlinks.PathParamHyperlinkDetector
 
 class PathParamHyperlinkDetectorTest {
 
@@ -41,7 +42,7 @@ class PathParamHyperlinkDetectorTest {
         val linkRegion = new Region(document.getLineOffset(1) + "  /".length(), "{id}".length())
         val targetRegion = new Region(43, 19)
 
-        assertThat(Arrays.asList(hyperlinks), hasItem(new SwaggerHyperlink("id", viewer, linkRegion, targetRegion)));
+        assertThat(Arrays.asList(hyperlinks), hasItem(new SwaggerHyperlink("id : get", viewer, linkRegion, targetRegion)));
     }
 
     @Test
