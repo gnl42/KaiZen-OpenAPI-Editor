@@ -363,5 +363,32 @@ properties:
         responses:
           '200':
             description: response description</template>
+            
+ <!--
+ 	CALLBACK 
+  -->
+
+     <template name="Object resource" 
+       id="com.reprezen.swagedit.openapi3.templates.callback.object_resource_template" 
+       description="object resource template" 
+       context="com.reprezen.swagedit.openapi3.templates.callback" 
+       enabled="true">/${resource}:
+  get:
+    description: ${description}
+    responses:
+      '200':
+        description: Ok
+        content:
+          application/json:
+            schema:
+              type: array
+              items:
+                $$ref: '${responseModel}'
+      default:
+        description: Error
+        content:
+          'text/html':
+            schema:
+              $$ref: '${errorModel}'</template>            
 
 </templates>
