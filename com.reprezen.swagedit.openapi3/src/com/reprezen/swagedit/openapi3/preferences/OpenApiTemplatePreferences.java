@@ -8,7 +8,7 @@
  * Contributors:
  *    ModelSolv, Inc. - initial API and implementation and/or initial documentation
  *******************************************************************************/
-package com.reprezen.swagedit.preferences;
+package com.reprezen.swagedit.openapi3.preferences;
 
 import org.eclipse.jface.text.source.SourceViewer;
 import org.eclipse.jface.text.source.SourceViewerConfiguration;
@@ -21,10 +21,10 @@ import org.eclipse.swt.widgets.Shell;
 import org.eclipse.ui.IWorkbenchPreferencePage;
 import org.eclipse.ui.texteditor.templates.TemplatePreferencePage;
 
-import com.reprezen.swagedit.Activator;
-import com.reprezen.swagedit.editor.SwaggerSourceViewerConfiguration;
+import com.reprezen.swagedit.openapi3.Activator;
+import com.reprezen.swagedit.openapi3.editor.OpenApi3Editor;
 
-public class SwaggerTemplatePreferences extends TemplatePreferencePage implements IWorkbenchPreferencePage {
+public class OpenApiTemplatePreferences extends TemplatePreferencePage implements IWorkbenchPreferencePage {
 
     protected static class SwaggerEditTemplateDialog extends TemplatePreferencePage.EditTemplateDialog {
 
@@ -35,7 +35,7 @@ public class SwaggerTemplatePreferences extends TemplatePreferencePage implement
 
         protected SourceViewer createViewer(Composite parent) {
             SourceViewer viewer = new SourceViewer(parent, null, null, false, SWT.BORDER | SWT.V_SCROLL | SWT.H_SCROLL);
-            SourceViewerConfiguration configuration = new SwaggerSourceViewerConfiguration(Activator.getDefault().getPreferenceStore());
+            SourceViewerConfiguration configuration = new OpenApi3Editor.OpenApi3SourceViewerConfiguration();
             viewer.configure(configuration);
 
             return viewer;
@@ -43,7 +43,7 @@ public class SwaggerTemplatePreferences extends TemplatePreferencePage implement
 
     }
 
-    public SwaggerTemplatePreferences() {
+    public OpenApiTemplatePreferences() {
         setPreferenceStore(Activator.getDefault().getPreferenceStore());
         setTemplateStore(Activator.getDefault().getTemplateStore());
         setContextTypeRegistry(Activator.getDefault().getContextTypeRegistry());
