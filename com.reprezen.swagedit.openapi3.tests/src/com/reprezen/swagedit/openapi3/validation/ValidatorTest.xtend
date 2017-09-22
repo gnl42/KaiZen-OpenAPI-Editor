@@ -1,10 +1,5 @@
 package com.reprezen.swagedit.openapi3.validation
 
-import com.google.common.collect.ImmutableMap
-import com.reprezen.swagedit.core.json.references.JsonDocumentManager
-import com.reprezen.swagedit.core.json.references.JsonReferenceFactory
-import com.reprezen.swagedit.core.json.references.JsonReferenceValidator
-import com.reprezen.swagedit.core.model.AbstractNode
 import com.reprezen.swagedit.core.validation.Messages
 import com.reprezen.swagedit.core.validation.SwaggerError
 import com.reprezen.swagedit.openapi3.editor.OpenApi3Document
@@ -18,32 +13,7 @@ import static org.junit.Assert.*
 
 class ValidatorTest {
 
-	val docManager = new JsonDocumentManager() {
-		override getFile(URI uri) {
-			null
-		}
-	}
-	val factory = new JsonReferenceFactory() {
-		override create(AbstractNode node) {
-			val reference = super.create(node)
-			if (reference !== null) {
-				reference.documentManager = docManager
-			}
-			reference
-		}
-
-		override createSimpleReference(URI baseURI, AbstractNode valueNode) {
-			val reference = super.createSimpleReference(baseURI, valueNode)
-			if (reference !== null) {
-				reference.documentManager = docManager
-			}
-			reference
-		}
-	}
-	val validator = new OpenApi3Validator(
-		new JsonReferenceValidator(factory),
-		ImmutableMap.of("http://openapis.org/v3/schema.json", new OpenApi3Schema().asJson)
-	)
+	val validator = ValidationHelper.validator()
 	val document = new OpenApi3Document(new OpenApi3Schema)
 
 	@Test
@@ -344,8 +314,10 @@ class ValidatorTest {
 		document.set(content)
 		val errors = validator.validate(document, null as URI)
 		assertEquals(1, errors.size())
-		assertThat(errors, hasItems(
-				new SwaggerError(15, IMarker.SEVERITY_ERROR, Messages.error_invalid_reference_type)		
+		assertThat(
+			errors,
+			hasItems(
+				new SwaggerError(15, IMarker.SEVERITY_ERROR, Messages.error_invalid_reference_type)
 			)
 		)
 	}
@@ -377,7 +349,7 @@ class ValidatorTest {
 		val errors = validator.validate(document, null as URI)
 		assertEquals(0, errors.size())
 	}
-	
+
 	@Test
 	def void testValidationShouldFail_SecuritySchemes() {
 		val content = '''
@@ -404,8 +376,10 @@ class ValidatorTest {
 		document.set(content)
 		val errors = validator.validate(document, null as URI)
 		assertEquals(1, errors.size())
-		assertThat(errors, hasItems(
-				new SwaggerError(10, IMarker.SEVERITY_ERROR, Messages.error_invalid_reference_type)		
+		assertThat(
+			errors,
+			hasItems(
+				new SwaggerError(10, IMarker.SEVERITY_ERROR, Messages.error_invalid_reference_type)
 			)
 		)
 	}
@@ -435,8 +409,10 @@ class ValidatorTest {
 		val errors = validator.validate(document, null as URI)
 
 		assertEquals(1, errors.size())
-		assertThat(errors, hasItems(
-				new SwaggerError(10, IMarker.SEVERITY_ERROR, Messages.error_invalid_parameter_location)		
+		assertThat(
+			errors,
+			hasItems(
+				new SwaggerError(10, IMarker.SEVERITY_ERROR, Messages.error_invalid_parameter_location)
 			)
 		)
 	}
@@ -465,6 +441,6 @@ class ValidatorTest {
 		document.set(content)
 		val errors = validator.validate(document, null as URI)
 
-		assertEquals(0, errors.size())		
+		assertEquals(0, errors.size())
 	}
 }
