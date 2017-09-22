@@ -2,7 +2,6 @@ package com.reprezen.swagedit.editor.hyperlinks
 
 import com.reprezen.swagedit.editor.SwaggerDocument
 import com.reprezen.swagedit.mocks.Mocks
-import com.reprezen.swagedit.tests.utils.PointerHelpers
 import java.util.Arrays
 import org.eclipse.jface.text.BadLocationException
 import org.eclipse.jface.text.ITextViewer
@@ -11,19 +10,12 @@ import org.junit.Test
 
 import static org.hamcrest.core.IsCollectionContaining.hasItem
 import static org.junit.Assert.*
+import com.reprezen.swagedit.core.hyperlinks.DefinitionHyperlinkDetector
 import com.reprezen.swagedit.core.hyperlinks.SwaggerHyperlink
 
 class DefinitionHyperlinkDetectorTest {
 
-	extension PointerHelpers = new PointerHelpers
-
 	val detector = new DefinitionHyperlinkDetector()
-
-	@Test
-	def void testCanDetect() {
-		assertTrue("/tags/0".matches(DefinitionHyperlinkDetector.TAGS_PATTERN))
-		assertTrue(detector.canDetect("/tags/0".ptr))
-	}
 
 	@Test
 	def void testShouldCreateHyperLink_ToDefinition() throws BadLocationException {
@@ -36,7 +28,7 @@ class DefinitionHyperlinkDetectorTest {
 			definitions:
 			  foo:
 			    type: object
-		 '''
+		'''
 
 		document.set(text)
 

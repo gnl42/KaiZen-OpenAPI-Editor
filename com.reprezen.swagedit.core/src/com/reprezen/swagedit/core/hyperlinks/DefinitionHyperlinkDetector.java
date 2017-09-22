@@ -8,7 +8,7 @@
  * Contributors:
  *    ModelSolv, Inc. - initial API and implementation and/or initial documentation
  *******************************************************************************/
-package com.reprezen.swagedit.editor.hyperlinks;
+package com.reprezen.swagedit.core.hyperlinks;
 
 import static com.google.common.base.Strings.emptyToNull;
 
@@ -21,10 +21,7 @@ import org.eclipse.jface.text.hyperlink.IHyperlink;
 
 import com.fasterxml.jackson.core.JsonPointer;
 import com.reprezen.swagedit.core.editor.JsonDocument;
-import com.reprezen.swagedit.core.hyperlinks.AbstractJsonHyperlinkDetector;
-import com.reprezen.swagedit.core.hyperlinks.SwaggerHyperlink;
 import com.reprezen.swagedit.core.model.AbstractNode;
-import com.reprezen.swagedit.editor.SwaggerDocument;
 
 /**
  * Hyperlink detector that detects links to and inside schema definition elements.
@@ -32,8 +29,8 @@ import com.reprezen.swagedit.editor.SwaggerDocument;
  */
 public class DefinitionHyperlinkDetector extends AbstractJsonHyperlinkDetector {
 
-    protected static final String TAGS_PATTERN = "^[/\\W+|\\w+]*/tags([/\\W+|\\w+]+)";
-    protected static final String REQUIRED_PATTERN = "^([/\\W+|\\w+]+)(/required[/\\W+|\\w+]+)";
+    public static final String TAGS_PATTERN = "^[/\\W+|\\w+]*/tags([/\\W+|\\w+]+)";
+    public static final String REQUIRED_PATTERN = "^([/\\W+|\\w+]+)(/required[/\\W+|\\w+]+)";
 
     @Override
     protected boolean canDetect(JsonPointer pointer) {

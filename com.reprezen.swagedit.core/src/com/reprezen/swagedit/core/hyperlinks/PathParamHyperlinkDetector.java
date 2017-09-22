@@ -8,12 +8,12 @@
  * Contributors:
  *    ModelSolv, Inc. - initial API and implementation and/or initial documentation
  *******************************************************************************/
-package com.reprezen.swagedit.editor.hyperlinks;
+package com.reprezen.swagedit.core.hyperlinks;
 
 import static com.google.common.base.Strings.emptyToNull;
 
-import java.util.ArrayList;
 import java.util.List;
+import java.util.Map;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
 
@@ -24,14 +24,10 @@ import org.eclipse.jface.text.hyperlink.IHyperlink;
 
 import com.fasterxml.jackson.core.JsonPointer;
 import com.google.common.collect.Lists;
+import com.google.common.collect.Maps;
 import com.reprezen.swagedit.core.editor.JsonDocument;
-import com.reprezen.swagedit.core.hyperlinks.AbstractJsonHyperlinkDetector;
-import com.reprezen.swagedit.core.hyperlinks.SwaggerHyperlink;
 import com.reprezen.swagedit.core.json.references.JsonReference;
 import com.reprezen.swagedit.core.model.AbstractNode;
-import com.reprezen.swagedit.editor.SwaggerDocument;
-
-import io.swagger.models.HttpMethod;
 
 /**
  * Hyperlink detector that detects links from path parameters.
@@ -39,7 +35,10 @@ import io.swagger.models.HttpMethod;
  */
 public class PathParamHyperlinkDetector extends AbstractJsonHyperlinkDetector {
 
-    protected static final Pattern PARAMETER_PATTERN = Pattern.compile("\\{(\\w+)\\}");
+    public static final Pattern PARAMETER_PATTERN = Pattern.compile("\\{(\\w+)\\}");
+
+    private final List<String> methods = Lists.newArrayList(//
+            "get", "post", "put", "delete", "options", "head", "patch", "trace");
 
     @Override
     protected boolean canDetect(JsonPointer pointer) {
@@ -65,37 +64,38 @@ public class PathParamHyperlinkDetector extends AbstractJsonHyperlinkDetector {
             return null;
         }
 
-        Iterable<JsonPointer> targetPaths = findParameterPath(doc, pointer, parameter);
-
         IRegion linkRegion = new Region(info.getOffset() + start, end - start);
-        List<IHyperlink> links = new ArrayList<>();
-        for (JsonPointer path : targetPaths) {
-            IRegion target = doc.getRegion(path);
+
+        Map<String, JsonPointer> paths = findParameterPath(doc, pointer, parameter);
+        List<IHyperlink> links = Lists.newArrayList();
+        for (String key : paths.keySet()) {
+            IRegion target = doc.getRegion(paths.get(key));
 
             if (target != null) {
-                links.add(new SwaggerHyperlink(parameter, viewer, linkRegion, target));
+                links.add(new SwaggerHyperlink(parameter + " : " + key, viewer, linkRegion, target));
             }
         }
 
         return links.isEmpty() ? null : links.toArray(new IHyperlink[links.size()]);
     }
 
-    private Iterable<JsonPointer> findParameterPath(JsonDocument doc, JsonPointer basePath, String parameter) {
-        AbstractNode parent = doc.getModel().find(basePath);
+    /*
+     * Returns a Map having for keys a method name and for value the pointer to the parameter.
+     */
+    private Map<String, JsonPointer> findParameterPath(JsonDocument doc, JsonPointer basePath, String parameter) {
+        Map<String, JsonPointer> paths = Maps.newHashMap();
 
+        AbstractNode parent = doc.getModel().find(basePath);
         if (parent == null || !parent.isObject()) {
-            return Lists.newArrayList();
+            return paths;
         }
 
-        List<JsonPointer> paths = new ArrayList<>();
-        for (HttpMethod method : HttpMethod.values()) {
-            String mName = method.name().toLowerCase();
-
-            if (parent.get(mName) == null) {
+        for (String method : methods) {
+            if (parent.get(method) == null) {
                 continue;
             }
 
-            AbstractNode parameters = parent.get(mName).get("parameters");
+            AbstractNode parameters = parent.get(method).get("parameters");
 
             if (parameters != null && parameters.isArray()) {
                 for (int i = 0; i < parameters.size(); i++) {
@@ -107,14 +107,14 @@ public class PathParamHyperlinkDetector extends AbstractJsonHyperlinkDetector {
 
                         if (resolved != null && resolved.isObject() && resolved.get("name") != null) {
                             if (parameter.equals(resolved.get("name").asValue().getValue())) {
-                                paths.add(ptr);
+                                paths.put(method, ptr);
                             }
                         }
 
                     } else if (current.isObject() && current.get("name") != null) {
 
                         if (parameter.equals(current.get("name").asValue().getValue())) {
-                            paths.add(JsonPointer.compile(basePath + "/" + mName + "/parameters/" + i));
+                            paths.put(method, JsonPointer.compile(basePath + "/" + method + "/parameters/" + i));
                         }
                     }
                 }
