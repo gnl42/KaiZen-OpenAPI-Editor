@@ -25,8 +25,7 @@ import com.reprezen.swagedit.core.templates.SchemaBasedTemplateContextType;
 public class OpenApi3ContextType extends TemplateContextType {
     
     private static final String TEMPLATE_ID_PREFIX = "com.reprezen.swagedit.openapi3.templates.";
-    private static final String PATH_ITEM_REGEX = "/paths/~1[^/]+";
-
+  
     private final String regex;
 
     public OpenApi3ContextType(String name, String regex) {
@@ -65,17 +64,11 @@ public class OpenApi3ContextType extends TemplateContextType {
 
     }
 
-    public static class PathItemContextType extends OpenApi3ContextType {
-        public PathItemContextType() {
-            super("path_item", PATH_ITEM_REGEX + "$");
-        }
-    }
-
     private static List<TemplateContextType> allContextTypes = Lists.<TemplateContextType>newArrayList( //
             new RootContextType(), //
             new ContactContextType(), //
             new PathsContextType(), //
-            new PathItemContextType(), //
+            new SchemaBasedTemplateContextType(TEMPLATE_ID_PREFIX + "path_item", "pathItem", "/definitions/pathItem"), //
             // Components
             new SchemaBasedTemplateContextType(TEMPLATE_ID_PREFIX + "components", "components", "/definitions/components"),
             // Component Object Maps
@@ -84,11 +77,11 @@ public class OpenApi3ContextType extends TemplateContextType {
             new SchemaBasedTemplateContextType(TEMPLATE_ID_PREFIX + "links", "links", "/definitions/linksOrReferences"),
             new SchemaBasedTemplateContextType(TEMPLATE_ID_PREFIX + "parameters", "parameters", "/definitions/parametersOrReferences"),
             new SchemaBasedTemplateContextType(TEMPLATE_ID_PREFIX + "requestBodies", "requestBodies", "/definitions/requestBodiesOrReferences"),
-            new SchemaBasedTemplateContextType(TEMPLATE_ID_PREFIX + "responses", "responses", "/definitions/responsesOrReferences"),
+            new SchemaBasedTemplateContextType(TEMPLATE_ID_PREFIX + "responses", "responses", "/definitions/responsesOrReferences", "/definitions/responses"), // 
             new SchemaBasedTemplateContextType(TEMPLATE_ID_PREFIX + "securitySchemes", "securitySchemes", "/definitions/securitySchemesOrReferences"),
             new SchemaBasedTemplateContextType(TEMPLATE_ID_PREFIX + "headers", "headers", "/definitions/headersOrReferences"),
             // Component Objects
-            new SchemaBasedTemplateContextType(TEMPLATE_ID_PREFIX + "schema", "schema", "/definitions/schema"),
+            new SchemaBasedTemplateContextType(TEMPLATE_ID_PREFIX + "schema", "schema", "/definitions/schema"), 
             new SchemaBasedTemplateContextType(TEMPLATE_ID_PREFIX + "callback", "callback", "/definitions/callback"),
             new SchemaBasedTemplateContextType(TEMPLATE_ID_PREFIX + "link", "link", "/definitions/link"),
             new SchemaBasedTemplateContextType(TEMPLATE_ID_PREFIX + "parameter", "parameter", "/definitions/parameter"),
