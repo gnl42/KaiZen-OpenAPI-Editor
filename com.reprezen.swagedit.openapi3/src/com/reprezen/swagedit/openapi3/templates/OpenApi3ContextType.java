@@ -88,7 +88,9 @@ public class OpenApi3ContextType extends TemplateContextType {
             new SchemaBasedTemplateContextType(TEMPLATE_ID_PREFIX + "requestBody", "requestBody", "/definitions/requestBody"),
             new SchemaBasedTemplateContextType(TEMPLATE_ID_PREFIX + "response", "response", "/definitions/response"),
             new SchemaBasedTemplateContextType(TEMPLATE_ID_PREFIX + "securityScheme", "securityScheme", "/definitions/securityScheme"),
-            new SchemaBasedTemplateContextType(TEMPLATE_ID_PREFIX + "header", "header", "/definitions/header")
+            new SchemaBasedTemplateContextType(TEMPLATE_ID_PREFIX + "header", "header", "/definitions/header"),
+            // Other
+            new SchemaBasedTemplateContextType(TEMPLATE_ID_PREFIX + "mediaTypes", "mediaTypes", "/definitions/mediaTypes")
             );
 
     public static List<TemplateContextType> allContextTypes() {

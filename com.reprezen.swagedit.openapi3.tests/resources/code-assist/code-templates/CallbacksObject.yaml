@@ -53,7 +53,7 @@ components:
           requestBody:
             description: content of the status update notification.
             content: 
-              #KZOE-template name="3 mediatypes template", value="content"
+              #KZOE-template name="3 mediatypes template", value="mediaTypes"
               "application/json":
                 schema:
                   #KZOE-template name="4 schema template", value="schema"
