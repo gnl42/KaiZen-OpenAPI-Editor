@@ -138,7 +138,7 @@ public abstract class CompositeSchema {
         return href.startsWith("#") ? null : href.split("#")[0];
     }
 
-    protected JsonPointer pointer(String href) {
+    public static JsonPointer pointer(String href) {
         if (href.startsWith("#")) {
             return JsonPointer.compile(href.substring(1));
         } else if (href.startsWith("/")) {

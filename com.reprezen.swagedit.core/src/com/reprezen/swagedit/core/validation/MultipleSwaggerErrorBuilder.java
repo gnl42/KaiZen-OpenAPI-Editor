@@ -105,7 +105,7 @@ public class MultipleSwaggerErrorBuilder {
         return getHumanFriendlyText(swaggerSchemaNode, location);
     }
 
-    protected String getHumanFriendlyText(JsonNode swaggerSchemaNode, final String defaultValue) {
+    public static String getHumanFriendlyText(JsonNode swaggerSchemaNode, final String defaultValue) {
         JsonNode title = swaggerSchemaNode.get("title");
         if (title != null) {
             return title.asText();
@@ -139,7 +139,7 @@ public class MultipleSwaggerErrorBuilder {
         return defaultValue;
     }
 
-    private String getLabelForRef(String refValue) {
+    private static String getLabelForRef(String refValue) {
         return refValue.substring(refValue.lastIndexOf("/") + 1);
     }
 

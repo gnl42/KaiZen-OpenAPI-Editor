@@ -21,9 +21,11 @@ import org.apache.commons.lang3.math.NumberUtils;
 
 import com.fasterxml.jackson.core.JsonPointer;
 import com.fasterxml.jackson.databind.JsonNode;
+import com.fasterxml.jackson.databind.node.ObjectNode;
 import com.google.common.base.Strings;
 import com.google.common.collect.Lists;
 import com.reprezen.swagedit.core.assist.ext.ContentAssistExt;
+import com.reprezen.swagedit.core.json.references.JsonReference;
 import com.reprezen.swagedit.core.model.AbstractNode;
 import com.reprezen.swagedit.core.model.Model;
 import com.reprezen.swagedit.core.schema.ArrayTypeDefinition;
@@ -33,6 +35,7 @@ import com.reprezen.swagedit.core.schema.MultipleTypeDefinition;
 import com.reprezen.swagedit.core.schema.ObjectTypeDefinition;
 import com.reprezen.swagedit.core.schema.ReferenceTypeDefinition;
 import com.reprezen.swagedit.core.schema.TypeDefinition;
+import com.reprezen.swagedit.core.validation.MultipleSwaggerErrorBuilder;
 
 /**
  * Provider of completion proposals.
@@ -196,7 +199,19 @@ public class JsonProposalProvider {
         }
 
         if (proposals.isEmpty()) {
-            proposals.add(new Proposal("_key_" + ":", "_key_", null, null));
+            JsonNode typeAsJson = type.asJson();
+            if (typeAsJson instanceof ObjectNode && ((ObjectNode)typeAsJson).has("additionalProperties")) {
+                typeAsJson = ((ObjectNode)typeAsJson).get("additionalProperties");
+                if (typeAsJson instanceof ObjectNode && ((ObjectNode)typeAsJson).has(JsonReference.PROPERTY)) {
+                    TypeDefinition refedType = type.getSchema().getManager().resolve(type, typeAsJson.get(JsonReference.PROPERTY).asText());
+                    if (refedType instanceof ComplexTypeDefinition) {
+                        refedType = ((ComplexTypeDefinition)refedType).getComplexTypes().iterator().next();
+                    }
+                    typeAsJson = refedType.getContent();
+                }
+            }
+            String schemaName = MultipleSwaggerErrorBuilder.getHumanFriendlyText(typeAsJson, "_key_");
+            proposals.add(new Proposal(schemaName + ":", schemaName, null, null));
         }
 
         return proposals;
