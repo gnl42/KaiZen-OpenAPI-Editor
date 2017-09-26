@@ -17,7 +17,7 @@
   version: "1.0.0"
   title: ${API_title}
   description: ${API_description}
-  termsOfService: ${terms}
+  termsOfService: ${terms_url}
   contact:
     name: ${contact_name}
     url: ${contact_url}
