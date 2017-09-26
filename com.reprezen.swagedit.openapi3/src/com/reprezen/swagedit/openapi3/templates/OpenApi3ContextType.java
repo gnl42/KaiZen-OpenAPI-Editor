@@ -12,7 +12,6 @@ package com.reprezen.swagedit.openapi3.templates;
 
 import java.util.List;
 
-import org.eclipse.jface.text.templates.GlobalTemplateVariables;
 import org.eclipse.jface.text.templates.TemplateContextType;
 
 import com.google.common.base.Function;
@@ -22,52 +21,23 @@ import com.google.common.collect.Lists;
 import com.reprezen.swagedit.core.model.Model;
 import com.reprezen.swagedit.core.templates.SchemaBasedTemplateContextType;
 
-public class OpenApi3ContextType extends TemplateContextType {
+public class OpenApi3ContextType {
     
     private static final String TEMPLATE_ID_PREFIX = "com.reprezen.swagedit.openapi3.templates.";
   
-    private final String regex;
-
-    public OpenApi3ContextType(String name, String regex) {
-        super(TEMPLATE_ID_PREFIX + name, name);
-        this.regex = regex;
-        addGlobalResolvers();
-    }
-
-    private void addGlobalResolvers() {
-        addResolver(new GlobalTemplateVariables.Cursor());
-        addResolver(new GlobalTemplateVariables.WordSelection());
-        addResolver(new GlobalTemplateVariables.LineSelection());
-        addResolver(new GlobalTemplateVariables.Dollar());
-        addResolver(new GlobalTemplateVariables.Date());
-        addResolver(new GlobalTemplateVariables.Year());
-        addResolver(new GlobalTemplateVariables.Time());
-        addResolver(new GlobalTemplateVariables.User());
-    }
-
-    public static class RootContextType extends OpenApi3ContextType {
+    public static class RootContextType extends TemplateContextType {
         public RootContextType() {
-            super("root", "");
+            super(TEMPLATE_ID_PREFIX + "root", "root");
         }
-    }
-
-    public static class ContactContextType extends OpenApi3ContextType {
-        public ContactContextType() {
-            super("info.contact", "/info/contact");
+        protected static boolean isRoot(String normalizedPath) {
+            return normalizedPath == null || normalizedPath.isEmpty() || "/".equals(normalizedPath);
         }
-    }
-
-    public static class PathsContextType extends OpenApi3ContextType {
-        public PathsContextType() {
-            super("paths", "/paths");
-        }
-
     }
 
     private static List<TemplateContextType> allContextTypes = Lists.<TemplateContextType>newArrayList( //
             new RootContextType(), //
-            new ContactContextType(), //
-            new PathsContextType(), //
+            new SchemaBasedTemplateContextType(TEMPLATE_ID_PREFIX + "info.contact", "info.contact", "/definitions/info"), //
+            new SchemaBasedTemplateContextType(TEMPLATE_ID_PREFIX + "paths", "paths", "/definitions/paths"), //
             new SchemaBasedTemplateContextType(TEMPLATE_ID_PREFIX + "path_item", "pathItem", "/definitions/pathItem"), //
             // Components
             new SchemaBasedTemplateContextType(TEMPLATE_ID_PREFIX + "components", "components", "/definitions/components"),
@@ -112,17 +82,13 @@ public class OpenApi3ContextType extends TemplateContextType {
         
         final String normalizedPath = (path != null && path.endsWith("/")) ? path.substring(0, path.length() - 1)
                 : path;
-        if (normalizedPath == null || normalizedPath.isEmpty() || "/".equals(normalizedPath)) {
+        if (RootContextType.isRoot(normalizedPath)) {
             return new RootContextType();
         }
         return Iterables.getFirst(Iterables.filter(allContextTypes, new Predicate<TemplateContextType>() {
 
             @Override
             public boolean apply(TemplateContextType input) {
-                if (input instanceof OpenApi3ContextType) {
-                    return normalizedPath.matches(((OpenApi3ContextType)input).regex);
-                    
-                }
                 if (input instanceof SchemaBasedTemplateContextType) {
                     return ((SchemaBasedTemplateContextType)input).matches(model, path);
                 }
