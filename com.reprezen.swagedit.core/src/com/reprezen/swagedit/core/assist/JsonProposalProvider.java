@@ -211,7 +211,7 @@ public class JsonProposalProvider {
                 }
             }
             String schemaName = MultipleSwaggerErrorBuilder.getHumanFriendlyText(typeAsJson, "_key_");
-            proposals.add(new Proposal(schemaName + ":", schemaName, null, null));
+            proposals.add(new Proposal(schemaName + ":", schemaName, null, null, schemaName));
         }
 
         return proposals;

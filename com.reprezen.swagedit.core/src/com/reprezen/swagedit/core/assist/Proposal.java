@@ -30,6 +30,7 @@ public class Proposal {
     public final String displayString;
     public final String type;
     public final String description;
+    private final String selection;
 
     protected final Styler typeStyler = new StyledString.Styler() {
         @Override
@@ -38,11 +39,16 @@ public class Proposal {
         }
     };
 
-    public Proposal(String replacementString, String displayString, String description, String type) {
+    public Proposal(String replacementString, String displayString, String description, String type, String selection) {
         this.replacementString = replacementString;
         this.displayString = displayString;
         this.type = type;
         this.description = description;
+        this.selection = selection;
+    }
+
+    public Proposal(String replacementString, String displayString, String description, String type) {
+        this(replacementString, displayString, description, type, "");
     }
 
     /**
@@ -93,9 +99,10 @@ public class Proposal {
 
         StyledCompletionProposal proposal = null;
         if (Strings.emptyToNull(prefix) == null) {
-            proposal = new StyledCompletionProposal(replacementString, styledString, null, description, offset);
+            proposal = new StyledCompletionProposal(replacementString, styledString, null, description, offset,
+                    selection);
         } else if (rString.toLowerCase().contains(prefix.toLowerCase())) {
-            proposal = new StyledCompletionProposal(rString, styledString, prefix, description, offset);
+            proposal = new StyledCompletionProposal(rString, styledString, prefix, description, offset, selection);
         }
 
         return proposal;
