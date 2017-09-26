@@ -78,7 +78,7 @@ class MultipleSwaggerErrorMessageTest {
 		val swaggerError = new MultipleSwaggerErrorBuilder() {
 			
 			def public public_getHumanFriendlyText(JsonNode swaggerSchemaNode, String defaultValue) {
-				super.getHumanFriendlyText(swaggerSchemaNode, defaultValue)
+				getHumanFriendlyText(swaggerSchemaNode, defaultValue)
 			}
 			
 		};
@@ -93,7 +93,7 @@ class MultipleSwaggerErrorMessageTest {
 		val swaggerError = new MultipleSwaggerErrorBuilder() {
 			
 			def public public_getHumanFriendlyText(JsonNode swaggerSchemaNode, String defaultValue) {
-				super.getHumanFriendlyText(swaggerSchemaNode, defaultValue)
+				getHumanFriendlyText(swaggerSchemaNode, defaultValue)
 			}
 			
 		};
