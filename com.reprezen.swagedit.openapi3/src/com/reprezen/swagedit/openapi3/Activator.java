@@ -3,13 +3,18 @@ package com.reprezen.swagedit.openapi3;
 import java.io.IOException;
 
 import org.dadacoalition.yedit.YEditLog;
+import org.dadacoalition.yedit.preferences.PreferenceConstants;
+import org.eclipse.jface.preference.IPreferenceStore;
 import org.eclipse.jface.text.templates.ContextTypeRegistry;
+import org.eclipse.jface.text.templates.Template;
 import org.eclipse.jface.text.templates.TemplateContextType;
+import org.eclipse.jface.text.templates.persistence.TemplatePersistenceData;
 import org.eclipse.jface.text.templates.persistence.TemplateStore;
 import org.eclipse.ui.editors.text.templates.ContributionTemplateStore;
 import org.eclipse.ui.plugin.AbstractUIPlugin;
 import org.osgi.framework.BundleContext;
 
+import com.google.common.base.Strings;
 import com.reprezen.swagedit.openapi3.schema.OpenApi3Schema;
 import com.reprezen.swagedit.openapi3.templates.OpenApi3ContextType;
 
@@ -88,8 +93,35 @@ public class Activator extends AbstractUIPlugin {
             } catch (IOException e) {
                 YEditLog.logException(e);
             }
+            addNamedSchemaTemplates();
         }
         return templateStore;
+    }
+
+    private void addNamedSchemaTemplates() {
+        Template[] schemaTemplates = templateStore.getTemplates("com.reprezen.swagedit.openapi3.templates.schema");
+        for (int i = 0; i < schemaTemplates.length; i++) {
+            Template schemaTemplate = schemaTemplates[i];
+            Template template = createNamedTemplate(schemaTemplate, "com.reprezen.swagedit.openapi3.templates.schemas");
+            templateStore.add(new TemplatePersistenceData(template, true));
+        }
+    }
+
+    private Template createNamedTemplate(Template inlineTemplate, String newTemplateId) {
+        String indent = Strings.repeat(" ", getTabWidth());
+        String newPattern = inlineTemplate.getPattern().replaceAll("\n", "\n" + indent);
+        Template template = new Template(inlineTemplate.getName(), //
+                inlineTemplate.getDescription(), //
+                newTemplateId, //
+                "${schemaName}:\n" + indent + newPattern, //
+                inlineTemplate.isAutoInsertable());
+        return template;
+    }
+
+    // TODO: make it reusable: a similar method is defined in QuickFixer
+    private int getTabWidth() {
+        IPreferenceStore prefs = org.dadacoalition.yedit.Activator.getDefault().getPreferenceStore();
+        return prefs.getInt(PreferenceConstants.SPACES_PER_TAB);
     }
 
 }
