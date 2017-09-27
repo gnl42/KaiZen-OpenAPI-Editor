@@ -10,57 +10,16 @@
  *******************************************************************************/
 package com.reprezen.swagedit.openapi3.preferences;
 
-import org.eclipse.jface.text.source.SourceViewer;
-import org.eclipse.jface.text.source.SourceViewerConfiguration;
-import org.eclipse.jface.text.templates.ContextTypeRegistry;
-import org.eclipse.jface.text.templates.Template;
-import org.eclipse.jface.window.Window;
-import org.eclipse.swt.SWT;
-import org.eclipse.swt.widgets.Composite;
-import org.eclipse.swt.widgets.Shell;
-import org.eclipse.ui.IWorkbenchPreferencePage;
-import org.eclipse.ui.texteditor.templates.TemplatePreferencePage;
-
+import com.reprezen.swagedit.core.preferences.KaizenTemplatePreferences;
 import com.reprezen.swagedit.openapi3.Activator;
 import com.reprezen.swagedit.openapi3.editor.OpenApi3Editor;
 
-public class OpenApiTemplatePreferences extends TemplatePreferencePage implements IWorkbenchPreferencePage {
-
-    protected static class SwaggerEditTemplateDialog extends TemplatePreferencePage.EditTemplateDialog {
-
-        public SwaggerEditTemplateDialog(Shell parent, Template template, boolean edit, boolean isNameModifiable,
-                ContextTypeRegistry registry) {
-            super(parent, template, edit, isNameModifiable, registry);
-        }
-
-        protected SourceViewer createViewer(Composite parent) {
-            SourceViewer viewer = new SourceViewer(parent, null, null, false, SWT.BORDER | SWT.V_SCROLL | SWT.H_SCROLL);
-            SourceViewerConfiguration configuration = new OpenApi3Editor.OpenApi3SourceViewerConfiguration();
-            viewer.configure(configuration);
-
-            return viewer;
-        }
-
-    }
+public class OpenApiTemplatePreferences extends KaizenTemplatePreferences {
 
     public OpenApiTemplatePreferences() {
-        setPreferenceStore(Activator.getDefault().getPreferenceStore());
-        setTemplateStore(Activator.getDefault().getTemplateStore());
-        setContextTypeRegistry(Activator.getDefault().getContextTypeRegistry());
+        super(new OpenApi3Editor.OpenApi3SourceViewerConfiguration(), Activator.getDefault().getPreferenceStore(),
+                Activator.getDefault().getTemplateStore(), Activator.getDefault().getContextTypeRegistry());
 
-    }
-
-    protected Template editTemplate(Template template, boolean edit, boolean isNameModifiable) {
-        SwaggerEditTemplateDialog dialog = new SwaggerEditTemplateDialog(getShell(), template, edit, isNameModifiable,
-                getContextTypeRegistry());
-        if (dialog.open() == Window.OK) {
-            return dialog.getTemplate();
-        }
-        return null;
-    }
-
-    protected boolean isShowFormatterSetting() {
-        return false;
     }
 
 }
