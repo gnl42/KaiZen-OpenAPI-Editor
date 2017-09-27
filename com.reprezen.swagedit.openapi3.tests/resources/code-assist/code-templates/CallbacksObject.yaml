@@ -40,4 +40,38 @@ components:
             '200':
               description: webhook successfully processed and no retries will be performed
 
- 
+    statusCallback:
+      #KZOE-template name="1 callbacks in components/callback", value="callback"
+      /statusUpdate:
+        #KZOE-template name="2 operation template", value="pathItem"
+        post:
+          operationId: StatusUpdateCallback
+          description: |
+            POST method to be implemented by the client. BeamUp will 
+            call this method to advise on the status of a requested, in-progress,
+            or completed trip.
+          requestBody:
+            description: content of the status update notification.
+            content: 
+              #KZOE-template name="3 mediatypes template", value="mediaTypes"
+              "application/json":
+                schema:
+                  #KZOE-template name="4 schema template", value="schema"
+                  type: object
+                  properties:
+                    tripId: 
+                      type: string
+                    tripStatusCode:
+                      type: string
+                      enum:
+                      - REQUESTED
+                      - IN_PROGRESS
+                      - COMPLETED
+                      - CANCELLED
+                    eta:
+                      type: string
+                      format: date-time
+          responses:
+            #KZOE-template name="7 response", value="responses"
+            200: 
+              description: Normal response to acknowledge a status update.
