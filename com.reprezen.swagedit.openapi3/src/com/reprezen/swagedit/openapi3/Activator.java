@@ -16,7 +16,7 @@ import org.osgi.framework.BundleContext;
 
 import com.google.common.base.Strings;
 import com.reprezen.swagedit.openapi3.schema.OpenApi3Schema;
-import com.reprezen.swagedit.openapi3.templates.OpenApi3ContextType;
+import com.reprezen.swagedit.openapi3.templates.OpenApi3ContextTypeProvider;
 
 /**
  * The activator class controls the plug-in life cycle
@@ -33,6 +33,7 @@ public class Activator extends AbstractUIPlugin {
 	private OpenApi3Schema schema;
     private ContextTypeRegistry contextTypeRegistry;
     private ContributionTemplateStore templateStore;
+    private OpenApi3ContextTypeProvider openApi3ContextTypes;
 	
 	/**
 	 * The constructor
@@ -77,11 +78,18 @@ public class Activator extends AbstractUIPlugin {
     public ContextTypeRegistry getContextTypeRegistry() {
         if (contextTypeRegistry == null) {
             contextTypeRegistry = new ContextTypeRegistry();
-            for (TemplateContextType contextType : OpenApi3ContextType.allContextTypes()) {
+            for (TemplateContextType contextType : getOpenApi3ContextTypeProvider().allContextTypes()) {
                 contextTypeRegistry.addContextType(contextType);
             }
         }
         return contextTypeRegistry;
+    }
+    
+    public OpenApi3ContextTypeProvider getOpenApi3ContextTypeProvider() {
+        if (openApi3ContextTypes == null) {
+            openApi3ContextTypes = new OpenApi3ContextTypeProvider();
+        }
+        return openApi3ContextTypes;
     }
 
     public TemplateStore getTemplateStore() {

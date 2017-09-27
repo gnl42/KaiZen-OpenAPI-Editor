@@ -23,10 +23,9 @@ import com.reprezen.swagedit.openapi3.assist.ext.CallbacksContentAssistExt;
 import com.reprezen.swagedit.openapi3.assist.ext.ParameterInContentAssistExt;
 import com.reprezen.swagedit.openapi3.assist.ext.SchemaFormatContentAssistExt;
 import com.reprezen.swagedit.openapi3.assist.ext.SchemaTypeContentAssistExt;
-import com.reprezen.swagedit.openapi3.templates.OpenApi3ContextType;
 
 public class OpenApi3ContentAssistProcessor extends JsonContentAssistProcessor {
-
+    
 	public OpenApi3ContentAssistProcessor(ContentAssistant ca) {
         super(ca, new JsonProposalProvider( //
                 new CallbacksContentAssistExt(), //
@@ -40,7 +39,7 @@ public class OpenApi3ContentAssistProcessor extends JsonContentAssistProcessor {
         super(ca, new JsonProposalProvider(new CallbacksContentAssistExt(), new SchemaTypeContentAssistExt(),
                 new SchemaFormatContentAssistExt()), new OpenApi3ReferenceProposalProvider(schema));
     }
-
+    
 	@Override
 	protected TemplateStore getTemplateStore() {
         return Activator.getDefault().getTemplateStore();
@@ -53,7 +52,7 @@ public class OpenApi3ContentAssistProcessor extends JsonContentAssistProcessor {
 
     @Override
     protected String getContextTypeId(Model model, String path) {
-        TemplateContextType contextType = OpenApi3ContextType.getContextType(model, path);
+        TemplateContextType contextType = Activator.getDefault().getOpenApi3ContextTypeProvider().getContextType(model, path);
         return contextType != null ? contextType.getId() : null;
     }
 

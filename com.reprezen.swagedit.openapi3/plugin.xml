@@ -59,6 +59,12 @@
             id="com.reprezen.swagedit.openapi3.preferences.OpenApiColorPreferences"
             name="Color Preferences">
       </page>
+      <page
+            category="com.reprezen.swagedit.openapi3.preferences"
+            class="com.reprezen.swagedit.openapi3.preferences.OpenApiTemplatePreferences"
+            id="com.reprezen.swagedit.openapi3.preferences.OpenApiTemplatePreferences"
+            name="Templates">
+      </page>
    </extension>
    <extension
          point="org.eclipse.core.runtime.preferences">

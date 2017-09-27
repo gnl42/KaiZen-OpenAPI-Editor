@@ -60,7 +60,7 @@ class CodeTemplateTextTest {
 		val testCases = new CodeAssistHelper().extractTests(resourcesDir, KZOEref)
 		testCases.forEach [
 			val contextType = getCodeTemplateContext(createOpenApi3Document(it.file), it.offset)
-			val templates = Activator.^default.templateStore.getTemplates(contextType.id);
+			val templates = Activator.^default.templateStore.getTemplates(contextType?.id);
 			result.addAll(templates.map [ t |
 				#[it.file, it.file.name, it.offset, it.name, t, t.name, contextType] as Object[]
 			])
