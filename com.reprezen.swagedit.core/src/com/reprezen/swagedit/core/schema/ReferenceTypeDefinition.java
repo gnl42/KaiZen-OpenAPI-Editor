@@ -68,4 +68,13 @@ public class ReferenceTypeDefinition extends TypeDefinition {
     public boolean validate(AbstractNode valueNode) {
         return resolve().validate(valueNode);
     }
+    
+    @Override
+    public String getLabel() {
+        String label = JsonSchemaUtils.getSchemaTitle(content);
+        if (label != null) {
+            return label;
+        }
+        return resolve().getLabel();
+    }
 }
