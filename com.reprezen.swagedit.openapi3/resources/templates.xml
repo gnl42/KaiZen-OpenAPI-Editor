@@ -80,7 +80,7 @@ email: ${contact_email}</template>
 	<template name="get" 
        id="com.reprezen.swagedit.openapi3.templates.path_get_template" 
        description="GET template" 
-       context="com.reprezen.swagedit.openapi3.templates.path_item" 
+       context="com.reprezen.swagedit.openapi3.templates.pathItem" 
        enabled="true">get:
   summary: Read
   description: Provide details for the entire list (for collection resources) or an item (for object resources)
@@ -95,7 +95,7 @@ email: ${contact_email}</template>
      <template name="post" 
        id="com.reprezen.swagedit.openapi3.templates.path_post_template" 
        description="POST template" 
-       context="com.reprezen.swagedit.openapi3.templates.path_item" 
+       context="com.reprezen.swagedit.openapi3.templates.pathItem" 
        enabled="true">post:
   summary: Create
   description: Create a new item
@@ -112,7 +112,7 @@ email: ${contact_email}</template>
      <template name="put" 
        id="com.reprezen.swagedit.openapi3.templates.path_put_template" 
        description="PUT template" 
-       context="com.reprezen.swagedit.openapi3.templates.path_item" 
+       context="com.reprezen.swagedit.openapi3.templates.pathItem" 
        enabled="true">put:
   summary: Update
   description: Update the entire list (for collection resources) or an item (for object resources)   
@@ -123,7 +123,7 @@ email: ${contact_email}</template>
      <template name="delete" 
        id="com.reprezen.swagedit.openapi3.templates.path_delete_template" 
        description="DELETE template" 
-       context="com.reprezen.swagedit.openapi3.templates.path_item" 
+       context="com.reprezen.swagedit.openapi3.templates.pathItem" 
        enabled="true">delete:
   summary: Delete 
   description: Delete the entire list (for collection resources) or an item (for object resources)
@@ -138,7 +138,7 @@ email: ${contact_email}</template>
     <template name="patch" 
        id="com.reprezen.swagedit.openapi3.templates.path_patch_template" 
        description="PATCH template" 
-       context="com.reprezen.swagedit.openapi3.templates.path_item" 
+       context="com.reprezen.swagedit.openapi3.templates.pathItem" 
        enabled="true">patch:
   summary: Partial update
   description: ${Update}   
@@ -153,7 +153,7 @@ email: ${contact_email}</template>
     <template name="options" 
        id="com.reprezen.swagedit.openapi3.templates.path_options_template" 
        description="OPTIONS template" 
-       context="com.reprezen.swagedit.openapi3.templates.path_item" 
+       context="com.reprezen.swagedit.openapi3.templates.pathItem" 
        enabled="true">options:
   summary: Request resource options
   description: Request information about methods available for resource manipulation 
@@ -164,7 +164,7 @@ email: ${contact_email}</template>
     <template name="head" 
        id="com.reprezen.swagedit.openapi3.templates.path_head_template" 
        description="HEAD template" 
-       context="com.reprezen.swagedit.openapi3.templates.path_item" 
+       context="com.reprezen.swagedit.openapi3.templates.pathItem" 
        enabled="true">head:
   summary: Query a resource in the server
   description: HEAD sends request and get the response only in the header, the body should not be used
