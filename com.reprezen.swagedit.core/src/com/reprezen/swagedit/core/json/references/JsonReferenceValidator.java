@@ -103,8 +103,13 @@ public class JsonReferenceValidator {
             if (externalDoc != null) {
                 try {
                     Model externalModel = Model.parse(model.getSchema(), externalDoc);
-                    pointer = pointer.substring(pointer.indexOf("#") + 1, pointer.length());
-                    valueNode = externalModel.find(pointer);
+
+                    int pos = pointer.indexOf("#");
+                    if (pos == -1) {
+                        valueNode = externalModel.getRoot();
+                    } else {
+                        valueNode = externalModel.find(pointer.substring(pos, pointer.length()));
+                    }
 
                     if (valueNode == null) {
                         return;
