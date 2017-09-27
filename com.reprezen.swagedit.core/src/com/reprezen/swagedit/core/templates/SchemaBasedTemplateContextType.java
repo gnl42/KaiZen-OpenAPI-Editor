@@ -17,7 +17,6 @@ import java.util.List;
 import org.eclipse.jface.text.templates.GlobalTemplateVariables;
 import org.eclipse.jface.text.templates.TemplateContextType;
 
-import com.reprezen.swagedit.core.model.AbstractNode;
 import com.reprezen.swagedit.core.model.Model;
 import com.reprezen.swagedit.core.schema.ComplexTypeDefinition;
 import com.reprezen.swagedit.core.schema.ReferenceTypeDefinition;
