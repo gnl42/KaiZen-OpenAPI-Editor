@@ -72,7 +72,7 @@
          point="org.eclipse.ui.workbench.texteditor.hyperlinkDetectorTargets">
       <target
             id="com.reprezen.swagedit.openapi3.hyperlink.target"
-            name="SwagEdit OpenAPI v3">
+            name="KaiZen Editor OpenAPI v3">
             <context type="org.eclipse.ui.texteditor.ITextEditor"/>
       </target>
    </extension>

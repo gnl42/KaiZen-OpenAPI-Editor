@@ -31,9 +31,9 @@
    <extension
          point="org.eclipse.ui.contexts">
       <context
-            description="Context for SwagEdit"
+            description="Context for KaiZen Editor"
             id="com.reprezen.swagedit.context"
-            name="SwagEdit"
+            name="KaiZen Editor"
             parentId="org.eclipse.ui.textEditorScope">
       </context>
    </extension>

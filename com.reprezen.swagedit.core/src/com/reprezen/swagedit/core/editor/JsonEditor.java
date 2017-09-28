@@ -415,7 +415,7 @@ public abstract class JsonEditor extends YEdit implements IShowInSource, IShowIn
     }
 
     protected void runValidate(final boolean onOpen) {
-        new SafeWorkspaceJob("Update SwagEdit validation markers") {
+        new SafeWorkspaceJob("Update KaiZen Editor validation markers") {
 
             @Override
             public IStatus doRunInWorkspace(IProgressMonitor monitor) throws CoreException {
