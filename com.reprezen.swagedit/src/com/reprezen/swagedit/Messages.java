@@ -19,28 +19,6 @@ public class Messages extends NLS {
     // UI
     public static String swagedit_wizard_title;
     public static String swagedit_wizard_description;
-    public static String outline_proposal_local;
-    public static String outline_proposal_project;
-    public static String outline_proposal_workspace;
-
-    // errors
-    public static String error_nullType;
-    public static String error_typeNoMatch;
-    public static String error_notInEnum;
-    public static String error_additional_properties_not_allowed;
-    public static String error_required_properties;
-    public static String error_duplicate_keys;
-    public static String error_cannot_read_content;
-    public static String error_missing_reference;
-    public static String error_invalid_reference;
-    public static String error_array_items_should_be_object;
-
-    public static String error_array_missing_items;
-    public static String error_object_type_missing;
-    public static String error_type_missing;
-    public static String error_wrong_type;
-    public static String error_missing_properties;
-    public static String warning_simple_reference;
 
 
     static {
