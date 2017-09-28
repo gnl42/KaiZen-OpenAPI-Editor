@@ -160,8 +160,7 @@ class OpenApi3ContentAssistProcessorTest {
 		)
 	}
 
-// TODO
-//	@Test
+	@Test
 	def void testResponseStatusCode() {
 		val document = new OpenApi3Document(new OpenApi3Schema)
 		val test = setUpContentAssistTest('''
@@ -175,7 +174,25 @@ class OpenApi3ContentAssistProcessorTest {
 		val proposals = test.apply(processor, "1")
 		assertThat(
 			proposals.map[(it as StyledCompletionProposal).replacementString],
-			hasItems("200:")
+			hasItems("100:", "200:", "300:", "400:", "500:", "default:", "x-")
+		)
+	}
+	
+	@Test
+	def void testResponseStatusCodeWithPrefix() {
+		val document = new OpenApi3Document(new OpenApi3Schema)
+		val test = setUpContentAssistTest('''
+			paths:
+			  /foo:
+			    get:
+			      responses:
+			         1<1>
+		''', document)
+
+		val proposals = test.apply(processor, "1")
+		assertThat(
+			proposals.map[(it as StyledCompletionProposal).replacementString],
+			hasItems("100:", "101:", "102:")
 		)
 	}
 

@@ -390,5 +390,10 @@
         "description": "indicates that the client needs to authenticate to gain network access.",
         "spec_title": "RFC6585#6",
         "spec_href": "https://tools.ietf.org/html/rfc6585#section-6"
+    },
+    {
+        "code": "default",
+        "phrase": "Other Responses",
+        "description": "The documentation of responses other than the ones declared for specific HTTP response codes. Use this field to cover undeclared responses"
     }
 ]
