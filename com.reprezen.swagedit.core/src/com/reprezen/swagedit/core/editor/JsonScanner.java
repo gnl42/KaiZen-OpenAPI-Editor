@@ -41,7 +41,7 @@ import org.eclipse.swt.graphics.RGB;
 
 /*
  * Identical implementation of a BufferedRuleBasedScanner than YAMLScanner but makes 
- * use of SwagEdit PreferenceStore to set SwagEdit colors instead of YEdit colors.
+ * use of KaiZen Editor PreferenceStore to set KaiZen Editor colors instead of YEdit colors.
  * 
  * This implementation is necessary due to the lack of possibility to override YAMLScanner
  * usage of a preference store.

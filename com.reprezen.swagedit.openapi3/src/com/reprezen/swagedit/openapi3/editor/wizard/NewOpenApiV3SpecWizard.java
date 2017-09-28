@@ -39,7 +39,7 @@ public class NewOpenApiV3SpecWizard extends NewFileWizard {
             super("SwagEditNewWizardPage", selection);
             setTitle("OpenAPI v3 Spec");
             setDescription(
-                    "This wizard creates a new OpenAPI v3 Spec in YAML format, which can be opened in SwagEdit.");
+                    "This wizard creates a new OpenAPI v3 Spec in YAML format, which can be opened in KaiZen Editor.");
             setImageDescriptor(Activator.imageDescriptorFromPlugin(Activator.PLUGIN_ID, "icons/openAPI_64.png"));
             setFileExtension(extension);
         }
