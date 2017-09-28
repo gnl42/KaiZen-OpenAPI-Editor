@@ -10,7 +10,6 @@
  *******************************************************************************/
 package com.reprezen.swagedit.openapi3.assist
 
-import com.reprezen.swagedit.openapi3.editor.OpenApi3Document
 import com.reprezen.swagedit.openapi3.schema.OpenApi3Schema
 import java.nio.file.Paths
 import java.util.Collection
