@@ -19,6 +19,8 @@ class OpenApi3ContentAssistProcessorTest {
 		override protected getContextTypeRegistry() { null }
 
 		override protected getTemplateStore() { null }
+
+		override protected getContextTypeId(Model model, String path) { null }
 	}
 
 	@Test
@@ -32,8 +34,9 @@ class OpenApi3ContentAssistProcessorTest {
 			        <1>
 		''', document)
 
-		val proposals = test.apply(processor, "1")		
-		assertThat(proposals.map[(it as StyledCompletionProposal).replacementString], 
+		val proposals = test.apply(processor, "1")
+		assertThat(
+			proposals.map[(it as StyledCompletionProposal).replacementString],
 			hasItems("_key_:")
 		)
 	}
@@ -48,7 +51,8 @@ class OpenApi3ContentAssistProcessorTest {
 		''', document)
 
 		val proposals = test.apply(processor, "1")
-		assertThat(proposals.map[(it as StyledCompletionProposal).replacementString], 
+		assertThat(
+			proposals.map[(it as StyledCompletionProposal).replacementString],
 			hasItems("_key_:")
 		)
 	}
@@ -65,13 +69,14 @@ class OpenApi3ContentAssistProcessorTest {
 			          type: string
 			          format: <1>
 		''', document)
-		
+
 		val proposals = test.apply(processor, "1")
-		assertThat(proposals.map[(it as StyledCompletionProposal).replacementString], 
+		assertThat(
+			proposals.map[(it as StyledCompletionProposal).replacementString],
 			hasItems("byte", "binary", "date", "date-time", "password", "")
 		)
 	}
-	
+
 	@Test
 	def void testSchemaFormat_ForInteger() {
 		val document = new OpenApi3Document(new OpenApi3Schema)
@@ -84,9 +89,10 @@ class OpenApi3ContentAssistProcessorTest {
 			          type: integer
 			          format: <1>
 		''', document)
-		
+
 		val proposals = test.apply(processor, "1")
-		assertThat(proposals.map[(it as StyledCompletionProposal).replacementString], 
+		assertThat(
+			proposals.map[(it as StyledCompletionProposal).replacementString],
 			hasItems("int32", "int64")
 		)
 	}
@@ -103,9 +109,10 @@ class OpenApi3ContentAssistProcessorTest {
 			          type: number
 			          format: <1>
 		''', document)
-		
+
 		val proposals = test.apply(processor, "1")
-		assertThat(proposals.map[(it as StyledCompletionProposal).replacementString], 
+		assertThat(
+			proposals.map[(it as StyledCompletionProposal).replacementString],
 			hasItems("float", "double")
 		)
 	}
@@ -139,16 +146,54 @@ class OpenApi3ContentAssistProcessorTest {
 
 		proposals = test.apply(processor, "2")
 		assertThat(proposals.map[(it as StyledCompletionProposal).replacementString], hasItems())
-		
+
 		proposals = test.apply(processor, "3")
 		assertThat(proposals.map[(it as StyledCompletionProposal).replacementString], hasItems())
-		
+
 		proposals = test.apply(processor, "4")
 		assertThat(proposals.map[(it as StyledCompletionProposal).replacementString], hasItems())
 
 		proposals = test.apply(processor, "5")
-		assertThat(proposals.map[(it as StyledCompletionProposal).replacementString],  
+		assertThat(
+			proposals.map[(it as StyledCompletionProposal).replacementString],
 			hasItems("int32", "int64", "float", "double", "byte", "binary", "date", "date-time", "password", "")
 		)
 	}
+
+	@Test
+	def void testResponseStatusCode() {
+		val document = new OpenApi3Document(new OpenApi3Schema)
+		val test = setUpContentAssistTest('''
+			paths:
+			  /foo:
+			    get:
+			      responses:
+			        <1>
+		''', document)
+
+		val proposals = test.apply(processor, "1")
+		assertThat(
+			proposals.map[(it as StyledCompletionProposal).replacementString],
+			hasItems("100:", "200:", "300:", "400:", "500:", "default:", "x-")
+		)
+	}
+	
+	@Test
+	def void testResponseStatusCodeWithPrefix() {
+		val document = new OpenApi3Document(new OpenApi3Schema)
+		val test = setUpContentAssistTest('''
+			paths:
+			  /foo:
+			    get:
+			      responses:
+			         1<1>
+		''', document)
+
+		val proposals = test.apply(processor, "1")
+		assertThat(
+			proposals.map[(it as StyledCompletionProposal).replacementString],
+			hasItems("100:", "101:", "102:")
+		)
+	}
+
 }
