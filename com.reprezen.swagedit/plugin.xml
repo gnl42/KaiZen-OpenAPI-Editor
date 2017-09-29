@@ -143,7 +143,7 @@
    <extension point="com.github.eclipsecolortheme.mapper">
        <mapper
            class="com.github.eclipsecolortheme.mapper.GenericMapper"
-           name="SwagEdit"
+           name="KaiZen Editor"
            pluginId="com.reprezen.swagedit"
            xml="resources/com.reprezen.swagedit.xml"/>
     </extension>
@@ -152,7 +152,7 @@
          point="org.eclipse.ui.workbench.texteditor.hyperlinkDetectorTargets">
       <target
             id="com.reprezen.swagedit.hyperlink.target"
-            name="SwagEdit">
+            name="KaiZen Editor">
             <context type="org.eclipse.ui.texteditor.ITextEditor"/>
       </target>
    </extension>
@@ -184,14 +184,14 @@
    
    <extension
          point="org.eclipse.ui.themes">
-        <themeElementCategory label="SwagEdit" id="com.reprezen.swagedit.editor.presentation"/>
+        <themeElementCategory label="KaiZen Editor" id="com.reprezen.swagedit.editor.presentation"/>
         <fontDefinition
               categoryId="com.reprezen.swagedit.editor.presentation"
               defaultsTo="org.eclipse.jface.textfont"
               id="com.reprezen.swagedit.editor.textfont"
-              label="SwagEdit Text Font">
+              label="KaiZen Editor Text Font">
          <description>
-            This font is used by Swagger editor.
+            This font is used by KaiZen Editor.
          </description>
         </fontDefinition>
    </extension>
