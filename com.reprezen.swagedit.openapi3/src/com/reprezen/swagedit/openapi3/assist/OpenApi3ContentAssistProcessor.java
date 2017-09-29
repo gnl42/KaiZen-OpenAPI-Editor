@@ -1,4 +1,3 @@
-package com.reprezen.swagedit.openapi3.assist;
 /*******************************************************************************
  *  Copyright (c) 2016 ModelSolv, Inc. and others.
  *  All rights reserved. This program and the accompanying materials
@@ -9,6 +8,8 @@ package com.reprezen.swagedit.openapi3.assist;
  *  Contributors:
  *     ModelSolv, Inc. - initial API and implementation and/or initial documentation
  *******************************************************************************/
+package com.reprezen.swagedit.openapi3.assist;
+
 import org.eclipse.jface.text.contentassist.ContentAssistant;
 import org.eclipse.jface.text.templates.ContextTypeRegistry;
 import org.eclipse.jface.text.templates.TemplateContextType;
@@ -16,6 +17,7 @@ import org.eclipse.jface.text.templates.persistence.TemplateStore;
 
 import com.reprezen.swagedit.core.assist.JsonContentAssistProcessor;
 import com.reprezen.swagedit.core.assist.JsonProposalProvider;
+import com.reprezen.swagedit.core.assist.ext.ResponseCodeContentAssistExt;
 import com.reprezen.swagedit.core.model.Model;
 import com.reprezen.swagedit.core.schema.CompositeSchema;
 import com.reprezen.swagedit.openapi3.Activator;
@@ -23,24 +25,24 @@ import com.reprezen.swagedit.openapi3.assist.ext.CallbacksContentAssistExt;
 import com.reprezen.swagedit.openapi3.assist.ext.ParameterInContentAssistExt;
 import com.reprezen.swagedit.openapi3.assist.ext.SchemaFormatContentAssistExt;
 import com.reprezen.swagedit.openapi3.assist.ext.SchemaTypeContentAssistExt;
-import com.reprezen.swagedit.openapi3.templates.OpenApi3ContextType;
 
 public class OpenApi3ContentAssistProcessor extends JsonContentAssistProcessor {
+    
+    private static final JsonProposalProvider proposalProvider = new JsonProposalProvider(
+            new CallbacksContentAssistExt(), //
+            new SchemaTypeContentAssistExt(), //
+            new SchemaFormatContentAssistExt(), //
+            new ParameterInContentAssistExt(), //
+            new ResponseCodeContentAssistExt());
 
 	public OpenApi3ContentAssistProcessor(ContentAssistant ca) {
-        super(ca, new JsonProposalProvider( //
-                new CallbacksContentAssistExt(), //
-                new SchemaTypeContentAssistExt(), //
-                new SchemaFormatContentAssistExt(), //
-                new ParameterInContentAssistExt()),
-                new OpenApi3ReferenceProposalProvider());
+        super(ca, proposalProvider, new OpenApi3ReferenceProposalProvider());
 	}
 
     public OpenApi3ContentAssistProcessor(ContentAssistant ca, CompositeSchema schema) {
-        super(ca, new JsonProposalProvider(new CallbacksContentAssistExt(), new SchemaTypeContentAssistExt(),
-                new SchemaFormatContentAssistExt()), new OpenApi3ReferenceProposalProvider(schema));
+        super(ca, proposalProvider, new OpenApi3ReferenceProposalProvider(schema));
     }
-
+    
 	@Override
 	protected TemplateStore getTemplateStore() {
         return Activator.getDefault().getTemplateStore();
@@ -53,7 +55,7 @@ public class OpenApi3ContentAssistProcessor extends JsonContentAssistProcessor {
 
     @Override
     protected String getContextTypeId(Model model, String path) {
-        TemplateContextType contextType = OpenApi3ContextType.getContextType(model, path);
+        TemplateContextType contextType = Activator.getDefault().getOpenApi3ContextTypeProvider().getContextType(model, path);
         return contextType != null ? contextType.getId() : null;
     }
 

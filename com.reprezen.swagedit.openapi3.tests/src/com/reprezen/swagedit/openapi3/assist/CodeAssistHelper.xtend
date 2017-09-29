@@ -22,7 +22,7 @@ import java.util.regex.Pattern
 import org.eclipse.jface.text.templates.TemplateContextType
 import com.reprezen.swagedit.openapi3.editor.OpenApi3Document
 import com.reprezen.swagedit.openapi3.schema.OpenApi3Schema
-import com.reprezen.swagedit.openapi3.templates.OpenApi3ContextType
+import com.reprezen.swagedit.openapi3.templates.OpenApi3ContextTypeProvider
 
 class CodeAssistHelper {
 
@@ -99,7 +99,7 @@ class CodeAssistHelper {
 		val isArrayItem = annotationLine.contains(" " + arrayItemMarker)
 		val maybeArrayPrefix = if(isArrayItem) "/0" else ""
 
-		val contextType = OpenApi3ContextType::getContextType(document.getModel(), path.toString + maybeArrayPrefix)
+		val contextType = new OpenApi3ContextTypeProvider().getContextType(document.getModel(), path.toString + maybeArrayPrefix)
 		return contextType
 	}
 }

@@ -18,6 +18,7 @@ import com.reprezen.swagedit.Activator;
 import com.reprezen.swagedit.assist.ext.MediaTypeContentAssistExt;
 import com.reprezen.swagedit.core.assist.JsonContentAssistProcessor;
 import com.reprezen.swagedit.core.assist.JsonProposalProvider;
+import com.reprezen.swagedit.core.assist.ext.ResponseCodeContentAssistExt;
 import com.reprezen.swagedit.core.model.Model;
 import com.reprezen.swagedit.templates.SwaggerContextType;
 
@@ -27,8 +28,12 @@ import com.reprezen.swagedit.templates.SwaggerContextType;
  */
 public class SwaggerContentAssistProcessor extends JsonContentAssistProcessor {
 	
+    private static final JsonProposalProvider proposalProvider = new JsonProposalProvider(//
+            new MediaTypeContentAssistExt(), //
+            new ResponseCodeContentAssistExt());
+
 	public SwaggerContentAssistProcessor(ContentAssistant ca) {
-		super(ca, new JsonProposalProvider(new MediaTypeContentAssistExt()), new SwaggerReferenceProposalProvider());
+        super(ca, proposalProvider, new SwaggerReferenceProposalProvider());
 	}
 
 	@Override

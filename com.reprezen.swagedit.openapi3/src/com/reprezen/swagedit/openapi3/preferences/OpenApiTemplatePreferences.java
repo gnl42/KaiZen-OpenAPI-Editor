@@ -8,18 +8,17 @@
  * Contributors:
  *    ModelSolv, Inc. - initial API and implementation and/or initial documentation
  *******************************************************************************/
-package com.reprezen.swagedit.preferences;
+package com.reprezen.swagedit.openapi3.preferences;
 
-import com.reprezen.swagedit.Activator;
 import com.reprezen.swagedit.core.preferences.KaizenTemplatePreferences;
-import com.reprezen.swagedit.editor.SwaggerSourceViewerConfiguration;
+import com.reprezen.swagedit.openapi3.Activator;
+import com.reprezen.swagedit.openapi3.editor.OpenApi3Editor;
 
-public class SwaggerTemplatePreferences extends KaizenTemplatePreferences {
+public class OpenApiTemplatePreferences extends KaizenTemplatePreferences {
 
-    public SwaggerTemplatePreferences() {
-        super(new SwaggerSourceViewerConfiguration(Activator.getDefault().getPreferenceStore()),
-                Activator.getDefault().getPreferenceStore(), Activator.getDefault().getTemplateStore(),
-                Activator.getDefault().getContextTypeRegistry());
+    public OpenApiTemplatePreferences() {
+        super(new OpenApi3Editor.OpenApi3SourceViewerConfiguration(), Activator.getDefault().getPreferenceStore(),
+                Activator.getDefault().getTemplateStore(), Activator.getDefault().getContextTypeRegistry());
 
     }
 
