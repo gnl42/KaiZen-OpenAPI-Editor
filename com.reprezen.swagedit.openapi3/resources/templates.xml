@@ -293,7 +293,7 @@ content:
        description="Schema definition with a required property" 
        context="com.reprezen.swagedit.openapi3.templates.schema" 
        enabled="true">required:
-  - ${property}
+- ${property}
 properties:
   ${property}:
     type: integer
