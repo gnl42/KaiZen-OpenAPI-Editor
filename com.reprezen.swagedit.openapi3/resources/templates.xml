@@ -280,13 +280,13 @@ content:
        description="Schema definition with a required property" 
        context="com.reprezen.swagedit.openapi3.templates.schemas" 
        enabled="true">${type}:
-required:
-  - ${property}
-properties:
-  ${property}:
-    type: integer
-    format: int64</template>
-
+  required:
+    - ${property}
+  properties:
+    ${property}:
+      type: integer
+      format: int64</template>
+      
 <!--
 	SCHEMA OBJECT
  -->
