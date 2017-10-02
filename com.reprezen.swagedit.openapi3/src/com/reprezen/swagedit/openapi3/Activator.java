@@ -127,7 +127,7 @@ public class Activator extends AbstractUIPlugin {
     }
 
     // TODO: make it reusable: a similar method is defined in QuickFixer
-    private int getTabWidth() {
+    protected int getTabWidth() {
         IPreferenceStore prefs = org.dadacoalition.yedit.Activator.getDefault().getPreferenceStore();
         return prefs.getInt(PreferenceConstants.SPACES_PER_TAB);
     }
