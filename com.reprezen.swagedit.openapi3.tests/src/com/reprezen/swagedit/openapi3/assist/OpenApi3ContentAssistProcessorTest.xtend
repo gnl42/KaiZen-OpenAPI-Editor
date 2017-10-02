@@ -36,7 +36,7 @@ class OpenApi3ContentAssistProcessorTest {
 
 		val proposals = test.apply(processor, "1")		
 		assertThat(proposals.map[(it as StyledCompletionProposal).replacementString], 
-			hasItems("callback:")
+			hasItems("(callback name):")
 		)
 	}
 
@@ -51,7 +51,7 @@ class OpenApi3ContentAssistProcessorTest {
 
 		val proposals = test.apply(processor, "1")
 		assertThat(proposals.map[(it as StyledCompletionProposal).replacementString], 
-			hasItems("callback:")
+			hasItems("(callback name):")
 		)
 	}
 

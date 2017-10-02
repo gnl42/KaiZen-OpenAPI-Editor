@@ -75,6 +75,11 @@ public class ReferenceTypeDefinition extends TypeDefinition {
         if (label != null) {
             return label;
         }
-        return resolve().getLabel();
+        // $ref=schemaOrReference
+        if (resolve() instanceof ComplexTypeDefinition) {
+            return resolve().getLabel();
+        }
+        // $ref=schema
+        return JsonSchemaUtils.getLabelForRef(content.get(JsonReference.PROPERTY).asText());
     }
 }

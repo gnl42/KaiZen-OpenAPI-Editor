@@ -62,7 +62,7 @@ public class JsonSchemaUtils {
         return null;
     }
 
-    private static String getLabelForRef(String refValue) {
+    public static String getLabelForRef(String refValue) {
         return refValue.substring(refValue.lastIndexOf("/") + 1);
     }
 }

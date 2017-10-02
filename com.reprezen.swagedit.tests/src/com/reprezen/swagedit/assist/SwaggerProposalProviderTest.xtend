@@ -114,7 +114,7 @@ class SwaggerProposalProviderTest {
 		assertThat(provider.getProposals(node).map [
 			replacementString
 		], hasItems(
-			"_key_:"
+			"(schema name):"
 		))
 	}
 
