@@ -101,27 +101,39 @@ public class Activator extends AbstractUIPlugin {
             } catch (IOException e) {
                 YEditLog.logException(e);
             }
-            addNamedSchemaTemplates();
+            addNamedSchemaTemplatesInSchemas();
+            addNamedSchemaTemplatesInSchemaProperties();
         }
         return templateStore;
     }
 
-    private void addNamedSchemaTemplates() {
-        Template[] schemaTemplates = templateStore.getTemplates("com.reprezen.swagedit.openapi3.templates.schema");
+    private void addNamedSchemaTemplatesInSchemas() {
+        addNamedTemplates("com.reprezen.swagedit.openapi3.templates.schema",
+                "com.reprezen.swagedit.openapi3.templates.schemas", "schema");
+    }
+
+    private void addNamedSchemaTemplatesInSchemaProperties() {
+        addNamedTemplates("com.reprezen.swagedit.openapi3.templates.schema",
+                "com.reprezen.swagedit.openapi3.templates.properties", "property");
+    }
+
+    private void addNamedTemplates(String inlineContextId, String namedContextId, String key) {
+        Template[] schemaTemplates = templateStore.getTemplates(inlineContextId);
         for (int i = 0; i < schemaTemplates.length; i++) {
             Template schemaTemplate = schemaTemplates[i];
-            Template template = createNamedTemplate(schemaTemplate, "com.reprezen.swagedit.openapi3.templates.schemas");
+            Template template = createNamedTemplate(schemaTemplate, namedContextId, key);
             templateStore.add(new TemplatePersistenceData(template, true));
         }
     }
 
-    private Template createNamedTemplate(Template inlineTemplate, String newTemplateId) {
+    private Template createNamedTemplate(Template inlineTemplate, String newTemplateId, String key) {
         String indent = Strings.repeat(" ", getTabWidth());
         String newPattern = inlineTemplate.getPattern().replaceAll("\n", "\n" + indent);
+        String pattern = String.format("${%s_name}:\n%s%s", key, indent, newPattern);
         Template template = new Template(inlineTemplate.getName(), //
                 inlineTemplate.getDescription(), //
                 newTemplateId, //
-                "${schemaName}:\n" + indent + newPattern, //
+                pattern, //
                 inlineTemplate.isAutoInsertable());
         return template;
     }

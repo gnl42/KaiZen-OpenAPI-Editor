@@ -84,7 +84,10 @@ public class OpenApi3ContextTypeProvider {
             createOpenApi3TemplateContextType("securityScheme", "/definitions/securityScheme"),
             createOpenApi3TemplateContextType("header", "/definitions/header"),
             // Other
-            createOpenApi3TemplateContextType("mediaTypes", "/definitions/mediaTypes"));
+            createOpenApi3TemplateContextType("mediaTypes", "/definitions/mediaTypes"),
+            createOpenApi3TemplateContextType("properties", "/definitions/schema/properties/type",
+                    "/definitions/schema/properties/properties")//
+    );
 
     public List<TemplateContextType> allContextTypes() {
         return allContextTypes;

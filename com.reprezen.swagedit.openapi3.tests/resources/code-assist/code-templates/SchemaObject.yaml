@@ -40,6 +40,15 @@ components:
           type: integer
           format: int32
           minimum: 0    
+
+    SchemaWithProperties:
+      type: object
+      required:
+      - name
+      properties:
+        name:
+          type: string
+        #KZOE-template name="named schema in a property", value="properties"
         
     StringToModelMappingObject:
       type: object
