@@ -129,7 +129,7 @@ public class Activator extends AbstractUIPlugin {
     private Template createNamedTemplate(Template inlineTemplate, String newTemplateId, String key) {
         String indent = Strings.repeat(" ", getTabWidth());
         String newPattern = inlineTemplate.getPattern().replaceAll("\n", "\n" + indent);
-        String pattern = String.format("${%s_name}:\n%s%s", key, indent, newPattern);
+        String pattern = String.format("${element_name:element_name('(%s name)')}:\n%s%s", key, indent, newPattern);
         Template template = new Template(inlineTemplate.getName(), //
                 inlineTemplate.getDescription(), //
                 newTemplateId, //
