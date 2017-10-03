@@ -196,6 +196,130 @@ class OpenApi3ContentAssistProcessorTest {
 	}
 	
 	@Test
+	def void testMediaTypeInContent_ShouldReturn_MediaTypeName() {
+		val document = new OpenApi3Document(new OpenApi3Schema)
+		val test = setUpContentAssistTest('''
+paths:
+  "/resource":
+    get:
+      description: description
+      responses:
+        '200':
+          description: Ok
+          content:
+            <1>
+		''', document)
+
+		val proposals = test.apply(processor, "1")
+		assertThat(proposals.map[(it as StyledCompletionProposal).replacementString], 
+			hasItems("(mediaType name):")
+		)
+	}
+	
+	@Test
+	def void testEncodingInMediaType_ShouldReturn_EncodingName() {
+		val document = new OpenApi3Document(new OpenApi3Schema)	
+		val test = setUpContentAssistTest('''
+paths:
+  "/resource":
+    get:
+      description: description
+      responses:
+        '200':
+          description: Ok
+          content:
+            application/json:
+              encoding:
+                <1>
+		''', document)
+
+		val proposals = test.apply(processor, "1")
+		assertThat(proposals.map[(it as StyledCompletionProposal).replacementString], 
+			hasItems("(encoding name):")
+		)
+	}
+	
+	@Test
+	def void testServerVariableInServer_ShouldReturn_ServerVariableName() {
+		val document = new OpenApi3Document(new OpenApi3Schema)
+		val test = setUpContentAssistTest('''
+servers:  
+- url: https://development.gigantic-server.com/v1
+  description: Development server
+  variables:
+    <1>
+		''', document)
+
+		val proposals = test.apply(processor, "1")
+		assertThat(proposals.map[(it as StyledCompletionProposal).replacementString], 
+			hasItems("(serverVariable name):")
+		)
+	}
+	
+	@Test
+	def void testAnyInLinkParameter_ShouldReturn_AnyName() {
+		val document = new OpenApi3Document(new OpenApi3Schema)
+		val test = setUpContentAssistTest('''
+components:
+  links:
+    MyLink:
+      operationId: getRepositoriesByOwner
+      parameters:
+        <1>
+		''', document)
+
+		val proposals = test.apply(processor, "1")
+		assertThat(proposals.map[(it as StyledCompletionProposal).replacementString], 
+			hasItems("(any name):")
+		)
+	}	
+	
+	@Test
+	def void testStringsInDiscriminatorMapping() {
+		val document = new OpenApi3Document(new OpenApi3Schema)
+		val test = setUpContentAssistTest('''
+components:
+  schemas:
+    MyResponseType:
+      oneOf:
+      - $ref: '#/components/schemas/Cat'
+      - $ref: '#/components/schemas/Dog'
+      discriminator:
+        propertyName: pet_type
+        mapping:
+          <1>
+		''', document)
+
+		val proposals = test.apply(processor, "1")
+		// _key_ is a temporary solution, just documenting the current state
+		assertThat(proposals.map[(it as StyledCompletionProposal).replacementString], 
+			hasItems("_key_:")
+		)
+	}	
+
+	@Test
+	def void testStringsInOauthFlowScopes() {
+		val document = new OpenApi3Document(new OpenApi3Schema)
+		val test = setUpContentAssistTest('''
+components:
+  securitySchemes:
+    mySecurityScheme:
+      type: oauth2
+      flows: 
+        implicit:
+          authorizationUrl: https://example.com/api/oauth/dialog
+          scopes:
+            <1>
+		''', document)
+
+		// _key_ is a temporary solution, just documenting the current state
+		val proposals = test.apply(processor, "1")
+		assertThat(proposals.map[(it as StyledCompletionProposal).replacementString], 
+			hasItems("_key_:")
+		)
+	}	
+	
+	@Test
 	def void testSchemaFormat_ForString() {
 		val document = new OpenApi3Document(new OpenApi3Schema)
 		val test = setUpContentAssistTest('''
