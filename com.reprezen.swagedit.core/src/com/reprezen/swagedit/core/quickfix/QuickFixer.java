@@ -10,13 +10,13 @@
  *******************************************************************************/
 package com.reprezen.swagedit.core.quickfix;
 
+import static com.reprezen.swagedit.core.preferences.KaiZenPreferencesUtils.getTabWidth;
+
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
 
-import org.dadacoalition.yedit.preferences.PreferenceConstants;
 import org.eclipse.core.resources.IMarker;
 import org.eclipse.core.runtime.CoreException;
-import org.eclipse.jface.preference.IPreferenceStore;
 import org.eclipse.jface.text.BadLocationException;
 import org.eclipse.jface.text.IDocument;
 import org.eclipse.jface.text.IRegion;
@@ -83,10 +83,6 @@ public class QuickFixer implements IMarkerResolutionGenerator2 {
             return definitionIndent + Strings.repeat(" ", getTabWidth());
         }
 
-        private int getTabWidth() {
-            IPreferenceStore prefs = org.dadacoalition.yedit.Activator.getDefault().getPreferenceStore();
-            return prefs.getInt(PreferenceConstants.SPACES_PER_TAB);
-        }
     }
 
 }

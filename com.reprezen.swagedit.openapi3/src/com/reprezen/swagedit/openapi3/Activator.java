@@ -3,8 +3,6 @@ package com.reprezen.swagedit.openapi3;
 import java.io.IOException;
 
 import org.dadacoalition.yedit.YEditLog;
-import org.dadacoalition.yedit.preferences.PreferenceConstants;
-import org.eclipse.jface.preference.IPreferenceStore;
 import org.eclipse.jface.text.templates.ContextTypeRegistry;
 import org.eclipse.jface.text.templates.Template;
 import org.eclipse.jface.text.templates.TemplateContextType;
@@ -15,6 +13,7 @@ import org.eclipse.ui.plugin.AbstractUIPlugin;
 import org.osgi.framework.BundleContext;
 
 import com.google.common.base.Strings;
+import com.reprezen.swagedit.core.preferences.KaiZenPreferencesUtils;
 import com.reprezen.swagedit.openapi3.schema.OpenApi3Schema;
 import com.reprezen.swagedit.openapi3.templates.OpenApi3ContextTypeProvider;
 
@@ -138,10 +137,8 @@ public class Activator extends AbstractUIPlugin {
         return template;
     }
 
-    // TODO: make it reusable: a similar method is defined in QuickFixer
     protected int getTabWidth() {
-        IPreferenceStore prefs = org.dadacoalition.yedit.Activator.getDefault().getPreferenceStore();
-        return prefs.getInt(PreferenceConstants.SPACES_PER_TAB);
+       return KaiZenPreferencesUtils.getTabWidth();
     }
 
 }
