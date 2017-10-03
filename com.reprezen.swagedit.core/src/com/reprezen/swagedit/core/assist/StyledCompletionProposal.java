@@ -84,8 +84,8 @@ public class StyledCompletionProposal
                 offset = replacementOffset - prefix.length();
             }
         }
-        int replacementIndex = replacementString.indexOf(selection);
-        int selectionStart = offset + (replacementIndex < 0 ? 0 : replacementIndex);
+        int replacementIndex = !"".equals(selection) ? replacementString.indexOf(selection) : -1;
+        int selectionStart = offset + (replacementIndex < 0 ? replacementString.length() : replacementIndex);
         return new Point(selectionStart, selection.length());
     }
 
