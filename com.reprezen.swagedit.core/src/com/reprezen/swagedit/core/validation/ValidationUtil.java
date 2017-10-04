@@ -26,7 +26,17 @@ import com.google.common.collect.Lists;
 public class ValidationUtil {
     
     public static boolean isInDefinition(String pointerString) {
-        return pointerString.startsWith("/definitions") || pointerString.endsWith("/schema");
+        return isInOpenApi3Definition(pointerString) //
+                || isInSwagger2Definition(pointerString);
+    }
+
+    private static boolean isInSwagger2Definition(String pointerString) {
+        return pointerString.startsWith("/definitions") //
+                || pointerString.endsWith("/schema"); //
+    }
+
+    private static boolean isInOpenApi3Definition(String pointerString) {
+        return pointerString.startsWith("/components/schemas"); // OAS v3
     }
     
     public static String getInstancePointer(JsonNode error) {
