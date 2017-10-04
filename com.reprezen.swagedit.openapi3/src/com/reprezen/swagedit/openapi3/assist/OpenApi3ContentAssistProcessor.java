@@ -17,6 +17,7 @@ import org.eclipse.jface.text.templates.persistence.TemplateStore;
 
 import com.reprezen.swagedit.core.assist.JsonContentAssistProcessor;
 import com.reprezen.swagedit.core.assist.JsonProposalProvider;
+import com.reprezen.swagedit.core.assist.ext.MediaTypeContentAssistExt;
 import com.reprezen.swagedit.core.assist.ext.ResponseCodeContentAssistExt;
 import com.reprezen.swagedit.core.model.Model;
 import com.reprezen.swagedit.core.schema.CompositeSchema;
@@ -33,7 +34,8 @@ public class OpenApi3ContentAssistProcessor extends JsonContentAssistProcessor {
             new SchemaTypeContentAssistExt(), //
             new SchemaFormatContentAssistExt(), //
             new ParameterInContentAssistExt(), //
-            new ResponseCodeContentAssistExt());
+            new ResponseCodeContentAssistExt(), //
+            new MediaTypeContentAssistExt());
 
 	public OpenApi3ContentAssistProcessor(ContentAssistant ca) {
         super(ca, proposalProvider, new OpenApi3ReferenceProposalProvider());
