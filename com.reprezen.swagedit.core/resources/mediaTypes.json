@@ -1,5 +1,5 @@
 [
-    "*/*",
+    "'*/*'",
     "application/*",
     "application/atom+xml",
     "application/binary",
