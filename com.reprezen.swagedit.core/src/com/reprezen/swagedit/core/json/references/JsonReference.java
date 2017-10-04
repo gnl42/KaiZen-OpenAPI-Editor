@@ -79,9 +79,9 @@ public class JsonReference {
     }
 
     /**
-     * Returns true if the reference points to an existing JSON document and the pointer to an existing node inside that
-     * document.
+     * Returns true if the reference cannot be resolved and the pointer points to an inexistent element.
      * 
+     * @param document
      * @param baseURI
      * @return true if the reference can be resolved.
      */
@@ -100,6 +100,7 @@ public class JsonReference {
      * If the resolution of the referenced node fails, this method returns null. If the pointer does not points to an
      * existing node, this method will return a missing node (see JsonNode.isMissingNode()).
      * 
+     * @param document
      * @param baseURI
      * @return referenced node
      */
