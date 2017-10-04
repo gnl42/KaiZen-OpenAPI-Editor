@@ -26,7 +26,8 @@ import com.google.common.collect.Lists;
 public class ValidationUtil {
     
     public static boolean isInDefinition(String pointerString) {
-        return pointerString.startsWith("/definitions") || pointerString.endsWith("/schema");
+        return (pointerString.startsWith("/definitions") || pointerString.startsWith("/components/schemas"))
+                || pointerString.endsWith("/schema");
     }
     
     public static String getInstancePointer(JsonNode error) {
