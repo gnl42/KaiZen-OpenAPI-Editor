@@ -7,6 +7,7 @@ import org.junit.Test
 
 import static com.reprezen.swagedit.openapi3.utils.Cursors.*
 import static org.hamcrest.core.IsCollectionContaining.*
+import static org.hamcrest.core.IsNot.*
 import static org.junit.Assert.*
 import com.reprezen.swagedit.openapi3.schema.OpenApi3Schema
 import com.reprezen.swagedit.core.model.Model
@@ -196,7 +197,7 @@ class OpenApi3ContentAssistProcessorTest {
 	}
 	
 	@Test
-	def void testMediaTypeInContent_ShouldReturn_MediaTypeName() {
+	def void testMediaTypeInContent_Should_NOT_Return_MediaTypeName() {
 		val document = new OpenApi3Document(new OpenApi3Schema)
 		val test = setUpContentAssistTest('''
 paths:
@@ -211,8 +212,10 @@ paths:
 		''', document)
 
 		val proposals = test.apply(processor, "1")
+		// we don't need a "(mediaType name)" as valid mediatypes are provided by 
+		// [#395] OpenAPI v3: Content assist for media types
 		assertThat(proposals.map[(it as StyledCompletionProposal).replacementString], 
-			hasItems("(mediaType name):")
+			not(hasItem("(mediaType name):"))
 		)
 	}
 	
