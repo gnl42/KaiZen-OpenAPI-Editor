@@ -34,9 +34,10 @@ import com.reprezen.swagedit.core.schema.TypeDefinition;
 public class MediaTypeContentAssistExt implements ContentAssistExt {
 
     private final List<JsonPointer> validPointers = Lists.newArrayList(//
-            JsonPointer.compile("/definitions/mediaTypeList"), //
-            JsonPointer.compile("/definitions/mimeType"), //
-            JsonPointer.compile("/definitions/mediaTypes"));
+            JsonPointer.compile("/definitions/mediaTypeList"), // Swagger v2
+            JsonPointer.compile("/definitions/mimeType"), // OAS3
+            JsonPointer.compile("/definitions/mediaTypes") // OAS3
+            ); 
 
     private final JsonNode mediaTypes;
 
