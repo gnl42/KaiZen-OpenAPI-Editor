@@ -835,9 +835,9 @@
         },
         "properties": {
           "type": "object",
+          "title": "property",
           "additionalProperties": {
-            "$ref": "#/definitions/schemaOrReference",
-            "title": "property"
+            "$ref": "#/definitions/schemaOrReference"
           }
         },
         "additionalProperties": {

@@ -196,7 +196,8 @@ public class JsonProposalProvider {
         }
 
         if (type.getAdditionalProperties() != null) {
-            String elementName = type.getAdditionalProperties().getLabel();
+            String elementTitle = type.getLabel();
+            String elementName = elementTitle != null? elementTitle : type.getAdditionalProperties().getLabel();
             if (elementName != null) {
                 elementName = String.format("(%s name)", elementName);
                 proposals.add(new Proposal(elementName + ":", elementName, null, null, elementName));

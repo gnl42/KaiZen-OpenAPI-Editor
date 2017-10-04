@@ -117,6 +117,18 @@ class SwaggerProposalProviderTest {
 			"(schema name):"
 		))
 	}
+	
+	@Test
+	def void testGetProposals_SchemaPropertiesObject() {
+		val node = model.objectNode(null, "/definitions/MyType/properties".ptr)
+		node.type = schema.getType(node)
+
+		assertThat(provider.getProposals(node).map [
+			replacementString
+		], hasItems(
+			"(property name):"
+		))
+	}	
 
 	@Test
 	def void testPathGetProposals() {

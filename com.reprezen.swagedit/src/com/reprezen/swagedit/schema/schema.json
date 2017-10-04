@@ -1025,6 +1025,7 @@
         },
         "properties": {
           "type": "object",
+          "title": "property",
           "additionalProperties": {
             "$ref": "#/definitions/schema"
           },
