@@ -8,7 +8,7 @@
  * Contributors:
  *    ModelSolv, Inc. - initial API and implementation and/or initial documentation
  *******************************************************************************/
-package com.reprezen.swagedit.assist.ext;
+package com.reprezen.swagedit.core.assist.ext;
 
 import java.io.IOException;
 import java.net.URL;
@@ -21,9 +21,8 @@ import com.fasterxml.jackson.databind.JsonNode;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import com.google.common.base.Strings;
 import com.google.common.collect.Lists;
-import com.reprezen.swagedit.Activator;
+import com.reprezen.swagedit.core.Activator;
 import com.reprezen.swagedit.core.assist.Proposal;
-import com.reprezen.swagedit.core.assist.ext.ContentAssistExt;
 import com.reprezen.swagedit.core.model.AbstractNode;
 import com.reprezen.swagedit.core.schema.ArrayTypeDefinition;
 import com.reprezen.swagedit.core.schema.TypeDefinition;
@@ -36,7 +35,8 @@ public class MediaTypeContentAssistExt implements ContentAssistExt {
 
     private final List<JsonPointer> validPointers = Lists.newArrayList(//
             JsonPointer.compile("/definitions/mediaTypeList"), //
-            JsonPointer.compile("/definitions/mimeType"));
+            JsonPointer.compile("/definitions/mimeType"), //
+            JsonPointer.compile("/definitions/mediaTypes"));
 
     private final JsonNode mediaTypes;
 
