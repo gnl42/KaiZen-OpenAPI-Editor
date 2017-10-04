@@ -15,9 +15,9 @@ import org.eclipse.jface.text.templates.ContextTypeRegistry;
 import org.eclipse.jface.text.templates.persistence.TemplateStore;
 
 import com.reprezen.swagedit.Activator;
-import com.reprezen.swagedit.assist.ext.MediaTypeContentAssistExt;
 import com.reprezen.swagedit.core.assist.JsonContentAssistProcessor;
 import com.reprezen.swagedit.core.assist.JsonProposalProvider;
+import com.reprezen.swagedit.core.assist.ext.MediaTypeContentAssistExt;
 import com.reprezen.swagedit.core.assist.ext.ResponseCodeContentAssistExt;
 import com.reprezen.swagedit.core.model.Model;
 import com.reprezen.swagedit.templates.SwaggerContextType;
