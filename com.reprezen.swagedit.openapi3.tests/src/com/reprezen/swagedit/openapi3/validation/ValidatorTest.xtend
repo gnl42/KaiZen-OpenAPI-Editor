@@ -443,4 +443,124 @@ class ValidatorTest {
 
 		assertEquals(0, errors.size())
 	}
+
+	@Test
+	def void testValidateMissingRequiredProperties() {
+		val content = '''
+		openapi: '3.0.0'
+		info:
+		  version: 0.0.0
+		  title: Simple API
+		paths: {}
+		components:
+		  schemas:
+		    Foo:
+		      type: object
+		      properties:
+		        bar:
+		          type: string
+		      required:
+		        - baz
+		'''
+
+		document.set(content)
+		document.onChange()
+
+		val errors = validator.validate(document, null as URI)		
+		assertEquals(1, errors.size())
+		assertEquals(String.format(Messages.error_required_properties, "baz"), errors.get(0).message)
+	}
+	
+	@Test
+	def void testValidateInlineSchemas() {
+		val content = '''
+		openapi: '3.0.0'
+		info:
+		  version: 0.0.0
+		  title: Simple API
+		paths:
+		  /foo:
+		    get:
+		      description: ok
+		      responses:
+		        '200':
+		          description: OK
+		          content:
+		            application/json:
+		              schema:
+		                properties:
+		                  bar:
+		                    type: string
+		'''
+
+		document.set(content)
+		document.onChange()
+
+		val errors = validator.validate(document, null as URI)		
+		assertEquals(1, errors.size())
+		assertEquals(Messages.error_object_type_missing, errors.get(0).message)
+	}
+
+	@Test
+	def void testArrayWithItemsIsInvalid() {
+		val content = '''
+		openapi: '3.0.0'
+		info:
+		  version: 0.0.0
+		  title: Simple API
+		paths:
+		  /foo/{bar}:
+		    get:
+		      responses:
+		        '200':
+		          description: OK
+		components:
+		  schemas:
+		    Pets:
+		      type: array
+		      items:
+		        - type: string		 
+		'''
+
+		document.set(content)
+		document.onChange()
+
+		val errors = validator.validate(document, null as URI)		
+		assertEquals(1, errors.size())
+		assertTrue(errors.map[message].forall[it.equals(Messages.error_array_items_should_be_object)])
+		assertThat(errors.map[line], hasItems(15))
+	}
+
+	@Test
+	def void testObjectWithPropertyNamedProperties_ShouldBeValid() {
+		val content = '''
+		openapi: '3.0.0'
+		info:
+		  version: 0.0.0
+		  title: Simple API
+		paths:
+		  /foo/{bar}:
+		    get:
+		      responses:
+		        '200':
+		          description: OK
+		components:
+		  schemas:
+		    Pets:
+		      type: object
+		      properties:
+		        properties:
+		          type: object
+		          properties:
+		            name: 
+		              type: string
+		'''
+
+		document.set(content)
+		document.onChange()
+
+		val errors = validator.validate(document, null as URI)		
+		assertEquals(0, errors.size())
+	}
+
 }

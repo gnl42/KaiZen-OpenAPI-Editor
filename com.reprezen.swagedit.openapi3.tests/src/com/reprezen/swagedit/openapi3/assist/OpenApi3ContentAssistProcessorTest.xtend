@@ -436,7 +436,7 @@ components:
 		val proposals = test.apply(processor, "1")
 		assertThat(
 			proposals.map[(it as StyledCompletionProposal).replacementString],
-			hasItems("100:", "200:", "300:", "400:", "500:", "default:", "x-")
+			hasItems("'100':", "'200':", "'300':", "'400':", "'500':", "'default':", "x-")
 		)
 	}
 	
@@ -454,7 +454,7 @@ components:
 		val proposals = test.apply(processor, "1")
 		assertThat(
 			proposals.map[(it as StyledCompletionProposal).replacementString],
-			hasItems("100:", "101:", "102:")
+			hasItems("'100':", "'101':", "'102':")
 		)
 	}
 
