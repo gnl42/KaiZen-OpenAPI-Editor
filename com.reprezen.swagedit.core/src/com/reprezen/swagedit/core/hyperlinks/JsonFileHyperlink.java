@@ -74,10 +74,6 @@ public abstract class JsonFileHyperlink implements IHyperlink {
         } catch (IOException e) {
             return null;
         }
-        if (doc == null) {
-            return null;
-        }
-
         return doc.getRegion(pointer);
     }
 
