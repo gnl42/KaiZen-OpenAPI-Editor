@@ -134,8 +134,8 @@ class ValidatorTest {
 			paths: {}
 			components: 
 			  schemas:
-			  
 			    MyType1:
+			      type: object
 			      properties:
 			        property:
 			          $ref: "INVALID"
@@ -143,8 +143,8 @@ class ValidatorTest {
 
 		document.set(content)
 		val errors = validator.validate(document, null as URI)
+
 		assertEquals(1, errors.size())
-		println(errors.map[message])
 		assertThat(
 			errors,
 			hasItems(
@@ -164,8 +164,8 @@ class ValidatorTest {
 			paths: {}
 			components: 
 			  schemas:
-			  
 			    MyType1:
+			      type: object
 			      properties:
 			        property:
 			          $ref: "https://www.reprezen.com/#"
