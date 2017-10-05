@@ -13,9 +13,9 @@ package com.reprezen.swagedit.core.json.references;
 import static com.reprezen.swagedit.core.json.references.JsonReference.PROPERTY;
 
 import java.net.URI;
-import java.util.Set;
+import java.util.Map;
 
-import com.google.common.collect.Sets;
+import com.google.common.collect.Maps;
 import com.reprezen.swagedit.core.model.AbstractNode;
 import com.reprezen.swagedit.core.model.Model;
 
@@ -40,8 +40,8 @@ public class JsonReferenceCollector {
      * @param model
      * @return all reference nodes
      */
-    public Iterable<JsonReference> collect(URI baseURI, Model model) {
-        final Set<JsonReference> references = Sets.newHashSet();
+    public Map<AbstractNode, JsonReference> collect(URI baseURI, Model model) {
+        final Map<AbstractNode, JsonReference> references = Maps.newHashMap();
 
         for (AbstractNode node : model.allNodes()) {
             if (JsonReference.isReference(node)) {
@@ -50,7 +50,7 @@ public class JsonReferenceCollector {
                     reference = factory.create(node);
                 }
                 if (reference != null) {
-                    references.add(reference);
+                    references.put(node, reference);
                 }
             }
         }

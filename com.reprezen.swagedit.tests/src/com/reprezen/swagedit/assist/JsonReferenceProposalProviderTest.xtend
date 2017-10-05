@@ -10,6 +10,9 @@
  *******************************************************************************/
 package com.reprezen.swagedit.assist
 
+import com.reprezen.swagedit.core.assist.Proposal
+import com.reprezen.swagedit.core.assist.contexts.RegexContextType
+import com.reprezen.swagedit.core.utils.SwaggerFileFinder.Scope
 import com.reprezen.swagedit.editor.SwaggerDocument
 import com.reprezen.swagedit.mocks.Mocks
 import com.reprezen.swagedit.tests.utils.PointerHelpers
@@ -18,10 +21,6 @@ import org.junit.Test
 
 import static org.hamcrest.core.IsCollectionContaining.*
 import static org.junit.Assert.*
-import com.reprezen.swagedit.core.utils.SwaggerFileFinder.Scope
-import com.reprezen.swagedit.core.assist.Proposal
-import com.reprezen.swagedit.core.assist.contexts.ContextType
-import com.reprezen.swagedit.core.assist.contexts.RegexContextType
 
 class JsonReferenceProposalProviderTest {
 
