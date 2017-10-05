@@ -10,7 +10,6 @@
  *******************************************************************************/
 package com.reprezen.swagedit.core.json.references;
 
-import java.io.IOException;
 import java.net.MalformedURLException;
 import java.net.URI;
 import java.net.URL;
@@ -54,51 +53,23 @@ public class JsonDocumentManager {
      * @return JSON tree
      */
     public JsonNode getDocument(URL url) {
-        if (documents.containsKey(url)) {
-            return documents.get(url);
+        URL normalized = normalize(url);
+
+        if (documents.containsKey(normalized)) {
+            return documents.get(normalized);
         }
 
-        JsonNode document;
-        if (url.getFile().endsWith("json")) {
-            try {
-                document = mapper.readTree(url);
-            } catch (Exception e) {
-                document = null;
-            }
-        } else if (url.getFile().endsWith("yaml") || url.getFile().endsWith("yml")) {
-            try {
-                document = yamlMapper.readTree(url);
-            } catch (IOException e) {
-                document = null;
-            }
-        } else {
-            // cannot decide which format, so we try both parsers
-            try {
-                document = mapper.readTree(url);
-            } catch (Exception e) {
-                try {
-                    document = yamlMapper.readTree(url);
-                } catch (IOException ee) {
-                    document = null;
-                }
-            }
-        }
-
+        JsonNode document = parse(normalized);
         if (document != null) {
-            documents.put(url, document);
+            documents.put(normalized, document);
         }
         return document;
     }
 
     public JsonNode getDocument(URI uri) {
-        final IFile file = getFile(uri);
-        if (file == null || !file.exists()) {
-            return null;
-        }
-
         try {
             return getDocument(uri.toURL());
-        } catch (MalformedURLException e) {
+        } catch (IllegalArgumentException | MalformedURLException e) {
             return null;
         }
     }
@@ -112,6 +83,41 @@ public class JsonDocumentManager {
      */
     public IFile getFile(URI uri) {
         return uri != null ? DocumentUtils.getWorkspaceFile(uri) : null;
+    }
+
+    private JsonNode parse(URL url) {
+        if (url.getFile().endsWith("json")) {
+            try {
+                return mapper.readTree(url);
+            } catch (Exception e) {
+                return null;
+            }
+        } else if (url.getFile().endsWith("yaml") || url.getFile().endsWith("yml")) {
+            try {
+                return yamlMapper.readTree(url);
+            } catch (Exception e) {
+                return null;
+            }
+        } else {
+            // cannot decide which format, so we try both parsers
+            try {
+                return mapper.readTree(url);
+            } catch (Exception e) {
+                try {
+                    return yamlMapper.readTree(url);
+                } catch (Exception ee) {
+                    return null;
+                }
+            }
+        }
+    }
+
+    private URL normalize(URL url) {
+        try {
+            return new URL(url.getProtocol(), url.getHost(), url.getFile());
+        } catch (MalformedURLException e) {
+            return url;
+        }
     }
 
 }
