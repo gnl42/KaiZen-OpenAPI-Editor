@@ -39,6 +39,9 @@ public class Messages extends NLS {
     public static String error_array_items_should_be_object;
     public static String error_invalid_reference_type;
     public static String error_invalid_parameter_location;
+    public static String error_scope_should_be_empty;
+    public static String error_scope_should_not_be_empty;
+    public static String error_invalid_scope_reference;
 
     public static String error_array_missing_items;
     public static String error_object_type_missing;

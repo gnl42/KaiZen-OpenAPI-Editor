@@ -334,15 +334,14 @@ class ValidatorTest {
 			    get:
 			      operationId: opId
 			      security:
-			        - open:
-			          - a:a
+			        - open: []
 			      responses:
 			        200:
 			          description: Ok
 			components: 
 			  securitySchemes:
 			    open:
-			      type: a
+			      type: basic
 		'''
 
 		document.set(content)
@@ -362,15 +361,14 @@ class ValidatorTest {
 			    get:
 			      operationId: opId
 			      security:
-			        - foo:
-			          - a:a
+			        - foo: []
 			      responses:
 			        200:
 			          description: Ok
 			components: 
 			  securitySchemes:
 			    open:
-			      type: a
+			      type: basic
 		'''
 
 		document.set(content)
@@ -562,5 +560,133 @@ class ValidatorTest {
 		val errors = validator.validate(document, null as URI)		
 		assertEquals(0, errors.size())
 	}
+	
+	@Test
+	def void validateOAuthSecuritySchemes() {
+		val content = '''
+		openapi: '3.0.0'
+		info:
+		  version: 0.0.0
+		  title: Simple API
+		paths:
+		  /foo/{bar}:
+		    get:
+		      security:
+		        - oauth:
+		            - write:pets
+		            - read:pets
+		      responses:
+		        '200':
+		          description: OK
+		components:
+		  securitySchemes:
+		    oauth:
+		      type: oauth2
+		      flows: 
+		        implicit:
+		          authorizationUrl: https://example.com/api/oauth/dialog
+		          scopes:
+		            write:pets: modify pets in your account
+		            read:pets: read your pets
+		'''
 
+		document.set(content)
+
+		val errors = validator.validate(document, null as URI)		
+		assertEquals(0, errors.size())
+	}
+	
+	@Test
+	def void validateOAuthSecuritySchemes_WithWrongScope() {
+		val content = '''
+		openapi: '3.0.0'
+		info:
+		  version: 0.0.0
+		  title: Simple API
+		paths:
+		  /foo/{bar}:
+		    get:
+		      security:
+		        - oauth:
+		            - write:pets
+		            - foo
+		      responses:
+		        '200':
+		          description: OK
+		components:
+		  securitySchemes:
+		    oauth:
+		      type: oauth2
+		      flows: 
+		        implicit:
+		          authorizationUrl: https://example.com/api/oauth/dialog
+		          scopes:
+		            write:pets: modify pets in your account
+		            read:pets: read your pets
+		'''
+
+		document.set(content)
+
+		val errors = validator.validate(document, null as URI)		
+		assertEquals(1, errors.size())
+		assertTrue(errors.map[message].forall[it.equals(Messages.error_invalid_scope_reference)])
+		assertThat(errors.map[line], hasItems(11))
+	}
+
+	@Test
+	def void validateNonOAuthSecuritySchemes() {
+		val content = '''
+		openapi: '3.0.0'
+		info:
+		  version: 0.0.0
+		  title: Simple API
+		paths:
+		  /foo/{bar}:
+		    get:
+		      security:
+		        - oauth: []
+		      responses:
+		        '200':
+		          description: OK
+		components:
+		  securitySchemes:
+		    oauth:
+		      type: http
+		'''
+
+		document.set(content)
+
+		val errors = validator.validate(document, null as URI)		
+		assertEquals(0, errors.size())
+	}
+
+	@Test
+	def void validateNonOAuthSecuritySchemes_WithWrongScope() {
+		val content = '''
+		openapi: '3.0.0'
+		info:
+		  version: 0.0.0
+		  title: Simple API
+		paths:
+		  /foo/{bar}:
+		    get:
+		      security:
+		        - basic:
+		          - foo
+		      responses:
+		        '200':
+		          description: OK
+		components:
+		  securitySchemes:
+		    basic:
+		      type: http
+		'''
+
+		document.set(content)
+
+		val errors = validator.validate(document, null as URI)		
+		assertEquals(1, errors.size())		
+		assertTrue(errors.map[message].forall[it.equals(Messages.error_scope_should_be_empty)])
+		assertThat(errors.map[line], hasItems(9))
+	}
 }
