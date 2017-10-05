@@ -12,6 +12,12 @@ import com.reprezen.swagedit.openapi3.editor.OpenApi3Document;
 
 public class Mocks {
 
+    public static ITextViewer mockTextViewer(OpenApi3Document document) {
+        ITextViewer viewer = mock(ITextViewer.class);
+        when(viewer.getDocument()).thenReturn(document);
+        return viewer;
+    }
+
     public static ITextViewer mockTextViewer(OpenApi3Document document, int offset) {
         ITextViewer viewer = mock(ITextViewer.class);
         ISelectionProvider selectionProvider = mockSelectionProvider();

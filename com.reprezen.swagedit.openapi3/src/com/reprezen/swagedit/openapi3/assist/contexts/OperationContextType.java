@@ -32,7 +32,7 @@ public class OperationContextType extends SchemaContextType {
 
         for (AbstractNode node : nodes) {
             String pointer = node.getPointerString();
-            String basePath = (path != null ? path.toString() : "") + "#" + pointer + "/";
+            String basePath = (path != null ? path.toString() : "") + "#" + pointer;
             String key = node.getProperty();
             String value = basePath;
             String encoded = URLUtils.encodeURL(value);

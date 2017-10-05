@@ -12,8 +12,17 @@ import org.eclipse.xtext.xbase.lib.Functions.Function2
 import org.eclipse.xtext.xbase.lib.Procedures.Procedure2
 
 import static org.junit.Assert.*
+import java.util.Map
 
 class Cursors {
+
+	static def Map<String, IRegion> setUpRegions(String yaml, OpenApi3Document doc) {
+		val groups = groupMarkers(yaml)
+		doc.set(removeMarkers(yaml))
+		doc.onChange
+
+		groups
+	}
 
 	static def (String, String)=>void setUpPathTest(String yaml, OpenApi3Document doc) {
 		val groups = groupMarkers(yaml)

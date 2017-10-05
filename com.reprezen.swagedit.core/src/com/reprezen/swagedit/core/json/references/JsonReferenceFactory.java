@@ -114,6 +114,11 @@ public class JsonReferenceFactory {
         String fragment = uri.getFragment();
         JsonPointer pointer = null;
         try {
+            // Pointer fails to resolve if ends with /
+            if (fragment.endsWith("/")) {
+                fragment = fragment.substring(0, fragment.length() - 1);
+            }
+
             pointer = JsonPointer.compile(Strings.emptyToNull(fragment));
         } catch (IllegalArgumentException e) {
             // let the pointer be null

@@ -37,7 +37,7 @@ public abstract class JsonReferenceHyperlinkDetector extends AbstractJsonHyperli
 
     @Override
     protected boolean canDetect(JsonPointer pointer) {
-        return pointer != null && pointer.toString().endsWith("$ref");
+        return pointer != null && (pointer.toString().endsWith("$ref") || pointer.toString().endsWith("operationRef"));
     }
 
     @Override

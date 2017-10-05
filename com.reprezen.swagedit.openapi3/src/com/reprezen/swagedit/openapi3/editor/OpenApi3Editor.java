@@ -22,7 +22,9 @@ import com.reprezen.swagedit.core.schema.CompositeSchema;
 import com.reprezen.swagedit.core.validation.Validator;
 import com.reprezen.swagedit.openapi3.Activator;
 import com.reprezen.swagedit.openapi3.assist.OpenApi3ContentAssistProcessor;
+import com.reprezen.swagedit.openapi3.hyperlinks.LinkOperationHyperlinkDetector;
 import com.reprezen.swagedit.openapi3.hyperlinks.OpenApi3ReferenceHyperlinkDetector;
+import com.reprezen.swagedit.openapi3.hyperlinks.SecuritySchemeHyperlinkDetector;
 import com.reprezen.swagedit.openapi3.validation.OpenApi3Validator;
 
 public class OpenApi3Editor extends JsonEditor {
@@ -56,7 +58,9 @@ public class OpenApi3Editor extends JsonEditor {
             return new IHyperlinkDetector[] { new URLHyperlinkDetector(), //
                     new PathParamHyperlinkDetector(), //
                     new DefinitionHyperlinkDetector(), //
-                    new OpenApi3ReferenceHyperlinkDetector() };
+                    new OpenApi3ReferenceHyperlinkDetector(), //
+                    new SecuritySchemeHyperlinkDetector(), //
+                    new LinkOperationHyperlinkDetector() };
 		}
 
 		@Override
