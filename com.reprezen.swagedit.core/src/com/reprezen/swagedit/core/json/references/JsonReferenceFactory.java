@@ -115,7 +115,7 @@ public class JsonReferenceFactory {
         JsonPointer pointer = null;
         try {
             // Pointer fails to resolve if ends with /
-            if (fragment.endsWith("/")) {
+            if (fragment != null && fragment.length() > 1 && fragment.endsWith("/")) {
                 fragment = fragment.substring(0, fragment.length() - 1);
             }
 
