@@ -15,13 +15,18 @@ import org.eclipse.jface.text.IRegion;
 
 import com.fasterxml.jackson.core.JsonPointer;
 import com.reprezen.swagedit.core.hyperlinks.JsonFileHyperlink;
-import com.reprezen.swagedit.core.hyperlinks.JsonReferenceHyperlinkDetector;
+import com.reprezen.swagedit.core.hyperlinks.ReferenceHyperlinkDetector;
 
-public class OpenApi3ReferenceHyperlinkDetector extends JsonReferenceHyperlinkDetector {
+public class LinkOperationRefHyperlinkDetector extends ReferenceHyperlinkDetector {
 
-	@Override
-	protected JsonFileHyperlink createFileHyperlink(IRegion linkRegion, String label, IFile file, JsonPointer pointer) {
-		return new OpenApi3FileHyperlink(linkRegion, label, file, pointer);
-	}
+    @Override
+    protected JsonFileHyperlink createFileHyperlink(IRegion linkRegion, String label, IFile file, JsonPointer pointer) {
+        return new OpenApi3FileHyperlink(linkRegion, label, file, pointer);
+    }
+
+    @Override
+    protected boolean canDetect(JsonPointer pointer) {
+        return pointer != null && pointer.toString().endsWith("operationRef");
+    }
 
 }
