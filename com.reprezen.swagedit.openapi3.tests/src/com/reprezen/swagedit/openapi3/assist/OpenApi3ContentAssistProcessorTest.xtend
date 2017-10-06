@@ -17,6 +17,7 @@ import org.junit.Test
 
 import static com.reprezen.swagedit.openapi3.utils.Cursors.*
 import static org.hamcrest.core.IsCollectionContaining.*
+import static org.hamcrest.core.IsNot.*
 import static org.junit.Assert.*
 import com.reprezen.swagedit.openapi3.schema.OpenApi3Schema
 import com.reprezen.swagedit.core.model.Model
@@ -34,7 +35,7 @@ class OpenApi3ContentAssistProcessorTest {
 	}
 
 	@Test
-	def void testCallbacksInOperation_ShouldReturnKey() {
+	def void testCallbacksInOperation_ShouldReturn_CallbackName() {
 		val document = new OpenApi3Document(new OpenApi3Schema)
 		val test = setUpContentAssistTest('''
 			paths:
@@ -44,15 +45,14 @@ class OpenApi3ContentAssistProcessorTest {
 			        <1>
 		''', document)
 
-		val proposals = test.apply(processor, "1")
-		assertThat(
-			proposals.map[(it as StyledCompletionProposal).replacementString],
-			hasItems("_key_:")
+		val proposals = test.apply(processor, "1")		
+		assertThat(proposals.map[(it as StyledCompletionProposal).replacementString], 
+			hasItems("(callback name):")
 		)
 	}
 
 	@Test
-	def void testCallbacksInComponents_ShouldReturnKey() {
+	def void testCallbacksInComponents_ShouldReturn_CallbackName() {
 		val document = new OpenApi3Document(new OpenApi3Schema)
 		val test = setUpContentAssistTest('''
 			components:
@@ -61,8 +61,329 @@ class OpenApi3ContentAssistProcessorTest {
 		''', document)
 
 		val proposals = test.apply(processor, "1")
-		assertThat(
-			proposals.map[(it as StyledCompletionProposal).replacementString],
+		assertThat(proposals.map[(it as StyledCompletionProposal).replacementString], 
+			hasItems("(callback name):")
+		)
+	}
+
+	@Test
+	def void testSchemaInComponents_ShouldReturn_SchemaName() {
+		val document = new OpenApi3Document(new OpenApi3Schema)
+		val test = setUpContentAssistTest('''
+			components:
+			  schemas:
+			    <1>
+		''', document)
+
+		val proposals = test.apply(processor, "1")
+		assertThat(proposals.map[(it as StyledCompletionProposal).replacementString], 
+			hasItems("(schema name):")
+		)
+	}
+	
+	@Test
+	def void testAnonymousSchemaInMediaType_Should_NOT_Return_SchemaName_Key() {
+		val document = new OpenApi3Document(new OpenApi3Schema)
+		val test = setUpContentAssistTest('''
+paths:
+  /resource:
+    get:
+      description: description
+      responses:
+        default:
+          description: Ok
+          content:
+            application/json:
+              schema:
+                <1>
+		''', document)
+
+		val proposals = test.apply(processor, "1")
+		assertThat(proposals.map[(it as StyledCompletionProposal).replacementString], 
+			not(hasItem("(schema name):"))
+		)
+		assertThat(proposals.map[(it as StyledCompletionProposal).replacementString], 
+			not(hasItem("_key_:"))
+		)
+	}
+
+	@Test
+	def void testSchemaInSchemaProperties_ShouldReturn_PropertyName() {
+		val document = new OpenApi3Document(new OpenApi3Schema)
+		val test = setUpContentAssistTest('''
+			components:
+			  schemas:
+			    MyDataType:
+			      type: object
+			      properties:
+			        <1>
+		''', document)
+
+		val proposals = test.apply(processor, "1")
+		assertThat(proposals.map[(it as StyledCompletionProposal).replacementString], 
+			hasItems("(property name):")
+		)
+	}
+	
+	
+	@Test
+	def void testResponseInComponents_ShouldReturn_ResponseName() {
+		val document = new OpenApi3Document(new OpenApi3Schema)
+		val test = setUpContentAssistTest('''
+			components:
+			  responses:
+			    <1>
+		''', document)
+
+		val proposals = test.apply(processor, "1")
+		assertThat(proposals.map[(it as StyledCompletionProposal).replacementString], 
+			hasItems("(response name):")
+		)
+	}
+	
+	
+	@Test
+	def void testParameterInComponents_ShouldReturn_ParameterName() {
+		val document = new OpenApi3Document(new OpenApi3Schema)
+		val test = setUpContentAssistTest('''
+			components:
+			  parameters:
+			    <1>
+		''', document)
+
+		val proposals = test.apply(processor, "1")
+		assertThat(proposals.map[(it as StyledCompletionProposal).replacementString], 
+			hasItems("(parameter name):")
+		)
+	}
+	
+	@Test
+	def void testExampleInComponents_ShouldReturn_ExampleName() {
+		val document = new OpenApi3Document(new OpenApi3Schema)
+		val test = setUpContentAssistTest('''
+			components:
+			  examples:
+			    <1>
+		''', document)
+
+		val proposals = test.apply(processor, "1")
+		assertThat(proposals.map[(it as StyledCompletionProposal).replacementString], 
+			hasItems("(example name):")
+		)
+	}
+	
+	@Test
+	def void testRequestBodiesInComponents_ShouldReturn_RequestBodyName() {
+		val document = new OpenApi3Document(new OpenApi3Schema)
+		val test = setUpContentAssistTest('''
+			components:
+			  requestBodies:
+			    <1>
+		''', document)
+
+		val proposals = test.apply(processor, "1")
+		assertThat(proposals.map[(it as StyledCompletionProposal).replacementString], 
+			hasItems("(requestBody name):")
+		)
+	}
+	
+	@Test
+	def void testHeaderInComponents_ShouldReturn_HeaderName() {
+		val document = new OpenApi3Document(new OpenApi3Schema)
+		val test = setUpContentAssistTest('''
+			components:
+			  headers:
+			    <1>
+		''', document)
+
+		val proposals = test.apply(processor, "1")
+		assertThat(proposals.map[(it as StyledCompletionProposal).replacementString], 
+			hasItems("(header name):")
+		)
+	}
+	
+	@Test
+	def void testSecuritySchemeInComponents_ShouldReturn_SecuritySchemeName() {
+		val document = new OpenApi3Document(new OpenApi3Schema)
+		val test = setUpContentAssistTest('''
+			components:
+			  securitySchemes:
+			    <1>
+		''', document)
+
+		val proposals = test.apply(processor, "1")
+		assertThat(proposals.map[(it as StyledCompletionProposal).replacementString], 
+			hasItems("(securityScheme name):")
+		)
+	}
+	
+	@Test
+	def void testLinkInComponents_ShouldReturn_LinkName() {
+		val document = new OpenApi3Document(new OpenApi3Schema)
+		val test = setUpContentAssistTest('''
+			components:
+			  links:
+			    <1>
+		''', document)
+
+		val proposals = test.apply(processor, "1")
+		assertThat(proposals.map[(it as StyledCompletionProposal).replacementString], 
+			hasItems("(link name):")
+		)
+	}
+	
+	@Test
+	def void testMediaTypeInContent_Should_NOT_Return_MediaTypeName() {
+		val document = new OpenApi3Document(new OpenApi3Schema)
+		val test = setUpContentAssistTest('''
+paths:
+  "/resource":
+    get:
+      description: description
+      responses:
+        '200':
+          description: Ok
+          content:
+            <1>
+		''', document)
+
+		val proposals = test.apply(processor, "1")
+		// we don't need a "(mediaType name)" as valid mediatypes are provided by 
+		// [#395] OpenAPI v3: Content assist for media types
+		assertThat(proposals.map[(it as StyledCompletionProposal).replacementString], 
+			not(hasItem("(mediaType name):"))
+		)
+	}
+	
+	@Test
+	def void testEncodingInMediaType_ShouldReturn_EncodingName() {
+		val document = new OpenApi3Document(new OpenApi3Schema)	
+		val test = setUpContentAssistTest('''
+paths:
+  "/resource":
+    get:
+      description: description
+      responses:
+        '200':
+          description: Ok
+          content:
+            application/json:
+              encoding:
+                <1>
+		''', document)
+
+		val proposals = test.apply(processor, "1")
+		assertThat(proposals.map[(it as StyledCompletionProposal).replacementString], 
+			hasItems("(encoding name):")
+		)
+	}
+	
+	@Test
+	def void testServerVariableInServer_ShouldReturn_ServerVariableName() {
+		val document = new OpenApi3Document(new OpenApi3Schema)
+		val test = setUpContentAssistTest('''
+servers:  
+- url: https://development.gigantic-server.com/v1
+  description: Development server
+  variables:
+    <1>
+		''', document)
+
+		val proposals = test.apply(processor, "1")
+		assertThat(proposals.map[(it as StyledCompletionProposal).replacementString], 
+			hasItems("(serverVariable name):")
+		)
+	}
+	
+	@Test
+	def void testAnyInLinkParameter_ShouldReturn_AnyName() {
+		val document = new OpenApi3Document(new OpenApi3Schema)
+		val test = setUpContentAssistTest('''
+components:
+  links:
+    MyLink:
+      operationId: getRepositoriesByOwner
+      parameters:
+        <1>
+		''', document)
+
+		val proposals = test.apply(processor, "1")
+		assertThat(proposals.map[(it as StyledCompletionProposal).replacementString], 
+			hasItems("(any name):")
+		)
+	}	
+	
+	@Test
+	def void testStringsInDiscriminatorMapping() {
+		val document = new OpenApi3Document(new OpenApi3Schema)
+		val test = setUpContentAssistTest('''
+components:
+  schemas:
+    MyResponseType:
+      oneOf:
+      - $ref: '#/components/schemas/Cat'
+      - $ref: '#/components/schemas/Dog'
+      discriminator:
+        propertyName: pet_type
+        mapping:
+          <1>
+		''', document)
+
+		val proposals = test.apply(processor, "1")
+		// _key_ is a temporary solution, just documenting the current state
+		assertThat(proposals.map[(it as StyledCompletionProposal).replacementString], 
+			hasItems("_key_:")
+		)
+	}	
+
+	@Test
+	def void testStringsInOauthFlowScopes() {
+		val document = new OpenApi3Document(new OpenApi3Schema)
+		val test = setUpContentAssistTest('''
+components:
+  securitySchemes:
+    mySecurityScheme:
+      type: oauth2
+      flows: 
+        implicit:
+          authorizationUrl: https://example.com/api/oauth/dialog
+          scopes:
+            <1>
+		''', document)
+
+		// _key_ is a temporary solution, just documenting the current state
+		val proposals = test.apply(processor, "1")
+		assertThat(proposals.map[(it as StyledCompletionProposal).replacementString], 
+			hasItems("_key_:")
+		)
+	}
+
+	@Test
+	def void testResponseSchemaStillContainsKeyProposal() {
+		val document = setUpContentAssistTest('''
+		openapi: "3.0.0"
+		info:
+		  version: 1.0.0
+		  title: Test
+		paths:
+		  /:
+		    get:
+		      summary: All
+		      responses:
+		        200:
+		          description: Ok          
+		          content:
+		            application/json:    
+		              schema:
+		                <1>$ref: "#/components/schemas/Pets"
+		components:
+		  schemas:
+		    Pets:
+		      type: object
+		''', new OpenApi3Document(new OpenApi3Schema))
+
+		val proposals = document.apply(processor, "1")
+		assertThat(proposals.map[(it as StyledCompletionProposal).replacementString], 
 			hasItems("_key_:")
 		)
 	}

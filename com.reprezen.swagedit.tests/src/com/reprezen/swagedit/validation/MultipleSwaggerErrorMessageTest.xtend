@@ -4,13 +4,13 @@ import com.fasterxml.jackson.databind.JsonNode
 import com.fasterxml.jackson.databind.node.ArrayNode
 import com.google.common.base.Strings
 import com.google.common.collect.Lists
+import com.reprezen.swagedit.core.schema.JsonSchemaUtils
 import com.reprezen.swagedit.schema.SwaggerSchema
 import io.swagger.util.Json
 import java.util.List
 import org.junit.Test
 
 import static org.junit.Assert.*
-import com.reprezen.swagedit.core.validation.MultipleSwaggerErrorBuilder
 
 class MultipleSwaggerErrorMessageTest {
 
@@ -75,28 +75,14 @@ class MultipleSwaggerErrorMessageTest {
 	}
 
 	def void assertHumanFriendlyTextForNodeEquals(CharSequence json, String expectedLabel, String defaultValue) {
-		val swaggerError = new MultipleSwaggerErrorBuilder() {
-			
-			def public public_getHumanFriendlyText(JsonNode swaggerSchemaNode, String defaultValue) {
-				super.getHumanFriendlyText(swaggerSchemaNode, defaultValue)
-			}
-			
-		};
 		val JsonNode arrayOfSchemasNode = Json.mapper().readTree(json.toString);
 		assertNotNull(arrayOfSchemasNode)
-		val label = swaggerError.public_getHumanFriendlyText(arrayOfSchemasNode, defaultValue);
+		val label = JsonSchemaUtils::getHumanFriendlyText(arrayOfSchemasNode, defaultValue);
 		assertEquals(expectedLabel, label)
 	}
 
 	def void testCombinedSchemas(String propertyName) throws Exception {
 		val JsonNode swaggerSchema = new SwaggerSchema().asJson
-		val swaggerError = new MultipleSwaggerErrorBuilder() {
-			
-			def public public_getHumanFriendlyText(JsonNode swaggerSchemaNode, String defaultValue) {
-				super.getHumanFriendlyText(swaggerSchemaNode, defaultValue)
-			}
-			
-		};
 		val List<JsonNode> combinedSchemas = newArrayList();
 		// oneOf and anyOf are usually ArrayNodes
 		swaggerSchema.findValues(propertyName).forEach [
@@ -108,7 +94,7 @@ class MultipleSwaggerErrorMessageTest {
 		];
 		assertFalse(combinedSchemas.filterNull.isNullOrEmpty)
 
-		val emptyLabels = combinedSchemas.filter[it|Strings.isNullOrEmpty(swaggerError.public_getHumanFriendlyText(it, null))]
+		val emptyLabels = combinedSchemas.filter[it|Strings.isNullOrEmpty(JsonSchemaUtils::getHumanFriendlyText(it, null))]
 		assertTrue("Null labels are not expected, but got null for the following nodes: " + emptyLabels,
 			emptyLabels.isNullOrEmpty)
 	}

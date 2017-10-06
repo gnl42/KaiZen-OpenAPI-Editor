@@ -63,6 +63,11 @@ public class SwaggerError {
     public int getLine() {
         return line;
     }
+    
+    @Override
+    public java.lang.String toString() {
+        return getMessage();
+    }
 
     String getIndentedMessage() {
         final StringBuilder builder = new StringBuilder();

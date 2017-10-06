@@ -33,7 +33,7 @@ class ValidationHelper {
 		val JsonNode schemaAsJson = getSchema().asJson()
 		val ErrorProcessor processor = new ErrorProcessor(null, null) {
 			override protected Set<SwaggerError> fromNode(JsonNode error, int indent) {
-				fail('''JSON Schema validation error: «error.asText()»''')
+				fail('''JSON Schema validation error: «super.fromNode(error, indent)»''')
 				return super.fromNode(error, indent)
 			}
 		}

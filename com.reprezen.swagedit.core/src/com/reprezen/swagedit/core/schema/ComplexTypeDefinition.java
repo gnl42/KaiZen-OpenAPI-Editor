@@ -19,6 +19,7 @@ import java.util.List;
 import com.fasterxml.jackson.core.JsonPointer;
 import com.fasterxml.jackson.databind.JsonNode;
 import com.fasterxml.jackson.databind.node.ArrayNode;
+import com.google.common.collect.Iterables;
 import com.reprezen.swagedit.core.model.AbstractNode;
 
 /**
@@ -138,5 +139,11 @@ public class ComplexTypeDefinition extends TypeDefinition {
         }
 
         return isValid;
+    }
+    
+    @Override
+    public String getLabel() {
+        TypeDefinition firstType = Iterables.getFirst(complexTypes, null);
+        return firstType!=null ? firstType.getLabel() : null;
     }
 }

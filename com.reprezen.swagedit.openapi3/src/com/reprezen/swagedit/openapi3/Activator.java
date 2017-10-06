@@ -14,12 +14,16 @@ import java.io.IOException;
 
 import org.dadacoalition.yedit.YEditLog;
 import org.eclipse.jface.text.templates.ContextTypeRegistry;
+import org.eclipse.jface.text.templates.Template;
 import org.eclipse.jface.text.templates.TemplateContextType;
+import org.eclipse.jface.text.templates.persistence.TemplatePersistenceData;
 import org.eclipse.jface.text.templates.persistence.TemplateStore;
 import org.eclipse.ui.editors.text.templates.ContributionTemplateStore;
 import org.eclipse.ui.plugin.AbstractUIPlugin;
 import org.osgi.framework.BundleContext;
 
+import com.google.common.base.Strings;
+import com.reprezen.swagedit.core.preferences.KaiZenPreferencesUtils;
 import com.reprezen.swagedit.openapi3.schema.OpenApi3Schema;
 import com.reprezen.swagedit.openapi3.templates.OpenApi3ContextTypeProvider;
 
@@ -106,8 +110,45 @@ public class Activator extends AbstractUIPlugin {
             } catch (IOException e) {
                 YEditLog.logException(e);
             }
+            addNamedSchemaTemplatesInSchemas();
+            addNamedSchemaTemplatesInSchemaProperties();
         }
         return templateStore;
+    }
+
+    private void addNamedSchemaTemplatesInSchemas() {
+        addNamedTemplates("com.reprezen.swagedit.openapi3.templates.schema",
+                "com.reprezen.swagedit.openapi3.templates.schemas", "schema");
+    }
+
+    private void addNamedSchemaTemplatesInSchemaProperties() {
+        addNamedTemplates("com.reprezen.swagedit.openapi3.templates.schema",
+                "com.reprezen.swagedit.openapi3.templates.properties", "property");
+    }
+
+    private void addNamedTemplates(String inlineContextId, String namedContextId, String key) {
+        Template[] schemaTemplates = templateStore.getTemplates(inlineContextId);
+        for (int i = 0; i < schemaTemplates.length; i++) {
+            Template schemaTemplate = schemaTemplates[i];
+            Template template = createNamedTemplate(schemaTemplate, namedContextId, key);
+            templateStore.add(new TemplatePersistenceData(template, true));
+        }
+    }
+
+    private Template createNamedTemplate(Template inlineTemplate, String newTemplateId, String key) {
+        String indent = Strings.repeat(" ", getTabWidth());
+        String newPattern = inlineTemplate.getPattern().replaceAll("\n", "\n" + indent);
+        String pattern = String.format("${element_name:element_name('(%s name)')}:\n%s%s", key, indent, newPattern);
+        Template template = new Template(inlineTemplate.getName(), //
+                inlineTemplate.getDescription(), //
+                newTemplateId, //
+                pattern, //
+                inlineTemplate.isAutoInsertable());
+        return template;
+    }
+
+    protected int getTabWidth() {
+       return KaiZenPreferencesUtils.getTabWidth();
     }
 
 }

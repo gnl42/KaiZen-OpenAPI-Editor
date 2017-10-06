@@ -195,10 +195,17 @@ public class JsonProposalProvider {
             }
         }
 
+        if (type.getAdditionalProperties() != null) {
+            String elementTitle = type.getLabel();
+            String elementName = elementTitle != null? elementTitle : type.getAdditionalProperties().getLabel();
+            if (elementName != null) {
+                elementName = String.format("(%s name)", elementName);
+                proposals.add(new Proposal(elementName + ":", elementName, null, null, elementName));
+            }
+        }
         if (proposals.isEmpty()) {
             proposals.add(new Proposal("_key_" + ":", "_key_", null, null));
         }
-
         return proposals;
     }
 

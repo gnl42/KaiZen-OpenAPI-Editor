@@ -3,7 +3,7 @@
   "id": "http://openapis.org/v3/schema.json#",
   "$schema": "http://json-schema.org/draft-04/schema#",
   "type": "object",
-  "description": "This is the root document object of the OpenAPI definition.",
+  "description": "This is the root document object of the OpenAPI document.",
   "required": [
     "openapi",
     "info",
@@ -834,6 +834,7 @@
           ]
         },
         "properties": {
+          "title": "property",
           "type": "object",
           "additionalProperties": {
             "$ref": "#/definitions/schemaOrReference"

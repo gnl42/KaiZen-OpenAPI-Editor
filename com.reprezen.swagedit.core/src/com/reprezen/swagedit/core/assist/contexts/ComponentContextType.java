@@ -13,8 +13,8 @@ package com.reprezen.swagedit.core.assist.contexts;
 import java.util.Collection;
 
 import com.fasterxml.jackson.core.JsonPointer;
-import com.fasterxml.jackson.databind.ObjectMapper;
-import com.fasterxml.jackson.databind.node.ObjectNode;
+import com.fasterxml.jackson.databind.JsonNode;
+import com.reprezen.swagedit.core.json.references.JsonReference;
 import com.reprezen.swagedit.core.model.AbstractNode;
 import com.reprezen.swagedit.core.model.Model;
 import com.reprezen.swagedit.core.schema.ComplexTypeDefinition;
@@ -23,13 +23,13 @@ import com.reprezen.swagedit.core.schema.TypeDefinition;
 
 public class ComponentContextType extends ContextType {
 
-    private final ObjectNode componentRef;
-    
+    private final String componentRef;
+
     public ComponentContextType(String value, String label, String componentSchemaPath) {
         super(value, label);
-        componentRef = new ObjectMapper().createObjectNode().put("$ref", "#/definitions/" + componentSchemaPath);
+        componentRef = "#/definitions/" + componentSchemaPath;
     }
-    
+
     protected String getReferencePointerString() {
         return "/definitions/reference/properties/$ref";
     }
@@ -73,12 +73,17 @@ public class ComponentContextType extends ContextType {
         if (parentType instanceof ComplexTypeDefinition) {
             Collection<TypeDefinition> types = ((ComplexTypeDefinition) parentType).getComplexTypes();
             for (TypeDefinition type : types) {
-                if (componentRef.equals(type.getContent())) {
+                if (hasRefToComponent(type.getContent())) {
                     return true;
                 }
             }
         }
-        return componentRef.equals(parentType.getContent());
+        return hasRefToComponent(parentType.getContent());
+    }
+
+    private boolean hasRefToComponent(JsonNode content) {
+        return content.hasNonNull(JsonReference.PROPERTY)
+                && componentRef.equals(content.get(JsonReference.PROPERTY).asText());
     }
 
 }

@@ -73,6 +73,21 @@ public class TypeDefinition {
         }
         return content.get("description").asText();
     }
+    
+    /**
+     * Human-friendly label which can be used in GUI.
+     * It does not intent to provide complete information about a type, 
+     * just a concise label.</br>
+     * Subclasses are welcome to override this method.
+     * </br>
+     * Can return null.
+     */
+    public String getLabel() {
+        if (content == null) {
+            return null;
+        }
+        return JsonSchemaUtils.getHumanFriendlyText(content, null);
+    }
 
     @Override
     public String toString() {

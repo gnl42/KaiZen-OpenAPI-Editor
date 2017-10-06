@@ -34,11 +34,13 @@ public class StyledCompletionProposal
     private final String description;
     /** Lower-cased prefix - content assist typeahead should be case-insensitive */
     private final String prefix;
+    private final String selection;
 
     public StyledCompletionProposal(String replacement, StyledString label, String prefix, String description,
-            int offset) {
+            int offset, String selection) {
         this.label = label;
         this.replacementString = replacement;
+        this.selection = selection == null ? "" : selection;
         this.prefix = prefix != null ? prefix.toLowerCase() : null;
         this.replacementOffset = offset;
         this.description = description;
@@ -82,10 +84,9 @@ public class StyledCompletionProposal
                 offset = replacementOffset - prefix.length();
             }
         }
-
-        int cursorPosition = offset + replacementString.length();
-
-        return new Point(cursorPosition, 0);
+        int replacementIndex = !"".equals(selection) ? replacementString.indexOf(selection) : -1;
+        int selectionStart = offset + (replacementIndex < 0 ? replacementString.length() : replacementIndex);
+        return new Point(selectionStart, selection.length());
     }
 
     @Override

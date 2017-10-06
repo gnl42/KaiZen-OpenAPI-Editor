@@ -60,7 +60,16 @@ class CodeTemplateTextTest {
 		val testCases = new CodeAssistHelper().extractTests(resourcesDir, KZOEref)
 		testCases.forEach [
 			val contextType = getCodeTemplateContext(createOpenApi3Document(it.file), it.offset)
-			val templates = Activator.^default.templateStore.getTemplates(contextType?.id);
+			val activator = new Activator() {
+
+				override protected getTabWidth() {
+					// YEdit preferences defaults are not iniatialized properly why running the test from Maven
+					// Therefore, tabWidth is 0 which creates false test failures 
+					2
+				}
+
+			}
+			val templates = activator.templateStore.getTemplates(contextType?.id);
 			result.addAll(templates.map [ t |
 				#[it.file, it.file.name, it.offset, it.name, t, t.name, contextType] as Object[]
 			])

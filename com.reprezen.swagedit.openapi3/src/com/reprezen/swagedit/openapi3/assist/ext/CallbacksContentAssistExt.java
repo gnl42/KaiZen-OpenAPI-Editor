@@ -31,7 +31,6 @@ public class CallbacksContentAssistExt implements ContentAssistExt {
     @Override
     public Collection<Proposal> getProposals(TypeDefinition type, AbstractNode node, String prefix) {
         return Lists.newArrayList( //
-                new Proposal("_key_:", "_key_", null, "callbackOrReference"), //
                 new Proposal("x-:", "x-", null, "specificationExtension"));
     }
 

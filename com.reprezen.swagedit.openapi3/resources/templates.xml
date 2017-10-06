@@ -272,21 +272,9 @@ content:
       $$ref: ${model}</template>
  
 <!--
-	NAMED SCHEMA 
+	NAMED SCHEMA: generated from SCHEMA OBJECT
  -->
- 
-	<template name="named schema" 
-       id="com.reprezen.swagedit.openapi3.templates.schemas.named_schema_required_property" 
-       description="Schema definition with a required property" 
-       context="com.reprezen.swagedit.openapi3.templates.schemas" 
-       enabled="true">${type}:
-  required:
-    - ${property}
-  properties:
-    ${property}:
-      type: integer
-      format: int64</template>
-      
+
 <!--
 	SCHEMA OBJECT
  -->
@@ -343,6 +331,14 @@ properties:
   properties:
     ${name}:
       type: string</template>          
+
+ 	<template name="$ref property" 
+       id="com.reprezen.swagedit.openapi3.templates.properties.ref" 
+       description="Property with a schema $ref template" 
+       context="com.reprezen.swagedit.openapi3.templates.properties" 
+       enabled="true">propertyName:
+  $$ref: "#/components/schemas/${schema}"</template>
+
 <!--
 	CALLBACKS 
  -->
@@ -390,5 +386,4 @@ properties:
           'text/html':
             schema:
               $$ref: '${errorModel}'</template>            
-
 </templates>
