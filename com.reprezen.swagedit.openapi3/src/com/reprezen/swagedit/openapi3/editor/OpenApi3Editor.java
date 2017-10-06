@@ -1,3 +1,13 @@
+/*******************************************************************************
+ *  Copyright (c) 2016 ModelSolv, Inc. and others.
+ *  All rights reserved. This program and the accompanying materials
+ *  are made available under the terms of the Eclipse Public License v1.0
+ *  which accompanies this distribution, and is available at
+ *  http://www.eclipse.org/legal/epl-v10.html
+ *  
+ *  Contributors:
+ *     ModelSolv, Inc. - initial API and implementation and/or initial documentation
+ *******************************************************************************/
 package com.reprezen.swagedit.openapi3.editor;
 
 import java.util.Map;
@@ -23,6 +33,7 @@ import com.reprezen.swagedit.core.validation.Validator;
 import com.reprezen.swagedit.openapi3.Activator;
 import com.reprezen.swagedit.openapi3.assist.OpenApi3ContentAssistProcessor;
 import com.reprezen.swagedit.openapi3.hyperlinks.LinkOperationHyperlinkDetector;
+import com.reprezen.swagedit.openapi3.hyperlinks.LinkOperationRefHyperlinkDetector;
 import com.reprezen.swagedit.openapi3.hyperlinks.OpenApi3ReferenceHyperlinkDetector;
 import com.reprezen.swagedit.openapi3.hyperlinks.SecuritySchemeHyperlinkDetector;
 import com.reprezen.swagedit.openapi3.validation.OpenApi3Validator;
@@ -60,7 +71,8 @@ public class OpenApi3Editor extends JsonEditor {
                     new DefinitionHyperlinkDetector(), //
                     new OpenApi3ReferenceHyperlinkDetector(), //
                     new SecuritySchemeHyperlinkDetector(), //
-                    new LinkOperationHyperlinkDetector() };
+                    new LinkOperationHyperlinkDetector(), //
+                    new LinkOperationRefHyperlinkDetector() };
 		}
 
 		@Override
