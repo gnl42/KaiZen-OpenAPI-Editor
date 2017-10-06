@@ -1,22 +1,24 @@
-package com.reprezen.swagedit.validation
+package com.reprezen.swagedit.openapi3.validation
 
 import com.fasterxml.jackson.databind.JsonNode
 import com.reprezen.swagedit.core.json.references.JsonReferenceValidator
 import com.reprezen.swagedit.core.validation.Messages
 import com.reprezen.swagedit.core.validation.SwaggerError
-import com.reprezen.swagedit.editor.SwaggerDocument
-import com.reprezen.swagedit.mocks.Mocks
-import io.swagger.util.Yaml
+import com.reprezen.swagedit.openapi3.editor.OpenApi3Document
+import com.reprezen.swagedit.openapi3.utils.Mocks
 import java.net.URI
 import java.util.Map
 import org.eclipse.core.resources.IMarker
 import org.junit.Test
 
 import static org.junit.Assert.*
+import com.fasterxml.jackson.dataformat.yaml.YAMLFactory
+import com.fasterxml.jackson.databind.ObjectMapper
+import com.reprezen.swagedit.openapi3.schema.OpenApi3Schema
 
 class ReferenceValidatorTest {
 
-	val document = new SwaggerDocument
+	val document = new OpenApi3Document(new OpenApi3Schema)
 
 	def validator(Map<URI, JsonNode> entries) {
 		new JsonReferenceValidator(Mocks.mockJsonReferenceFactory(entries))
@@ -25,7 +27,7 @@ class ReferenceValidatorTest {
 	@Test
 	def void shouldValidateReference_To_ValidType() {
 		val content = '''
-			swagger: '2.0'
+			openapi: '3.0.0'
 			info:
 			  version: 0.0.0
 			  title: Simple API
@@ -33,20 +35,21 @@ class ReferenceValidatorTest {
 			  /foo/{bar}:
 			    get:
 			      parameters:
-			        - $ref: '#/parameters/Valid'
+			        - $ref: '#/components/parameters/Valid'
 			      responses:
 			        '200':
 			          description: OK
-			parameters:
-			  Valid:
-			    name: Valid
-			    in: query
-			    type: string
+			components:
+			  parameters:
+			    Valid:
+			      name: Valid
+			      in: query
+			      type: string
 		'''
 
 		document.set(content)
 		val baseURI = new URI(null, null, null)
-		val resolvedURI = new URI(null, null, "/definitions/Valid")
+		val resolvedURI = new URI(null, null, "/components/parameters/Valid")
 		val errors = validator(#{resolvedURI -> document.asJson}).validate(baseURI, document)
 
 		assertEquals(0, errors.size())
@@ -55,7 +58,7 @@ class ReferenceValidatorTest {
 	@Test
 	def void shouldValidateReference_To_InvalidCorrect() {
 		val content = '''
-			swagger: '2.0'
+			openapi: '3.0.0'
 			info:
 			  version: 0.0.0
 			  title: Simple API
@@ -63,18 +66,19 @@ class ReferenceValidatorTest {
 			  /foo/{bar}:
 			    get:
 			      parameters:
-			        - $ref: '#/definitions/Valid'
+			        - $ref: '#/components/schemas/Valid'
 			      responses:
 			        '200':
 			          description: OK
-			definitions:
-			  Valid:
-			    type: string
+			components:
+			  schemas:
+			    Valid:
+			      type: string
 		'''
 
 		document.set(content)
 		val baseURI = new URI(null, null, null)
-		val resolvedURI = new URI(null, null, "/definitions/Valid")
+		val resolvedURI = new URI(null, null, "/components/schemas/Valid")
 		val errors = validator(#{resolvedURI -> document.asJson}).validate(baseURI, document)
 
 		assertEquals(1, errors.size())		
@@ -86,7 +90,7 @@ class ReferenceValidatorTest {
 	@Test
 	def void shouldValidateReference_To_InvalidDefinition() {
 		val content = '''
-			swagger: '2.0'
+			openapi: '3.0.0'
 			info:
 			  version: 0.0.0
 			  title: Simple API
@@ -94,7 +98,7 @@ class ReferenceValidatorTest {
 			  /foo/{bar}:
 			    get:
 			      parameters:
-			        - $ref: '#/definitions/Invalid'
+			        - $ref: '#/components/parameters/Invalid'
 			      responses:
 			        '200':
 			          description: OK
@@ -102,7 +106,7 @@ class ReferenceValidatorTest {
 
 		document.set(content)
 		val baseURI = new URI(null, null, null)
-		val resolvedURI = new URI(null, null, "/definitions/Invalid")
+		val resolvedURI = new URI(null, null, "/components/parameters/Invalid")
 		val errors = validator(#{resolvedURI -> document.asJson}).validate(baseURI, document)
 
 		assertEquals(1, errors.size())
@@ -114,7 +118,7 @@ class ReferenceValidatorTest {
 	@Test
 	def void shouldValidateReference_To_ValidPath() {
 		val content = '''
-			swagger: '2.0'
+			openapi: '3.0.0'
 			info:
 			  version: 0.0.0
 			  title: Simple API
@@ -139,7 +143,7 @@ class ReferenceValidatorTest {
 	@Test
 	def void shouldWarnOnInvalidCharacters() {
 		val content = '''
-			swagger: '2.0'
+			openapi: '3.0.0'
 			info:
 			  version: 0.0.0
 			  title: Simple API
@@ -165,7 +169,7 @@ class ReferenceValidatorTest {
 	@Test
 	def void shouldValidateReference_To_InvalidPath() {
 		val content = '''
-			swagger: '2.0'
+			openapi: '3.0.0'
 			info:
 			  version: 0.0.0
 			  title: Simple API
@@ -193,11 +197,11 @@ class ReferenceValidatorTest {
 	@Test
 	def void shouldValidateReference_To_ExternalFile() {
 		val other = '''
-			swagger: '2.0'
+			openapi: '3.0.0'
 		'''
 
 		val content = '''
-			swagger: '2.0'
+			openapi: '3.0.0'
 			info:
 			  version: 0.0.0
 			  title: Simple API
@@ -225,7 +229,7 @@ class ReferenceValidatorTest {
 	@Test
 	def void should_Not_ValidateReference_To_Invalid_ExternalFile() {
 		val content = '''
-			swagger: '2.0'
+			openapi: '3.0.0'
 			info:
 			  version: 0.0.0
 			  title: Simple API
@@ -252,16 +256,17 @@ class ReferenceValidatorTest {
 
 	@Test
 	def void shouldValidateReference_To_ExternalFileWithValidType() {
-		val other = '''
-			parameters:
-			  foo:
-			    name: foo
-			    in: query
-			    type: string
+		val other = '''			
+			components:
+			  parameters:
+			    foo:
+			      name: foo
+			      in: query
+			      type: string
 		'''
 
 		val content = '''
-			swagger: '2.0'
+			openapi: '3.0.0'
 			info:
 			  version: 0.0.0
 			  title: Simple API
@@ -269,7 +274,7 @@ class ReferenceValidatorTest {
 			  /foo/{bar}:
 			    get:
 			      parameters:
-			        - $ref: 'other.yaml#/parameters/foo'
+			        - $ref: 'other.yaml#/components/parameters/foo'
 			      responses:
 			        '200':
 			          description: OK
@@ -277,23 +282,24 @@ class ReferenceValidatorTest {
 
 		document.set(content)
 		val baseURI = new URI(null, null, null)
-		val otherURI = URI.create("other.yaml#/parameters/foo")
+		val otherURI = URI.create("other.yaml#/components/parameters/foo")
 		val errors = validator(#{otherURI -> other.asJson}).validate(baseURI, document)
 
+		errors.forEach[println(it.message)]
 		assertEquals(0, errors.size())
 	}
 
 	@Test
 	def void shouldValidateReference_To_ExternalFileFragmentWithInvalidType() {
 		val other = '''
-			swagger: '2.0'
+			openapi: '3.0.0'
 			info:
 			  version: 0.0.0
 			  title: Simple API
 		'''
 
 		val content = '''
-			swagger: '2.0'
+			openapi: '3.0.0'
 			info:
 			  version: 0.0.0
 			  title: Simple API
@@ -321,14 +327,14 @@ class ReferenceValidatorTest {
 	@Test
 	def void should_Not_ValidateReference_To_ExternalFile_WithInvalidFragment() {
 		val other = '''
-			swagger: '2.0'
+			openapi: '3.0.0'
 			info:
 			  version: 0.0.0
 			  title: Simple API
 		'''
 
 		val content = '''
-			swagger: '2.0'
+			openapi: '3.0.0'
 			info:
 			  version: 0.0.0
 			  title: Simple API
@@ -356,7 +362,7 @@ class ReferenceValidatorTest {
 	@Test
 	def void should_ProduceError_If_URI_is_Invalid() {
 		val content = '''
-			swagger: '2.0'
+			openapi: '3.0.0'
 			info:
 			  version: 0.0.0
 			  title: Simple API
@@ -378,39 +384,10 @@ class ReferenceValidatorTest {
 		assertTrue(errors.contains(
 			new SwaggerError(9, IMarker.SEVERITY_WARNING, Messages.error_missing_reference)
 		))
-	}
-
-	@Test
-	def void should_warn_on_simple_reference() {
-		val content = '''
-			swagger: '2.0'
-			info:
-			  version: 0.0.0
-			  title: Simple API
-			paths:
-			  /foo/{bar}:
-			    get:
-			      parameters:
-			        - $ref: Valid
-			      responses:
-			        '200':
-			          description: OK
-			definitions:
-			  Valid:
-			    type: string
-		'''
-
-		document.set(content)
-		val baseURI = new URI(null, null, null)
-		val resolvedURI = new URI(null, null, "/definitions/Valid")
-		val errors = validator(#{resolvedURI -> document.asJson}).validate(baseURI, document)
-
-		assertEquals(1, errors.size())
-		assertEquals(Messages.warning_simple_reference, errors.get(0).message)
-	}
+	}	
 
 	def asJson(String string) {
-		Yaml.mapper().readTree(string)
+		new ObjectMapper(new YAMLFactory).readTree(string)
 	}
 
 }
