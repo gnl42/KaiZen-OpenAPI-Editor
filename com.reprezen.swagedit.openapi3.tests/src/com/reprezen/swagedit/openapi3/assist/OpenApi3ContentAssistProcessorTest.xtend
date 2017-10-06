@@ -346,8 +346,38 @@ components:
 		assertThat(proposals.map[(it as StyledCompletionProposal).replacementString], 
 			hasItems("_key_:")
 		)
-	}	
-	
+	}
+
+	@Test
+	def void testResponseSchemaStillContainsKeyProposal() {
+		val document = setUpContentAssistTest('''
+		openapi: "3.0.0"
+		info:
+		  version: 1.0.0
+		  title: Test
+		paths:
+		  /:
+		    get:
+		      summary: All
+		      responses:
+		        200:
+		          description: Ok          
+		          content:
+		            application/json:    
+		              schema:
+		                <1>$ref: "#/components/schemas/Pets"
+		components:
+		  schemas:
+		    Pets:
+		      type: object
+		''', new OpenApi3Document(new OpenApi3Schema))
+
+		val proposals = document.apply(processor, "1")
+		assertThat(proposals.map[(it as StyledCompletionProposal).replacementString], 
+			hasItems("_key_:")
+		)
+	}
+
 	@Test
 	def void testSchemaFormat_ForString() {
 		val document = new OpenApi3Document(new OpenApi3Schema)
