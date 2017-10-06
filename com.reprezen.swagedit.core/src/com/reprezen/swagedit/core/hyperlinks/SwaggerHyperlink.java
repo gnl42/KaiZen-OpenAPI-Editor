@@ -43,6 +43,10 @@ public class SwaggerHyperlink implements IHyperlink {
         return text;
     }
 
+    public IRegion getTarget() {
+        return target;
+    }
+
     @Override
     public void open() {
         if (viewer != null) {

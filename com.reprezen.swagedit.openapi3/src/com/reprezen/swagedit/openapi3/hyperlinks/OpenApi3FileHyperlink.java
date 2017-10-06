@@ -14,14 +14,19 @@ import org.eclipse.core.resources.IFile;
 import org.eclipse.jface.text.IRegion;
 
 import com.fasterxml.jackson.core.JsonPointer;
+import com.reprezen.swagedit.core.editor.JsonDocument;
 import com.reprezen.swagedit.core.hyperlinks.JsonFileHyperlink;
-import com.reprezen.swagedit.core.hyperlinks.JsonReferenceHyperlinkDetector;
+import com.reprezen.swagedit.openapi3.editor.OpenApi3Document;
 
-public class OpenApi3ReferenceHyperlinkDetector extends JsonReferenceHyperlinkDetector {
+public class OpenApi3FileHyperlink extends JsonFileHyperlink {
 
-	@Override
-	protected JsonFileHyperlink createFileHyperlink(IRegion linkRegion, String label, IFile file, JsonPointer pointer) {
-		return new OpenApi3FileHyperlink(linkRegion, label, file, pointer);
+	public OpenApi3FileHyperlink(IRegion linkRegion, String label, IFile file, JsonPointer pointer) {
+		super(linkRegion, label, file, pointer);
 	}
 
+	@Override
+	protected JsonDocument createDocument() {
+		return new OpenApi3Document();
+	}
+	
 }

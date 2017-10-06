@@ -69,7 +69,9 @@ public class ResponseCodeContentAssistExt implements ContentAssistExt {
             String description = current.get("description").asText();
             String phase = current.get("phrase").asText();
 
-            proposals.add(new Proposal("'" + code + "':", code, description, phase));
+            String replacement = ("default".equals(code) ? code : "'" + code + "'") + ":";
+
+            proposals.add(new Proposal(replacement, code, description, phase));
         }
 
         proposals.add(new Proposal("x-", "x-", null, "vendorExtension"));
