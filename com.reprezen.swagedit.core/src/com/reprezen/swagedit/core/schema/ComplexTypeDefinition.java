@@ -143,6 +143,7 @@ public class ComplexTypeDefinition extends TypeDefinition {
     
     @Override
     public String getLabel() {
-        return Iterables.getFirst(complexTypes, null).getLabel();
+        TypeDefinition firstType = Iterables.getFirst(complexTypes, null);
+        return firstType!=null ? firstType.getLabel() : null;
     }
 }
