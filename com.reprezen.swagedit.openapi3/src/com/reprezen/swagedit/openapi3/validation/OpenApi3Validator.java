@@ -23,6 +23,7 @@ import com.fasterxml.jackson.databind.JsonNode;
 import com.google.common.collect.Lists;
 import com.reprezen.swagedit.core.json.references.JsonReferenceValidator;
 import com.reprezen.swagedit.core.model.AbstractNode;
+import com.reprezen.swagedit.core.model.ArrayNode;
 import com.reprezen.swagedit.core.model.Model;
 import com.reprezen.swagedit.core.validation.Messages;
 import com.reprezen.swagedit.core.validation.SwaggerError;
@@ -52,19 +53,93 @@ public class OpenApi3Validator extends Validator {
 
             if (node.isObject()) {
                 for (String field : node.asObject().fieldNames()) {
-                    if (securitySchemes.get(field) == null) {
-                        errors.add(
-                                error(node.get(field), IMarker.SEVERITY_ERROR, Messages.error_invalid_reference_type));
+                    AbstractNode securityScheme = securitySchemes.get(field);
+
+                    if (securityScheme == null) {
+                        String message = Messages.error_invalid_reference_type
+                                + " It should be a valid security scheme.";
+
+                        errors.add(error(node.get(field), IMarker.SEVERITY_ERROR, message));
+                    } else {
+                        validateSecuritySchemeScopes(node, field, securityScheme, errors);
                     }
                 }
             }
         }
     }
 
+    private List<String> oauthScopes = Lists.newArrayList("oauth2", "openIdConnect");
+
+    private void validateSecuritySchemeScopes(AbstractNode node, String name, AbstractNode securityScheme,
+            Set<SwaggerError> errors) {
+        String type = getType(securityScheme);
+        if (type == null) {
+            return;
+        }
+
+        boolean shouldHaveScopes = oauthScopes.contains(type);
+        List<String> scopes = getSecurityScopes(securityScheme);
+
+        AbstractNode values = node.get(name);
+        if (values.isArray()) {
+            ArrayNode scopeValues = values.asArray();
+
+            if (scopeValues.size() > 0 && !shouldHaveScopes) {
+                String message = String.format(Messages.error_scope_should_be_empty, name, type, name);
+
+                errors.add(error(node.get(name), IMarker.SEVERITY_ERROR, message));
+            } else if (scopeValues.size() == 0 && shouldHaveScopes) {
+                String message = String.format(Messages.error_scope_should_not_be_empty, name, type);
+
+                errors.add(error(node.get(name), IMarker.SEVERITY_ERROR, message));
+            } else {
+                for (AbstractNode scope : scopeValues.elements()) {
+                    try {
+                        String scopeName = (String) scope.asValue().getValue();
+                        if (!scopes.contains(scopeName)) {
+                            String message = String.format(Messages.error_invalid_scope_reference, scopeName, name);
+
+                            errors.add(error(scope, IMarker.SEVERITY_ERROR, message));
+                        }
+                    } catch (Exception e) {
+                        // Invalid scope name type.
+                        // No need to create an error, it will be handle by the schema validation.
+                    }
+                }
+            }
+        }
+    }
+
+    private String getType(AbstractNode securityScheme) {
+        AbstractNode type = securityScheme.get("type");
+        if (type == null) {
+            return null;
+        }
+
+        return (String) type.asValue().getValue();
+    }
+
+    private List<String> getSecurityScopes(AbstractNode securityScheme) {
+        List<String> scopes = Lists.newArrayList();
+
+        try {
+            AbstractNode flows = securityScheme.get("flows");
+            for (AbstractNode flow : flows.elements()) {
+                AbstractNode values = flow.get("scopes");
+                if (values != null && values.isObject()) {
+                    scopes.addAll(values.asObject().fieldNames());
+                }
+            }
+        } catch (Exception e) {
+            // could be a NPE, let's just return the scopes we have so far.
+        }
+        return scopes;
+    }
+
     private void validateOperationRefReferences(Model model, AbstractNode node, Set<SwaggerError> errors) {
         JsonPointer schemaPointer = JsonPointer.compile("/definitions/link/properties/operationRef");
 
-        if (node != null && node.getType() != null && schemaPointer.equals(node.getType().getPointer())) {            
+        if (node != null && node.getType() != null && schemaPointer.equals(node.getType().getPointer())) {
             String operationRefPointer = (String) node.asValue().getValue();
             AbstractNode operation = model.find(operationRefPointer);
 
