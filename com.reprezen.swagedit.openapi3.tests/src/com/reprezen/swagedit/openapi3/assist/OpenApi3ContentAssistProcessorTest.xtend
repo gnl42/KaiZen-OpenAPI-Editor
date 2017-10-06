@@ -70,6 +70,32 @@ class OpenApi3ContentAssistProcessorTest {
 			hasItems("(schema name):")
 		)
 	}
+	
+	@Test
+	def void testAnonymousSchemaInMediaType_Should_NOT_Return_SchemaName_Key() {
+		val document = new OpenApi3Document(new OpenApi3Schema)
+		val test = setUpContentAssistTest('''
+paths:
+  /resource:
+    get:
+      description: description
+      responses:
+        default:
+          description: Ok
+          content:
+            application/json:
+              schema:
+                <1>
+		''', document)
+
+		val proposals = test.apply(processor, "1")
+		assertThat(proposals.map[(it as StyledCompletionProposal).replacementString], 
+			not(hasItem("(schema name):"))
+		)
+		assertThat(proposals.map[(it as StyledCompletionProposal).replacementString], 
+			not(hasItem("_key_:"))
+		)
+	}
 
 	@Test
 	def void testSchemaInSchemaProperties_ShouldReturn_PropertyName() {
