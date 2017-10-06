@@ -29,7 +29,7 @@ class HyperlinkDetectorTest {
 	val operationRefDetector = new LinkOperationRefHyperlinkDetector() {
 		override protected getActiveEditor() {
 			null
-		}	
+		}
 	}
 
 	@Test
@@ -111,6 +111,72 @@ class HyperlinkDetectorTest {
 			  links:
 			    foo:
 			      operationRef: '#/<1>paths/~1/get'
+		''', document)
+
+		val region = groups.get("1")
+		val hyperlinks = operationRefDetector.detectHyperlinks(viewer, region, false)
+
+		assertNotNull(hyperlinks);
+		assertEquals(1, hyperlinks.size)
+
+		val link = hyperlinks.get(0)
+		val target = (link as SwaggerHyperlink).target
+
+		// target on same line
+		assertEquals(
+			document.getLineOfOffset(groups.get("2").offset),
+			document.getLineOfOffset(target.offset)
+		)
+	}
+
+	@Test
+	def void testShouldCreateHyperLink_FromLinkInsideResponses() throws Exception {
+		val document = new OpenApi3Document(new OpenApi3Schema)
+		val viewer = Mocks.mockTextViewer(document)
+
+		val groups = Cursors.setUpRegions('''
+			paths:
+			  /:
+			    get:
+			      <2>operationId: list
+			      responses:
+			        '200':
+			          links:
+			            foo:
+			              operationId: li<1>st
+		''', document)
+
+		val region = groups.get("1")
+		val hyperlinks = operationDetector.detectHyperlinks(viewer, region, false)
+
+		assertNotNull(hyperlinks);
+		assertEquals(1, hyperlinks.size)
+
+		val link = hyperlinks.get(0)
+		val target = (link as SwaggerHyperlink).target
+
+		// target on same line
+		assertEquals(
+			document.getLineOfOffset(groups.get("2").offset),
+			document.getLineOfOffset(target.offset)
+		)
+	}
+
+	@Test
+	def void testShouldCreateHyperLink_FromLinkOperationRefInsideResponses() throws Exception {
+		val document = new OpenApi3Document(new OpenApi3Schema)
+		val viewer = Mocks.mockTextViewer(document)
+
+		val groups = Cursors.setUpRegions('''
+			paths:
+			  /:
+			    <2>get:
+			      operationId: list
+			      responses:
+			        '200':
+			          links:
+			            foo:
+			              operationRef: '#/<1>paths/~1/get'
 		''', document)
 
 		val region = groups.get("1")

@@ -29,7 +29,7 @@ public class LinkOperationHyperlinkDetector extends AbstractJsonHyperlinkDetecto
 
     @Override
     protected boolean canDetect(JsonPointer pointer) {
-        return pointer != null && pointer.toString().matches("/components/links/(\\w+)/operationId");
+        return pointer != null && pointer.toString().matches(".*/links/(\\w+)/operationId");
     }
 
     @Override
