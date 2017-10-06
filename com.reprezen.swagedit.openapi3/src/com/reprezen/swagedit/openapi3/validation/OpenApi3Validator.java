@@ -46,10 +46,12 @@ public class OpenApi3Validator extends Validator {
                     AbstractNode securityScheme = securitySchemes.get(field);
 
                     if (securityScheme == null) {
-                        errors.add(
-                                error(node.get(field), IMarker.SEVERITY_ERROR, Messages.error_invalid_reference_type));
+                        String message = Messages.error_invalid_reference_type
+                                + " It should be a valid security scheme.";
+
+                        errors.add(error(node.get(field), IMarker.SEVERITY_ERROR, message));
                     } else {
-                        validateSecuritySchemScopes(node, field, securityScheme, errors);
+                        validateSecuritySchemeScopes(node, field, securityScheme, errors);
                     }
                 }
             }
@@ -58,36 +60,53 @@ public class OpenApi3Validator extends Validator {
 
     private List<String> oauthScopes = Lists.newArrayList("oauth2", "openIdConnect");
 
-    private void validateSecuritySchemScopes(AbstractNode node, String name, AbstractNode securityScheme,
+    private void validateSecuritySchemeScopes(AbstractNode node, String name, AbstractNode securityScheme,
             Set<SwaggerError> errors) {
-        AbstractNode type = securityScheme.get("type");
+        String type = getType(securityScheme);
         if (type == null) {
             return;
         }
 
-        boolean hasScopes = oauthScopes.contains(type.asValue().getValue());
+        boolean shouldHaveScopes = oauthScopes.contains(type);
         List<String> scopes = getSecurityScopes(securityScheme);
 
         AbstractNode values = node.get(name);
         if (values.isArray()) {
             ArrayNode scopeValues = values.asArray();
 
-            if (scopeValues.size() > 0 && !hasScopes) {
-                errors.add(error(node.get(name), IMarker.SEVERITY_ERROR, Messages.error_scope_should_be_empty));
-            } else if (scopeValues.size() == 0 && hasScopes) {
-                errors.add(error(node.get(name), IMarker.SEVERITY_ERROR, Messages.error_scope_should_not_be_empty));
+            if (scopeValues.size() > 0 && !shouldHaveScopes) {
+                String message = String.format(Messages.error_scope_should_be_empty, name, type, name);
+
+                errors.add(error(node.get(name), IMarker.SEVERITY_ERROR, message));
+            } else if (scopeValues.size() == 0 && shouldHaveScopes) {
+                String message = String.format(Messages.error_scope_should_not_be_empty, name, type);
+
+                errors.add(error(node.get(name), IMarker.SEVERITY_ERROR, message));
             } else {
                 for (AbstractNode scope : scopeValues.elements()) {
                     try {
-                        if (!scopes.contains((String) scope.asValue().getValue())) {
-                            errors.add(error(scope, IMarker.SEVERITY_ERROR, Messages.error_invalid_scope_reference));
+                        String scopeName = (String) scope.asValue().getValue();
+                        if (!scopes.contains(scopeName)) {
+                            String message = String.format(Messages.error_invalid_scope_reference, scopeName, name);
+
+                            errors.add(error(scope, IMarker.SEVERITY_ERROR, message));
                         }
                     } catch (Exception e) {
-                        errors.add(error(scope, IMarker.SEVERITY_ERROR, Messages.error_invalid_scope_reference));
+                        // Invalid scope name type.
+                        // No need to create an error, it will be handle by the schema validation.
                     }
                 }
             }
         }
+    }
+
+    private String getType(AbstractNode securityScheme) {
+        AbstractNode type = securityScheme.get("type");
+        if (type == null) {
+            return null;
+        }
+
+        return (String) type.asValue().getValue();
     }
 
     private List<String> getSecurityScopes(AbstractNode securityScheme) {
