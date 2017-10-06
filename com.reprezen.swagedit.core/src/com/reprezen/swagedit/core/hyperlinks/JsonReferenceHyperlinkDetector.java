@@ -10,86 +10,25 @@
  *******************************************************************************/
 package com.reprezen.swagedit.core.hyperlinks;
 
-import java.net.URI;
-
 import org.eclipse.core.resources.IFile;
 import org.eclipse.jface.text.IRegion;
-import org.eclipse.jface.text.ITextViewer;
-import org.eclipse.jface.text.hyperlink.IHyperlink;
-import org.eclipse.ui.part.FileEditorInput;
 
 import com.fasterxml.jackson.core.JsonPointer;
-import com.reprezen.swagedit.core.editor.JsonDocument;
-import com.reprezen.swagedit.core.json.references.JsonReference;
-import com.reprezen.swagedit.core.json.references.JsonReferenceFactory;
-import com.reprezen.swagedit.core.model.AbstractNode;
-import com.reprezen.swagedit.core.utils.DocumentUtils;
 
 /**
  * Hyperlink detector that detects links from JSON references.
- * 
  */
-public abstract class JsonReferenceHyperlinkDetector extends AbstractJsonHyperlinkDetector {
+public abstract class JsonReferenceHyperlinkDetector extends ReferenceHyperlinkDetector {
 
-    protected final JsonReferenceFactory factory = new JsonReferenceFactory();
-    
-    protected abstract JsonFileHyperlink createFileHyperlink(IRegion linkRegion, String label, IFile file, JsonPointer pointer) ;
+    @Override
+    protected JsonFileHyperlink createFileHyperlink(IRegion linkRegion, String label, IFile file, JsonPointer pointer) {
+        // TODO Auto-generated method stub
+        return null;
+    }
 
     @Override
     protected boolean canDetect(JsonPointer pointer) {
         return pointer != null && pointer.toString().endsWith("$ref");
-    }
-
-    @Override
-    protected IHyperlink[] doDetect(JsonDocument doc, ITextViewer viewer, HyperlinkInfo info, JsonPointer pointer) {
-        URI baseURI = getBaseURI();
-
-        AbstractNode node = doc.getModel().find(pointer);
-        JsonReference reference = getFactory().createSimpleReference(getBaseURI(), node);
-        if (reference == null) {
-            reference = getFactory().create(node);
-        }
-
-        if (reference.isInvalid() || reference.isMissing(doc, getBaseURI())) {
-            return null;
-        }
-
-        if (reference.isLocal()) {
-            IRegion target = doc.getRegion(reference.getPointer());
-            if (target == null) {
-                return null;
-            }
-            return new IHyperlink[] { new SwaggerHyperlink(reference.getPointer().toString(), viewer, info.region,
-                    target) };
-        } else {
-            URI resolved;
-            try {
-                resolved = baseURI.resolve(reference.getUri());
-            } catch (IllegalArgumentException e) {
-                // the given string violates RFC 2396
-                return null;
-            }
-            IFile file = DocumentUtils.getWorkspaceFile(resolved);
-			if (file != null && file.exists()) {
-				return new IHyperlink[] { createFileHyperlink(info.region, info.text, file, reference.getPointer()) };
-			}
-        }
-
-        return null;
-    }
-
-    protected FileEditorInput getActiveEditor() {
-        return DocumentUtils.getActiveEditorInput();
-    }
-
-    protected URI getBaseURI() {
-        FileEditorInput editor = getActiveEditor();
-
-        return editor != null ? editor.getURI() : null;
-    }
-
-    protected JsonReferenceFactory getFactory() {
-        return factory;
     }
 
 }

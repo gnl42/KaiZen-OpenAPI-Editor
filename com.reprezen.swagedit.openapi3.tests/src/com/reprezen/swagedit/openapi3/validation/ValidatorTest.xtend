@@ -1,3 +1,13 @@
+/*******************************************************************************
+ * Copyright (c) 2016 ModelSolv, Inc. and others.
+ * All rights reserved. This program and the accompanying materials
+ * are made available under the terms of the Eclipse Public License v1.0
+ * which accompanies this distribution, and is available at
+ * http://www.eclipse.org/legal/epl-v10.html
+ *
+ * Contributors:
+ *    ModelSolv, Inc. - initial API and implementation and/or initial documentation
+ *******************************************************************************/
 package com.reprezen.swagedit.openapi3.validation
 
 import com.reprezen.swagedit.core.validation.Messages
@@ -6,6 +16,7 @@ import com.reprezen.swagedit.openapi3.editor.OpenApi3Document
 import com.reprezen.swagedit.openapi3.schema.OpenApi3Schema
 import java.net.URI
 import org.eclipse.core.resources.IMarker
+import org.eclipse.xtext.xbase.lib.Functions.Function1
 import org.junit.Test
 
 import static org.hamcrest.CoreMatchers.*
@@ -177,7 +188,7 @@ class ValidatorTest {
 		assertEquals(1, errors.size())
 		assertThat(
 			errors,
-			hasItems(				
+			hasItems(
 				new SwaggerError(13, IMarker.SEVERITY_WARNING, Messages.error_missing_reference)
 			)
 		)
@@ -332,15 +343,14 @@ class ValidatorTest {
 			    get:
 			      operationId: opId
 			      security:
-			        - open:
-			          - a:a
+			        - open: []
 			      responses:
 			        200:
 			          description: Ok
 			components: 
 			  securitySchemes:
 			    open:
-			      type: a
+			      type: basic
 		'''
 
 		document.set(content)
@@ -360,26 +370,21 @@ class ValidatorTest {
 			    get:
 			      operationId: opId
 			      security:
-			        - foo:
-			          - a:a
+			        - foo: []
 			      responses:
 			        200:
 			          description: Ok
 			components: 
 			  securitySchemes:
 			    open:
-			      type: a
+			      type: basic
 		'''
 
 		document.set(content)
 		val errors = validator.validate(document, null as URI)
 		assertEquals(1, errors.size())
-		assertThat(
-			errors,
-			hasItems(
-				new SwaggerError(10, IMarker.SEVERITY_ERROR, Messages.error_invalid_reference_type)
-			)
-		)
+		assertTrue(errors.map[message].forall[shouldHaveInvalidReferenceType()])
+		assertThat(errors.map[line], hasItems(10))
 	}
 
 	@Test
@@ -445,56 +450,56 @@ class ValidatorTest {
 	@Test
 	def void testValidateMissingRequiredProperties() {
 		val content = '''
-		openapi: '3.0.0'
-		info:
-		  version: 0.0.0
-		  title: Simple API
-		paths: {}
-		components:
-		  schemas:
-		    Foo:
-		      type: object
-		      properties:
-		        bar:
-		          type: string
-		      required:
-		        - baz
+			openapi: '3.0.0'
+			info:
+			  version: 0.0.0
+			  title: Simple API
+			paths: {}
+			components:
+			  schemas:
+			    Foo:
+			      type: object
+			      properties:
+			        bar:
+			          type: string
+			      required:
+			        - baz
 		'''
 
 		document.set(content)
 		document.onChange()
 
-		val errors = validator.validate(document, null as URI)		
+		val errors = validator.validate(document, null as URI)
 		assertEquals(1, errors.size())
 		assertEquals(String.format(Messages.error_required_properties, "baz"), errors.get(0).message)
 	}
-	
+
 	@Test
 	def void testValidateInlineSchemas() {
 		val content = '''
-		openapi: '3.0.0'
-		info:
-		  version: 0.0.0
-		  title: Simple API
-		paths:
-		  /foo:
-		    get:
-		      description: ok
-		      responses:
-		        '200':
-		          description: OK
-		          content:
-		            application/json:
-		              schema:
-		                properties:
-		                  bar:
-		                    type: string
+			openapi: '3.0.0'
+			info:
+			  version: 0.0.0
+			  title: Simple API
+			paths:
+			  /foo:
+			    get:
+			      description: ok
+			      responses:
+			        '200':
+			          description: OK
+			          content:
+			            application/json:
+			              schema:
+			                properties:
+			                  bar:
+			                    type: string
 		'''
 
 		document.set(content)
 		document.onChange()
 
-		val errors = validator.validate(document, null as URI)		
+		val errors = validator.validate(document, null as URI)
 		assertEquals(1, errors.size())
 		assertEquals(Messages.error_object_type_missing, errors.get(0).message)
 	}
@@ -502,28 +507,28 @@ class ValidatorTest {
 	@Test
 	def void testArrayWithItemsIsInvalid() {
 		val content = '''
-		openapi: '3.0.0'
-		info:
-		  version: 0.0.0
-		  title: Simple API
-		paths:
-		  /foo/{bar}:
-		    get:
-		      responses:
-		        '200':
-		          description: OK
-		components:
-		  schemas:
-		    Pets:
-		      type: array
-		      items:
-		        - type: string		 
+			openapi: '3.0.0'
+			info:
+			  version: 0.0.0
+			  title: Simple API
+			paths:
+			  /foo/{bar}:
+			    get:
+			      responses:
+			        '200':
+			          description: OK
+			components:
+			  schemas:
+			    Pets:
+			      type: array
+			      items:
+			        - type: string		 
 		'''
 
 		document.set(content)
 		document.onChange()
 
-		val errors = validator.validate(document, null as URI)		
+		val errors = validator.validate(document, null as URI)
 		assertEquals(1, errors.size())
 		assertTrue(errors.map[message].forall[it.equals(Messages.error_array_items_should_be_object)])
 		assertThat(errors.map[line], hasItems(15))
@@ -532,33 +537,182 @@ class ValidatorTest {
 	@Test
 	def void testObjectWithPropertyNamedProperties_ShouldBeValid() {
 		val content = '''
-		openapi: '3.0.0'
-		info:
-		  version: 0.0.0
-		  title: Simple API
-		paths:
-		  /foo/{bar}:
-		    get:
-		      responses:
-		        '200':
-		          description: OK
-		components:
-		  schemas:
-		    Pets:
-		      type: object
-		      properties:
-		        properties:
-		          type: object
-		          properties:
-		            name: 
-		              type: string
+			openapi: '3.0.0'
+			info:
+			  version: 0.0.0
+			  title: Simple API
+			paths:
+			  /foo/{bar}:
+			    get:
+			      responses:
+			        '200':
+			          description: OK
+			components:
+			  schemas:
+			    Pets:
+			      type: object
+			      properties:
+			        properties:
+			          type: object
+			          properties:
+			            name: 
+			              type: string
 		'''
 
 		document.set(content)
 		document.onChange()
 
-		val errors = validator.validate(document, null as URI)		
+		val errors = validator.validate(document, null as URI)
 		assertEquals(0, errors.size())
+	}
+
+	@Test
+	def void validateOAuthSecuritySchemes() {
+		val content = '''
+			openapi: '3.0.0'
+			info:
+			  version: 0.0.0
+			  title: Simple API
+			paths:
+			  /foo/{bar}:
+			    get:
+			      security:
+			        - oauth:
+			            - write:pets
+			            - read:pets
+			      responses:
+			        '200':
+			          description: OK
+			components:
+			  securitySchemes:
+			    oauth:
+			      type: oauth2
+			      flows: 
+			        implicit:
+			          authorizationUrl: https://example.com/api/oauth/dialog
+			          scopes:
+			            write:pets: modify pets in your account
+			            read:pets: read your pets
+		'''
+
+		document.set(content)
+
+		val errors = validator.validate(document, null as URI)
+		assertEquals(0, errors.size())
+	}
+
+	@Test
+	def void validateOAuthSecuritySchemes_WithWrongScope() {
+		val content = '''
+			openapi: '3.0.0'
+			info:
+			  version: 0.0.0
+			  title: Simple API
+			paths:
+			  /foo/{bar}:
+			    get:
+			      security:
+			        - oauth:
+			            - write:pets
+			            - foo
+			      responses:
+			        '200':
+			          description: OK
+			components:
+			  securitySchemes:
+			    oauth:
+			      type: oauth2
+			      flows: 
+			        implicit:
+			          authorizationUrl: https://example.com/api/oauth/dialog
+			          scopes:
+			            write:pets: modify pets in your account
+			            read:pets: read your pets
+		'''
+
+		document.set(content)
+
+		val errors = validator.validate(document, null as URI)
+		assertEquals(1, errors.size())
+		assertTrue(errors.map[message].forall[shouldBeInvalidScopeReference("foo", "oauth")])
+		assertThat(errors.map[line], hasItems(11))
+	}
+
+	@Test
+	def void validateNonOAuthSecuritySchemes() {
+		val content = '''
+			openapi: '3.0.0'
+			info:
+			  version: 0.0.0
+			  title: Simple API
+			paths:
+			  /foo/{bar}:
+			    get:
+			      security:
+			        - basic: []
+			      responses:
+			        '200':
+			          description: OK
+			components:
+			  securitySchemes:
+			    basic:
+			      type: http
+		'''
+
+		document.set(content)
+
+		val errors = validator.validate(document, null as URI)
+		assertEquals(0, errors.size())
+	}
+
+	@Test
+	def void validateNonOAuthSecuritySchemes_WithWrongScope() {
+		val content = '''
+			openapi: '3.0.0'
+			info:
+			  version: 0.0.0
+			  title: Simple API
+			paths:
+			  /foo/{bar}:
+			    get:
+			      security:
+			        - basic:
+			          - foo
+			      responses:
+			        '200':
+			          description: OK
+			components:
+			  securitySchemes:
+			    basic:
+			      type: http
+		'''
+
+		document.set(content)
+
+		val errors = validator.validate(document, null as URI)
+		assertEquals(1, errors.size())
+		assertTrue(errors.map[message].forall[shouldBeEmptyMessage("basic", "http")])
+		assertThat(errors.map[line], hasItems(9))
+	}
+
+	private def shouldHaveInvalidReferenceType(String actual) {
+		expectedMessage(Messages.error_invalid_reference_type + " It should be a valid security scheme.").apply(actual)
+	}
+
+	private def shouldBeInvalidScopeReference(String actual, String scope, String name) {
+		expectedMessage(Messages.error_invalid_scope_reference, scope, name).apply(actual)
+	}
+
+	private def shouldBeEmptyMessage(String actual, String name, String type) {
+		expectedMessage(Messages.error_scope_should_be_empty, name, type, name).apply(actual)
+	}
+
+	private def (String)=>Boolean expectedMessage(String message, String... args) {
+		new Function1<String, Boolean> {
+			override apply(String actual) {
+				actual.equals(String.format(message, args))
+			}
+		}
 	}
 
 }

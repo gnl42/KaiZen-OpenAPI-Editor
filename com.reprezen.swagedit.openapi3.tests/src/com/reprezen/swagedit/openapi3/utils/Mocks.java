@@ -1,3 +1,13 @@
+/*******************************************************************************
+ * Copyright (c) 2016 ModelSolv, Inc. and others.
+ * All rights reserved. This program and the accompanying materials
+ * are made available under the terms of the Eclipse Public License v1.0
+ * which accompanies this distribution, and is available at
+ * http://www.eclipse.org/legal/epl-v10.html
+ *
+ * Contributors:
+ *    ModelSolv, Inc. - initial API and implementation and/or initial documentation
+ *******************************************************************************/
 package com.reprezen.swagedit.openapi3.utils;
 
 import static org.mockito.Mockito.mock;
@@ -20,6 +30,12 @@ import com.reprezen.swagedit.core.model.AbstractNode;
 import com.reprezen.swagedit.openapi3.editor.OpenApi3Document;
 
 public class Mocks {
+
+    public static ITextViewer mockTextViewer(OpenApi3Document document) {
+        ITextViewer viewer = mock(ITextViewer.class);
+        when(viewer.getDocument()).thenReturn(document);
+        return viewer;
+    }
 
     public static JsonReferenceFactory mockJsonReferenceFactory(final Map<URI, JsonNode> entries) {
         final IFile file = mock(IFile.class);
