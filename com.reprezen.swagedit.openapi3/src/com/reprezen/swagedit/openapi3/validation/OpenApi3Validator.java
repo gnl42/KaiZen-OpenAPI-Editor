@@ -168,7 +168,7 @@ public class OpenApi3Validator extends Validator {
             }
 
             if (!found) {
-                errors.add(error(node, IMarker.SEVERITY_ERROR, Messages.error_invalid_reference_type));
+                errors.add(error(node, IMarker.SEVERITY_ERROR, Messages.error_invalid_operation_id));
             }
         }
     }

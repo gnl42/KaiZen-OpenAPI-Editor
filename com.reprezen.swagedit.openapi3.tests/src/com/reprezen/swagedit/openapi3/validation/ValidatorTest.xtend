@@ -273,6 +273,7 @@ class ValidatorTest {
 		document.set(content)
 		val errors = validator.validate(document, null as URI)
 		assertEquals(1, errors.size())
+		assertTrue(errors.map[message].forall[it.equals(Messages.error_invalid_operation_id)])
 	}
 
 	@Test
