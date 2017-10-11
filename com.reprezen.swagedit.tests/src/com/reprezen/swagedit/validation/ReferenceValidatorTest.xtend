@@ -122,15 +122,19 @@ class ReferenceValidatorTest {
 			  /foo/{bar}:
 			    get:
 			      parameters:
-			        - $ref: '#/paths/~1foo~1%7Bbar%7D'
+			        - $ref: '#/parameters/bar'
 			      responses:
 			        '200':
 			          description: OK
+			parameters:
+			  bar:
+			    name: bar
+			    in: path
 		'''
 
 		document.set(content)
 		val baseURI = new URI(null, null, null)
-		val resolvedURI = new URI(null, null, "/paths/~1foo~1{bar}")
+		val resolvedURI = new URI(null, null, "/parameters/bar")
 		val errors = validator(#{resolvedURI -> document.asJson}).validate(baseURI, document)
 
 		assertEquals(0, errors.size())

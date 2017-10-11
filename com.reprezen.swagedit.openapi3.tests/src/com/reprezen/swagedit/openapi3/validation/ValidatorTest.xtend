@@ -695,6 +695,32 @@ class ValidatorTest {
 		assertThat(errors.map[line], hasItems(9))
 	}
 
+	@Test
+	def void testPointerWithSpecialCharacters() {
+		val content = '''		
+		openapi: "3.0.0"
+		info:
+		  version: "1.0.0"
+		  title: Test API
+		paths:
+		  /test/{id}:
+		    get:
+		      responses:
+		        '200':
+		          description: OK
+		          content:
+		            application/json:
+		              schema:
+		                $ref: "#/paths/~1test~1%7Bid%7D"
+		'''
+		
+		document.set(content)
+		val errors = validator.validate(document, null as URI)
+		assertEquals(1, errors.size())
+		assertTrue(errors.map[message].forall[it.equals(Messages.error_invalid_reference_type)])
+		assertThat(errors.map[line], hasItems(14))
+	}
+
 	private def shouldHaveInvalidReferenceType(String actual) {
 		expectedMessage(Messages.error_invalid_reference_type + " It should be a valid security scheme.").apply(actual)
 	}

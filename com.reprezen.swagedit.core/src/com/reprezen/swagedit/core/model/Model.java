@@ -15,6 +15,8 @@ import static com.reprezen.swagedit.core.model.NodeDeserializer.ATTRIBUTE_PARENT
 import static com.reprezen.swagedit.core.model.NodeDeserializer.ATTRIBUTE_POINTER;
 
 import java.io.IOException;
+import java.io.UnsupportedEncodingException;
+import java.net.URLDecoder;
 import java.util.Iterator;
 import java.util.LinkedHashMap;
 import java.util.List;
@@ -221,6 +223,12 @@ public class Model {
         }
         if (pointer.length() > 1 && pointer.endsWith("/")) {
             pointer = pointer.substring(0, pointer.length() - 1);
+        }
+
+        try {
+            pointer = URLDecoder.decode(pointer, "UTF-8");
+        } catch (UnsupportedEncodingException e) {
+            // leave the pointer as it is
         }
 
         try {
