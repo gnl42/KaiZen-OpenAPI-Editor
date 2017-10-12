@@ -21,8 +21,8 @@ import com.fasterxml.jackson.databind.JsonNode;
 import com.google.common.base.Strings;
 import com.reprezen.swagedit.core.model.AbstractNode;
 import com.reprezen.swagedit.core.model.Model;
+import com.reprezen.swagedit.core.model.ValueNode;
 import com.reprezen.swagedit.core.utils.URLUtils;
-
 
 /**
  * JSON Reference Factory
@@ -37,11 +37,12 @@ public class JsonReferenceFactory {
             return new JsonReference(null, null, false, false, false, node);
         }
 
-        if (node.isObject() && node.get(JsonReference.PROPERTY) != null) {
-            node = node.get(JsonReference.PROPERTY);
+        ValueNode value = getReferenceValue(node);
+        if (value != null) {
+            return doCreate((String) value.getValue(), value);
+        } else {
+            return null;
         }
-
-        return doCreate((String) node.asValue().getValue(), node);
     }
 
     public JsonReference create(JsonNode node) {
@@ -49,9 +50,7 @@ public class JsonReferenceFactory {
             return new JsonReference(null, null, false, false, false, node);
         }
 
-        String text = node.isTextual() ? node.asText() : node.get(PROPERTY).asText();
-
-        return doCreate(text, node);
+        return doCreate(getReferenceValue(node), node);
     }
 
     public JsonReference create(ScalarNode node) {
@@ -70,7 +69,7 @@ public class JsonReferenceFactory {
      * @return reference
      */
     public JsonReference createSimpleReference(URI baseURI, AbstractNode valueNode) {
-        if (valueNode.isArray() || valueNode.isObject()) {
+        if (valueNode == null || valueNode.isArray() || valueNode.isObject()) {
             return null;
         }
 
@@ -133,4 +132,22 @@ public class JsonReferenceFactory {
         return new JsonReference(uri, pointer, absolute, local, warnings, source);
     }
 
+    protected Boolean isReference(AbstractNode node) {
+        return JsonReference.isReference(node);
+    }
+
+    protected ValueNode getReferenceValue(AbstractNode node) {
+        if (node.isValue()) {
+            return node.asValue();
+        }
+        AbstractNode value = node.get(PROPERTY);
+        if (value != null && value.isValue()) {
+            return value.asValue();
+        }
+        return null;
+    }
+
+    protected String getReferenceValue(JsonNode node) {
+        return node.isTextual() ? node.asText() : node.get(PROPERTY).asText();
+    }
 }

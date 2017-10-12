@@ -76,25 +76,53 @@ public abstract class AbstractNode {
      * 
      * @return true if object
      */
-    public abstract boolean isObject();
+    public boolean isObject() {
+        return false;
+    }
 
     /**
      * Returns true if the node is an array.
      * 
      * @return true if array
      */
-    public abstract boolean isArray();
+    public boolean isArray() {
+        return false;
+    }
 
+    /**
+     * Returns true if the node is a value
+     * 
+     * @return true if value
+     */
+    public boolean isValue() {
+        return false;
+    }
+
+    /**
+     * Returns the current node as an {@link ObjectNode} if it is an instance, or null otherwise.
+     * 
+     * @return node
+     */
     public ObjectNode asObject() {
-        return (ObjectNode) this;
+        return null;
     }
 
+    /**
+     * Returns the current node as an {@link ArrayNode} if it is an instance, or null otherwise.
+     * 
+     * @return node
+     */
     public ArrayNode asArray() {
-        return (ArrayNode) this;
+        return null;
     }
 
+    /**
+     * Returns the current node as an {@link ValueNode} if it is an instance, or null otherwise.
+     * 
+     * @return node
+     */
     public ValueNode asValue() {
-        return (ValueNode) this;
+        return null;
     }
 
     /**

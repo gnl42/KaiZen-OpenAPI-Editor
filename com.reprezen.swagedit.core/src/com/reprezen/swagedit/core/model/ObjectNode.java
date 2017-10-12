@@ -50,8 +50,8 @@ public class ObjectNode extends AbstractNode {
     }
 
     @Override
-    public boolean isArray() {
-        return false;
+    public ObjectNode asObject() {
+        return this;
     }
 
     @Override

@@ -31,7 +31,7 @@ class ReferenceValidatorTest {
 	val document = new OpenApi3Document(new OpenApi3Schema)
 
 	def validator(Map<URI, JsonNode> entries) {
-		new JsonReferenceValidator(Mocks.mockJsonReferenceFactory(entries))
+		new OpenApi3ReferenceValidator(Mocks.mockJsonReferenceFactory(entries))
 	}
 
 	@Test
@@ -399,7 +399,91 @@ class ReferenceValidatorTest {
 		assertTrue(errors.contains(
 			new SwaggerError(9, IMarker.SEVERITY_WARNING, Messages.error_missing_reference)
 		))
-	}	
+	}
+
+	@Test
+	def void shouldValidateOperationRef() {
+		val content = '''
+			openapi: '3.0.0'
+			info:
+			  version: 0.0.0
+			  title: Simple API
+			paths:
+			  /test:
+			    get:
+			      responses:
+			        '200':
+			          description: OK
+			components:
+			  links:
+			    test:
+			      operationRef: "#/paths/~1test/get"
+		'''
+
+		document.set(content)
+		val baseURI = new URI(null, null, null)
+		val errors = validator(#{}).validate(baseURI, document)
+
+		assertEquals(0, errors.size())
+	}
+
+	@Test
+	def void shouldValidateOperationRefIfInvalid() {
+		val content = '''
+			openapi: '3.0.0'
+			info:
+			  version: 0.0.0
+			  title: Simple API
+			paths:
+			  /test:
+			    get:
+			      responses:
+			        '200':
+			          description: OK
+			components:
+			  links:
+			    test:
+			      operationRef: "#/paths/~1foo"
+		'''
+
+		document.set(content)
+		val baseURI = new URI(null, null, null)
+		val errors = validator(#{}).validate(baseURI, document)
+
+		assertEquals(1, errors.size())
+		assertTrue(errors.contains(
+			new SwaggerError(14, IMarker.SEVERITY_WARNING, Messages.error_missing_reference)
+		))
+	}
+
+	@Test
+	def void shouldValidateOperationRefIfInvalidType() {
+		val content = '''
+			openapi: '3.0.0'
+			info:
+			  version: 0.0.0
+			  title: Simple API
+			paths:
+			  /test:
+			    get:
+			      responses:
+			        '200':
+			          description: OK
+			components:
+			  links:
+			    test:
+			      operationRef: "#/paths/~1test"
+		'''
+
+		document.set(content)
+		val baseURI = new URI(null, null, null)
+		val errors = validator(#{}).validate(baseURI, document)
+
+		assertEquals(1, errors.size())
+		assertTrue(errors.contains(
+			new SwaggerError(14, IMarker.SEVERITY_WARNING, Messages.error_invalid_reference_type)
+		))
+	}
 
 	def asJson(String string) {
 		new ObjectMapper(new YAMLFactory).readTree(string)

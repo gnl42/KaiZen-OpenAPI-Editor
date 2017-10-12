@@ -21,7 +21,6 @@ import org.eclipse.core.resources.IMarker;
 import com.fasterxml.jackson.core.JsonPointer;
 import com.fasterxml.jackson.databind.JsonNode;
 import com.google.common.collect.Lists;
-import com.reprezen.swagedit.core.json.references.JsonReferenceValidator;
 import com.reprezen.swagedit.core.model.AbstractNode;
 import com.reprezen.swagedit.core.model.ArrayNode;
 import com.reprezen.swagedit.core.model.Model;
@@ -34,15 +33,18 @@ public class OpenApi3Validator extends Validator {
     private final JsonPointer operationPointer = JsonPointer.compile("/definitions/operation");
     private final JsonPointer securityPointer = JsonPointer.compile("/components/securitySchemes");
 
-    public OpenApi3Validator(JsonReferenceValidator referenceValidator, Map<String, JsonNode> preloadedSchemas) {
-        super(referenceValidator, preloadedSchemas);
+    public OpenApi3Validator(Map<String, JsonNode> preloadedSchemas) {
+        super(new OpenApi3ReferenceValidator(), preloadedSchemas);
+    }
+
+    OpenApi3Validator(OpenApi3ReferenceValidator validator, Map<String, JsonNode> preloadedSchemas) {
+        super(validator, preloadedSchemas);
     }
 
     @Override
     protected void executeModelValidation(Model model, AbstractNode node, Set<SwaggerError> errors) {
         super.executeModelValidation(model, node, errors);
         validateOperationIdReferences(model, node, errors);
-        validateOperationRefReferences(model, node, errors);
         validateSecuritySchemeReferences(model, node, errors);
         validateParameters(model, node, errors);
     }
@@ -134,22 +136,6 @@ public class OpenApi3Validator extends Validator {
             // could be a NPE, let's just return the scopes we have so far.
         }
         return scopes;
-    }
-
-    private void validateOperationRefReferences(Model model, AbstractNode node, Set<SwaggerError> errors) {
-        JsonPointer schemaPointer = JsonPointer.compile("/definitions/link/properties/operationRef");
-
-        if (node != null && node.getType() != null && schemaPointer.equals(node.getType().getPointer())) {
-            String operationRefPointer = (String) node.asValue().getValue();
-            AbstractNode operation = model.find(operationRefPointer);
-
-            if (operation == null) {
-                errors.add(error(node, IMarker.SEVERITY_ERROR, Messages.error_invalid_reference));
-            } else if (operation.getType() == null
-                    || !Objects.equals(operationPointer, operation.getType().getPointer())) {
-                errors.add(error(node, IMarker.SEVERITY_ERROR, Messages.error_invalid_reference_type));
-            }
-        }
     }
 
     protected void validateOperationIdReferences(Model model, AbstractNode node, Set<SwaggerError> errors) {
