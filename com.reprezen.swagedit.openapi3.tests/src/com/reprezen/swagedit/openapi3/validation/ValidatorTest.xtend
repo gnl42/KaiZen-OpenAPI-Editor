@@ -328,7 +328,7 @@ class ValidatorTest {
 		assertThat(
 			errors,
 			hasItems(
-				new SwaggerError(15, IMarker.SEVERITY_WARNING, Messages.error_invalid_reference_type)
+				new SwaggerError(15, IMarker.SEVERITY_WARNING, Messages.error_invalid_operation_ref)
 			)
 		)
 	}

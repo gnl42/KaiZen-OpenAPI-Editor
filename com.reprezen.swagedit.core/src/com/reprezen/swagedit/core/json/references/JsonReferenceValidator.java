@@ -85,22 +85,16 @@ public class JsonReferenceValidator {
      * @param errors
      *            current set of errors
      */
-    private void validateType(JsonDocument doc, URI baseURI, AbstractNode node, JsonReference reference,
+    protected void validateType(JsonDocument doc, URI baseURI, AbstractNode node, JsonReference reference,
             Set<SwaggerError> errors) {
-        if (node == null) {
-            return;
-        }
 
         AbstractNode target = findTarget(doc, baseURI, reference);
-        if (!isValidType(node, target, reference)) {
+        TypeDefinition type = node.getType();
+        boolean isValidType = type != null && type.validate(target);
+
+        if (!isValidType) {
             errors.add(createReferenceError(SEVERITY_WARNING, error_invalid_reference_type, reference));
         }
-    }
-
-    protected boolean isValidType(AbstractNode source, AbstractNode target, JsonReference reference) {
-        TypeDefinition type = source.getType();
-
-        return type != null && type.validate(target);
     }
 
     protected AbstractNode findTarget(JsonDocument doc, URI baseURI, JsonReference reference) {

@@ -10,14 +10,21 @@
  *******************************************************************************/
 package com.reprezen.swagedit.openapi3.validation;
 
+import static com.reprezen.swagedit.core.validation.Messages.error_invalid_operation_ref;
+import static org.eclipse.core.resources.IMarker.SEVERITY_WARNING;
+
+import java.net.URI;
 import java.util.Objects;
+import java.util.Set;
 
 import com.fasterxml.jackson.core.JsonPointer;
+import com.reprezen.swagedit.core.editor.JsonDocument;
 import com.reprezen.swagedit.core.json.references.JsonReference;
 import com.reprezen.swagedit.core.json.references.JsonReferenceFactory;
 import com.reprezen.swagedit.core.json.references.JsonReferenceValidator;
 import com.reprezen.swagedit.core.model.AbstractNode;
 import com.reprezen.swagedit.core.model.ValueNode;
+import com.reprezen.swagedit.core.validation.SwaggerError;
 
 public class OpenApi3ReferenceValidator extends JsonReferenceValidator {
 
@@ -33,12 +40,20 @@ public class OpenApi3ReferenceValidator extends JsonReferenceValidator {
     }
 
     @Override
-    protected boolean isValidType(AbstractNode source, AbstractNode target, JsonReference reference) {
-        if (schemaPointer.equals(source.getType().getPointer())) {
-            return target != null && target.getType() != null
+    protected void validateType(JsonDocument doc, URI baseURI, AbstractNode node, JsonReference reference,
+            Set<SwaggerError> errors) {
+
+        if (schemaPointer.equals(node.getType().getPointer())) {
+            AbstractNode target = findTarget(doc, baseURI, reference);
+            boolean isValidType = target != null && target.getType() != null
                     && Objects.equals(operationPointer, target.getType().getPointer());
+
+            if (!isValidType) {
+                errors.add(createReferenceError(SEVERITY_WARNING, error_invalid_operation_ref, reference));
+            }
+        } else {
+            super.validateType(doc, baseURI, node, reference, errors);
         }
-        return super.isValidType(source, target, reference);
     }
 
     public static class OpenApi3ReferenceFactory extends JsonReferenceFactory {

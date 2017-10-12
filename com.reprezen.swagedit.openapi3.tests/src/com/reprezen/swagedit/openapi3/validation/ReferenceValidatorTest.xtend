@@ -481,7 +481,7 @@ class ReferenceValidatorTest {
 
 		assertEquals(1, errors.size())
 		assertTrue(errors.contains(
-			new SwaggerError(14, IMarker.SEVERITY_WARNING, Messages.error_invalid_reference_type)
+			new SwaggerError(14, IMarker.SEVERITY_WARNING, Messages.error_invalid_operation_ref)
 		))
 	}
 
