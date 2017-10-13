@@ -29,8 +29,8 @@ public class ArrayNode extends AbstractNode {
     }
 
     @Override
-    public boolean isObject() {
-        return false;
+    public ArrayNode asArray() {
+        return this;
     }
 
     @Override

@@ -23,13 +23,13 @@ public class ValueNode extends AbstractNode {
     }
 
     @Override
-    public boolean isObject() {
-        return false;
+    public boolean isValue() {
+        return true;
     }
 
     @Override
-    public boolean isArray() {
-        return false;
+    public ValueNode asValue() {
+        return this;
     }
 
     public Object getValue() {

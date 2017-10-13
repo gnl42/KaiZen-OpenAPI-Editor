@@ -324,10 +324,11 @@ class ValidatorTest {
 		document.set(content)
 		val errors = validator.validate(document, null as URI)
 		assertEquals(1, errors.size())
+
 		assertThat(
 			errors,
 			hasItems(
-				new SwaggerError(15, IMarker.SEVERITY_ERROR, Messages.error_invalid_reference_type)
+				new SwaggerError(15, IMarker.SEVERITY_WARNING, Messages.error_invalid_operation_ref)
 			)
 		)
 	}

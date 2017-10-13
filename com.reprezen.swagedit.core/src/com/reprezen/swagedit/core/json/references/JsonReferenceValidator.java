@@ -10,6 +10,10 @@
  *******************************************************************************/
 package com.reprezen.swagedit.core.json.references;
 
+import static com.reprezen.swagedit.core.validation.Messages.error_invalid_reference;
+import static com.reprezen.swagedit.core.validation.Messages.error_invalid_reference_type;
+import static com.reprezen.swagedit.core.validation.Messages.error_missing_reference;
+import static com.reprezen.swagedit.core.validation.Messages.warning_simple_reference;
 import static org.eclipse.core.resources.IMarker.SEVERITY_ERROR;
 import static org.eclipse.core.resources.IMarker.SEVERITY_WARNING;
 
@@ -18,15 +22,12 @@ import java.util.Collection;
 import java.util.Map;
 import java.util.Set;
 
-import org.eclipse.core.resources.IMarker;
-
 import com.fasterxml.jackson.databind.JsonNode;
 import com.google.common.collect.Sets;
 import com.reprezen.swagedit.core.editor.JsonDocument;
 import com.reprezen.swagedit.core.model.AbstractNode;
 import com.reprezen.swagedit.core.model.Model;
 import com.reprezen.swagedit.core.schema.TypeDefinition;
-import com.reprezen.swagedit.core.validation.Messages;
 import com.reprezen.swagedit.core.validation.SwaggerError;
 
 /**
@@ -58,13 +59,13 @@ public class JsonReferenceValidator {
             JsonReference reference = references.get(node);
 
             if (reference instanceof JsonReference.SimpleReference) {
-                errors.add(createReferenceError(SEVERITY_WARNING, Messages.warning_simple_reference, reference));
+                errors.add(createReferenceError(SEVERITY_WARNING, warning_simple_reference, reference));
             } else if (reference.isInvalid()) {
-                errors.add(createReferenceError(SEVERITY_ERROR, Messages.error_invalid_reference, reference));
+                errors.add(createReferenceError(SEVERITY_ERROR, error_invalid_reference, reference));
             } else if (reference.isMissing(doc, baseURI)) {
-                errors.add(createReferenceError(SEVERITY_WARNING, Messages.error_missing_reference, reference));
+                errors.add(createReferenceError(SEVERITY_WARNING, error_missing_reference, reference));
             } else if (reference.containsWarning()) {
-                errors.add(createReferenceError(SEVERITY_WARNING, Messages.error_invalid_reference, reference));
+                errors.add(createReferenceError(SEVERITY_WARNING, error_invalid_reference, reference));
             } else {
                 validateType(doc, baseURI, node, reference, errors);
             }
@@ -84,18 +85,21 @@ public class JsonReferenceValidator {
      * @param errors
      *            current set of errors
      */
-    private void validateType(JsonDocument doc, URI baseURI, AbstractNode node, JsonReference reference,
+    protected void validateType(JsonDocument doc, URI baseURI, AbstractNode node, JsonReference reference,
             Set<SwaggerError> errors) {
-        if (node == null) {
-            return;
-        }
 
-        Model model = doc.getModel();
+        AbstractNode target = findTarget(doc, baseURI, reference);
         TypeDefinition type = node.getType();
+        boolean isValidType = type != null && type.validate(target);
 
-        AbstractNode nodeValue = node.get(JsonReference.PROPERTY);
-        String pointer = (String) nodeValue.asValue().getValue();
-        AbstractNode valueNode = model.find(pointer);
+        if (!isValidType) {
+            errors.add(createReferenceError(SEVERITY_WARNING, error_invalid_reference_type, reference));
+        }
+    }
+
+    protected AbstractNode findTarget(JsonDocument doc, URI baseURI, JsonReference reference) {
+        Model model = doc.getModel();
+        AbstractNode valueNode = model.find(reference.getPointer());
 
         if (valueNode == null) {
             // Try to load the referenced node from an external document
@@ -103,28 +107,14 @@ public class JsonReferenceValidator {
             if (externalDoc != null) {
                 try {
                     Model externalModel = Model.parse(model.getSchema(), externalDoc);
-
-                    int pos = pointer.indexOf("#");
-                    if (pos == -1) {
-                        valueNode = externalModel.getRoot();
-                    } else {
-                        valueNode = externalModel.find(pointer.substring(pos, pointer.length()));
-                    }
-
-                    if (valueNode == null) {
-                        return;
-                    }
+                    valueNode = externalModel.find(reference.getPointer());
                 } catch (Exception e) {
                     // fail to parse the model or the pointer
-                    return;
+                    return null;
                 }
             }
         }
-
-        if (!type.validate(valueNode)) {
-            errors.add(
-                    createReferenceError(IMarker.SEVERITY_WARNING, Messages.error_invalid_reference_type, reference));
-        }
+        return valueNode;
     }
 
     protected SwaggerError createReferenceError(int severity, String message, JsonReference reference) {

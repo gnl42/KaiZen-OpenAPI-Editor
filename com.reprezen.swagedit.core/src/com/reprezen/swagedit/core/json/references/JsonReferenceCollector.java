@@ -44,7 +44,7 @@ public class JsonReferenceCollector {
         final Map<AbstractNode, JsonReference> references = Maps.newHashMap();
 
         for (AbstractNode node : model.allNodes()) {
-            if (JsonReference.isReference(node)) {
+            if (factory.isReference(node)) {
                 JsonReference reference = factory.createSimpleReference(baseURI, node.get(PROPERTY));
                 if (reference == null) {
                     reference = factory.create(node);
@@ -57,5 +57,4 @@ public class JsonReferenceCollector {
 
         return references;
     }
-
 }
