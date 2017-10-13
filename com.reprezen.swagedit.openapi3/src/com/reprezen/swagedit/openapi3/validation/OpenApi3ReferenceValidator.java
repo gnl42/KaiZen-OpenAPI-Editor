@@ -24,12 +24,13 @@ import com.reprezen.swagedit.core.json.references.JsonReferenceFactory;
 import com.reprezen.swagedit.core.json.references.JsonReferenceValidator;
 import com.reprezen.swagedit.core.model.AbstractNode;
 import com.reprezen.swagedit.core.model.ValueNode;
+import com.reprezen.swagedit.core.schema.TypeDefinition;
 import com.reprezen.swagedit.core.validation.SwaggerError;
 
 public class OpenApi3ReferenceValidator extends JsonReferenceValidator {
 
-    private final JsonPointer schemaPointer = JsonPointer.compile("/definitions/linkOrReference");
-    private final JsonPointer operationPointer = JsonPointer.compile("/definitions/operation");
+    private final JsonPointer linkTypePointer = JsonPointer.compile("/definitions/linkOrReference");
+    private final JsonPointer operationTypePointer = JsonPointer.compile("/definitions/operation");
 
     public OpenApi3ReferenceValidator() {
         super(new OpenApi3ReferenceFactory());
@@ -43,10 +44,9 @@ public class OpenApi3ReferenceValidator extends JsonReferenceValidator {
     protected void validateType(JsonDocument doc, URI baseURI, AbstractNode node, JsonReference reference,
             Set<SwaggerError> errors) {
 
-        if (schemaPointer.equals(node.getType().getPointer())) {
+        if (linkTypePointer.equals(node.getType().getPointer())) {
             AbstractNode target = findTarget(doc, baseURI, reference);
-            boolean isValidType = target != null && target.getType() != null
-                    && Objects.equals(operationPointer, target.getType().getPointer());
+            boolean isValidType = isValidOperation(target);
 
             if (!isValidType) {
                 errors.add(createReferenceError(SEVERITY_WARNING, error_invalid_operation_ref, reference));
@@ -54,6 +54,12 @@ public class OpenApi3ReferenceValidator extends JsonReferenceValidator {
         } else {
             super.validateType(doc, baseURI, node, reference, errors);
         }
+    }
+
+    protected boolean isValidOperation(AbstractNode operation) {
+        TypeDefinition type = operation != null ? operation.getType() : null;
+
+        return type != null && Objects.equals(operationTypePointer, type.getPointer());
     }
 
     public static class OpenApi3ReferenceFactory extends JsonReferenceFactory {
