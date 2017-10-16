@@ -48,7 +48,7 @@ paths:
                           type: string
                           format: date-time
                         userData:
-                          $ref: '#/components/schemas/UserLogData'
+                          type: string
               responses:
                 '202':
                   description: |
