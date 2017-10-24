@@ -58,9 +58,7 @@ public class StyledCompletionProposal
         String text = replacementString;
 
         if (Strings.emptyToNull(prefix) != null) {
-            if (replacementString.toLowerCase().startsWith(prefix)) {
-                text = replacementString.substring(prefix.length());
-            } else if (replacementString.toLowerCase().contains(prefix)) {
+            if (replacementString.toLowerCase().contains(prefix)) {
                 offset = replacementOffset - prefix.length();
                 length = prefix.length();
             }
