@@ -4,13 +4,13 @@
 
 _KaiZen OpenAPI Editor_ is an Eclipse editor for the [industry standard API description language](http://openapis.org), formerly known as [Swagger](http://swagger.io). It now supports both [Swagger-OpenAPI version 2.0](https://github.com/OAI/OpenAPI-Specification/blob/master/versions/2.0.md) and [OpenAPI version 3.0](https://github.com/OAI/OpenAPI-Specification/blob/master/versions/3.0.0.md).  
 
-KaiZen Editor, formerly known as SwagEdit, was developed for [RepreZen API Studio](http://reprezen.com/swagger-tools), a comprehensive solution for API modeling, documentation, visualization, testing and code generation, built on Eclipse.
+KaiZen Editor is a core component of [RepreZen API Studio](http://reprezen.com/swagger-tools), a comprehensive solution for API modeling, documentation, visualization, testing and code generation, built on Eclipse.
 
 We welcome your suggestions and contributions!
 
-## Available on Eclipse Marketplace
+## Eclipse Installer
 
-KaiZen OpenAPI Editor is available on [Eclipse Marketplace](https://marketplace.eclipse.org/content/kaizen-openapi-editor). Drag-and-drop this button into Eclipse Mars.2 or later to install:
+KaiZen OpenAPI Editor is available on [Eclipse Marketplace](https://marketplace.eclipse.org/content/kaizen-openapi-editor). Drag-and-drop this button into Eclipse Mars.2 or later to install, or [see below](#installing-kaizen-openapi-editor) for other options:
 
 [![Drag to your running Eclipse* workspace. *Requires Eclipse Marketplace Client](https://marketplace.eclipse.org/sites/all/themes/solstice/public/images/marketplace/btn-install.png)](http://marketplace.eclipse.org/marketplace-client-intro?mpc_install=3429028 "Drag to your running Eclipse* workspace. *Requires Eclipse Marketplace Client")
 
@@ -56,7 +56,7 @@ Outline View shows the contents of the active OpenAPI spec:
 <img src="http://i.imgur.com/iv49CLn.png" alt="Navigation_to_references" width="400">
 
 ## Installing KaiZen OpenAPI Editor
-KaiZen OpenAPI Editor requires Eclipse Mars.2 or higher.
+KaiZen OpenAPI Editor requires Java 8 (64-bit) and Eclipse Mars.2 or later.
 
 ### Installing from Eclipse Marketplace
 The [Eclipse Marketplace solution](https://marketplace.eclipse.org/content/kaizen-openapi-editor) is the easiest way to install KaiZen Editor into an Eclipse IDE. You can drag-and-drop the Install button from the browser into your Eclipse IDE, or use the built-in Eclipse Marketplace Client.
