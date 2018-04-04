@@ -69,7 +69,12 @@ This will show a dialog box where you can select the location of the update site
 Use the update site http://products.reprezen.com/swagedit/latest/ as the URL.
 
 ### Installing RepreZen API Studio
-KaiZen Editor is included as a core component of RepreZen API Studio, which adds live documentation and diagram views, sandbox testing with the built-in mock service and Swagger-UI, powerful code generation, and other features. See the RepreZen API Studio [video and feature tour](http://www.reprezen.com/OpenAPI) to learn more and download a free trial.
+KaiZen Editor is included as a core component of RepreZen API Studio, which adds live documentation and diagram views, sandbox testing with the built-in mock service and Swagger-UI, powerful code generation, and other features.
+
+RepreZen API Studio is available through two different installation options:  
+* [API Studio Desktop](http://www.reprezen.com/OpenAPI) installs as a standalone desktop application on Windows, MacOS or Linux.
+* [API Studio for Eclipse](https://marketplace.eclipse.org/content/reprezen-api-studio) installs into an Eclipse IDE distribution, allowing you to use RepreZen's API design, documentation and development features in your primary Eclipse development environment.<br/>
+[![Drag to your running Eclipse* workspace. *Requires Eclipse Marketplace Client](https://marketplace.eclipse.org/sites/all/themes/solstice/public/images/marketplace/btn-install.png)](http://marketplace.eclipse.org/marketplace-client-intro?mpc_install=3138718 "Drag to your running Eclipse* workspace. *Requires Eclipse Marketplace Client")
 
 ## Troubleshooting
 See the [Troubleshooting Guide](https://github.com/RepreZen/SwagEdit/blob/master/TROUBLESHOOTING.md) for solutions to common problems.
