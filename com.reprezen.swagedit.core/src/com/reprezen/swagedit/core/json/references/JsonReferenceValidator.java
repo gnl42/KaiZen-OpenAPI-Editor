@@ -23,10 +23,13 @@ import java.util.Map;
 import java.util.Set;
 
 import com.fasterxml.jackson.databind.JsonNode;
+import com.github.fge.jsonschema.core.exceptions.ProcessingException;
+import com.github.fge.jsonschema.core.report.ProcessingReport;
+import com.github.fge.jsonschema.main.JsonSchema;
+import com.github.fge.jsonschema.main.JsonSchemaFactory;
 import com.google.common.collect.Sets;
 import com.reprezen.swagedit.core.editor.JsonDocument;
 import com.reprezen.swagedit.core.model.AbstractNode;
-import com.reprezen.swagedit.core.model.Model;
 import com.reprezen.swagedit.core.schema.TypeDefinition;
 import com.reprezen.swagedit.core.validation.SwaggerError;
 
@@ -36,9 +39,14 @@ import com.reprezen.swagedit.core.validation.SwaggerError;
 public class JsonReferenceValidator {
 
     private final JsonReferenceCollector collector;
+    protected JsonSchemaFactory factory = null;
 
     public JsonReferenceValidator(JsonReferenceFactory factory) {
         this.collector = new JsonReferenceCollector(factory);
+    }
+
+    public void setFactory(JsonSchemaFactory factory) {
+        this.factory = factory;
     }
 
     /**
@@ -87,33 +95,42 @@ public class JsonReferenceValidator {
      */
     protected void validateType(JsonDocument doc, URI baseURI, AbstractNode node, JsonReference reference,
             Set<SwaggerError> errors) {
-
-        AbstractNode target = findTarget(doc, baseURI, reference);
+        JsonNode target = findTarget(doc, baseURI, reference);
         TypeDefinition type = node.getType();
-        boolean isValidType = type != null && type.validate(target);
 
-        if (!isValidType) {
-            errors.add(createReferenceError(SEVERITY_WARNING, error_invalid_reference_type, reference));
+        ProcessingReport report;
+        if (factory != null) {
+            try {
+                JsonSchema jsonSchema = factory.getJsonSchema(doc.getSchema().asJson(), type.getPointer().toString());
+                report = jsonSchema.validate(target);
+
+                if (!report.isSuccess()) {
+                    errors.add(createReferenceError(SEVERITY_WARNING, error_invalid_reference_type, reference));
+                }
+            } catch (ProcessingException e) {
+                errors.add(createReferenceError(SEVERITY_WARNING, error_invalid_reference_type, reference));
+            }
         }
     }
 
-    protected AbstractNode findTarget(JsonDocument doc, URI baseURI, JsonReference reference) {
-        Model model = doc.getModel();
-        AbstractNode valueNode = model.find(reference.getPointer());
+    protected JsonNode findTarget(JsonDocument doc, URI baseURI, JsonReference reference) {
+        JsonNode valueNode = null;
 
-        if (valueNode == null) {
+        if (!reference.getUri().equals(baseURI)) {
             // Try to load the referenced node from an external document
             JsonNode externalDoc = reference.getDocument(doc, baseURI);
+
             if (externalDoc != null) {
                 try {
-                    Model externalModel = Model.parse(model.getSchema(), externalDoc);
-                    valueNode = externalModel.find(reference.getPointer());
+                    valueNode = externalDoc.at(reference.getPointer());
                 } catch (Exception e) {
                     // fail to parse the model or the pointer
-                    return null;
                 }
             }
+        } else {
+            valueNode = doc.asJson().at(reference.getPointer());
         }
+
         return valueNode;
     }
 

@@ -62,8 +62,10 @@ import com.reprezen.swagedit.core.model.ValueNode;
 public class Validator {
 
     private final JsonReferenceValidator referenceValidator;
-    private JsonNode schemaRefTemplate = new ObjectMapper().createObjectNode().put("$ref", "#/definitions/schema");
-    private LoadingConfiguration loadingConfiguration;
+    private final JsonNode schemaRefTemplate = new ObjectMapper().createObjectNode() //
+            .put("$ref", "#/definitions/schema");
+    private final LoadingConfiguration loadingConfiguration;
+    private final JsonSchemaFactory factory;
 
     public Validator() {
         this(new JsonReferenceValidator(new JsonReferenceFactory()));
@@ -75,11 +77,24 @@ public class Validator {
 
     public Validator(JsonReferenceValidator referenceValidator, Map<String, JsonNode> preloadSchemas) {
         this.referenceValidator = referenceValidator;
+        this.loadingConfiguration = getLoadingConfiguration(preloadSchemas);
+        this.factory = JsonSchemaFactory.newBuilder() //
+                .setLoadingConfiguration(loadingConfiguration) //
+                .freeze();
+        this.referenceValidator.setFactory(factory);
+    }
+
+
+    private LoadingConfiguration getLoadingConfiguration(Map<String, JsonNode> preloadSchemas) {
         LoadingConfigurationBuilder loadingConfigurationBuilder = LoadingConfiguration.newBuilder();
         for (String nextSchemaUri : preloadSchemas.keySet()) {
             loadingConfigurationBuilder.preloadSchema(nextSchemaUri, preloadSchemas.get(nextSchemaUri));
         }
-        this.loadingConfiguration = loadingConfigurationBuilder.freeze();
+        return loadingConfigurationBuilder.freeze();
+    }
+
+    public JsonSchemaFactory getFactory() {
+        return factory;
     }
 
     /**
@@ -135,8 +150,6 @@ public class Validator {
     }
     
     public Set<SwaggerError> validateAgainstSchema(ErrorProcessor processor, JsonNode schemaAsJson, JsonNode documentAsJson) {
-        final JsonSchemaFactory factory = JsonSchemaFactory.newBuilder().setLoadingConfiguration(loadingConfiguration)
-                .freeze();
         final Set<SwaggerError> errors = Sets.newHashSet();
 
         JsonSchema schema = null;

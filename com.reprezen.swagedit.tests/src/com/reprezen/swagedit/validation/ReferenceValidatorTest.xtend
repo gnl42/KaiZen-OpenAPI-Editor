@@ -13,13 +13,16 @@ import org.eclipse.core.resources.IMarker
 import org.junit.Test
 
 import static org.junit.Assert.*
+import com.reprezen.swagedit.core.validation.Validator
 
 class ReferenceValidatorTest {
 
 	val document = new SwaggerDocument
 
 	def validator(Map<URI, JsonNode> entries) {
-		new JsonReferenceValidator(Mocks.mockJsonReferenceFactory(entries))
+		val validator = new JsonReferenceValidator(Mocks.mockJsonReferenceFactory(entries))
+		validator.factory = new Validator().factory
+		validator
 	}
 
 	@Test
@@ -130,6 +133,8 @@ class ReferenceValidatorTest {
 			  bar:
 			    name: bar
 			    in: path
+			    required: true
+			    type: string
 		'''
 
 		document.set(content)

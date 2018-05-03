@@ -22,7 +22,11 @@ Require-Bundle: org.eclipse.ui,
  org.eclipse.ui.workbench.texteditor
 Bundle-RequiredExecutionEnvironment: JavaSE-1.7
 Bundle-ActivationPolicy: lazy
-Export-Package: com.reprezen.swagedit.core,
+Export-Package: com.github.fge.jsonschema.core.exceptions,
+ com.github.fge.jsonschema.core.load.configuration,
+ com.github.fge.jsonschema.core.report,
+ com.github.fge.jsonschema.main,
+ com.reprezen.swagedit.core,
  com.reprezen.swagedit.core.assist,
  com.reprezen.swagedit.core.assist.contexts,
  com.reprezen.swagedit.core.assist.ext,
