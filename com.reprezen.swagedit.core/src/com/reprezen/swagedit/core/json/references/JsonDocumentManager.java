@@ -112,9 +112,12 @@ public class JsonDocumentManager {
         }
     }
 
+    /*
+     * Returns a copy of the URL parameter without the fragment or query.
+     */
     private URL normalize(URL url) {
         try {
-            return new URL(url.getProtocol(), url.getHost(), url.getFile());
+            return new URL(url.getProtocol(), url.getHost(), url.getPort(), url.getFile());
         } catch (MalformedURLException e) {
             return url;
         }
