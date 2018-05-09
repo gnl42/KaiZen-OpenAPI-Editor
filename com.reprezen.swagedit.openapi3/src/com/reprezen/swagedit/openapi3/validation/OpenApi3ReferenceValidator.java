@@ -10,14 +10,17 @@
  *******************************************************************************/
 package com.reprezen.swagedit.openapi3.validation;
 
-import static com.reprezen.swagedit.core.validation.Messages.error_invalid_operation_ref;
-import static org.eclipse.core.resources.IMarker.SEVERITY_WARNING;
-
 import java.net.URI;
 import java.util.Objects;
 import java.util.Set;
 
+import org.eclipse.core.resources.IMarker;
+
 import com.fasterxml.jackson.core.JsonPointer;
+import com.fasterxml.jackson.databind.JsonNode;
+import com.github.fge.jsonschema.core.exceptions.ProcessingException;
+import com.github.fge.jsonschema.core.report.ProcessingReport;
+import com.github.fge.jsonschema.main.JsonSchema;
 import com.reprezen.swagedit.core.editor.JsonDocument;
 import com.reprezen.swagedit.core.json.references.JsonReference;
 import com.reprezen.swagedit.core.json.references.JsonReferenceFactory;
@@ -25,6 +28,7 @@ import com.reprezen.swagedit.core.json.references.JsonReferenceValidator;
 import com.reprezen.swagedit.core.model.AbstractNode;
 import com.reprezen.swagedit.core.model.ValueNode;
 import com.reprezen.swagedit.core.schema.TypeDefinition;
+import com.reprezen.swagedit.core.validation.Messages;
 import com.reprezen.swagedit.core.validation.SwaggerError;
 
 public class OpenApi3ReferenceValidator extends JsonReferenceValidator {
@@ -45,11 +49,20 @@ public class OpenApi3ReferenceValidator extends JsonReferenceValidator {
             Set<SwaggerError> errors) {
 
         if (linkTypePointer.equals(node.getType().getPointer())) {
-            AbstractNode target = findTarget(doc, baseURI, reference);
-            boolean isValidType = isValidOperation(target);
+            JsonNode target = findTarget(doc, baseURI, reference);
 
-            if (!isValidType) {
-                errors.add(createReferenceError(SEVERITY_WARNING, error_invalid_operation_ref, reference));
+            if (factory != null) {
+                JsonSchema jsonSchema;
+                try {
+                    jsonSchema = factory.getJsonSchema(doc.getSchema().asJson(), operationTypePointer.toString());
+                    ProcessingReport report = jsonSchema.validate(target);
+                    if (!report.isSuccess()) {
+                        errors.add(createReferenceError(IMarker.SEVERITY_WARNING, Messages.error_invalid_operation_ref,
+                                reference));
+                    }
+                } catch (ProcessingException e) {
+                    e.printStackTrace();
+                }
             }
         } else {
             super.validateType(doc, baseURI, node, reference, errors);

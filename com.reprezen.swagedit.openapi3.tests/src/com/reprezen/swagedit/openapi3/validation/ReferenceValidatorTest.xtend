@@ -11,7 +11,6 @@
 package com.reprezen.swagedit.openapi3.validation
 
 import com.fasterxml.jackson.databind.JsonNode
-import com.reprezen.swagedit.core.json.references.JsonReferenceValidator
 import com.reprezen.swagedit.core.validation.Messages
 import com.reprezen.swagedit.core.validation.SwaggerError
 import com.reprezen.swagedit.openapi3.editor.OpenApi3Document
@@ -31,7 +30,9 @@ class ReferenceValidatorTest {
 	val document = new OpenApi3Document(new OpenApi3Schema)
 
 	def validator(Map<URI, JsonNode> entries) {
-		new OpenApi3ReferenceValidator(Mocks.mockJsonReferenceFactory(entries))
+		val validator = new OpenApi3ReferenceValidator(Mocks.mockJsonReferenceFactory(entries))
+		validator.factory =  ValidationHelper.validator.factory
+		validator
 	}
 
 	@Test
@@ -54,7 +55,6 @@ class ReferenceValidatorTest {
 			    Valid:
 			      name: Valid
 			      in: query
-			      type: string
 		'''
 
 		document.set(content)
@@ -271,13 +271,12 @@ class ReferenceValidatorTest {
 
 	@Test
 	def void shouldValidateReference_To_ExternalFileWithValidType() {
-		val other = '''			
+		val other = '''
 			components:
 			  parameters:
 			    foo:
 			      name: foo
 			      in: query
-			      type: string
 		'''
 
 		val content = '''

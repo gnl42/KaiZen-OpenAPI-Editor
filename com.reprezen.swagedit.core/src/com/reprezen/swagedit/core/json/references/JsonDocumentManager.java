@@ -10,9 +10,11 @@
  *******************************************************************************/
 package com.reprezen.swagedit.core.json.references;
 
+import java.io.File;
 import java.net.MalformedURLException;
 import java.net.URI;
 import java.net.URL;
+import java.nio.file.Paths;
 import java.util.Collections;
 import java.util.Map;
 import java.util.WeakHashMap;
@@ -43,6 +45,7 @@ public class JsonDocumentManager {
     private final ObjectMapper yamlMapper = new ObjectMapper(new YAMLFactory());
 
     private final Map<URL, JsonNode> documents = Collections.synchronizedMap(new WeakHashMap<URL, JsonNode>());
+    private final Map<URL, Long> documentVersions = Collections.synchronizedMap(new WeakHashMap<URL, Long>());
 
     /**
      * Returns the JSON representation of the document located at the given URL. If the document is not found or the
@@ -54,15 +57,25 @@ public class JsonDocumentManager {
      */
     public JsonNode getDocument(URL url) {
         URL normalized = normalize(url);
+        Long currentTime = getTimestamp(normalized);
 
-        if (documents.containsKey(normalized)) {
+        Long previousTime = -1L;
+        if (documentVersions.containsKey(normalized)) {
+             previousTime = documentVersions.get(normalized);
+        }
+
+        if (documents.containsKey(normalized) && previousTime >= currentTime) {
             return documents.get(normalized);
         }
 
         JsonNode document = parse(normalized);
         if (document != null) {
             documents.put(normalized, document);
+            if (currentTime > 0) {
+                documentVersions.put(normalized, currentTime);
+            }
         }
+
         return document;
     }
 
@@ -83,6 +96,16 @@ public class JsonDocumentManager {
      */
     public IFile getFile(URI uri) {
         return uri != null ? DocumentUtils.getWorkspaceFile(uri) : null;
+    }
+
+    private Long getTimestamp(URL url) {
+        try {
+            File file = Paths.get(url.toURI()).toFile();
+
+            return file != null ? file.lastModified() : 0L;
+        } catch (Exception e) {
+            return 0L;
+        }
     }
 
     private JsonNode parse(URL url) {

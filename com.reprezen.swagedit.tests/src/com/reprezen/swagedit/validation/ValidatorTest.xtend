@@ -792,16 +792,16 @@ class ValidatorTest {
 			  version: 0.0.0
 			  title: Simple API
 			paths:
-			  {}
-			
-			responses:
-			  ok:
-			    description: Ok
+			  /resource:
+			    get:
+			      responses:
+			        '200':
+			          description: OK
 			definitions:
 			  Foo:
 			    type: array
 			    items:
-			      $ref: "#/responses/ok"
+			      $ref: "#/paths/resource"
 			  Bar:
 			    type: object
 		'''

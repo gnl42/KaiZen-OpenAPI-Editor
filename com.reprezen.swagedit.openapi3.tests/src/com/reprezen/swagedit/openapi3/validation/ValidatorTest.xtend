@@ -118,6 +118,9 @@ class ValidatorTest {
 			components:
 			  responses:
 			    ok:
+			      headers: 
+			        bearer:
+			          description: Bearer
 			      description: Ok
 			  schemas:
 			    Foo:
