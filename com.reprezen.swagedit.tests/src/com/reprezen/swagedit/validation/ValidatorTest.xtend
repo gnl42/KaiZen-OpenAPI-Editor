@@ -801,7 +801,7 @@ class ValidatorTest {
 			  Foo:
 			    type: array
 			    items:
-			      $ref: "#/paths/resource"
+			      $ref: "#/paths/~1resource"
 			  Bar:
 			    type: object
 		'''
