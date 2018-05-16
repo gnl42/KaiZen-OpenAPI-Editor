@@ -232,4 +232,42 @@ public class JsonReference {
         }
     }
 
+    @Override
+    public int hashCode() {
+        final int prime = 31;
+        int result = 1;
+        result = prime * result + ((pointer == null) ? 0 : pointer.hashCode());
+        result = prime * result + ((uri == null) ? 0 : uri.hashCode());
+        return result;
+    }
+
+    @Override
+    public boolean equals(Object obj) {
+        if (this == obj) {
+            return true;
+        }
+        if (obj == null) {
+            return false;
+        }
+        if (!(obj instanceof JsonReference)) {
+            return false;
+        }
+        JsonReference other = (JsonReference) obj;
+        if (pointer == null) {
+            if (other.pointer != null) {
+                return false;
+            }
+        } else if (!pointer.equals(other.pointer)) {
+            return false;
+        }
+        if (uri == null) {
+            if (other.uri != null) {
+                return false;
+            }
+        } else if (!uri.equals(other.uri)) {
+            return false;
+        }
+        return true;
+    }
+
 }

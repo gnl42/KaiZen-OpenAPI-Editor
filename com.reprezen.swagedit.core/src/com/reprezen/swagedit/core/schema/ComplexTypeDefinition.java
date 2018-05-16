@@ -12,7 +12,6 @@ package com.reprezen.swagedit.core.schema;
 
 import java.util.ArrayList;
 import java.util.Collection;
-import java.util.Iterator;
 import java.util.LinkedHashSet;
 import java.util.List;
 
@@ -20,7 +19,6 @@ import com.fasterxml.jackson.core.JsonPointer;
 import com.fasterxml.jackson.databind.JsonNode;
 import com.fasterxml.jackson.databind.node.ArrayNode;
 import com.google.common.collect.Iterables;
-import com.reprezen.swagedit.core.model.AbstractNode;
 
 /**
  * Represents a JSON schema type definition of a complex type, eg oneOf, allOf, anyOf types.
@@ -107,40 +105,6 @@ public class ComplexTypeDefinition extends TypeDefinition {
         }
     }
 
-    @Override
-    public boolean validate(AbstractNode valueNode) {
-        if (valueNode == null) {
-            return false;
-        }
-
-        TypeDefinition valueType = valueNode.getType();
-        if (valueType == null) {
-            return false;
-        }
-
-        if (valueType instanceof ReferenceTypeDefinition) {
-            valueType = ((ReferenceTypeDefinition) valueType).resolve();
-        }
-
-        boolean isValid = this == valueType;
-
-        if (isValid) {
-            return true;
-        }
-
-        Iterator<TypeDefinition> it = getComplexTypes().iterator();
-        while (it.hasNext() && !isValid) {
-            TypeDefinition current = it.next();
-
-            if (current.getPointer() != null && valueType != null
-                    && current.getPointer().equals(valueType.getPointer())) {
-                isValid = true;
-            }
-        }
-
-        return isValid;
-    }
-    
     @Override
     public String getLabel() {
         TypeDefinition firstType = Iterables.getFirst(complexTypes, null);
