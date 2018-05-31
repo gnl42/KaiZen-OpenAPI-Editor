@@ -13,7 +13,6 @@ package com.reprezen.swagedit.core.schema;
 import com.fasterxml.jackson.core.JsonPointer;
 import com.fasterxml.jackson.databind.JsonNode;
 import com.reprezen.swagedit.core.json.references.JsonReference;
-import com.reprezen.swagedit.core.model.AbstractNode;
 
 /**
  * Represents a JSON reference that should be resolved as a type definition.
@@ -62,11 +61,6 @@ public class ReferenceTypeDefinition extends TypeDefinition {
     @Override
     public TypeDefinition getPropertyType(String property) {
         return resolve().getPropertyType(property);
-    }
-
-    @Override
-    public boolean validate(AbstractNode valueNode) {
-        return resolve().validate(valueNode);
     }
     
     @Override

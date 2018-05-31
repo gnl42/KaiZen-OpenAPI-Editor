@@ -12,7 +12,6 @@ package com.reprezen.swagedit.core.schema;
 
 import com.fasterxml.jackson.core.JsonPointer;
 import com.fasterxml.jackson.databind.JsonNode;
-import com.reprezen.swagedit.core.model.AbstractNode;
 
 /**
  * Represents a type defined inside a JSON Schema.
@@ -97,23 +96,6 @@ public class TypeDefinition {
     protected static String getProperty(JsonPointer pointer) {
         String s = pointer.toString();
         return s.substring(s.lastIndexOf("/") + 1).replaceAll("~1", "/");
-    }
-
-    public boolean validate(AbstractNode valueNode) {
-        if (valueNode == null) {
-            return false;
-        }
-
-        TypeDefinition valueType = valueNode.getType();
-        if (valueType == null) {
-            return false;
-        }
-
-        if (valueType instanceof ReferenceTypeDefinition) {
-            valueType = ((ReferenceTypeDefinition) valueType).resolve();
-        }
-
-        return this == valueType;
     }
 
 }
