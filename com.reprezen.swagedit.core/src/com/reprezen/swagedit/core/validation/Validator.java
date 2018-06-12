@@ -13,6 +13,7 @@ package com.reprezen.swagedit.core.validation;
 import java.io.IOException;
 import java.net.URI;
 import java.util.HashSet;
+import java.util.Iterator;
 import java.util.Map;
 import java.util.Objects;
 import java.util.Set;
@@ -30,6 +31,7 @@ import org.yaml.snakeyaml.nodes.SequenceNode;
 import org.yaml.snakeyaml.parser.ParserException;
 
 import com.fasterxml.jackson.core.JsonPointer;
+import com.fasterxml.jackson.core.JsonProcessingException;
 import com.fasterxml.jackson.databind.JsonNode;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import com.github.fge.jsonschema.core.exceptions.ProcessingException;
@@ -43,14 +45,11 @@ import com.google.common.collect.Maps;
 import com.google.common.collect.Multimap;
 import com.google.common.collect.Sets;
 import com.reprezen.swagedit.core.editor.JsonDocument;
+import com.reprezen.swagedit.core.json.JsonModel;
 import com.reprezen.swagedit.core.json.references.JsonReference;
 import com.reprezen.swagedit.core.json.references.JsonReferenceFactory;
 import com.reprezen.swagedit.core.json.references.JsonReferenceValidator;
-import com.reprezen.swagedit.core.model.AbstractNode;
-import com.reprezen.swagedit.core.model.ArrayNode;
-import com.reprezen.swagedit.core.model.Model;
-import com.reprezen.swagedit.core.model.ObjectNode;
-import com.reprezen.swagedit.core.model.ValueNode;
+import com.reprezen.swagedit.core.schema.TypeDefinition;
 
 /**
  * This class contains methods for validating a Swagger YAML document.
@@ -84,7 +83,6 @@ public class Validator {
         this.referenceValidator.setFactory(factory);
     }
 
-
     private LoadingConfiguration getLoadingConfiguration(Map<String, JsonNode> preloadSchemas) {
         LoadingConfigurationBuilder loadingConfigurationBuilder = LoadingConfiguration.newBuilder();
         for (String nextSchemaUri : preloadSchemas.keySet()) {
@@ -113,31 +111,34 @@ public class Validator {
         URI baseURI = editorInput != null ? editorInput.getFile().getLocationURI() : null;
         return validate(document, baseURI);
     }
-    
+
     public Set<SwaggerError> validate(JsonDocument document, URI baseURI) {
         Set<SwaggerError> errors = Sets.newHashSet();
 
-        JsonNode jsonContent = null;
+        JsonModel model;
         try {
-            jsonContent = document.asJson();
+            model = document.getContent();
         } catch (Exception e) {
-            jsonContent = null;
+            model = null;
         }
 
-        if (jsonContent != null) {
-            Node yaml = document.getYaml();
-            if (yaml != null) {
-                errors.addAll(validateAgainstSchema(
-                        new ErrorProcessor(yaml, document.getSchema().getRootType().getContent()), document));
-                errors.addAll(validateModel(document.getModel()));
-                errors.addAll(checkDuplicateKeys(yaml));
+        if (model != null) {
+            if (!model.getErrors().isEmpty()) {
+                for (Exception e : model.getErrors()) {
+                    errors.add(SwaggerError.newJsonError((JsonProcessingException) e));
+                }
+            } else {
+                ErrorProcessor processor = new ErrorProcessor(model, document.getSchema().getRootType().getContent());
+                errors.addAll(validateAgainstSchema(processor, document));
+                errors.addAll(validateModel(model));
+                // errors.addAll(checkDuplicateKeys(yaml));
                 errors.addAll(referenceValidator.validate(baseURI, document));
             }
         }
 
         return errors;
     }
-    
+
     /**
      * Validates the YAML document against the Swagger schema
      * 
@@ -148,8 +149,9 @@ public class Validator {
     protected Set<SwaggerError> validateAgainstSchema(ErrorProcessor processor, JsonDocument document) {
         return validateAgainstSchema(processor, document.getSchema().asJson(), document.asJson());
     }
-    
-    public Set<SwaggerError> validateAgainstSchema(ErrorProcessor processor, JsonNode schemaAsJson, JsonNode documentAsJson) {
+
+    public Set<SwaggerError> validateAgainstSchema(ErrorProcessor processor, JsonNode schemaAsJson,
+            JsonNode documentAsJson) {
         final Set<SwaggerError> errors = Sets.newHashSet();
 
         JsonSchema schema = null;
@@ -177,20 +179,23 @@ public class Validator {
      * @param model
      * @return errors
      */
-    protected Set<SwaggerError> validateModel(Model model) {
+    protected Set<SwaggerError> validateModel(JsonModel model) {
         final Set<SwaggerError> errors = new HashSet<>();
 
-        if (model != null && model.getRoot() != null) {
-            for (AbstractNode node : model.allNodes()) {
-                executeModelValidation(model, node, errors);
+        if (model != null) {
+            for (JsonPointer p : model.getTypes().keySet()) {
+                JsonNode node = model.getContent().at(p);
+                checkArrayTypeDefinition(errors, node);
+
+                if (node != null && node.isObject()) {
+                    if (ValidationUtil.isInDefinition(p.toString())) {
+                        checkMissingType(errors, node);
+                        checkMissingRequiredProperties(errors, node);
+                    }
+                }
             }
         }
         return errors;
-    }
-
-    protected void executeModelValidation(Model model, AbstractNode node, Set<SwaggerError> errors) {
-        checkArrayTypeDefinition(errors, node);
-        checkObjectTypeDefinition(errors, node);
     }
 
     /**
@@ -199,9 +204,9 @@ public class Validator {
      * @param errors
      * @param model
      */
-    protected void checkArrayTypeDefinition(Set<SwaggerError> errors, AbstractNode node) {
+    protected void checkArrayTypeDefinition(Set<SwaggerError> errors, JsonNode node) {
         if (hasArrayType(node)) {
-            AbstractNode items = node.get("items");
+            JsonNode items = node.get("items");
             if (items == null) {
                 errors.add(error(node, IMarker.SEVERITY_ERROR, Messages.error_array_missing_items));
             } else {
@@ -218,28 +223,12 @@ public class Validator {
      * @param node
      * @return true if array definition
      */
-    protected boolean hasArrayType(AbstractNode node) {
-        if (node.isObject() && node.get("type") instanceof ValueNode) {
-            ValueNode typeValue = node.get("type").asValue();
-            return typeValue.getValue() != null && "array".equalsIgnoreCase(typeValue.getValue().toString());
+    protected boolean hasArrayType(JsonNode node) {
+        if (node.isObject() && node.get("type") != null) {
+            String typeValue = node.get("type").asText();
+            return "array".equalsIgnoreCase(typeValue);
         }
         return false;
-    }
-
-    /**
-     * Validates an object type definition.
-     * 
-     * @param errors
-     * @param node
-     */
-    protected void checkObjectTypeDefinition(Set<SwaggerError> errors, AbstractNode node) {
-        if (node instanceof ObjectNode) {
-            JsonPointer ptr = node.getPointer();
-            if (ptr != null && ValidationUtil.isInDefinition(ptr.toString())) {
-                checkMissingType(errors, node);
-                checkMissingRequiredProperties(errors, node);
-            }
-        }
     }
 
     /**
@@ -248,31 +237,31 @@ public class Validator {
      * @param errors
      * @param node
      */
-    protected void checkMissingType(Set<SwaggerError> errors, AbstractNode node) {
+    protected void checkMissingType(Set<SwaggerError> errors, JsonNode node) {
         // object
         if (node.get("properties") != null) {
             // bypass this node, it is a property whose name is `properties`
 
-            if ("properties".equals(node.getProperty())) {
-                return;
-            }
+            // if ("properties".equals(node.getProperty())) {
+            // return;
+            // }
 
             if (node.get("type") == null) {
                 errors.add(error(node, IMarker.SEVERITY_WARNING, Messages.error_object_type_missing));
             } else {
-                AbstractNode typeValue = node.get("type");
-                if (!(typeValue instanceof ValueNode) || !Objects.equals("object", typeValue.asValue().getValue())) {
+                JsonNode typeValue = node.get("type");
+                if (!(typeValue.isValueNode()) || !Objects.equals("object", typeValue.asText())) {
                     errors.add(error(node, IMarker.SEVERITY_ERROR, Messages.error_wrong_type));
                 }
             }
-        } else if (isSchemaDefinition(node) && node.get("type") == null) {
+        } else if (isSchemaDefinition(node, null) && node.get("type") == null) {
             errors.add(error(node, IMarker.SEVERITY_WARNING, Messages.error_type_missing));
         }
     }
 
-    private boolean isSchemaDefinition(AbstractNode node) {
+    private boolean isSchemaDefinition(JsonNode node, TypeDefinition type) {
         // need to use getContent() because asJson() returns resolvedValue is some subclasses
-        return schemaRefTemplate.equals(node.getType().getContent()) //
+        return type != null && schemaRefTemplate.equals(type.getContent()) //
                 && node.get(JsonReference.PROPERTY) == null //
                 && node.get("allOf") == null;
     }
@@ -283,21 +272,22 @@ public class Validator {
      * @param errors
      * @param node
      */
-    protected void checkMissingRequiredProperties(Set<SwaggerError> errors, AbstractNode node) {
-        if (node.get("required") instanceof ArrayNode) {
-            ArrayNode required = node.get("required").asArray();
+    protected void checkMissingRequiredProperties(Set<SwaggerError> errors, JsonNode node) {
+        if (node.get("required") != null && node.get("required").isArray()) {
+            com.fasterxml.jackson.databind.node.ArrayNode required = (com.fasterxml.jackson.databind.node.ArrayNode) node
+                    .get("required");
 
-            AbstractNode properties = node.get("properties");
+            JsonNode properties = node.get("properties");
             if (properties == null) {
                 errors.add(error(node, IMarker.SEVERITY_ERROR, Messages.error_missing_properties));
             } else {
-                for (AbstractNode prop : required.elements()) {
-                    if (prop instanceof ValueNode) {
-                        ValueNode valueNode = prop.asValue();
-                        String value = valueNode.getValue().toString();
+                for (Iterator<JsonNode> it = required.elements(); it.hasNext();) {
+                    JsonNode prop = it.next();
+                    if (prop.isValueNode()) {
+                        String value = prop.asText();
 
                         if (properties.get(value) == null) {
-                            errors.add(error(valueNode, IMarker.SEVERITY_ERROR,
+                            errors.add(error(prop, IMarker.SEVERITY_ERROR,
                                     String.format(Messages.error_required_properties, value)));
                         }
                     }
@@ -306,8 +296,9 @@ public class Validator {
         }
     }
 
-    protected SwaggerError error(AbstractNode node, int level, String message) {
-        return new SwaggerError(node.getStart().getLine() + 1, level, message);
+    protected SwaggerError error(JsonNode node, int level, String message) {
+        // return new SwaggerError(node.getStart().getLine() + 1, level, message);
+        return new SwaggerError(1, level, message);
     }
 
     /*

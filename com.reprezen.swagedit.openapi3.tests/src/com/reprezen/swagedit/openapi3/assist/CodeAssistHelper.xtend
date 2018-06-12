@@ -94,12 +94,12 @@ class CodeAssistHelper {
 		val line = document.getLineOfOffset(offset)
 		val annotationLine = document.get(region.offset, region.getLength())
 
-		val path = document.getModel(offset).getPath(line, document.getColumnOfOffset(line, region))
+		val path = document.getPath(line, document.getColumnOfOffset(line, region))
 
 		val isArrayItem = annotationLine.contains(" " + arrayItemMarker)
 		val maybeArrayPrefix = if(isArrayItem) "/0" else ""
 
-		val contextType = new OpenApi3ContextTypeProvider().getContextType(document.getModel(), path.toString + maybeArrayPrefix)
+		val contextType = new OpenApi3ContextTypeProvider().getContextType(document, path.toString + maybeArrayPrefix)
 		return contextType
 	}
 }

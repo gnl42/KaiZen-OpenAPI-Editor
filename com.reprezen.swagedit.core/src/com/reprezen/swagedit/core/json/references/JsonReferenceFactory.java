@@ -20,7 +20,6 @@ import com.fasterxml.jackson.core.JsonPointer;
 import com.fasterxml.jackson.databind.JsonNode;
 import com.google.common.base.Strings;
 import com.reprezen.swagedit.core.model.AbstractNode;
-import com.reprezen.swagedit.core.model.Model;
 import com.reprezen.swagedit.core.model.ValueNode;
 import com.reprezen.swagedit.core.utils.URLUtils;
 
@@ -32,18 +31,18 @@ import com.reprezen.swagedit.core.utils.URLUtils;
  */
 public class JsonReferenceFactory {
 
-    public JsonReference create(AbstractNode node) {
-        if (node == null) {
-            return new JsonReference(null, null, false, false, false, node);
-        }
-
-        ValueNode value = getReferenceValue(node);
-        if (value != null) {
-            return doCreate((String) value.getValue(), value);
-        } else {
-            return null;
-        }
-    }
+    // public JsonReference create(AbstractNode node) {
+    // if (node == null) {
+    // return new JsonReference(null, null, false, false, false, node);
+    // }
+    //
+    // ValueNode value = getReferenceValue(node);
+    // if (value != null) {
+    // return doCreate((String) value.getValue(), value);
+    // } else {
+    // return null;
+    // }
+    // }
 
     public JsonReference create(JsonNode node) {
         if (node == null || node.isMissingNode()) {
@@ -68,28 +67,20 @@ public class JsonReferenceFactory {
      * @param value
      * @return reference
      */
-    public JsonReference createSimpleReference(URI baseURI, AbstractNode valueNode) {
+    public JsonReference createSimpleReference(URI baseURI, JsonNode document, JsonNode valueNode) {
         if (valueNode == null || valueNode.isArray() || valueNode.isObject()) {
             return null;
         }
 
-        final Object value = valueNode.asValue().getValue();
-        if (!(value instanceof String)) {
+        String value = valueNode.asText();
+        if (Strings.emptyToNull(value) == null || value.startsWith("#") || value.contains("/")) {
             return null;
         }
 
-        String stringValue = (String) value;
-        if (Strings.emptyToNull(stringValue) == null || stringValue.startsWith("#") || stringValue.contains("/")) {
-            return null;
-        }
-
-        final Model model = valueNode.getModel();
-        if (model != null) {
-            JsonPointer ptr = JsonPointer.compile("/definitions/" + value);
-            AbstractNode target = model.find(ptr);
-            if (target != null) {
-                return new JsonReference.SimpleReference(baseURI, ptr, valueNode);
-            }
+        JsonPointer ptr = JsonPointer.compile("/definitions/" + value);
+        JsonNode target = document.at(ptr);
+        if (target != null && !target.isMissingNode()) {
+            return new JsonReference.SimpleReference(baseURI, ptr, valueNode);
         }
 
         return null;

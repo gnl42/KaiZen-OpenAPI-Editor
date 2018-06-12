@@ -14,9 +14,8 @@ import java.util.Collection;
 
 import com.fasterxml.jackson.core.JsonPointer;
 import com.fasterxml.jackson.databind.JsonNode;
+import com.reprezen.swagedit.core.json.JsonModel;
 import com.reprezen.swagedit.core.json.references.JsonReference;
-import com.reprezen.swagedit.core.model.AbstractNode;
-import com.reprezen.swagedit.core.model.Model;
 import com.reprezen.swagedit.core.schema.ComplexTypeDefinition;
 import com.reprezen.swagedit.core.schema.MultipleTypeDefinition;
 import com.reprezen.swagedit.core.schema.TypeDefinition;
@@ -35,20 +34,20 @@ public class ComponentContextType extends ContextType {
     }
 
     @Override
-    public boolean canProvideProposal(Model model, JsonPointer pointer) {
-        if (model == null) {
+    public boolean canProvideProposal(JsonModel document, JsonPointer pointer) {
+        if (document == null) {
             // model can be null when initTextMessages called in new JsonContentAssistProcessor()
             return false;
         }
-        return isReference(model, pointer) && isReferenceToComponent(model, pointer);
+        return isReference(document, pointer) && isReferenceToComponent(document, pointer);
     }
 
-    protected boolean isReference(Model model, JsonPointer pointer) {
-        AbstractNode contextNode = model.find(pointer);
+    protected boolean isReference(JsonModel document, JsonPointer pointer) {
+        JsonNode contextNode = document.getContent().at(pointer);
         if (contextNode == null) {
             return false;
         }
-        TypeDefinition type = contextNode.getType();
+        TypeDefinition type = document.getTypes().get(pointer);
         if (type instanceof MultipleTypeDefinition) {
             // MultipleTypeDefinition is a special case, it happens when several properties match a property
             for (TypeDefinition nestedType : ((MultipleTypeDefinition) type).getMultipleTypes()) {
@@ -64,12 +63,8 @@ public class ComponentContextType extends ContextType {
         return getReferencePointerString().equals(pointerToType.toString());
     }
 
-    protected boolean isReferenceToComponent(Model model, JsonPointer pointer) {
-        AbstractNode parentNode = model.find(pointer.head());
-        if (parentNode == null) {
-            return false;
-        }
-        TypeDefinition parentType = parentNode.getType();
+    protected boolean isReferenceToComponent(JsonModel document, JsonPointer pointer) {
+        TypeDefinition parentType = document.getTypes().get(pointer.head());
         if (parentType instanceof ComplexTypeDefinition) {
             Collection<TypeDefinition> types = ((ComplexTypeDefinition) parentType).getComplexTypes();
             for (TypeDefinition type : types) {

@@ -1,12 +1,12 @@
 package com.reprezen.swagedit.validation
 
 import com.fasterxml.jackson.databind.JsonNode
+import com.fasterxml.jackson.databind.ObjectMapper
 import com.fasterxml.jackson.databind.node.ArrayNode
 import com.google.common.base.Strings
 import com.google.common.collect.Lists
 import com.reprezen.swagedit.core.schema.JsonSchemaUtils
 import com.reprezen.swagedit.schema.SwaggerSchema
-import io.swagger.util.Json
 import java.util.List
 import org.junit.Test
 
@@ -75,7 +75,7 @@ class MultipleSwaggerErrorMessageTest {
 	}
 
 	def void assertHumanFriendlyTextForNodeEquals(CharSequence json, String expectedLabel, String defaultValue) {
-		val JsonNode arrayOfSchemasNode = Json.mapper().readTree(json.toString);
+		val JsonNode arrayOfSchemasNode = new ObjectMapper().readTree(json.toString);
 		assertNotNull(arrayOfSchemasNode)
 		val label = JsonSchemaUtils::getHumanFriendlyText(arrayOfSchemasNode, defaultValue);
 		assertEquals(expectedLabel, label)

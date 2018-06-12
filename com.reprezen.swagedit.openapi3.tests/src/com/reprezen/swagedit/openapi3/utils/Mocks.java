@@ -25,7 +25,6 @@ import org.eclipse.swt.graphics.Point;
 import com.fasterxml.jackson.databind.JsonNode;
 import com.reprezen.swagedit.core.json.references.JsonDocumentManager;
 import com.reprezen.swagedit.core.json.references.JsonReference;
-import com.reprezen.swagedit.core.model.AbstractNode;
 import com.reprezen.swagedit.openapi3.editor.OpenApi3Document;
 import com.reprezen.swagedit.openapi3.validation.OpenApi3ReferenceValidator;
 import com.reprezen.swagedit.openapi3.validation.OpenApi3ReferenceValidator.OpenApi3ReferenceFactory;
@@ -43,7 +42,7 @@ public class Mocks {
         when(file.exists()).thenReturn(true);
 
         return new OpenApi3ReferenceValidator.OpenApi3ReferenceFactory() {
-            public JsonReference create(AbstractNode node) {
+            public JsonReference create(JsonNode node) {
                 JsonReference ref = super.create(node);
                 ref.setDocumentManager(new JsonDocumentManager() {
                     @Override

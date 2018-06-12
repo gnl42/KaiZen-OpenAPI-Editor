@@ -50,8 +50,10 @@ public abstract class CompositeSchema {
      * @return node's type
      */
     public TypeDefinition getType(AbstractNode node) {
-        JsonPointer pointer = node.getPointer();
+        return getType(node.getPointer());
+    }
 
+    public TypeDefinition getType(JsonPointer pointer) {
         if (JsonPointer.compile("").equals(pointer)) {
             return swaggerType.getType();
         }

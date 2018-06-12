@@ -14,16 +14,13 @@ import java.util.Iterator;
 import java.util.List;
 import java.util.Objects;
 
-import org.eclipse.jface.text.IRegion;
 import org.eclipse.jface.text.ITextViewer;
 import org.eclipse.jface.text.hyperlink.IHyperlink;
 
 import com.fasterxml.jackson.core.JsonPointer;
+import com.fasterxml.jackson.databind.JsonNode;
 import com.reprezen.swagedit.core.editor.JsonDocument;
 import com.reprezen.swagedit.core.hyperlinks.AbstractJsonHyperlinkDetector;
-import com.reprezen.swagedit.core.hyperlinks.SwaggerHyperlink;
-import com.reprezen.swagedit.core.model.AbstractNode;
-import com.reprezen.swagedit.core.model.Model;
 
 public class LinkOperationHyperlinkDetector extends AbstractJsonHyperlinkDetector {
 
@@ -34,26 +31,25 @@ public class LinkOperationHyperlinkDetector extends AbstractJsonHyperlinkDetecto
 
     @Override
     protected IHyperlink[] doDetect(JsonDocument doc, ITextViewer viewer, HyperlinkInfo info, JsonPointer pointer) {
-        Model model = doc.getModel();
-        AbstractNode node = model.find(pointer);
-        List<AbstractNode> nodes = model.findByType(JsonPointer.compile("/definitions/operation"));
-        Iterator<AbstractNode> it = nodes.iterator();
+        JsonNode node = doc.asJson().at(pointer);
+        List<JsonNode> nodes = doc.getContent().findByType(JsonPointer.compile("/definitions/operation"));
+        Iterator<JsonNode> it = nodes.iterator();
 
-        AbstractNode found = null;
+        JsonNode found = null;
         while (it.hasNext() && found == null) {
-            AbstractNode current = it.next();
-            AbstractNode value = current.get("operationId");
+            JsonNode current = it.next();
+            JsonNode value = current.get("operationId");
 
-            if (value != null && Objects.equals(node.asValue().getValue(), value.asValue().getValue())) {
+            if (value != null && Objects.equals(node.asText(), value.asText())) {
                 found = value;
             }
         }
 
         if (found != null) {
-            IRegion target = doc.getRegion(found.getPointer());
-            if (target != null) {
-                return new IHyperlink[] { new SwaggerHyperlink(info.text, viewer, info.region, target) };
-            }
+            // IRegion target = doc.getRegion(found.getPointer());
+            // if (target != null) {
+            // return new IHyperlink[] { new SwaggerHyperlink(info.text, viewer, info.region, target) };
+            // }
         }
 
         return null;

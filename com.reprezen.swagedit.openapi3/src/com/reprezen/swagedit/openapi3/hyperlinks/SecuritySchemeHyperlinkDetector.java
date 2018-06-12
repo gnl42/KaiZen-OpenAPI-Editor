@@ -13,16 +13,13 @@ package com.reprezen.swagedit.openapi3.hyperlinks;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
 
-import org.eclipse.jface.text.IRegion;
 import org.eclipse.jface.text.ITextViewer;
 import org.eclipse.jface.text.hyperlink.IHyperlink;
 
 import com.fasterxml.jackson.core.JsonPointer;
+import com.fasterxml.jackson.databind.JsonNode;
 import com.reprezen.swagedit.core.editor.JsonDocument;
 import com.reprezen.swagedit.core.hyperlinks.AbstractJsonHyperlinkDetector;
-import com.reprezen.swagedit.core.hyperlinks.SwaggerHyperlink;
-import com.reprezen.swagedit.core.model.AbstractNode;
-import com.reprezen.swagedit.core.model.Model;
 
 public class SecuritySchemeHyperlinkDetector extends AbstractJsonHyperlinkDetector {
 
@@ -40,14 +37,13 @@ public class SecuritySchemeHyperlinkDetector extends AbstractJsonHyperlinkDetect
         String link = matcher.find() ? matcher.group(1) : null;
 
         if (link != null) {
-            Model model = doc.getModel();
-            AbstractNode securityScheme = model.find("/components/securitySchemes/" + link);
+            JsonNode securityScheme = doc.asJson().at("/components/securitySchemes/" + link);
 
             if (securityScheme != null) {
-                IRegion target = doc.getRegion(securityScheme.getPointer());
-                if (target != null) {
-                    return new IHyperlink[] { new SwaggerHyperlink(info.text, viewer, info.region, target) };
-                }
+                // IRegion target = doc.getRegion(securityScheme.getPointer());
+                // if (target != null) {
+                // return new IHyperlink[] { new SwaggerHyperlink(info.text, viewer, info.region, target) };
+                // }
             }
         }
         return null;

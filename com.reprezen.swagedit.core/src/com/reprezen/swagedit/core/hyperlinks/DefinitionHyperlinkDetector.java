@@ -20,8 +20,8 @@ import org.eclipse.jface.text.ITextViewer;
 import org.eclipse.jface.text.hyperlink.IHyperlink;
 
 import com.fasterxml.jackson.core.JsonPointer;
+import com.fasterxml.jackson.databind.JsonNode;
 import com.reprezen.swagedit.core.editor.JsonDocument;
-import com.reprezen.swagedit.core.model.AbstractNode;
 
 /**
  * Hyperlink detector that detects links to and inside schema definition elements.
@@ -71,18 +71,20 @@ public class DefinitionHyperlinkDetector extends AbstractJsonHyperlinkDetector {
             return null;
         }
 
-        AbstractNode container = doc.getModel().find(JsonPointer.compile(containerPath));
+        JsonNode container = doc.asJson().at(JsonPointer.compile(containerPath));
         if (container.get("properties") != null && container.get("properties").get(info.text) != null) {
-            return container.get("properties").get(info.text).getPointer();
+            return JsonPointer.compile(containerPath)
+                    .append(JsonPointer.compile("/" + container.get("properties").get(info.text).asText()));
         } else {
             return null;
         }
     }
 
     protected JsonPointer getTagDefinitionPath(JsonDocument doc, HyperlinkInfo info, JsonPointer pointer) {
-        AbstractNode node = doc.getModel().find(JsonPointer.compile("/definitions/" + info.text));
+        JsonPointer ptr = JsonPointer.compile("/definitions/" + info.text);
+        JsonNode node = doc.asJson().at(ptr);
 
-        return node != null ? node.getPointer() : null;
+        return node != null ? ptr : null;
     }
 
 }

@@ -10,7 +10,7 @@
  *******************************************************************************/
 package com.reprezen.swagedit.core.assist.contexts;
 import com.fasterxml.jackson.core.JsonPointer;
-import com.reprezen.swagedit.core.model.Model;
+import com.reprezen.swagedit.core.json.JsonModel;
 
 public class ContextTypeCollection {
 
@@ -20,9 +20,9 @@ public class ContextTypeCollection {
         this.contextTypes = contextTypes;
     }
 
-    public ContextType get(Model model, JsonPointer pointer) {
+    public ContextType get(JsonModel document, JsonPointer pointer) {
         for (ContextType next : contextTypes) {
-            if (next.canProvideProposal(model, pointer)) {
+            if (next.canProvideProposal(document, pointer)) {
                 return next;
             }
         }

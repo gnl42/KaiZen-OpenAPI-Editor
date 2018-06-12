@@ -60,10 +60,10 @@ class ReferenceContextTest {
 		val line = document.getLineOfOffset(offset)
 		val annotationLine = document.get(region.offset, region.getLength())
 
-		val path = document.getModel(offset).getPath(line, document.getColumnOfOffset(line, region))
+		val path = document.getPath(line, document.getColumnOfOffset(line, region))
 		val isArrayItem = annotationLine.contains(" " + arrayItemMarker)
 		val maybeArrayPrefix = if (isArrayItem) "/0" else ""
-		val contextType = allContextTypes.get(document.getModel(), path.append(JsonPointer.compile(maybeArrayPrefix + "/$ref")))
+		val contextType = allContextTypes.get(document.content, path.append(JsonPointer.compile(maybeArrayPrefix + "/$ref")))
 
 
 		val matcher = refValuePattern.matcher(annotationLine)

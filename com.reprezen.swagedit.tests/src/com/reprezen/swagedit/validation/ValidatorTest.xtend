@@ -338,139 +338,139 @@ class ValidatorTest {
 			))
 	}
 
-	@Test
-	def void correctAliasAfterAnchor() {
-		val content = '''
-			swagger: "2.0"
-			info:
-			  version: 1.0.0
-			  title: Uber parameters
-			
-			paths: {}
-			
-			parameters:  
-			
-			  law:
-			    name: law_applicability
-			    in: query
-			    description: scope of a law
-			    required: false
-			    type: string
-			    enum: &scope_values
-			    - GLOBAL
-			    - REGIONAL
-			    - LOCAL
-			
-			  brand:
-			    name: brand_reach
-			    in: query
-			    description: where a brand name is used
-			    type: string
-			    enum: *scope_values
-		'''
-
-		document.set(content)
-		document.onChange()
-
-		assertThat(document.yamlError, nullValue)
-		assertThat(document.jsonError, nullValue)
-
-		val errors = validator.validate(document, null as URI)
-		assertEquals(0, errors.size())
-	}
-
-	@Test
-	def void correctAliasBeforeAnchor() {
-		val content = '''
-			swagger: "2.0"
-			info:
-			  version: 1.0.0
-			  title: Uber parameters
-			
-			paths: {}
-			
-			parameters:  
-			
-			  brand:
-			    name: brand_reach
-			    in: query
-			    description: where a brand name is used
-			    type: string
-			    enum: *scope_values
-			
-			law:
-			    name: law_applicability
-			    in: query
-			    description: scope of a law
-			    required: false
-			    type: string
-			    enum: &scope_values
-			    - GLOBAL
-			    - REGIONAL
-			    - LOCAL
-			
-		'''
-
-		document.set(content)
-		document.onChange()
-
-		assertThat(document.yamlError, notNullValue)
-		assertThat(document.yamlError.message,
-			equalTo(
-				"found undefined alias scope_values\n in 'reader', line 15, column 11:\n        enum: *scope_values\n              ^\n"))
-
-		assertThat(document.jsonError, nullValue)
-
-		val errors = validator.validate(document, null as URI)
-		assertEquals(0, errors.size())
-	}
-
-	@Test
-	def void invlaidAlias() {
-		val content = '''
-			swagger: "2.0"
-			info:
-			  version: 1.0.0
-			  title: Uber parameters
-			
-			paths: {}
-			
-			parameters:  
-			
-			  law:
-			    name: law_applicability
-			    in: query
-			    description: scope of a law
-			    required: false
-			    type: string
-			    enum: &scope_values
-			    - GLOBAL
-			    - REGIONAL
-			    - LOCAL
-			
-			  brand:
-			    name: brand_reach
-			    in: query
-			    description: where a brand name is used
-			    type: string
-			    enum: *scope_values_BROKEN
-		'''
-
-		document.set(content)
-		document.onChange()
-
-		assertThat(document.yamlError, notNullValue)
-		println(document.yamlError)
-		assertThat(document.yamlError.message,
-			equalTo(
-				"found undefined alias scope_values_BROKEN\n in 'reader', line 26, column 11:\n        enum: *scope_values_BROKEN\n              ^\n"))
-
-		assertThat(document.jsonError, nullValue)
-
-		val errors = validator.validate(document, null as URI)
-		assertEquals(0, errors.size())
-
-	}
+//	@Test
+//	def void correctAliasAfterAnchor() {
+//		val content = '''
+//			swagger: "2.0"
+//			info:
+//			  version: 1.0.0
+//			  title: Uber parameters
+//			
+//			paths: {}
+//			
+//			parameters:  
+//			
+//			  law:
+//			    name: law_applicability
+//			    in: query
+//			    description: scope of a law
+//			    required: false
+//			    type: string
+//			    enum: &scope_values
+//			    - GLOBAL
+//			    - REGIONAL
+//			    - LOCAL
+//			
+//			  brand:
+//			    name: brand_reach
+//			    in: query
+//			    description: where a brand name is used
+//			    type: string
+//			    enum: *scope_values
+//		'''
+//
+//		document.set(content)
+//		document.onChange()
+//
+//		assertThat(document.yamlError, nullValue)
+//		assertThat(document.jsonError, nullValue)
+//
+//		val errors = validator.validate(document, null as URI)
+//		assertEquals(0, errors.size())
+//	}
+//
+//	@Test
+//	def void correctAliasBeforeAnchor() {
+//		val content = '''
+//			swagger: "2.0"
+//			info:
+//			  version: 1.0.0
+//			  title: Uber parameters
+//			
+//			paths: {}
+//			
+//			parameters:  
+//			
+//			  brand:
+//			    name: brand_reach
+//			    in: query
+//			    description: where a brand name is used
+//			    type: string
+//			    enum: *scope_values
+//			
+//			law:
+//			    name: law_applicability
+//			    in: query
+//			    description: scope of a law
+//			    required: false
+//			    type: string
+//			    enum: &scope_values
+//			    - GLOBAL
+//			    - REGIONAL
+//			    - LOCAL
+//			
+//		'''
+//
+//		document.set(content)
+//		document.onChange()
+//
+//		assertThat(document.yamlError, notNullValue)
+//		assertThat(document.yamlError.message,
+//			equalTo(
+//				"found undefined alias scope_values\n in 'reader', line 15, column 11:\n        enum: *scope_values\n              ^\n"))
+//
+//		assertThat(document.jsonError, nullValue)
+//
+//		val errors = validator.validate(document, null as URI)
+//		assertEquals(0, errors.size())
+//	}
+//
+//	@Test
+//	def void invlaidAlias() {
+//		val content = '''
+//			swagger: "2.0"
+//			info:
+//			  version: 1.0.0
+//			  title: Uber parameters
+//			
+//			paths: {}
+//			
+//			parameters:  
+//			
+//			  law:
+//			    name: law_applicability
+//			    in: query
+//			    description: scope of a law
+//			    required: false
+//			    type: string
+//			    enum: &scope_values
+//			    - GLOBAL
+//			    - REGIONAL
+//			    - LOCAL
+//			
+//			  brand:
+//			    name: brand_reach
+//			    in: query
+//			    description: where a brand name is used
+//			    type: string
+//			    enum: *scope_values_BROKEN
+//		'''
+//
+//		document.set(content)
+//		document.onChange()
+//
+//		assertThat(document.yamlError, notNullValue)
+//		println(document.yamlError)
+//		assertThat(document.yamlError.message,
+//			equalTo(
+//				"found undefined alias scope_values_BROKEN\n in 'reader', line 26, column 11:\n        enum: *scope_values_BROKEN\n              ^\n"))
+//
+//		assertThat(document.jsonError, nullValue)
+//
+//		val errors = validator.validate(document, null as URI)
+//		assertEquals(0, errors.size())
+//
+//	}
 
 	@Test
 	def void testArrayWithItemsAreValid() {

@@ -10,14 +10,13 @@
  *******************************************************************************/
 package com.reprezen.swagedit.core.json.references;
 
-import static com.reprezen.swagedit.core.json.references.JsonReference.PROPERTY;
-
 import java.net.URI;
 import java.util.Map;
 
+import com.fasterxml.jackson.core.JsonPointer;
+import com.fasterxml.jackson.databind.JsonNode;
 import com.google.common.collect.Maps;
-import com.reprezen.swagedit.core.model.AbstractNode;
-import com.reprezen.swagedit.core.model.Model;
+import com.reprezen.swagedit.core.editor.JsonDocument;
 
 /**
  * Collector of JSON references present in a JSON or YAML document.
@@ -40,18 +39,18 @@ public class JsonReferenceCollector {
      * @param model
      * @return all reference nodes
      */
-    public Map<AbstractNode, JsonReference> collect(URI baseURI, Model model) {
-        final Map<AbstractNode, JsonReference> references = Maps.newHashMap();
+    public Map<JsonNode, JsonReference> collect(URI baseURI, JsonDocument document) {
+        final Map<JsonNode, JsonReference> references = Maps.newHashMap();
+        final JsonNode json = document.asJson();
 
-        for (AbstractNode node : model.allNodes()) {
-            if (factory.isReference(node)) {
-                JsonReference reference = factory.createSimpleReference(baseURI, node.get(PROPERTY));
-                if (reference == null) {
-                    reference = factory.create(node);
-                }
-                if (reference != null) {
-                    references.put(node, reference);
-                }
+        for (JsonPointer pointer : document.getContent().getReferences()) {
+            JsonNode refNode = json.at(pointer);
+            JsonReference reference = factory.createSimpleReference(baseURI, json, refNode);
+            if (reference == null) {
+                reference = factory.create(refNode);
+            }
+            if (reference != null) {
+                references.put(refNode, reference);
             }
         }
 

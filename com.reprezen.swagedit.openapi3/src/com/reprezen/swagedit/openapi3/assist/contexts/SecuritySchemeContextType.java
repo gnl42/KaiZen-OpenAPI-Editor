@@ -18,8 +18,7 @@ import com.fasterxml.jackson.core.JsonPointer;
 import com.google.common.collect.Lists;
 import com.reprezen.swagedit.core.assist.Proposal;
 import com.reprezen.swagedit.core.assist.contexts.SchemaContextType;
-import com.reprezen.swagedit.core.model.AbstractNode;
-import com.reprezen.swagedit.core.model.Model;
+import com.reprezen.swagedit.core.json.JsonModel;
 import com.reprezen.swagedit.core.schema.CompositeSchema;
 
 /**
@@ -34,15 +33,15 @@ public class SecuritySchemeContextType extends SchemaContextType {
     }
 
     @Override
-    public Collection<Proposal> collectProposals(Model model, IPath path) {
+    public Collection<Proposal> collectProposals(JsonModel document, IPath path) {
         final Collection<Proposal> results = Lists.newArrayList();
-        AbstractNode securitySchemes = model.find(securityPointer);
-
-        if (securitySchemes != null && securitySchemes.isObject()) {
-            for (String key : securitySchemes.asObject().fieldNames()) {
-                results.add(new Proposal(key, key, null, securitySchemes.getProperty()));
-            }
-        }
+        // AbstractNode securitySchemes = model.find(securityPointer);
+        //
+        // if (securitySchemes != null && securitySchemes.isObject()) {
+        // for (String key : securitySchemes.asObject().fieldNames()) {
+        // results.add(new Proposal(key, key, null, securitySchemes.getProperty()));
+        // }
+        // }
 
         return results;
     }

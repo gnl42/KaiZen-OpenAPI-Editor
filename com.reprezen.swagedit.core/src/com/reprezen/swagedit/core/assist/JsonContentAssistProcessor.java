@@ -52,6 +52,8 @@ import com.reprezen.swagedit.core.Activator;
 import com.reprezen.swagedit.core.Activator.Icons;
 import com.reprezen.swagedit.core.assist.contexts.ContextType;
 import com.reprezen.swagedit.core.editor.JsonDocument;
+import com.reprezen.swagedit.core.json.JsonModel;
+import com.reprezen.swagedit.core.json.RangeNode;
 import com.reprezen.swagedit.core.json.references.Messages;
 import com.reprezen.swagedit.core.model.Model;
 import com.reprezen.swagedit.core.templates.SwaggerTemplateContext;
@@ -63,9 +65,9 @@ import com.reprezen.swagedit.core.utils.SwaggerFileFinder.Scope;
 public abstract class JsonContentAssistProcessor extends TemplateCompletionProcessor
         implements IContentAssistProcessor, ICompletionListener {
 
-   private final JsonProposalProvider proposalProvider;
-   private final JsonReferenceProposalProvider referenceProposalProvider;
-   private final ContentAssistant contentAssistant;
+    private final JsonProposalProvider proposalProvider;
+    private final JsonReferenceProposalProvider referenceProposalProvider;
+    private final ContentAssistant contentAssistant;
 
     /**
      * The pointer that helps us locate the current position of the cursor inside the document.
@@ -85,25 +87,25 @@ public abstract class JsonContentAssistProcessor extends TemplateCompletionProce
     private boolean isRefCompletion = false;
 
     private String[] textMessages;
-    
-	public JsonContentAssistProcessor(ContentAssistant ca, String fileContentType) {
-		this(ca, new JsonProposalProvider(),
-				new JsonReferenceProposalProvider(ContextType.emptyContentTypeCollection(), fileContentType));
-	}
-    
-    public JsonContentAssistProcessor(ContentAssistant ca, JsonProposalProvider proposalProvider, JsonReferenceProposalProvider referenceProposalProvider) {
+
+    public JsonContentAssistProcessor(ContentAssistant ca, String fileContentType) {
+        this(ca, new JsonProposalProvider(),
+                new JsonReferenceProposalProvider(ContextType.emptyContentTypeCollection(), fileContentType));
+    }
+
+    public JsonContentAssistProcessor(ContentAssistant ca, JsonProposalProvider proposalProvider,
+            JsonReferenceProposalProvider referenceProposalProvider) {
         this.contentAssistant = ca;
         this.proposalProvider = proposalProvider;
         this.referenceProposalProvider = referenceProposalProvider;
         this.textMessages = initTextMessages(null);
     }
-    
+
     protected abstract TemplateStore getTemplateStore();
 
     protected abstract ContextTypeRegistry getContextTypeRegistry();
-    
-    protected abstract String getContextTypeId(Model model, String path);
 
+    protected abstract String getContextTypeId(JsonDocument doc, String path);
 
     @Override
     public ICompletionProposal[] computeCompletionProposals(ITextViewer viewer, int documentOffset) {
@@ -131,19 +133,22 @@ public abstract class JsonContentAssistProcessor extends TemplateCompletionProce
             column -= prefix.length();
         }
 
-        Model model = document.getModel(documentOffset - prefix.length());
-        currentPath = model.getPath(line, column);
+        // Model model = document.getModel(documentOffset - prefix.length());
+        JsonModel model = new JsonModel(document.getSchema(), document.get(), false);
+        RangeNode range = model.findRegion(line + 1, column + 1);
+        currentPath = JsonPointer.compile(range.pointer.toString());
+
         isRefCompletion = referenceProposalProvider.canProvideProposal(model, currentPath);
 
         Collection<Proposal> p;
         if (isRefCompletion) {
             updateStatus(model);
-            p = referenceProposalProvider.getProposals(currentPath, document, currentScope);
+            p = referenceProposalProvider.getProposals(currentPath, model, currentScope);
         } else {
             clearStatus();
             p = proposalProvider.getProposals(currentPath, model, prefix);
         }
-   
+
         final Collection<ICompletionProposal> proposals = getCompletionProposals(p, prefix, documentOffset);
         // compute template proposals
         if (!isRefCompletion) {
@@ -164,10 +169,10 @@ public abstract class JsonContentAssistProcessor extends TemplateCompletionProce
         currentOffset = documentOffset;
     }
 
-    protected void updateStatus(Model model) {
+    protected void updateStatus(JsonModel doc) {
         if (contentAssistant != null) {
             if (textMessages == null) {
-                textMessages = initTextMessages(model);
+                textMessages = initTextMessages(doc);
             }
             contentAssistant.setStatusLineVisible(true);
             contentAssistant.setStatusMessage(textMessages[currentScope.getValue()]);
@@ -180,17 +185,17 @@ public abstract class JsonContentAssistProcessor extends TemplateCompletionProce
         }
     }
 
-	protected String[] initTextMessages(Model model) {
-		IBindingService bindingService = (IBindingService) PlatformUI.getWorkbench().getAdapter(IBindingService.class);
-		String bindingKey = bindingService.getBestActiveBindingFormattedFor(EDIT_CONTENT_ASSIST);
-     	ContextType contextType = referenceProposalProvider.getContextTypes().get(model, getCurrentPath());
-		String context = contextType != null ? contextType.label() : "";
+    protected String[] initTextMessages(JsonModel doc) {
+        IBindingService bindingService = (IBindingService) PlatformUI.getWorkbench().getAdapter(IBindingService.class);
+        String bindingKey = bindingService.getBestActiveBindingFormattedFor(EDIT_CONTENT_ASSIST);
+        ContextType contextType = referenceProposalProvider.getContextTypes().get(doc, getCurrentPath());
+        String context = contextType != null ? contextType.label() : "";
 
-		return new String[] { //
-				String.format(Messages.content_assist_proposal_project, bindingKey, context),
-				String.format(Messages.content_assist_proposal_workspace, bindingKey, context),
-				String.format(Messages.content_assist_proposal_local, bindingKey, context) };
-	}
+        return new String[] { //
+                String.format(Messages.content_assist_proposal_project, bindingKey, context),
+                String.format(Messages.content_assist_proposal_workspace, bindingKey, context),
+                String.format(Messages.content_assist_proposal_local, bindingKey, context) };
+    }
 
     protected Collection<ICompletionProposal> getCompletionProposals(Collection<Proposal> proposals, String prefix,
             int offset) {
@@ -254,15 +259,15 @@ public abstract class JsonContentAssistProcessor extends TemplateCompletionProce
         return null;
     }
 
-	@Override
-	protected ICompletionProposal createProposal(Template template, TemplateContext context, IRegion region,
-			int relevance) {
+    @Override
+    protected ICompletionProposal createProposal(Template template, TemplateContext context, IRegion region,
+            int relevance) {
         if (context instanceof DocumentTemplateContext) {
             context = new SwaggerTemplateContext((DocumentTemplateContext) context);
         }
-		return new StyledTemplateProposal(template, context, region, getImage(template), getTemplateLabel(template),
-				relevance);
-	}
+        return new StyledTemplateProposal(template, context, region, getImage(template), getTemplateLabel(template),
+                relevance);
+    }
 
     @Override
     protected Template[] getTemplates(String contextTypeId) {
@@ -272,21 +277,22 @@ public abstract class JsonContentAssistProcessor extends TemplateCompletionProce
     @Override
     protected TemplateContextType getContextType(ITextViewer viewer, IRegion region) {
         Model model = null;
-        if (viewer.getDocument() instanceof JsonDocument) {
-            model = ((JsonDocument)viewer.getDocument()).getModel();
-        }
-        String contextType = getContextTypeId(model, currentPath.toString());
-        ContextTypeRegistry registry = getContextTypeRegistry();
-        if (registry != null) {
-            return registry.getContextType(contextType);
-        } else {
-            return null;
-        }
+        // if (viewer.getDocument() instanceof JsonDocument) {
+        // model = ((JsonDocument)viewer.getDocument()).getModel();
+        // }
+        // String contextType = getContextTypeId(model, currentPath.toString());
+        // ContextTypeRegistry registry = getContextTypeRegistry();
+        // if (registry != null) {
+        // return registry.getContextType(contextType);
+        // } else {
+        // return null;
+        // }
+        return null;
     }
 
     @Override
     protected Image getImage(Template template) {
-       return Activator.getDefault().getImage(Icons.template_item);
+        return Activator.getDefault().getImage(Icons.template_item);
     }
 
     protected StyledString getTemplateLabel(Template template) {
@@ -323,9 +329,9 @@ public abstract class JsonContentAssistProcessor extends TemplateCompletionProce
         textMessages = null;
         currentOffset = -1;
     }
-    
+
     protected JsonPointer getCurrentPath() {
-    	return currentPath;
+        return currentPath;
     }
 
     @Override

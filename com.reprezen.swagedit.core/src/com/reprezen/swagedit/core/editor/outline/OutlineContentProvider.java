@@ -48,9 +48,9 @@ public class OutlineContentProvider implements ITreeContentProvider {
         }
 
         List<Object> roots = Lists.newArrayList();
-        for (Model model : models) {
-            roots.add(model.getRoot());
-        }
+        // for (Model model : models) {
+        // roots.add(model.getRoot());
+        // }
 
         return roots.toArray(new Object[roots.size()]);
     }

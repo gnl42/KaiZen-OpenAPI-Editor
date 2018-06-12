@@ -52,7 +52,7 @@ class ValidationHelper {
 			}
 		}
 		val validator = new OpenApi3ReferenceValidator(new OpenApi3ReferenceFactory() {
-			override create(AbstractNode node) {
+			override create(JsonNode node) {
 				val reference = super.create(node)
 				if (reference !== null) {
 					reference.documentManager = docManager
@@ -60,8 +60,8 @@ class ValidationHelper {
 				reference
 			}
 
-			override createSimpleReference(URI baseURI, AbstractNode valueNode) {
-				val reference = super.createSimpleReference(baseURI, valueNode)
+			override createSimpleReference(URI baseURI, JsonNode doc, JsonNode valueNode) {
+				val reference = super.createSimpleReference(baseURI, doc, valueNode)
 				if (reference !== null) {
 					reference.documentManager = docManager
 				}

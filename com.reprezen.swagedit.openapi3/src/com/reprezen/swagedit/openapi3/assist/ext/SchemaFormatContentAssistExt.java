@@ -15,12 +15,12 @@ import java.util.List;
 import java.util.Map;
 
 import com.fasterxml.jackson.core.JsonPointer;
+import com.fasterxml.jackson.databind.JsonNode;
 import com.google.common.collect.ImmutableList;
 import com.google.common.collect.ImmutableMap;
 import com.google.common.collect.Lists;
 import com.reprezen.swagedit.core.assist.Proposal;
 import com.reprezen.swagedit.core.assist.ext.ContentAssistExt;
-import com.reprezen.swagedit.core.model.AbstractNode;
 import com.reprezen.swagedit.core.schema.TypeDefinition;
 
 public class SchemaFormatContentAssistExt implements ContentAssistExt {
@@ -56,22 +56,22 @@ public class SchemaFormatContentAssistExt implements ContentAssistExt {
     }
 
     @Override
-    public Collection<Proposal> getProposals(TypeDefinition type, AbstractNode node, String prefix) {
+    public Collection<Proposal> getProposals(TypeDefinition type, JsonNode node, String prefix) {
         List<Proposal> proposals = Lists.newArrayList();
-
-        if (node.getParent() != null && node.getParent().get("type") != null) {
-            String filter = (String) node.getParent().get("type").asValue().getValue();
-
-            if (values.containsKey(filter)) {
-                return values.get(filter);
-            }
-        }
-
-        for (List<Proposal> value : values.values()) {
-            for (Proposal v : value) {
-                proposals.add(v);
-            }
-        }
+        //
+        // if (node.getParent() != null && node.getParent().get("type") != null) {
+        // String filter = (String) node.getParent().get("type").asValue().getValue();
+        //
+        // if (values.containsKey(filter)) {
+        // return values.get(filter);
+        // }
+        // }
+        //
+        // for (List<Proposal> value : values.values()) {
+        // for (Proposal v : value) {
+        // proposals.add(v);
+        // }
+        // }
 
         proposals.add(new Proposal("", "", null, "string"));
 

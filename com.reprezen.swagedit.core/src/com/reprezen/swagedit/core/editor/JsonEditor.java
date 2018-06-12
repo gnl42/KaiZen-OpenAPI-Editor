@@ -74,9 +74,7 @@ import org.eclipse.ui.part.ShowInContext;
 import org.eclipse.ui.swt.IFocusService;
 import org.eclipse.ui.texteditor.IDocumentProvider;
 import org.eclipse.ui.views.contentoutline.IContentOutlinePage;
-import org.yaml.snakeyaml.error.YAMLException;
 
-import com.fasterxml.jackson.core.JsonProcessingException;
 import com.reprezen.swagedit.core.editor.outline.JsonContentOutlinePage;
 import com.reprezen.swagedit.core.handlers.OpenQuickOutlineHandler;
 import com.reprezen.swagedit.core.model.AbstractNode;
@@ -448,7 +446,6 @@ public abstract class JsonEditor extends YEdit implements IShowInSource, IShowIn
                 ((JsonDocument) document).onChange();
             }
             clearMarkers(file);
-            validateYaml(file, (JsonDocument) document);
             validateSwagger(file, (JsonDocument) document, fileEditorInput);
         }
     }
@@ -460,15 +457,6 @@ public abstract class JsonEditor extends YEdit implements IShowInSource, IShowIn
         } catch (CoreException e) {
             YEditLog.logException(e);
             YEditLog.logger.warning("Failed to delete markers:\n" + e.toString());
-        }
-    }
-
-    protected void validateYaml(IFile file, JsonDocument document) {
-        if (document.getYamlError() instanceof YAMLException) {
-            addMarker(SwaggerError.newYamlError((YAMLException) document.getYamlError()), file, document);
-        }
-        if (document.getJsonError() instanceof JsonProcessingException) {
-            addMarker(SwaggerError.newJsonError((JsonProcessingException) document.getJsonError()), file, document);
         }
     }
 

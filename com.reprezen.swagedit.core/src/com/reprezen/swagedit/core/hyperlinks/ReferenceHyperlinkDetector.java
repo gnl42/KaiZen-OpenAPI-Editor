@@ -19,10 +19,10 @@ import org.eclipse.jface.text.hyperlink.IHyperlink;
 import org.eclipse.ui.part.FileEditorInput;
 
 import com.fasterxml.jackson.core.JsonPointer;
+import com.fasterxml.jackson.databind.JsonNode;
 import com.reprezen.swagedit.core.editor.JsonDocument;
 import com.reprezen.swagedit.core.json.references.JsonReference;
 import com.reprezen.swagedit.core.json.references.JsonReferenceFactory;
-import com.reprezen.swagedit.core.model.AbstractNode;
 import com.reprezen.swagedit.core.utils.DocumentUtils;
 
 public abstract class ReferenceHyperlinkDetector extends AbstractJsonHyperlinkDetector {
@@ -39,8 +39,8 @@ public abstract class ReferenceHyperlinkDetector extends AbstractJsonHyperlinkDe
     protected IHyperlink[] doDetect(JsonDocument doc, ITextViewer viewer, HyperlinkInfo info, JsonPointer pointer) {
         URI baseURI = getBaseURI();
 
-        AbstractNode node = doc.getModel().find(pointer);
-        JsonReference reference = getFactory().createSimpleReference(getBaseURI(), node);
+        JsonNode node = doc.asJson().at(pointer);
+        JsonReference reference = getFactory().createSimpleReference(getBaseURI(), doc.asJson(), node);
         if (reference == null) {
             reference = getFactory().create(node);
         }

@@ -23,7 +23,6 @@ import com.google.common.base.Strings;
 import com.google.common.collect.Lists;
 import com.reprezen.swagedit.core.Activator;
 import com.reprezen.swagedit.core.assist.Proposal;
-import com.reprezen.swagedit.core.model.AbstractNode;
 import com.reprezen.swagedit.core.schema.ArrayTypeDefinition;
 import com.reprezen.swagedit.core.schema.TypeDefinition;
 
@@ -65,7 +64,7 @@ public class MediaTypeContentAssistExt implements ContentAssistExt {
     }
 
     @Override
-    public Collection<Proposal> getProposals(TypeDefinition type, AbstractNode node, String prefix) {
+    public Collection<Proposal> getProposals(TypeDefinition type, JsonNode node, String prefix) {
         Collection<Proposal> proposals = new ArrayList<>();
 
         prefix = Strings.emptyToNull(prefix);

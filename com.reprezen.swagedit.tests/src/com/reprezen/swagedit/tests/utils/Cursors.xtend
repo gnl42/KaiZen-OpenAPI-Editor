@@ -34,6 +34,7 @@ class Cursors {
 		val groups = groupMarkers(yaml)
 		doc.set(removeMarkers(yaml))
 		doc.onChange
+		doc.asJson
 
 		new Function2<IContentAssistProcessor, String, ICompletionProposal[]>() {
 			override ICompletionProposal[] apply(IContentAssistProcessor processor, String marker) {

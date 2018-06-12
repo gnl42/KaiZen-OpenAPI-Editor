@@ -20,7 +20,6 @@ import com.reprezen.swagedit.core.hyperlinks.JsonReferenceHyperlinkDetector;
 import com.reprezen.swagedit.core.json.references.JsonDocumentManager;
 import com.reprezen.swagedit.core.json.references.JsonReference;
 import com.reprezen.swagedit.core.json.references.JsonReferenceFactory;
-import com.reprezen.swagedit.core.model.AbstractNode;
 import com.reprezen.swagedit.editor.SwaggerDocument;
 import com.reprezen.swagedit.editor.hyperlinks.SwaggerReferenceHyperlinkDetector;
 
@@ -43,18 +42,11 @@ public class Mocks {
             protected JsonReferenceFactory getFactory() {
                 return new JsonReferenceFactory() {
                     @Override
-                    public JsonReference createSimpleReference(URI baseURI, AbstractNode valueNode) {
-                        JsonReference ref = super.createSimpleReference(baseURI, valueNode);
+                    public JsonReference createSimpleReference(URI baseURI, JsonNode doc, JsonNode valueNode) {
+                        JsonReference ref = super.createSimpleReference(baseURI, doc, valueNode);
                         if (ref != null) {
                             ref.setDocumentManager(manager);
                         }
-                        return ref;
-                    }
-
-                    @Override
-                    public JsonReference create(AbstractNode node) {
-                        JsonReference ref = super.create(node);
-                        ref.setDocumentManager(manager);
                         return ref;
                     }
 
@@ -74,7 +66,7 @@ public class Mocks {
         when(file.exists()).thenReturn(true);
 
         return new JsonReferenceFactory() {
-            public JsonReference create(AbstractNode node) {
+            public JsonReference create(JsonNode node) {
                 JsonReference ref = super.create(node);
                 ref.setDocumentManager(new JsonDocumentManager() {
                     @Override

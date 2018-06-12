@@ -14,13 +14,8 @@ import java.net.URI;
 import java.util.Objects;
 import java.util.Set;
 
-import org.eclipse.core.resources.IMarker;
-
 import com.fasterxml.jackson.core.JsonPointer;
 import com.fasterxml.jackson.databind.JsonNode;
-import com.github.fge.jsonschema.core.exceptions.ProcessingException;
-import com.github.fge.jsonschema.core.report.ProcessingReport;
-import com.github.fge.jsonschema.main.JsonSchema;
 import com.reprezen.swagedit.core.editor.JsonDocument;
 import com.reprezen.swagedit.core.json.references.JsonReference;
 import com.reprezen.swagedit.core.json.references.JsonReferenceFactory;
@@ -28,7 +23,6 @@ import com.reprezen.swagedit.core.json.references.JsonReferenceValidator;
 import com.reprezen.swagedit.core.model.AbstractNode;
 import com.reprezen.swagedit.core.model.ValueNode;
 import com.reprezen.swagedit.core.schema.TypeDefinition;
-import com.reprezen.swagedit.core.validation.Messages;
 import com.reprezen.swagedit.core.validation.SwaggerError;
 
 public class OpenApi3ReferenceValidator extends JsonReferenceValidator {
@@ -45,28 +39,28 @@ public class OpenApi3ReferenceValidator extends JsonReferenceValidator {
     }
 
     @Override
-    protected void validateType(JsonDocument doc, URI baseURI, AbstractNode node, JsonReference reference,
+    protected void validateType(JsonDocument doc, URI baseURI, JsonNode node, JsonReference reference,
             Set<SwaggerError> errors) {
 
-        if (linkTypePointer.equals(node.getType().getPointer())) {
-            JsonNode target = findTarget(doc, baseURI, reference);
-
-            if (factory != null) {
-                JsonSchema jsonSchema;
-                try {
-                    jsonSchema = factory.getJsonSchema(doc.getSchema().asJson(), operationTypePointer.toString());
-                    ProcessingReport report = jsonSchema.validate(target);
-                    if (!report.isSuccess()) {
-                        errors.add(createReferenceError(IMarker.SEVERITY_WARNING, Messages.error_invalid_operation_ref,
-                                reference));
-                    }
-                } catch (ProcessingException e) {
-                    e.printStackTrace();
-                }
-            }
-        } else {
+        // if (linkTypePointer.equals(node.getType().getPointer())) {
+        // JsonNode target = findTarget(doc, baseURI, reference);
+        //
+        // if (factory != null) {
+        // JsonSchema jsonSchema;
+        // try {
+        // jsonSchema = factory.getJsonSchema(doc.getSchema().asJson(), operationTypePointer.toString());
+        // ProcessingReport report = jsonSchema.validate(target);
+        // if (!report.isSuccess()) {
+        // errors.add(createReferenceError(IMarker.SEVERITY_WARNING, Messages.error_invalid_operation_ref,
+        // reference));
+        // }
+        // } catch (ProcessingException e) {
+        // e.printStackTrace();
+        // }
+        // }
+        // } else {
             super.validateType(doc, baseURI, node, reference, errors);
-        }
+        // }
     }
 
     protected boolean isValidOperation(AbstractNode operation) {

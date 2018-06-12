@@ -23,11 +23,11 @@ import org.eclipse.jface.text.Region;
 import org.eclipse.jface.text.hyperlink.IHyperlink;
 
 import com.fasterxml.jackson.core.JsonPointer;
+import com.fasterxml.jackson.databind.JsonNode;
 import com.google.common.collect.Lists;
 import com.google.common.collect.Maps;
 import com.reprezen.swagedit.core.editor.JsonDocument;
 import com.reprezen.swagedit.core.json.references.JsonReference;
-import com.reprezen.swagedit.core.model.AbstractNode;
 
 /**
  * Hyperlink detector that detects links from path parameters.
@@ -85,7 +85,7 @@ public class PathParamHyperlinkDetector extends AbstractJsonHyperlinkDetector {
     private Map<String, JsonPointer> findParameterPath(JsonDocument doc, JsonPointer basePath, String parameter) {
         Map<String, JsonPointer> paths = Maps.newHashMap();
 
-        AbstractNode parent = doc.getModel().find(basePath);
+        JsonNode parent = doc.asJson().at(basePath);
         if (parent == null || !parent.isObject()) {
             return paths;
         }
@@ -95,25 +95,25 @@ public class PathParamHyperlinkDetector extends AbstractJsonHyperlinkDetector {
                 continue;
             }
 
-            AbstractNode parameters = parent.get(method).get("parameters");
+            JsonNode parameters = parent.get(method).get("parameters");
 
             if (parameters != null && parameters.isArray()) {
                 for (int i = 0; i < parameters.size(); i++) {
-                    AbstractNode current = parameters.get(i);
+                    JsonNode current = parameters.get(i);
 
                     if (JsonReference.isReference(current)) {
-                        JsonPointer ptr = JsonReference.getPointer(current.asObject());
-                        AbstractNode resolved = doc.getModel().find(ptr);
+                        JsonPointer ptr = JsonReference.getPointer(current);
+                        JsonNode resolved = doc.asJson().at(ptr);
 
                         if (resolved != null && resolved.isObject() && resolved.get("name") != null) {
-                            if (parameter.equals(resolved.get("name").asValue().getValue())) {
+                            if (parameter.equals(resolved.get("name").asText())) {
                                 paths.put(method, ptr);
                             }
                         }
 
                     } else if (current.isObject() && current.get("name") != null) {
 
-                        if (parameter.equals(current.get("name").asValue().getValue())) {
+                        if (parameter.equals(current.get("name").asText())) {
                             paths.put(method, JsonPointer.compile(basePath + "/" + method + "/parameters/" + i));
                         }
                     }

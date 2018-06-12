@@ -17,14 +17,14 @@ import org.eclipse.jface.text.templates.TemplateContextType;
 import com.google.common.base.Predicate;
 import com.google.common.collect.Iterables;
 import com.google.common.collect.Lists;
-import com.reprezen.swagedit.core.model.Model;
+import com.reprezen.swagedit.core.editor.JsonDocument;
 import com.reprezen.swagedit.core.templates.SchemaBasedTemplateContextType;
 
 public class OpenApi3ContextTypeProvider {
     
     private static final String TEMPLATE_ID_PREFIX = "com.reprezen.swagedit.openapi3.templates.";
   
-    public TemplateContextType getContextType(final Model model, final String path) {
+    public TemplateContextType getContextType(final JsonDocument doc, final String path) {
         if (OpenApi3ContextTypeProvider.RootContextType.isRoot(path)) {
             return new RootContextType();
         }
@@ -34,7 +34,7 @@ public class OpenApi3ContextTypeProvider {
                     @Override
                     public boolean apply(TemplateContextType input) {
                         if (input instanceof SchemaBasedTemplateContextType) {
-                            return ((SchemaBasedTemplateContextType) input).matches(model, path);
+                            return ((SchemaBasedTemplateContextType) input).matches(doc, path);
                         }
                         return false;
                     }

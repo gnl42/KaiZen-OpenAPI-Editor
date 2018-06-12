@@ -12,8 +12,8 @@ package com.reprezen.swagedit.core.assist.ext;
 
 import java.util.Collection;
 
+import com.fasterxml.jackson.databind.JsonNode;
 import com.reprezen.swagedit.core.assist.Proposal;
-import com.reprezen.swagedit.core.model.AbstractNode;
 import com.reprezen.swagedit.core.schema.TypeDefinition;
 
 /**
@@ -38,6 +38,6 @@ public interface ContentAssistExt {
      * @param prefix
      * @return proposals
      */
-    Collection<Proposal> getProposals(TypeDefinition type, AbstractNode node, String prefix);
+    Collection<Proposal> getProposals(TypeDefinition type, JsonNode node, String prefix);
 
 }

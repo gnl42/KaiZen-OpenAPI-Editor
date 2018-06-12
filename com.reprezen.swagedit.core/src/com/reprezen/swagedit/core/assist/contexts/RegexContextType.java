@@ -11,7 +11,7 @@
 package com.reprezen.swagedit.core.assist.contexts;
 
 import com.fasterxml.jackson.core.JsonPointer;
-import com.reprezen.swagedit.core.model.Model;
+import com.reprezen.swagedit.core.json.JsonModel;
 
 /**
  * 
@@ -31,7 +31,8 @@ public class RegexContextType extends ContextType {
         this.regex = regex;
     }
     
-    public boolean canProvideProposal(Model model, JsonPointer pointer) {
+    @Override
+    public boolean canProvideProposal(JsonModel document, JsonPointer pointer) {
         if (pointer != null && regex != null) {
             return pointer.toString().matches(regex);
         }

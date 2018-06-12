@@ -21,7 +21,7 @@ import com.reprezen.swagedit.schema.SwaggerSchema;
 public class SwaggerDocument extends JsonDocument {
 
     public SwaggerDocument() {
-        super(io.swagger.util.Yaml.mapper(), Activator.getDefault() != null ? Activator.getDefault().getSchema() : new SwaggerSchema());
+        super(Activator.getDefault() != null ? Activator.getDefault().getSchema() : new SwaggerSchema());
     }
 
 }

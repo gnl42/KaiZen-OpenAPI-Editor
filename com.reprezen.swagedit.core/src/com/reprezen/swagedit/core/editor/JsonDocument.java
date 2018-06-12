@@ -11,22 +11,20 @@
 package com.reprezen.swagedit.core.editor;
 
 import java.io.IOException;
-import java.io.StringReader;
+import java.util.List;
 
 import org.eclipse.jface.text.BadLocationException;
 import org.eclipse.jface.text.Document;
 import org.eclipse.jface.text.IRegion;
 import org.eclipse.jface.text.Position;
 import org.eclipse.jface.text.Region;
-import org.yaml.snakeyaml.Yaml;
-import org.yaml.snakeyaml.nodes.Node;
 import org.yaml.snakeyaml.parser.ParserException;
 
 import com.fasterxml.jackson.core.JsonPointer;
 import com.fasterxml.jackson.databind.JsonNode;
-import com.fasterxml.jackson.databind.ObjectMapper;
-import com.reprezen.swagedit.core.model.AbstractNode;
-import com.reprezen.swagedit.core.model.Model;
+import com.google.common.collect.Lists;
+import com.reprezen.swagedit.core.json.JsonModel;
+import com.reprezen.swagedit.core.json.RangeNode;
 import com.reprezen.swagedit.core.schema.CompositeSchema;
 
 /**
@@ -34,44 +32,20 @@ import com.reprezen.swagedit.core.schema.CompositeSchema;
  * 
  */
 public class JsonDocument extends Document {
-    
-    private final ObjectMapper mapper;
+
     private CompositeSchema schema;
+    private JsonModel model;
 
-
-    private final Yaml yaml = new Yaml();
-
-    private JsonNode jsonContent;
-    private Node yamlContent;
-
-    private Exception yamlError;
-    private Exception jsonError;
-    private Model model;
-    
-    public JsonDocument(ObjectMapper mapper, CompositeSchema schema) {
-        this.mapper = mapper;
+    public JsonDocument(CompositeSchema schema) {
         this.schema = schema;
     }
 
-    public Exception getYamlError() {
-        return yamlError;
+    public JsonModel getContent() {
+        return model;
     }
 
-    public Exception getJsonError() {
-        return jsonError;
-    }
-
-    /**
-     * Returns YAML abstract representation of the document.
-     * 
-     * @return Node
-     */
-    public Node getYaml() {
-        if (yamlContent == null) {
-            parseYaml(get());
-        }
-
-        return yamlContent;
+    public List<Exception> getErrors() {
+        return model != null ? model.getErrors() : Lists.<Exception> newArrayList();
     }
 
     /**
@@ -84,13 +58,9 @@ public class JsonDocument extends Document {
      * @throws IOException
      */
     public JsonNode asJson() {
-        if (jsonContent == null) {
-            parseJson(get());
-        }
-
-        return jsonContent;
+        return model != null ? model.getContent() : null;
     }
-    
+
     public CompositeSchema getSchema() {
         return schema;
     }
@@ -126,78 +96,18 @@ public class JsonDocument extends Document {
     }
 
     public void onChange() {
-        final String content = get();
-
-        parseModel();
-        parseYaml(content);
-
-        // No need to parse json if
-        // there is already a yaml parsing error.
-        if (yamlError != null) {
-            jsonContent = null;
-        } else {
-            parseJson(content);
-        }
-    }
-
-    private void parseYaml(String content) {
-        try {
-            yamlContent = yaml.compose(new StringReader(content));
-            yamlError = null;
-        } catch (Exception e) {
-            yamlContent = null;
-            yamlError = e;
-        }
-    }
-
-    private void parseJson(String content) {
-        try {
-            Object expandedYamlObject = new Yaml().load(content);
-            jsonContent = mapper.valueToTree(expandedYamlObject);
-            jsonError = null;
-        } catch (Exception e) {
-            jsonContent = null;
-            jsonError = e;
-        }
-    }
-
-    private void parseModel() {
-        try {
-            model = Model.parseYaml(schema, get());
-        } catch (Exception e) {
-            model = null;
-        }
-    }
-
-    /**
-     * @return the Model, or null if the spec is invalid YAML
-     */
-    public Model getModel() {
-        if (model == null) {
-            parseModel();
-        }
-        return model;
-    }
-
-    public Model getModel(int offset) {
-        // no parse errors
-        if (model != null) {
-            return model;
-        }
-
-        try {
-            if (0 > offset || offset > getLength()) {
-                return Model.parseYaml(schema, get());
-            } else {
-                return Model.parseYaml(schema, get(0, offset));
-            }
-        } catch (BadLocationException e) {
-            return null;
-        }
+        model = new JsonModel(schema, get(), true);
     }
 
     public JsonPointer getPath(int line, int column) {
-        return getModel().getPath(line, column);
+        JsonModel model = new JsonModel(schema, get(), false);
+        RangeNode range = model.findRegion(line, column);
+
+        return getPointer(range);
+    }
+
+    private JsonPointer getPointer(RangeNode range) {
+        return JsonPointer.compile(range.pointer.toString());
     }
 
     public JsonPointer getPath(IRegion region) {
@@ -208,7 +118,7 @@ public class JsonDocument extends Document {
             return null;
         }
 
-        return getModel().getPath(lineOfOffset, getColumnOfOffset(lineOfOffset, region));
+        return getPath(lineOfOffset, getColumnOfOffset(lineOfOffset, region));
     }
 
     public int getColumnOfOffset(int line, IRegion region) {
@@ -223,17 +133,14 @@ public class JsonDocument extends Document {
     }
 
     public IRegion getRegion(JsonPointer pointer) {
-        Model model = getModel();
-        if (model == null) {
-            return null;
-        }
+        String[] paths = pointer.toString().split("/");
+        RangeNode range = model.getRanges().get(com.github.fge.jackson.jsonpointer.JsonPointer.of(paths));
 
-        AbstractNode node = model.find(pointer);
-        if (node == null) {
+        if (range == null) {
             return new Region(0, 0);
         }
 
-        Position position = node.getPosition(this);
+        Position position = range.getPosition(this);
 
         return new Region(position.getOffset(), position.getLength());
     }

@@ -11,7 +11,9 @@
 package com.reprezen.swagedit.openapi3.assist
 
 import com.reprezen.swagedit.core.assist.StyledCompletionProposal
+import com.reprezen.swagedit.core.editor.JsonDocument
 import com.reprezen.swagedit.openapi3.editor.OpenApi3Document
+import com.reprezen.swagedit.openapi3.schema.OpenApi3Schema
 import java.util.ArrayList
 import org.junit.Test
 
@@ -19,19 +21,18 @@ import static com.reprezen.swagedit.openapi3.utils.Cursors.*
 import static org.hamcrest.core.IsCollectionContaining.*
 import static org.hamcrest.core.IsNot.*
 import static org.junit.Assert.*
-import com.reprezen.swagedit.openapi3.schema.OpenApi3Schema
-import com.reprezen.swagedit.core.model.Model
+import com.reprezen.swagedit.core.json.JsonModel
 
 class OpenApi3ContentAssistProcessorTest {
 
 	val processor = new OpenApi3ContentAssistProcessor(null, new OpenApi3Schema) {
-		override protected initTextMessages(Model model) { new ArrayList }
+		override protected initTextMessages(JsonModel doc) { new ArrayList }
 
 		override protected getContextTypeRegistry() { null }
 
 		override protected getTemplateStore() { null }
 
-		override protected getContextTypeId(Model model, String path) { null }
+		override protected getContextTypeId(JsonDocument doc, String path) { null }
 	}
 
 	@Test

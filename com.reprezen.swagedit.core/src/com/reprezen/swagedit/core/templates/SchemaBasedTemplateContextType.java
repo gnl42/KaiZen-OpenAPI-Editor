@@ -17,7 +17,8 @@ import java.util.List;
 import org.eclipse.jface.text.templates.GlobalTemplateVariables;
 import org.eclipse.jface.text.templates.TemplateContextType;
 
-import com.reprezen.swagedit.core.model.Model;
+import com.fasterxml.jackson.core.JsonPointer;
+import com.reprezen.swagedit.core.editor.JsonDocument;
 import com.reprezen.swagedit.core.schema.ComplexTypeDefinition;
 import com.reprezen.swagedit.core.schema.ReferenceTypeDefinition;
 import com.reprezen.swagedit.core.schema.TypeDefinition;
@@ -32,11 +33,12 @@ public class SchemaBasedTemplateContextType extends TemplateContextType {
         addGlobalResolvers();
     }
 
-    public boolean matches(Model model, final String path) {
-        if (model == null || model.find(path) == null) {
+    public boolean matches(JsonDocument doc, final String path) {
+        if (doc == null || doc.asJson().at(path) == null) {
             return false;
         }
-        TypeDefinition type = model.find(path).getType();
+
+        TypeDefinition type = doc.getContent().getTypes().get(JsonPointer.compile(path));
         return matches(type);
     }
 

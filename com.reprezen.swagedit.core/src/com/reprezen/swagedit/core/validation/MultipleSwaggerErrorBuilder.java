@@ -93,7 +93,7 @@ public class MultipleSwaggerErrorBuilder {
     }
 
     protected String getHumanFriendlyText(String location) {
-        JsonNode swaggerSchemaNode = ValidationUtil.findNode(location, jsonSchema);
+        JsonNode swaggerSchemaNode = jsonSchema.at(location);
         if (swaggerSchemaNode == null) {
             return location;
         }

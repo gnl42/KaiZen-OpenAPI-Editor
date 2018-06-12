@@ -11,7 +11,6 @@
 package com.reprezen.swagedit.core.json.references;
 
 import static com.reprezen.swagedit.core.validation.Messages.error_invalid_reference;
-import static com.reprezen.swagedit.core.validation.Messages.error_invalid_reference_type;
 import static com.reprezen.swagedit.core.validation.Messages.error_missing_reference;
 import static com.reprezen.swagedit.core.validation.Messages.warning_simple_reference;
 import static org.eclipse.core.resources.IMarker.SEVERITY_ERROR;
@@ -23,14 +22,10 @@ import java.util.Map;
 import java.util.Set;
 
 import com.fasterxml.jackson.databind.JsonNode;
-import com.github.fge.jsonschema.core.exceptions.ProcessingException;
-import com.github.fge.jsonschema.core.report.ProcessingReport;
-import com.github.fge.jsonschema.main.JsonSchema;
 import com.github.fge.jsonschema.main.JsonSchemaFactory;
 import com.google.common.collect.Sets;
 import com.reprezen.swagedit.core.editor.JsonDocument;
 import com.reprezen.swagedit.core.model.AbstractNode;
-import com.reprezen.swagedit.core.schema.TypeDefinition;
 import com.reprezen.swagedit.core.validation.SwaggerError;
 
 /**
@@ -57,13 +52,14 @@ public class JsonReferenceValidator {
      * @return collection of errors
      */
     public Collection<? extends SwaggerError> validate(URI baseURI, JsonDocument doc) {
-        return doValidate(baseURI, doc, collector.collect(baseURI, doc.getModel()));
+        return doValidate(baseURI, doc, collector.collect(baseURI, doc));
     }
 
     protected Collection<? extends SwaggerError> doValidate(URI baseURI, JsonDocument doc,
-            Map<AbstractNode, JsonReference> references) {
+            Map<JsonNode, JsonReference> references) {
+
         Set<SwaggerError> errors = Sets.newHashSet();
-        for (AbstractNode node : references.keySet()) {
+        for (JsonNode node : references.keySet()) {
             JsonReference reference = references.get(node);
 
             if (reference instanceof JsonReference.SimpleReference) {
@@ -93,24 +89,25 @@ public class JsonReferenceValidator {
      * @param errors
      *            current set of errors
      */
-    protected void validateType(JsonDocument doc, URI baseURI, AbstractNode node, JsonReference reference,
+    protected void validateType(JsonDocument doc, URI baseURI, JsonNode node, JsonReference reference,
             Set<SwaggerError> errors) {
+
         JsonNode target = findTarget(doc, baseURI, reference);
-        TypeDefinition type = node.getType();
-
-        ProcessingReport report;
-        if (factory != null) {
-            try {
-                JsonSchema jsonSchema = factory.getJsonSchema(doc.getSchema().asJson(), type.getPointer().toString());
-                report = jsonSchema.validate(target);
-
-                if (!report.isSuccess()) {
-                    errors.add(createReferenceError(SEVERITY_WARNING, error_invalid_reference_type, reference));
-                }
-            } catch (ProcessingException e) {
-                errors.add(createReferenceError(SEVERITY_WARNING, error_invalid_reference_type, reference));
-            }
-        }
+        // TypeDefinition type = node.getType();
+        //
+        // ProcessingReport report;
+        // if (factory != null) {
+        // try {
+        // JsonSchema jsonSchema = factory.getJsonSchema(doc.getSchema().asJson(), type.getPointer().toString());
+        // report = jsonSchema.validate(target);
+        //
+        // if (!report.isSuccess()) {
+        // errors.add(createReferenceError(SEVERITY_WARNING, error_invalid_reference_type, reference));
+        // }
+        // } catch (ProcessingException e) {
+        // errors.add(createReferenceError(SEVERITY_WARNING, error_invalid_reference_type, reference));
+        // }
+        // }
     }
 
     protected JsonNode findTarget(JsonDocument doc, URI baseURI, JsonReference reference) {

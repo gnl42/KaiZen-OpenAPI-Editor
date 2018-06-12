@@ -19,7 +19,7 @@ import com.reprezen.swagedit.core.assist.JsonContentAssistProcessor;
 import com.reprezen.swagedit.core.assist.JsonProposalProvider;
 import com.reprezen.swagedit.core.assist.ext.MediaTypeContentAssistExt;
 import com.reprezen.swagedit.core.assist.ext.ResponseCodeContentAssistExt;
-import com.reprezen.swagedit.core.model.Model;
+import com.reprezen.swagedit.core.editor.JsonDocument;
 import com.reprezen.swagedit.core.schema.CompositeSchema;
 import com.reprezen.swagedit.openapi3.Activator;
 import com.reprezen.swagedit.openapi3.assist.ext.CallbacksContentAssistExt;
@@ -56,8 +56,9 @@ public class OpenApi3ContentAssistProcessor extends JsonContentAssistProcessor {
 	}
 
     @Override
-    protected String getContextTypeId(Model model, String path) {
-        TemplateContextType contextType = Activator.getDefault().getOpenApi3ContextTypeProvider().getContextType(model, path);
+    protected String getContextTypeId(JsonDocument doc, String path) {
+        TemplateContextType contextType = Activator.getDefault().getOpenApi3ContextTypeProvider().getContextType(doc,
+                path);
         return contextType != null ? contextType.getId() : null;
     }
 

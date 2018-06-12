@@ -21,9 +21,7 @@ import org.eclipse.jface.text.Position;
 import org.eclipse.jface.text.reconciler.DirtyRegion;
 import org.eclipse.jface.text.reconciler.IReconcilingStrategy;
 import org.eclipse.jface.text.reconciler.IReconcilingStrategyExtension;
-import org.eclipse.swt.widgets.Display;
 import org.yaml.snakeyaml.nodes.MappingNode;
-import org.yaml.snakeyaml.nodes.Node;
 import org.yaml.snakeyaml.nodes.NodeTuple;
 
 public class JsonReconcilingStrategy implements IReconcilingStrategy, IReconcilingStrategyExtension {
@@ -62,16 +60,16 @@ public class JsonReconcilingStrategy implements IReconcilingStrategy, IReconcili
         if (!(document instanceof JsonDocument))
             return;
 
-        final Node yaml = ((JsonDocument) document).getYaml();
-        if (!(yaml instanceof MappingNode)) {
-            return;
-        }
-
-        Display.getDefault().asyncExec(new Runnable() {
-            public void run() {
-                editor.updateFoldingStructure(calculatePositions((MappingNode) yaml));
-            }
-        });
+        // final Node yaml = ((JsonDocument) document).getYaml();
+        // if (!(yaml instanceof MappingNode)) {
+        // return;
+        // }
+        //
+        // Display.getDefault().asyncExec(new Runnable() {
+        // public void run() {
+        // editor.updateFoldingStructure(calculatePositions((MappingNode) yaml));
+        // }
+        // });
     }
 
     protected List<Position> calculatePositions(MappingNode mapping) {

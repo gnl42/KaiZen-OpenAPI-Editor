@@ -10,9 +10,6 @@
  *******************************************************************************/
 package com.reprezen.swagedit.core.editor.outline;
 
-import static com.google.common.collect.Iterables.filter;
-import static com.google.common.collect.Iterables.toArray;
-
 import java.util.Arrays;
 import java.util.List;
 
@@ -25,10 +22,8 @@ import org.eclipse.ui.part.ShowInContext;
 import org.eclipse.ui.texteditor.IDocumentProvider;
 import org.eclipse.ui.views.contentoutline.ContentOutlinePage;
 
-import com.google.common.base.Predicate;
+import com.fasterxml.jackson.databind.JsonNode;
 import com.reprezen.swagedit.core.editor.JsonDocument;
-import com.reprezen.swagedit.core.model.AbstractNode;
-import com.reprezen.swagedit.core.model.Model;
 
 public class JsonContentOutlinePage extends ContentOutlinePage {
 
@@ -75,7 +70,7 @@ public class JsonContentOutlinePage extends ContentOutlinePage {
         final IDocument document = documentProvider.getDocument(currentInput);
 
         if (document instanceof JsonDocument) {
-            final Model model = ((JsonDocument) document).getModel();
+            JsonNode model = ((JsonDocument) document).asJson();
             if (model == null) {
                 return;
             }
@@ -91,13 +86,13 @@ public class JsonContentOutlinePage extends ContentOutlinePage {
                 viewer.setInput(model);
 
                 if (elements != null && !elements.isEmpty()) {
-                    Iterable<AbstractNode> newElements = filter(model.allNodes(), new Predicate<AbstractNode>() {
-                        @Override
-                        public boolean apply(AbstractNode node) {
-                            return elements.contains(node);
-                        }
-                    });
-                    viewer.setExpandedElements(toArray(newElements, AbstractNode.class));
+                    // Iterable<AbstractNode> newElements = filter(model.allNodes(), new Predicate<AbstractNode>() {
+                    // @Override
+                    // public boolean apply(AbstractNode node) {
+                    // return elements.contains(node);
+                    // }
+                    // });
+                    // viewer.setExpandedElements(toArray(newElements, AbstractNode.class));
                 }
             }
         }

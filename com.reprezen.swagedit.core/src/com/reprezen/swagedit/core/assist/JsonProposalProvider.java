@@ -24,8 +24,7 @@ import com.fasterxml.jackson.databind.JsonNode;
 import com.google.common.base.Strings;
 import com.google.common.collect.Lists;
 import com.reprezen.swagedit.core.assist.ext.ContentAssistExt;
-import com.reprezen.swagedit.core.model.AbstractNode;
-import com.reprezen.swagedit.core.model.Model;
+import com.reprezen.swagedit.core.json.JsonModel;
 import com.reprezen.swagedit.core.schema.ArrayTypeDefinition;
 import com.reprezen.swagedit.core.schema.ComplexTypeDefinition;
 import com.reprezen.swagedit.core.schema.JsonType;
@@ -58,36 +57,15 @@ public class JsonProposalProvider {
      * @param prefix
      * @return proposals
      */
-    public Collection<Proposal> getProposals(JsonPointer pointer, Model model, String prefix) {
-        final AbstractNode node = model.find(pointer);
+    public Collection<Proposal> getProposals(JsonPointer pointer, JsonModel document, String prefix) {
+        JsonNode node = document.getContent().at(pointer);
         if (node == null) {
             return Collections.emptyList();
         }
-        return getProposals(node.getType(), node, prefix);
+        return getProposals(document.getTypes().get(pointer), node, prefix);
     }
 
-    /**
-     * Returns all proposals for the node inside the given model located at the given pointer.
-     * 
-     * @param pointer
-     * @param model
-     * @return proposals
-     */
-    public Collection<Proposal> getProposals(JsonPointer pointer, Model model) {
-        return getProposals(pointer, model, null);
-    }
-
-    /**
-     * Returns all proposals for the current node.
-     * 
-     * @param node
-     * @return proposals
-     */
-    public Collection<Proposal> getProposals(AbstractNode node) {
-        return getProposals(node.getType(), node, null);
-    }
-
-    protected Collection<Proposal> getProposals(TypeDefinition type, AbstractNode node, String prefix) {
+    protected Collection<Proposal> getProposals(TypeDefinition type, JsonNode node, String prefix) {
         if (type instanceof ReferenceTypeDefinition) {
             type = ((ReferenceTypeDefinition) type).resolve();
         }
@@ -167,7 +145,7 @@ public class JsonProposalProvider {
         return new Proposal(key + ":", key, type.getDescription(), labelType);
     }
 
-    protected Collection<Proposal> createObjectProposals(ObjectTypeDefinition type, AbstractNode element,
+    protected Collection<Proposal> createObjectProposals(ObjectTypeDefinition type, JsonNode element,
             String prefix) {
         final Collection<Proposal> proposals = new LinkedHashSet<>();
 
@@ -209,7 +187,7 @@ public class JsonProposalProvider {
         return proposals;
     }
 
-    protected Collection<Proposal> createArrayProposals(ArrayTypeDefinition type, AbstractNode node) {
+    protected Collection<Proposal> createArrayProposals(ArrayTypeDefinition type, JsonNode node) {
         Collection<Proposal> proposals = new LinkedHashSet<>();
 
         if (type.itemsType.getType() == JsonType.ENUM) {
@@ -225,7 +203,7 @@ public class JsonProposalProvider {
         return proposals;
     }
 
-    protected Collection<Proposal> createComplextTypeProposals(ComplexTypeDefinition type, AbstractNode node,
+    protected Collection<Proposal> createComplextTypeProposals(ComplexTypeDefinition type, JsonNode node,
             String prefix) {
         final Collection<Proposal> proposals = new LinkedHashSet<>();
 
@@ -244,7 +222,7 @@ public class JsonProposalProvider {
         return literals;
     }
 
-    protected Collection<Proposal> createEnumProposals(TypeDefinition type, AbstractNode node) {
+    protected Collection<Proposal> createEnumProposals(TypeDefinition type, JsonNode node) {
         final Collection<Proposal> proposals = new LinkedHashSet<>();
         final String subType = type.asJson().has("type") ? //
                 type.asJson().get("type").asText() : //
