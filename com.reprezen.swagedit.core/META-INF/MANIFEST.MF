@@ -14,15 +14,16 @@ Require-Bundle: org.eclipse.ui,
  org.eclipse.ui.ide,
  org.eclipse.core.filesystem,
  org.eclipse.ui.views,
- com.fasterxml.jackson.core.jackson-core;bundle-version="2.9.2",
- com.fasterxml.jackson.dataformat.jackson-dataformat-yaml;bundle-version="2.9.2",
  org.yaml.snakeyaml;bundle-version="1.14.0",
  org.slf4j.api;bundle-version="1.7.2",
- org.eclipse.ui.workbench.texteditor,
- com.fasterxml.jackson.core.jackson-databind;bundle-version="2.9.2"
+ org.eclipse.ui.workbench.texteditor
 Bundle-RequiredExecutionEnvironment: JavaSE-1.7
 Bundle-ActivationPolicy: lazy
-Export-Package: com.github.fge.jackson.jsonpointer,
+Export-Package: com.fasterxml.jackson.core,
+ com.fasterxml.jackson.databind,
+ com.fasterxml.jackson.databind.node,
+ com.fasterxml.jackson.dataformat.yaml,
+ com.github.fge.jackson.jsonpointer,
  com.github.fge.jsonschema.core.exceptions,
  com.github.fge.jsonschema.core.load.configuration,
  com.github.fge.jsonschema.core.report,
@@ -56,5 +57,10 @@ Bundle-ClassPath: .,
  lib/com.googlecode.libphonenumber_6.2.0.jar,
  lib/com.github.fge.uri-template_0.9.0.jar,
  lib/org.mozilla.rhino_1.0.0.7R4.jar,
- lib/org.apache.commons.lang3_3.2.1.jar
+ lib/org.apache.commons.lang3_3.2.1.jar,
+ lib/com.fasterxml.jackson.core.jackson-annotations_2.9.0.jar,
+ lib/com.fasterxml.jackson.core.jackson-core_2.9.2.jar,
+ lib/com.fasterxml.jackson.core.jackson-databind_2.9.2.jar,
+ lib/com.fasterxml.jackson.dataformat.jackson-dataformat-yaml_2.9.2.jar,
+ lib/org.yaml.snakeyaml_1.18.0.jar
 Bundle-Activator: com.reprezen.swagedit.core.Activator

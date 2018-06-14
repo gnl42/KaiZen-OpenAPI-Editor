@@ -12,6 +12,7 @@ package com.reprezen.swagedit.core.assist;
 
 import static org.eclipse.ui.IWorkbenchCommandConstants.EDIT_CONTENT_ASSIST;
 
+import java.io.IOException;
 import java.util.ArrayList;
 import java.util.Collection;
 import java.util.List;
@@ -133,8 +134,17 @@ public abstract class JsonContentAssistProcessor extends TemplateCompletionProce
             column -= prefix.length();
         }
 
-        // Model model = document.getModel(documentOffset - prefix.length());
-        JsonModel model = new JsonModel(document.getSchema(), document.get(), false);
+        JsonModel model = null;
+        try {
+            model = new JsonModel(document.getSchema(), document.get(), false);
+        } catch (Exception e) {
+            try {
+                model = new JsonModel(document.getSchema(), document.get(0, documentOffset - prefix.length()), true);
+            } catch (BadLocationException | IOException ee) {
+                ee.printStackTrace();
+            }
+        }
+
         RangeNode range = model.findRegion(line + 1, column + 1);
         currentPath = JsonPointer.compile(range.pointer.toString());
 

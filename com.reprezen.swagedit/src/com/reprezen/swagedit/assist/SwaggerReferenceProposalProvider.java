@@ -32,11 +32,11 @@ public class SwaggerReferenceProposalProvider extends JsonReferenceProposalProvi
 	protected static final String PATH_ITEM_REGEX = "/paths/~1[^/]+/\\$ref";
 	
 
-	public static final ContextType SCHEMA_DEFINITION = new RegexContextType("definitions", "schemas",
+    public static final ContextType SCHEMA_DEFINITION = new RegexContextType("/definitions", "schemas",
 			SCHEMA_DEFINITION_REGEX);
-	public static final ContextType PATH_ITEM = new RegexContextType("paths", "path items", PATH_ITEM_REGEX);
-	public static final ContextType PATH_PARAMETER = new RegexContextType("parameters", "parameters", PARAMETER_REGEX);
-	public static final ContextType PATH_RESPONSE = new RegexContextType("responses", "responses", RESPONSE_REGEX);
+    public static final ContextType PATH_ITEM = new RegexContextType("/paths", "path items", PATH_ITEM_REGEX);
+    public static final ContextType PATH_PARAMETER = new RegexContextType("/parameters", "parameters", PARAMETER_REGEX);
+    public static final ContextType PATH_RESPONSE = new RegexContextType("/responses", "responses", RESPONSE_REGEX);
 
     public static final ContextTypeCollection SWAGGER_CONTEXT_TYPES = ContextType
             .newContentTypeCollection(Lists.newArrayList( //

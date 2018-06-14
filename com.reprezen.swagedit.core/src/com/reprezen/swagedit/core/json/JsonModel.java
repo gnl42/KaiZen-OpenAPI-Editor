@@ -1,5 +1,6 @@
 package com.reprezen.swagedit.core.json;
 
+import java.io.IOException;
 import java.util.Collection;
 import java.util.Iterator;
 import java.util.List;
@@ -9,6 +10,7 @@ import java.util.Set;
 import com.fasterxml.jackson.core.JsonPointer;
 import com.fasterxml.jackson.databind.JsonNode;
 import com.fasterxml.jackson.databind.ObjectMapper;
+import com.google.common.base.Strings;
 import com.google.common.collect.Lists;
 import com.google.common.collect.Maps;
 import com.google.common.collect.Sets;
@@ -31,20 +33,21 @@ public class JsonModel {
     private RangeNode range = null;
     private JsonNode content = null;
 
-    public JsonModel(CompositeSchema schema, String text, boolean strict) {
+    public JsonModel(CompositeSchema schema, String text, boolean strict) throws IOException {
         this.schema = schema;
 
-        try {
+        if (Strings.emptyToNull(text) == null) {
+            content = mapper.createObjectNode();
+            ranges.put(JsonPointer.compile(""), new RangeNode(JsonPointer.compile("")));
+            paths.put(JsonPointer.compile(""), Sets.<JsonPointer> newHashSet());
+            range = buildRangeTree();
+        } else {
             LineRecorderYamlParser parser = (LineRecorderYamlParser) factory.createParser(text);
-            parser.setStrict(strict);
 
             content = mapper.reader().readTree(parser);
             ranges = parser.getLines();
             paths = parser.getPaths();
             range = buildRangeTree();
-        } catch (Exception e) {
-            errors.add(e);
-            content = null;
         }
     }
 
@@ -108,13 +111,19 @@ public class JsonModel {
 
         RangeNode found = findContainingRegion(range.getChildren(), line, column);
         if (found == null) {
-            int previousLine = 0;
-            for (RangeNode node : range.getChildren()) {
-                int l = node.getContentLocation().startLine;
-                if (l <= line && previousLine < l) {
-                    found = node;
-                    previousLine = l;
-                }
+            found = findBeforeLine(range, line);
+        }
+        return found;
+    }
+
+    private RangeNode findBeforeLine(RangeNode container, int line) {
+        RangeNode found = null;
+        int previousLine = 0;
+        for (RangeNode node : container.getChildren()) {
+            int l = node.getContentLocation().startLine;
+            if (l <= line && previousLine < l) {
+                found = node;
+                previousLine = l;
             }
         }
         return found;
@@ -134,15 +143,7 @@ public class JsonModel {
                         contain = inside;
                     } else {
                         if (column > current.getContentLocation().startColumn && !current.getChildren().isEmpty()) {
-                            RangeNode lastBeforeLine = null;
-                            int previousLine = 0;
-                            for (RangeNode node : current.getChildren()) {
-                                int l = node.getContentLocation().startLine;
-                                if (l <= line && previousLine < l) {
-                                    lastBeforeLine = node;
-                                    previousLine = l;
-                                }
-                            }
+                            RangeNode lastBeforeLine = findBeforeLine(current, line);
                             if (lastBeforeLine != null) {
                                 contain = lastBeforeLine;
                             }

@@ -16,19 +16,9 @@ Require-Bundle: org.eclipse.ui,
  com.github.eclipsecolortheme;resolution:=optional,
  com.reprezen.swagedit.core,
  com.google.guava;bundle-version="15.0.0",
- com.fasterxml.jackson.core.jackson-core;bundle-version="2.9.2",
- com.fasterxml.jackson.core.jackson-annotations;bundle-version="2.9.0",
- com.fasterxml.jackson.core.jackson-databind;bundle-version="2.9.2",
- com.fasterxml.jackson.dataformat.jackson-dataformat-yaml;bundle-version="2.9.2",
  org.slf4j.api;bundle-version="1.7.2"
 Bundle-ActivationPolicy: lazy
-Bundle-RequiredExecutionEnvironment: JavaSE-1.7
-Bundle-ClassPath: .,
- lib/com.fasterxml.jackson.core.jackson-annotations_2.9.0.jar,
- lib/com.fasterxml.jackson.core.jackson-core_2.9.2.jar,
- lib/com.fasterxml.jackson.core.jackson-databind_2.9.2.jar,
- lib/com.fasterxml.jackson.dataformat.jackson-dataformat-yaml_2.9.2.jar,
- lib/org.yaml.snakeyaml_1.18.0.jar
+Bundle-RequiredExecutionEnvironment: JavaSE-1.7 
 Bundle-Activator: com.reprezen.swagedit.Activator
 Export-Package: com.reprezen.swagedit,
  com.reprezen.swagedit.assist,
@@ -36,6 +26,7 @@ Export-Package: com.reprezen.swagedit,
  com.reprezen.swagedit.editor.hyperlinks,
  com.reprezen.swagedit.preferences,
  com.reprezen.swagedit.quickfix,
+ com.reprezen.swagedit.schema,
  com.reprezen.swagedit.templates,
  com.reprezen.swagedit.wizards
 Bundle-Vendor: ModelSolv, Inc. d.b.a. RepreZen

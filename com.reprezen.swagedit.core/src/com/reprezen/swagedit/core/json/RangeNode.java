@@ -43,8 +43,8 @@ public class RangeNode {
 
     }
 
-    private Location fieldLocation;
-    private Location contentLocation;
+    private Location fieldLocation = null;
+    private Location contentLocation = new Location(1, 1, 1, 1);
 
     private final Set<RangeNode> children = Sets.newHashSet();
 

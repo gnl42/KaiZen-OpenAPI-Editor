@@ -1,5 +1,10 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <classpath>
+	<classpathentry exported="true" kind="lib" path="lib/com.fasterxml.jackson.core.jackson-annotations_2.9.0.jar"/>
+	<classpathentry exported="true" kind="lib" path="lib/com.fasterxml.jackson.core.jackson-core_2.9.2.jar"/>
+	<classpathentry exported="true" kind="lib" path="lib/com.fasterxml.jackson.core.jackson-databind_2.9.2.jar"/>
+	<classpathentry exported="true" kind="lib" path="lib/com.fasterxml.jackson.dataformat.jackson-dataformat-yaml_2.9.2.jar"/>
+	<classpathentry exported="true" kind="lib" path="lib/org.yaml.snakeyaml_1.18.0.jar"/>
 	<classpathentry exported="true" kind="lib" path="lib/org.apache.commons.lang3_3.2.1.jar"/>
 	<classpathentry exported="true" kind="lib" path="lib/org.mozilla.rhino_1.0.0.7R4.jar"/>
 	<classpathentry exported="true" kind="lib" path="lib/com.github.fge.uri-template_0.9.0.jar"/>

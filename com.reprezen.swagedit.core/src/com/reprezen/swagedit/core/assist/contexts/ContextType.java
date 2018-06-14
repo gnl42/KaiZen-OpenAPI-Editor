@@ -66,7 +66,7 @@ public abstract class ContextType {
     }
     
     public Collection<Proposal> collectProposals(JsonModel document, IPath path) {
-        return collectProposals(document, path);
+        return collectProposals(document.getContent(), path);
     }
 
     /**
@@ -83,7 +83,10 @@ public abstract class ContextType {
             return results;
         }
 
+        System.out.println(value() + " " + this.getClass().getName());
+        System.out.println(document);
         final JsonNode nodes = document.at(value());
+        System.out.println("HERE " + nodes);
         if (nodes == null) {
             return results;
         }

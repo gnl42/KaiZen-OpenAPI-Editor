@@ -41,13 +41,14 @@ public class LineRecorderYamlParser extends YAMLParser {
     @Override
     public JsonToken nextToken() throws IOException {
         JsonToken token = null;
-        try {
+        // try {
             token = super.nextToken();
-        } catch (Exception e) {
-            if (strictMode) {
-                throw e;
-            }
-        }
+        // } catch (Exception e) {
+        // e.printStackTrace();
+        // if (strictMode) {
+        // throw e;
+        // }
+        // }
 
         if (token != null) {
             processLineEntry(token, getCurrentLocation(), getParsingContext());

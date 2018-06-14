@@ -96,11 +96,24 @@ public class JsonDocument extends Document {
     }
 
     public void onChange() {
-        model = new JsonModel(schema, get(), true);
+        try {
+            model = new JsonModel(schema, get(), true);
+        } catch (IOException e) {
+            // TODO Auto-generated catch block
+            model = null;
+        }
     }
 
     public JsonPointer getPath(int line, int column) {
-        JsonModel model = new JsonModel(schema, get(), false);
+        System.out.println("GET PATH " + get());
+        JsonModel model;
+        try {
+            model = new JsonModel(schema, get(), false);
+        } catch (IOException e) {
+            // TODO Auto-generated catch block
+            e.printStackTrace();
+            return null;
+        }
         RangeNode range = model.findRegion(line, column);
 
         return getPointer(range);
@@ -118,7 +131,7 @@ public class JsonDocument extends Document {
             return null;
         }
 
-        return getPath(lineOfOffset, getColumnOfOffset(lineOfOffset, region));
+        return getPath(lineOfOffset + 1, getColumnOfOffset(lineOfOffset, region) + 1);
     }
 
     public int getColumnOfOffset(int line, IRegion region) {
