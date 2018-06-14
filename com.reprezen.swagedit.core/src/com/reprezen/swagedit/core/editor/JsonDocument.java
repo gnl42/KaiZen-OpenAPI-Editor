@@ -22,8 +22,7 @@ import org.yaml.snakeyaml.parser.ParserException;
 
 import com.fasterxml.jackson.core.JsonPointer;
 import com.fasterxml.jackson.databind.JsonNode;
-import com.reprezen.jsonoverlay.AbstractJsonOverlay;
-import com.reprezen.jsonoverlay.Overlay;
+import com.reprezen.jsonoverlay.IJsonOverlay;
 import com.reprezen.kaizen.oasparser.model3.OpenApi3;
 import com.reprezen.kaizen.oasparser.val.ValidationResults;
 import com.reprezen.swagedit.core.json.JsonRegion;
@@ -180,18 +179,15 @@ public class JsonDocument extends Document {
         return null;
     }
 
-    public AbstractJsonOverlay<?> findElement(JsonPointer pointer) {
-        if (model != null) {
-            return Overlay.of(model).find(pointer);
-        }
-        return null;
-    }
-
     public JsonRegion findRegion(JsonPointer ptr) {
         if (locator != null) {
             return locator.get(ptr);
         }
         return null;
+    }
+
+    public IJsonOverlay<?> getModel() {
+        return model;
     }
 
 }
