@@ -15,10 +15,10 @@ import com.fasterxml.jackson.core.util.BufferRecycler;
 import com.fasterxml.jackson.dataformat.yaml.YAMLParser;
 import com.google.common.collect.Maps;
 import com.google.common.collect.Sets;
-import com.reprezen.swagedit.core.json.RangeNode.Location;
+import com.reprezen.swagedit.core.json.JsonRegion.Location;
 
 public class LineRecorderYamlParser extends YAMLParser {
-    private final Map<JsonPointer, RangeNode> ranges = Maps.newHashMap();
+    private final Map<JsonPointer, JsonRegion> ranges = Maps.newHashMap();
     private final Map<JsonPointer, Set<JsonPointer>> paths = Maps.newHashMap();
 
     private JsonPointer ptr = JsonPointer.compile("");
@@ -30,7 +30,7 @@ public class LineRecorderYamlParser extends YAMLParser {
         super(ctxt, br, parserFeatures, formatFeatures, codec, reader);
     }
 
-    public Map<JsonPointer, RangeNode> getLines() {
+    public Map<JsonPointer, JsonRegion> getLines() {
         return ranges;
     }
 
@@ -62,7 +62,7 @@ public class LineRecorderYamlParser extends YAMLParser {
          * Root needs to be handled specially.
          */
         if (!seenRoot) {
-            RangeNode range = getOrCreateRange(ptr);
+            JsonRegion range = getOrCreateRange(ptr);
             range.setContentLocation(new Location( //
                     location.getLineNr(), //
                     location.getColumnNr(), //
@@ -80,7 +80,7 @@ public class LineRecorderYamlParser extends YAMLParser {
          * We get that if JSON Pointer "" points to a container... We need to skip that
          */
         if (context.inRoot()) {
-            RangeNode range = ranges.get(ptr);
+            JsonRegion range = ranges.get(ptr);
             Location previousLocation = range.getContentLocation();
             range.setContentLocation(new Location( //
                     previousLocation.startLine, //
@@ -95,7 +95,7 @@ public class LineRecorderYamlParser extends YAMLParser {
          * If the end of a container, "pop" one level
          */
         if (token == JsonToken.END_OBJECT || token == JsonToken.END_ARRAY) {
-            RangeNode range = getOrCreateRange(ptr);
+            JsonRegion range = getOrCreateRange(ptr);
             Location previousLocation = range.getContentLocation();
             range.setContentLocation(new Location( //
                     previousLocation.startLine, //
@@ -120,7 +120,7 @@ public class LineRecorderYamlParser extends YAMLParser {
 
             JsonPointer fieldPointer = append(ptr, context);
 
-            RangeNode range = getOrCreateRange(fieldPointer);
+            JsonRegion range = getOrCreateRange(fieldPointer);
             range.setFieldLocation(new Location( //
                     location.getLineNr(), //
                     location.getColumnNr(), //
@@ -146,7 +146,7 @@ public class LineRecorderYamlParser extends YAMLParser {
          */
         final JsonPointer entryPointer = append(ptr, context);
 
-        RangeNode range = getOrCreateRange(entryPointer);
+        JsonRegion range = getOrCreateRange(entryPointer);
         range.setContentLocation(new Location( //
                 location.getLineNr(), //
                 location.getColumnNr(), //
@@ -162,10 +162,10 @@ public class LineRecorderYamlParser extends YAMLParser {
         paths.put(top, list);
     }
 
-    protected RangeNode getOrCreateRange(JsonPointer pointer) {
-        RangeNode range = ranges.get(pointer);
+    protected JsonRegion getOrCreateRange(JsonPointer pointer) {
+        JsonRegion range = ranges.get(pointer);
         if (range == null) {
-            ranges.put(pointer, range = new RangeNode(pointer));
+            ranges.put(pointer, range = new JsonRegion(pointer));
         }
         return range;
     }
@@ -173,7 +173,7 @@ public class LineRecorderYamlParser extends YAMLParser {
     private void startContainer(final JsonStreamContext parent, JsonLocation location) {
         ptr = append(ptr, parent);
 
-        RangeNode range = getOrCreateRange(ptr);
+        JsonRegion range = getOrCreateRange(ptr);
         range.setContentLocation(new Location( //
                 location.getLineNr(), //
                 location.getColumnNr(), //

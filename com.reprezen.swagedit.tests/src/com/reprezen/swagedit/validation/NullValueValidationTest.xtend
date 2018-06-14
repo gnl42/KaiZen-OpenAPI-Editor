@@ -16,7 +16,7 @@ import org.junit.Test
 import static org.hamcrest.CoreMatchers.*
 import static org.junit.Assert.*
 import com.reprezen.swagedit.core.validation.Validator
-import java.net.URI
+import java.net.URL
 
 class NullValueValidationTest {
 
@@ -45,7 +45,7 @@ class NullValueValidationTest {
 		document.set(content)
 		document.onChange()
 
-		val errors = validator.validate(document, null as URI)
+		val errors = validator.validate(document, null as URL)
 		assertEquals(1, errors.size())
 		assertThat(errors.findFirst[true].getMessage(), containsString('The null value is not allowed for type, did you mean the "null" string (quoted)?'))
 		assertThat(errors.findFirst[true].line, equalTo(14))
@@ -73,7 +73,7 @@ class NullValueValidationTest {
 		document.set(content)
 		document.onChange()
 
-		val errors = validator.validate(document, null as URI)
+		val errors = validator.validate(document, null as URL)
 		assertEquals(0, errors.size())
 	}
 
@@ -100,7 +100,7 @@ class NullValueValidationTest {
 		document.set(content)
 		document.onChange()
 
-		val errors = validator.validate(document, null as URI)
+		val errors = validator.validate(document, null as URL)
 		assertEquals(0, errors.size())
 	}
 
@@ -128,7 +128,7 @@ class NullValueValidationTest {
 		document.set(content)
 		document.onChange()
 
-		val errors = validator.validate(document, null as URI)
+		val errors = validator.validate(document, null as URL)
 		assertEquals(0, errors.size())
 	}
 
@@ -155,7 +155,7 @@ class NullValueValidationTest {
 		document.set(content)
 		document.onChange()
 
-		val errors = validator.validate(document, null as URI)
+		val errors = validator.validate(document, null as URL)
 		assertEquals(1, errors.size())
 		assertThat(errors.findFirst[true].getMessage(), containsString("value of type null is not allowed"))
 		assertThat(errors.findFirst[true].line, equalTo(15))

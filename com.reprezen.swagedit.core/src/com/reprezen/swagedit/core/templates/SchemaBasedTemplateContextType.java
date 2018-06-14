@@ -17,7 +17,6 @@ import java.util.List;
 import org.eclipse.jface.text.templates.GlobalTemplateVariables;
 import org.eclipse.jface.text.templates.TemplateContextType;
 
-import com.fasterxml.jackson.core.JsonPointer;
 import com.reprezen.swagedit.core.editor.JsonDocument;
 import com.reprezen.swagedit.core.schema.ComplexTypeDefinition;
 import com.reprezen.swagedit.core.schema.ReferenceTypeDefinition;
@@ -38,8 +37,9 @@ public class SchemaBasedTemplateContextType extends TemplateContextType {
             return false;
         }
 
-        TypeDefinition type = doc.getContent().getTypes().get(JsonPointer.compile(path));
-        return matches(type);
+        // TypeDefinition type = doc.getContent().getTypes().get(JsonPointer.compile(path));
+        // return matches(type);
+        return false;
     }
 
     protected boolean matches(TypeDefinition type) {

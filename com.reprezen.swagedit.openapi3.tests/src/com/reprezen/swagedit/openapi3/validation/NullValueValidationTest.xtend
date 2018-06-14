@@ -17,6 +17,7 @@ import org.junit.Test
 
 import static org.hamcrest.CoreMatchers.*
 import static org.junit.Assert.*
+import java.net.URL
 
 class NullValueValidationTest {
 
@@ -45,7 +46,7 @@ class NullValueValidationTest {
 		document.set(content)
 		document.onChange()
 
-		val errors = validator.validate(document, null as URI)
+		val errors = validator.validate(document, null as URL)
 
 		assertEquals(1, errors.size())
 		assertThat(errors.head.getMessage(),
@@ -75,7 +76,7 @@ class NullValueValidationTest {
 		document.set(content)
 		document.onChange()
 
-		val errors = validator.validate(document, null as URI)
+		val errors = validator.validate(document, null as URL)
 		assertEquals(0, errors.size())
 	}
 
@@ -102,7 +103,7 @@ class NullValueValidationTest {
 		document.set(content)
 		document.onChange()
 
-		val errors = validator.validate(document, null as URI)		
+		val errors = validator.validate(document, null as URL)		
 		assertEquals(0, errors.size())
 	}
 
@@ -131,7 +132,7 @@ class NullValueValidationTest {
 		document.set(content)
 		document.onChange()
 
-		val errors = validator.validate(document, null as URI)
+		val errors = validator.validate(document, null as URL)
 		assertEquals(0, errors.size())
 	}
 
@@ -158,7 +159,7 @@ class NullValueValidationTest {
 		document.set(content)
 		document.onChange()
 
-		val errors = validator.validate(document, null as URI)
+		val errors = validator.validate(document, null as URL)
 		assertEquals(1, errors.size())
 		assertThat(errors.findFirst[true].getMessage(), containsString("value of type null is not allowed"))
 		assertThat(errors.findFirst[true].line, equalTo(11))

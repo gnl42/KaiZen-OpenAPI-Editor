@@ -11,8 +11,9 @@
 package com.reprezen.swagedit.core.validation;
 
 import java.io.IOException;
+import java.net.MalformedURLException;
 import java.net.URI;
-import java.util.HashSet;
+import java.net.URL;
 import java.util.Iterator;
 import java.util.Map;
 import java.util.Objects;
@@ -30,8 +31,6 @@ import org.yaml.snakeyaml.nodes.ScalarNode;
 import org.yaml.snakeyaml.nodes.SequenceNode;
 import org.yaml.snakeyaml.parser.ParserException;
 
-import com.fasterxml.jackson.core.JsonPointer;
-import com.fasterxml.jackson.core.JsonProcessingException;
 import com.fasterxml.jackson.databind.JsonNode;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import com.github.fge.jsonschema.core.exceptions.ProcessingException;
@@ -44,8 +43,9 @@ import com.google.common.collect.HashMultimap;
 import com.google.common.collect.Maps;
 import com.google.common.collect.Multimap;
 import com.google.common.collect.Sets;
+import com.reprezen.kaizen.oasparser.val.ValidationResults;
+import com.reprezen.kaizen.oasparser.val.ValidationResults.ValidationItem;
 import com.reprezen.swagedit.core.editor.JsonDocument;
-import com.reprezen.swagedit.core.json.JsonModel;
 import com.reprezen.swagedit.core.json.references.JsonReference;
 import com.reprezen.swagedit.core.json.references.JsonReferenceFactory;
 import com.reprezen.swagedit.core.json.references.JsonReferenceValidator;
@@ -104,35 +104,26 @@ public class Validator {
      * @param editorInput
      *            current input
      * @return list or errors
+     * @throws MalformedURLException
      * @throws IOException
      * @throws ParserException
      */
-    public Set<SwaggerError> validate(JsonDocument document, IFileEditorInput editorInput) {
+    public Set<SwaggerError> validate(JsonDocument document, IFileEditorInput editorInput)
+            throws MalformedURLException {
         URI baseURI = editorInput != null ? editorInput.getFile().getLocationURI() : null;
-        return validate(document, baseURI);
+        return validate(document, baseURI.toURL());
     }
 
-    public Set<SwaggerError> validate(JsonDocument document, URI baseURI) {
+    public Set<SwaggerError> validate(JsonDocument document, URL baseURI) {
         Set<SwaggerError> errors = Sets.newHashSet();
 
-        JsonModel model;
-        try {
-            model = document.getContent();
-        } catch (Exception e) {
-            model = null;
-        }
+        errors.addAll(validateAgainstSchema(document));
 
-        if (model != null) {
-            if (!model.getErrors().isEmpty()) {
-                for (Exception e : model.getErrors()) {
-                    errors.add(SwaggerError.newJsonError((JsonProcessingException) e));
-                }
-            } else {
-                ErrorProcessor processor = new ErrorProcessor(model, document.getSchema().getRootType().getContent());
-                errors.addAll(validateAgainstSchema(processor, document));
-                errors.addAll(validateModel(model));
-                // errors.addAll(checkDuplicateKeys(yaml));
-                errors.addAll(referenceValidator.validate(baseURI, document));
+        ValidationResults validationResults = document.validate(baseURI);
+        if (validationResults != null) {
+            for (ValidationItem item : validationResults.getItems()) {
+                System.out.println(item.getCrumbs());
+                System.out.println(item.getMsg());
             }
         }
 
@@ -146,12 +137,20 @@ public class Validator {
      * @param document
      * @return error
      */
-    protected Set<SwaggerError> validateAgainstSchema(ErrorProcessor processor, JsonDocument document) {
-        return validateAgainstSchema(processor, document.getSchema().asJson(), document.asJson());
+    protected Set<SwaggerError> validateAgainstSchema(JsonDocument document) {
+        JsonNode schema = document.getSchema().asJson();
+        JsonNode model = document.asJson();
+
+        System.out.println("DOC " + model);
+
+        ErrorProcessor processor = new ErrorProcessor(document);
+
+        return validateAgainstSchema(processor, schema, model);
     }
 
     public Set<SwaggerError> validateAgainstSchema(ErrorProcessor processor, JsonNode schemaAsJson,
             JsonNode documentAsJson) {
+
         final Set<SwaggerError> errors = Sets.newHashSet();
 
         JsonSchema schema = null;
@@ -173,30 +172,30 @@ public class Validator {
         return errors;
     }
 
-    /**
-     * Validates the model against with different rules that cannot be verified only by JSON schema validation.
-     * 
-     * @param model
-     * @return errors
-     */
-    protected Set<SwaggerError> validateModel(JsonModel model) {
-        final Set<SwaggerError> errors = new HashSet<>();
-
-        if (model != null) {
-            for (JsonPointer p : model.getTypes().keySet()) {
-                JsonNode node = model.getContent().at(p);
-                checkArrayTypeDefinition(errors, node);
-
-                if (node != null && node.isObject()) {
-                    if (ValidationUtil.isInDefinition(p.toString())) {
-                        checkMissingType(errors, node);
-                        checkMissingRequiredProperties(errors, node);
-                    }
-                }
-            }
-        }
-        return errors;
-    }
+    // /**
+    // * Validates the model against with different rules that cannot be verified only by JSON schema validation.
+    // *
+    // * @param model
+    // * @return errors
+    // */
+    // protected Set<SwaggerError> validateModel(JsonModel model) {
+    // final Set<SwaggerError> errors = new HashSet<>();
+    //
+    // if (model != null) {
+    // for (JsonPointer p : model.getTypes().keySet()) {
+    // JsonNode node = model.getContent().at(p);
+    // checkArrayTypeDefinition(errors, node);
+    //
+    // if (node != null && node.isObject()) {
+    // if (ValidationUtil.isInDefinition(p.toString())) {
+    // checkMissingType(errors, node);
+    // checkMissingRequiredProperties(errors, node);
+    // }
+    // }
+    // }
+    // }
+    // return errors;
+    // }
 
     /**
      * This method checks that the node if an array type definitions includes an items field.

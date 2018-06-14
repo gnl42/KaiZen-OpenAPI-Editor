@@ -18,7 +18,7 @@ import com.fasterxml.jackson.core.JsonPointer;
 import com.google.common.collect.Lists;
 import com.reprezen.swagedit.core.assist.Proposal;
 import com.reprezen.swagedit.core.assist.contexts.SchemaContextType;
-import com.reprezen.swagedit.core.json.JsonModel;
+import com.reprezen.swagedit.core.editor.JsonDocument;
 import com.reprezen.swagedit.core.schema.CompositeSchema;
 
 /**
@@ -33,7 +33,7 @@ public class OperationContextType extends SchemaContextType {
     }
 
     @Override
-    public Collection<Proposal> collectProposals(JsonModel document, IPath path) {
+    public Collection<Proposal> collectProposals(JsonDocument document, IPath path) {
         final Collection<Proposal> results = Lists.newArrayList();
         // final List<JsonNode> nodes = document.findByType(operationPointer);
         //

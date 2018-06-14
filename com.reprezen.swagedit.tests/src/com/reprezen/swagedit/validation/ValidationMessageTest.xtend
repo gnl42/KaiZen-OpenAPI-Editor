@@ -16,7 +16,7 @@ import org.junit.Test
 
 import static org.hamcrest.core.IsCollectionContaining.*
 import static org.junit.Assert.*
-import java.net.URI
+import java.net.URL
 
 /**
  * Tests as documentation for #9 - User-friendly validation messages
@@ -49,7 +49,7 @@ class ValidationMessageTest {
 		'''
 
 		document.set(content)
-		val errors = validator.validate(document, null as URI)
+		val errors = validator.validate(document, null as URL)
 		
 		assertEquals(1, errors.size)
 		assertEquals(expected, errors.get(0).message)
@@ -73,7 +73,7 @@ class ValidationMessageTest {
 		'''
 
 		document.set(content)
-		val errors = validator.validate(document, null as URI)
+		val errors = validator.validate(document, null as URL)
 		
 		assertEquals(1, errors.size)
 		assertEquals(expected, errors.get(0).message)
@@ -101,7 +101,7 @@ class ValidationMessageTest {
 		'''
 
 		document.set(content)
-		val errors = validator.validate(document, null as URI)
+		val errors = validator.validate(document, null as URL)
 		
 		assertEquals(1, errors.size)
 		assertEquals(expected, errors.get(0).message)
@@ -126,7 +126,7 @@ class ValidationMessageTest {
 		'''
 		
 		document.set(content)
-		val errors = validator.validate(document, null as URI)
+		val errors = validator.validate(document, null as URL)
 
 		assertEquals(1, errors.size)
 	}
@@ -152,7 +152,7 @@ class ValidationMessageTest {
 		'''
 		
 		document.set(content)
-		val errors = validator.validate(document, null as URI)
+		val errors = validator.validate(document, null as URL)
 
 		assertThat(errors.map[message], hasItems(expected))
 	}
@@ -173,7 +173,7 @@ class ValidationMessageTest {
 		'''
 
 		document.set(content)
-		val errors = validator.validate(document, null as URI)
+		val errors = validator.validate(document, null as URL)
 		
 		assertEquals(1, errors.size)
 		assertEquals(expected, errors.get(0).message)

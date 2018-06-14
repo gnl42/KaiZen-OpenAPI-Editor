@@ -13,7 +13,6 @@ package com.reprezen.swagedit.core.json.references;
 import java.net.URI;
 import java.util.Map;
 
-import com.fasterxml.jackson.core.JsonPointer;
 import com.fasterxml.jackson.databind.JsonNode;
 import com.google.common.collect.Maps;
 import com.reprezen.swagedit.core.editor.JsonDocument;
@@ -43,16 +42,16 @@ public class JsonReferenceCollector {
         final Map<JsonNode, JsonReference> references = Maps.newHashMap();
         final JsonNode json = document.asJson();
 
-        for (JsonPointer pointer : document.getContent().getReferences()) {
-            JsonNode refNode = json.at(pointer);
-            JsonReference reference = factory.createSimpleReference(baseURI, json, refNode);
-            if (reference == null) {
-                reference = factory.create(refNode);
-            }
-            if (reference != null) {
-                references.put(refNode, reference);
-            }
-        }
+        // for (JsonPointer pointer : document.getContent().getReferences()) {
+        // JsonNode refNode = json.at(pointer);
+        // JsonReference reference = factory.createSimpleReference(baseURI, json, refNode);
+        // if (reference == null) {
+        // reference = factory.create(refNode);
+        // }
+        // if (reference != null) {
+        // references.put(refNode, reference);
+        // }
+        // }
 
         return references;
     }

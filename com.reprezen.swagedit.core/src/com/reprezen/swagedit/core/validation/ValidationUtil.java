@@ -12,8 +12,8 @@ package com.reprezen.swagedit.core.validation;
 
 import com.fasterxml.jackson.core.JsonPointer;
 import com.fasterxml.jackson.databind.JsonNode;
-import com.reprezen.swagedit.core.json.JsonModel;
-import com.reprezen.swagedit.core.json.RangeNode;
+import com.reprezen.swagedit.core.editor.JsonDocument;
+import com.reprezen.swagedit.core.json.JsonRegion;
 
 public class ValidationUtil {
 
@@ -48,13 +48,13 @@ public class ValidationUtil {
      * 
      * The Node matching the path is found by the methods findNode().
      */
-    public static int getLine(JsonNode error, JsonModel model) {
+    public static int getLine(JsonNode error, JsonDocument document) {
         String path = getInstancePointer(error);
 
         if (path == null || path.isEmpty())
             return 1;
 
-        RangeNode node = model.getRanges().get(JsonPointer.compile(path));
+        JsonRegion node = document.findRegion(JsonPointer.compile(path));
 
         int line = 1;
         if (node != null) {

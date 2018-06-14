@@ -32,7 +32,7 @@ public class ErrorProcessorTest {
 
     @Before
     public void setUp() {
-        processor = new ErrorProcessor(null, null);
+        processor = new ErrorProcessor(null);
     }
 
     @Test

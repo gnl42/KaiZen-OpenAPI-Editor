@@ -10,6 +10,8 @@
  *******************************************************************************/
 package com.reprezen.swagedit.core.editor;
 
+import java.net.MalformedURLException;
+import java.net.URL;
 import java.util.Set;
 
 import org.dadacoalition.yedit.editor.ColorManager;
@@ -18,6 +20,7 @@ import org.eclipse.core.runtime.CoreException;
 import org.eclipse.jface.preference.IPreferenceStore;
 import org.eclipse.jface.text.IDocument;
 import org.eclipse.jface.text.rules.FastPartitioner;
+import org.eclipse.ui.IFileEditorInput;
 import org.eclipse.ui.editors.text.FileDocumentProvider;
 
 public abstract class JsonDocumentProvider extends FileDocumentProvider {
@@ -33,6 +36,17 @@ public abstract class JsonDocumentProvider extends FileDocumentProvider {
 	@Override
 	protected IDocument createDocument(Object element) throws CoreException {
 		IDocument document = super.createDocument(element);
+
+        if (element instanceof IFileEditorInput) {
+            try {
+                URL url = ((IFileEditorInput) element).getFile().getLocationURI().toURL();
+                if (document instanceof JsonDocument) {
+                    ((JsonDocument) document).setDocumentURL(url);
+                }
+            } catch (MalformedURLException e) {
+            }
+        }
+
 		if (document != null) {
 			JsonScanner scanner = new JsonScanner(new ColorManager(), store);
 			Set<String> tokens = YAMLToken.VALID_TOKENS.keySet();

@@ -19,6 +19,7 @@ import org.eclipse.jface.text.hyperlink.IHyperlink;
 
 import com.fasterxml.jackson.core.JsonPointer;
 import com.fasterxml.jackson.databind.JsonNode;
+import com.google.common.collect.Lists;
 import com.reprezen.swagedit.core.editor.JsonDocument;
 import com.reprezen.swagedit.core.hyperlinks.AbstractJsonHyperlinkDetector;
 
@@ -32,7 +33,8 @@ public class LinkOperationHyperlinkDetector extends AbstractJsonHyperlinkDetecto
     @Override
     protected IHyperlink[] doDetect(JsonDocument doc, ITextViewer viewer, HyperlinkInfo info, JsonPointer pointer) {
         JsonNode node = doc.asJson().at(pointer);
-        List<JsonNode> nodes = doc.getContent().findByType(JsonPointer.compile("/definitions/operation"));
+        // List<JsonNode> nodes = doc.getContent().findByType(JsonPointer.compile("/definitions/operation"));
+        List<JsonNode> nodes = Lists.newArrayList();
         Iterator<JsonNode> it = nodes.iterator();
 
         JsonNode found = null;

@@ -12,7 +12,6 @@ package com.reprezen.swagedit.core.assist;
 
 import static org.eclipse.ui.IWorkbenchCommandConstants.EDIT_CONTENT_ASSIST;
 
-import java.io.IOException;
 import java.util.ArrayList;
 import java.util.Collection;
 import java.util.List;
@@ -53,8 +52,6 @@ import com.reprezen.swagedit.core.Activator;
 import com.reprezen.swagedit.core.Activator.Icons;
 import com.reprezen.swagedit.core.assist.contexts.ContextType;
 import com.reprezen.swagedit.core.editor.JsonDocument;
-import com.reprezen.swagedit.core.json.JsonModel;
-import com.reprezen.swagedit.core.json.RangeNode;
 import com.reprezen.swagedit.core.json.references.Messages;
 import com.reprezen.swagedit.core.model.Model;
 import com.reprezen.swagedit.core.templates.SwaggerTemplateContext;
@@ -134,29 +131,20 @@ public abstract class JsonContentAssistProcessor extends TemplateCompletionProce
             column -= prefix.length();
         }
 
-        JsonModel model = null;
-        try {
-            model = new JsonModel(document.getSchema(), document.get(), false);
-        } catch (Exception e) {
-            try {
-                model = new JsonModel(document.getSchema(), document.get(0, documentOffset - prefix.length()), true);
-            } catch (BadLocationException | IOException ee) {
-                ee.printStackTrace();
-            }
-        }
+        currentPath = document.getPath(line + 1, column + 1);
+        // JsonRegion range = model.findRegion(line + 1, column + 1);
+        // currentPath = JsonPointer.compile(range.pointer.toString());
 
-        RangeNode range = model.findRegion(line + 1, column + 1);
-        currentPath = JsonPointer.compile(range.pointer.toString());
-
-        isRefCompletion = referenceProposalProvider.canProvideProposal(model, currentPath);
+        System.out.println("PATH " + currentPath);
+        isRefCompletion = referenceProposalProvider.canProvideProposal(document, currentPath);
 
         Collection<Proposal> p;
         if (isRefCompletion) {
-            updateStatus(model);
-            p = referenceProposalProvider.getProposals(currentPath, model, currentScope);
+            updateStatus(document);
+            p = referenceProposalProvider.getProposals(currentPath, document, currentScope);
         } else {
             clearStatus();
-            p = proposalProvider.getProposals(currentPath, model, prefix);
+            p = new OpenApiProposalProvider().getProposals(currentPath, document, prefix);
         }
 
         final Collection<ICompletionProposal> proposals = getCompletionProposals(p, prefix, documentOffset);
@@ -179,7 +167,7 @@ public abstract class JsonContentAssistProcessor extends TemplateCompletionProce
         currentOffset = documentOffset;
     }
 
-    protected void updateStatus(JsonModel doc) {
+    protected void updateStatus(JsonDocument doc) {
         if (contentAssistant != null) {
             if (textMessages == null) {
                 textMessages = initTextMessages(doc);
@@ -195,7 +183,7 @@ public abstract class JsonContentAssistProcessor extends TemplateCompletionProce
         }
     }
 
-    protected String[] initTextMessages(JsonModel doc) {
+    protected String[] initTextMessages(JsonDocument doc) {
         IBindingService bindingService = (IBindingService) PlatformUI.getWorkbench().getAdapter(IBindingService.class);
         String bindingKey = bindingService.getBestActiveBindingFormattedFor(EDIT_CONTENT_ASSIST);
         ContextType contextType = referenceProposalProvider.getContextTypes().get(doc, getCurrentPath());

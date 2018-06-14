@@ -20,7 +20,7 @@ import static org.hamcrest.CoreMatchers.*
 import static org.junit.Assert.*
 import com.reprezen.swagedit.core.validation.Validator
 import com.reprezen.swagedit.core.validation.SwaggerError
-import java.net.URI
+import java.net.URL
 
 class ValidatorTest {
 
@@ -45,7 +45,7 @@ class ValidatorTest {
 		'''
 
 		document.set(content)
-		val errors = validator.validate(document, null as URI)
+		val errors = validator.validate(document, null as URL)
 		assertEquals(0, errors.size())
 	}
 
@@ -61,7 +61,7 @@ class ValidatorTest {
 		'''
 
 		document.set(content)
-		val errors = validator.validate(document, null as URI)
+		val errors = validator.validate(document, null as URL)
 		assertEquals(1, errors.size())
 
 		val error = errors.get(0)
@@ -82,7 +82,7 @@ class ValidatorTest {
 		'''
 
 		document.set(content)
-		val errors = validator.validate(document, null as URI)
+		val errors = validator.validate(document, null as URL)
 		assertEquals(1, errors.size())
 
 		val error = errors.get(0)
@@ -106,7 +106,7 @@ class ValidatorTest {
 		'''
 
 		document.set(content)
-		val errors = validator.validate(document, null as URI)
+		val errors = validator.validate(document, null as URL)
 		assertEquals(1, errors.size())
 
 		val error = errors.get(0)
@@ -132,7 +132,7 @@ class ValidatorTest {
 		'''
 
 		document.set(content)
-		val errors = validator.validate(document, null as URI)
+		val errors = validator.validate(document, null as URL)
 		assertEquals(1, errors.size())
 
 		val error = errors.get(0)
@@ -161,7 +161,7 @@ class ValidatorTest {
 		'''
 
 		document.set(content)
-		val errors = validator.validate(document, null as URI)
+		val errors = validator.validate(document, null as URL)
 		assertEquals(1, errors.size())
 
 		val error = errors.get(0)
@@ -188,7 +188,7 @@ class ValidatorTest {
 		'''
 
 		document.set(content)
-		val errors = validator.validate(document, null as URI)
+		val errors = validator.validate(document, null as URL)
 
 		assertEquals(1, errors.size())
 
@@ -215,7 +215,7 @@ class ValidatorTest {
 		'''
 
 		document.set(content)
-		val errors = validator.validate(document, null as URI)
+		val errors = validator.validate(document, null as URL)
 
 		assertEquals(2, errors.size())
 		assertThat(errors,
@@ -245,7 +245,7 @@ class ValidatorTest {
 		'''
 
 		document.set(content)
-		val errors = validator.validate(document, null as URI)
+		val errors = validator.validate(document, null as URL)
 
 		assertEquals(0, errors.size())
 	}
@@ -267,7 +267,7 @@ class ValidatorTest {
 		'''
 
 		document.set(content)
-		val errors = validator.validate(document, null as URI)
+		val errors = validator.validate(document, null as URL)
 
 		assertEquals(2, errors.size())
 		assertThat(errors,
@@ -299,7 +299,7 @@ class ValidatorTest {
 		'''
 
 		document.set(content)
-		val errors = validator.validate(document, null as URI)
+		val errors = validator.validate(document, null as URL)
 
 		assertEquals(2, errors.size())
 		assertThat(errors,
@@ -328,7 +328,7 @@ class ValidatorTest {
 		'''
 
 		document.set(content)
-		val errors = validator.validate(document, null as URI)
+		val errors = validator.validate(document, null as URL)
 
 		assertEquals(2, errors.size())
 		assertThat(errors,
@@ -375,7 +375,7 @@ class ValidatorTest {
 //		assertThat(document.yamlError, nullValue)
 //		assertThat(document.jsonError, nullValue)
 //
-//		val errors = validator.validate(document, null as URI)
+//		val errors = validator.validate(document, null as URL)
 //		assertEquals(0, errors.size())
 //	}
 //
@@ -421,7 +421,7 @@ class ValidatorTest {
 //
 //		assertThat(document.jsonError, nullValue)
 //
-//		val errors = validator.validate(document, null as URI)
+//		val errors = validator.validate(document, null as URL)
 //		assertEquals(0, errors.size())
 //	}
 //
@@ -467,7 +467,7 @@ class ValidatorTest {
 //
 //		assertThat(document.jsonError, nullValue)
 //
-//		val errors = validator.validate(document, null as URI)
+//		val errors = validator.validate(document, null as URL)
 //		assertEquals(0, errors.size())
 //
 //	}
@@ -494,7 +494,7 @@ class ValidatorTest {
 
 		document.set(content)
 		document.onChange()
-		val errors = validator.validate(document, null as URI)
+		val errors = validator.validate(document, null as URL)
 		assertEquals(0, errors.size())
 	}
 
@@ -524,7 +524,7 @@ class ValidatorTest {
 		document.set(content)
 		document.onChange()
 
-		val errors = validator.validate(document, null as URI)		
+		val errors = validator.validate(document, null as URL)		
 		assertEquals(2, errors.size())		
 		assertTrue(errors.map[message].forall[it.equals(Messages.error_array_missing_items)])
 		assertThat(errors.map[line], hasItems(12, 17))
@@ -553,7 +553,7 @@ class ValidatorTest {
 		document.set(content)
 		document.onChange()
 
-		val errors = validator.validate(document, null as URI)		
+		val errors = validator.validate(document, null as URL)		
 		assertEquals(1, errors.size())
 		assertEquals(Messages.error_object_type_missing, errors.get(0).message)
 	}
@@ -582,7 +582,7 @@ class ValidatorTest {
 		document.set(content)
 		document.onChange()
 
-		val errors = validator.validate(document, null as URI)		
+		val errors = validator.validate(document, null as URL)		
 		assertEquals(1, errors.size())
 		assertEquals(Messages.error_wrong_type, errors.get(0).message)
 	}
@@ -613,7 +613,7 @@ class ValidatorTest {
 		document.set(content)
 		document.onChange()
 
-		val errors = validator.validate(document, null as URI)		
+		val errors = validator.validate(document, null as URL)		
 		assertEquals(1, errors.size())
 		assertEquals(String.format(Messages.error_required_properties, "baz"), errors.get(0).message)
 	}
@@ -641,7 +641,7 @@ class ValidatorTest {
 		document.set(content)
 		document.onChange()
 
-		val errors = validator.validate(document, null as URI)		
+		val errors = validator.validate(document, null as URL)		
 		assertEquals(1, errors.size())
 		assertEquals(Messages.error_object_type_missing, errors.get(0).message)
 	}
@@ -669,7 +669,7 @@ class ValidatorTest {
 		document.set(content)
 		document.onChange()
 
-		val errors = validator.validate(document, null as URI)		
+		val errors = validator.validate(document, null as URL)		
 		assertEquals(1, errors.size())
 		assertTrue(errors.map[message].forall[it.equals(Messages.error_array_items_should_be_object)])
 		assertThat(errors.map[line], hasItems(14))
@@ -702,7 +702,7 @@ class ValidatorTest {
 		document.set(content)
 		document.onChange()
 
-		val errors = validator.validate(document, null as URI)		
+		val errors = validator.validate(document, null as URL)		
 		assertEquals(0, errors.size())
 	}
 	
@@ -729,7 +729,7 @@ class ValidatorTest {
 		'''
 
 		document.set(content)
-		val errors = validator.validate(document, null as URI)
+		val errors = validator.validate(document, null as URL)
 		assertEquals(0, errors.size())
 	}
 
@@ -756,7 +756,7 @@ class ValidatorTest {
 		'''
 
 		document.set(content)
-		val errors = validator.validate(document, null as URI)
+		val errors = validator.validate(document, null as URL)
 		assertEquals(1, errors.size())
 		assertTrue(errors.map[message].forall[it.equals(Messages.error_invalid_reference_type)])
 	}
@@ -780,7 +780,7 @@ class ValidatorTest {
 		'''
 
 		document.set(content)
-		val errors = validator.validate(document, null as URI)		
+		val errors = validator.validate(document, null as URL)		
 		assertEquals(0, errors.size())
 	}
 	
@@ -807,7 +807,7 @@ class ValidatorTest {
 		'''
 
 		document.set(content)
-		val errors = validator.validate(document, null as URI)		
+		val errors = validator.validate(document, null as URL)		
 		assertEquals(1, errors.size())
 		assertTrue(errors.map[message].forall[it.equals(Messages.error_invalid_reference_type)])
 	}

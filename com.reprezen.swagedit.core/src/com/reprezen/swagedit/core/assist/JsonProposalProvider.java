@@ -24,7 +24,7 @@ import com.fasterxml.jackson.databind.JsonNode;
 import com.google.common.base.Strings;
 import com.google.common.collect.Lists;
 import com.reprezen.swagedit.core.assist.ext.ContentAssistExt;
-import com.reprezen.swagedit.core.json.JsonModel;
+import com.reprezen.swagedit.core.editor.JsonDocument;
 import com.reprezen.swagedit.core.schema.ArrayTypeDefinition;
 import com.reprezen.swagedit.core.schema.ComplexTypeDefinition;
 import com.reprezen.swagedit.core.schema.JsonType;
@@ -57,12 +57,13 @@ public class JsonProposalProvider {
      * @param prefix
      * @return proposals
      */
-    public Collection<Proposal> getProposals(JsonPointer pointer, JsonModel document, String prefix) {
-        JsonNode node = document.getContent().at(pointer);
+    public Collection<Proposal> getProposals(JsonPointer pointer, JsonDocument document, String prefix) {
+        JsonNode node = document.findNode(pointer);
         if (node == null) {
             return Collections.emptyList();
         }
-        return getProposals(document.getTypes().get(pointer), node, prefix);
+        // return getProposals(document.getTypes().get(pointer), node, prefix);
+        return Lists.newArrayList();
     }
 
     protected Collection<Proposal> getProposals(TypeDefinition type, JsonNode node, String prefix) {

@@ -4,7 +4,7 @@
  * are made available under the terms of the Eclipse Public License v1.0
  * which accompanies this distribution, and is available at
  * http://www.eclipse.org/legal/epl-v10.html
- *
+ * 
  * Contributors:
  *    ModelSolv, Inc. - initial API and implementation and/or initial documentation
  *******************************************************************************/
@@ -21,12 +21,11 @@ import static com.reprezen.swagedit.openapi3.utils.Cursors.*
 import static org.hamcrest.core.IsCollectionContaining.*
 import static org.hamcrest.core.IsNot.*
 import static org.junit.Assert.*
-import com.reprezen.swagedit.core.json.JsonModel
 
 class OpenApi3ContentAssistProcessorTest {
 
 	val processor = new OpenApi3ContentAssistProcessor(null, new OpenApi3Schema) {
-		override protected initTextMessages(JsonModel doc) { new ArrayList }
+		override protected initTextMessages(JsonDocument doc) { new ArrayList }
 
 		override protected getContextTypeRegistry() { null }
 
@@ -46,8 +45,9 @@ class OpenApi3ContentAssistProcessorTest {
 			        <1>
 		''', document)
 
-		val proposals = test.apply(processor, "1")		
-		assertThat(proposals.map[(it as StyledCompletionProposal).replacementString], 
+		val proposals = test.apply(processor, "1")
+		assertThat(
+			proposals.map[(it as StyledCompletionProposal).replacementString],
 			hasItems("(callback name):")
 		)
 	}
@@ -62,7 +62,8 @@ class OpenApi3ContentAssistProcessorTest {
 		''', document)
 
 		val proposals = test.apply(processor, "1")
-		assertThat(proposals.map[(it as StyledCompletionProposal).replacementString], 
+		assertThat(
+			proposals.map[(it as StyledCompletionProposal).replacementString],
 			hasItems("(callback name):")
 		)
 	}
@@ -77,11 +78,12 @@ class OpenApi3ContentAssistProcessorTest {
 		''', document)
 
 		val proposals = test.apply(processor, "1")
-		assertThat(proposals.map[(it as StyledCompletionProposal).replacementString], 
+		assertThat(
+			proposals.map[(it as StyledCompletionProposal).replacementString],
 			hasItems("(schema name):")
 		)
 	}
-	
+
 	@Test
 	def void testAnonymousSchemaInMediaType_Should_NOT_Return_SchemaName_Key() {
 		val document = new OpenApi3Document(new OpenApi3Schema)
@@ -100,10 +102,12 @@ paths:
 		''', document)
 
 		val proposals = test.apply(processor, "1")
-		assertThat(proposals.map[(it as StyledCompletionProposal).replacementString], 
+		assertThat(
+			proposals.map[(it as StyledCompletionProposal).replacementString],
 			not(hasItem("(schema name):"))
 		)
-		assertThat(proposals.map[(it as StyledCompletionProposal).replacementString], 
+		assertThat(
+			proposals.map[(it as StyledCompletionProposal).replacementString],
 			not(hasItem("_key_:"))
 		)
 	}
@@ -121,12 +125,12 @@ paths:
 		''', document)
 
 		val proposals = test.apply(processor, "1")
-		assertThat(proposals.map[(it as StyledCompletionProposal).replacementString], 
+		assertThat(
+			proposals.map[(it as StyledCompletionProposal).replacementString],
 			hasItems("(property name):")
 		)
 	}
-	
-	
+
 	@Test
 	def void testResponseInComponents_ShouldReturn_ResponseName() {
 		val document = new OpenApi3Document(new OpenApi3Schema)
@@ -137,12 +141,12 @@ paths:
 		''', document)
 
 		val proposals = test.apply(processor, "1")
-		assertThat(proposals.map[(it as StyledCompletionProposal).replacementString], 
+		assertThat(
+			proposals.map[(it as StyledCompletionProposal).replacementString],
 			hasItems("(response name):")
 		)
 	}
-	
-	
+
 	@Test
 	def void testParameterInComponents_ShouldReturn_ParameterName() {
 		val document = new OpenApi3Document(new OpenApi3Schema)
@@ -153,11 +157,12 @@ paths:
 		''', document)
 
 		val proposals = test.apply(processor, "1")
-		assertThat(proposals.map[(it as StyledCompletionProposal).replacementString], 
+		assertThat(
+			proposals.map[(it as StyledCompletionProposal).replacementString],
 			hasItems("(parameter name):")
 		)
 	}
-	
+
 	@Test
 	def void testExampleInComponents_ShouldReturn_ExampleName() {
 		val document = new OpenApi3Document(new OpenApi3Schema)
@@ -168,11 +173,12 @@ paths:
 		''', document)
 
 		val proposals = test.apply(processor, "1")
-		assertThat(proposals.map[(it as StyledCompletionProposal).replacementString], 
+		assertThat(
+			proposals.map[(it as StyledCompletionProposal).replacementString],
 			hasItems("(example name):")
 		)
 	}
-	
+
 	@Test
 	def void testRequestBodiesInComponents_ShouldReturn_RequestBodyName() {
 		val document = new OpenApi3Document(new OpenApi3Schema)
@@ -183,11 +189,12 @@ paths:
 		''', document)
 
 		val proposals = test.apply(processor, "1")
-		assertThat(proposals.map[(it as StyledCompletionProposal).replacementString], 
+		assertThat(
+			proposals.map[(it as StyledCompletionProposal).replacementString],
 			hasItems("(requestBody name):")
 		)
 	}
-	
+
 	@Test
 	def void testHeaderInComponents_ShouldReturn_HeaderName() {
 		val document = new OpenApi3Document(new OpenApi3Schema)
@@ -198,11 +205,12 @@ paths:
 		''', document)
 
 		val proposals = test.apply(processor, "1")
-		assertThat(proposals.map[(it as StyledCompletionProposal).replacementString], 
+		assertThat(
+			proposals.map[(it as StyledCompletionProposal).replacementString],
 			hasItems("(header name):")
 		)
 	}
-	
+
 	@Test
 	def void testSecuritySchemeInComponents_ShouldReturn_SecuritySchemeName() {
 		val document = new OpenApi3Document(new OpenApi3Schema)
@@ -213,11 +221,12 @@ paths:
 		''', document)
 
 		val proposals = test.apply(processor, "1")
-		assertThat(proposals.map[(it as StyledCompletionProposal).replacementString], 
+		assertThat(
+			proposals.map[(it as StyledCompletionProposal).replacementString],
 			hasItems("(securityScheme name):")
 		)
 	}
-	
+
 	@Test
 	def void testLinkInComponents_ShouldReturn_LinkName() {
 		val document = new OpenApi3Document(new OpenApi3Schema)
@@ -228,11 +237,12 @@ paths:
 		''', document)
 
 		val proposals = test.apply(processor, "1")
-		assertThat(proposals.map[(it as StyledCompletionProposal).replacementString], 
+		assertThat(
+			proposals.map[(it as StyledCompletionProposal).replacementString],
 			hasItems("(link name):")
 		)
 	}
-	
+
 	@Test
 	def void testMediaTypeInContent_Should_NOT_Return_MediaTypeName() {
 		val document = new OpenApi3Document(new OpenApi3Schema)
@@ -251,14 +261,15 @@ paths:
 		val proposals = test.apply(processor, "1")
 		// we don't need a "(mediaType name)" as valid mediatypes are provided by 
 		// [#395] OpenAPI v3: Content assist for media types
-		assertThat(proposals.map[(it as StyledCompletionProposal).replacementString], 
+		assertThat(
+			proposals.map[(it as StyledCompletionProposal).replacementString],
 			not(hasItem("(mediaType name):"))
 		)
 	}
-	
+
 	@Test
 	def void testEncodingInMediaType_ShouldReturn_EncodingName() {
-		val document = new OpenApi3Document(new OpenApi3Schema)	
+		val document = new OpenApi3Document(new OpenApi3Schema)
 		val test = setUpContentAssistTest('''
 paths:
   "/resource":
@@ -274,11 +285,12 @@ paths:
 		''', document)
 
 		val proposals = test.apply(processor, "1")
-		assertThat(proposals.map[(it as StyledCompletionProposal).replacementString], 
+		assertThat(
+			proposals.map[(it as StyledCompletionProposal).replacementString],
 			hasItems("(encoding name):")
 		)
 	}
-	
+
 	@Test
 	def void testServerVariableInServer_ShouldReturn_ServerVariableName() {
 		val document = new OpenApi3Document(new OpenApi3Schema)
@@ -291,11 +303,12 @@ servers:
 		''', document)
 
 		val proposals = test.apply(processor, "1")
-		assertThat(proposals.map[(it as StyledCompletionProposal).replacementString], 
+		assertThat(
+			proposals.map[(it as StyledCompletionProposal).replacementString],
 			hasItems("(serverVariable name):")
 		)
 	}
-	
+
 	@Test
 	def void testAnyInLinkParameter_ShouldReturn_AnyName() {
 		val document = new OpenApi3Document(new OpenApi3Schema)
@@ -309,11 +322,12 @@ components:
 		''', document)
 
 		val proposals = test.apply(processor, "1")
-		assertThat(proposals.map[(it as StyledCompletionProposal).replacementString], 
+		assertThat(
+			proposals.map[(it as StyledCompletionProposal).replacementString],
 			hasItems("(any name):")
 		)
-	}	
-	
+	}
+
 	@Test
 	def void testStringsInDiscriminatorMapping() {
 		val document = new OpenApi3Document(new OpenApi3Schema)
@@ -332,10 +346,11 @@ components:
 
 		val proposals = test.apply(processor, "1")
 		// _key_ is a temporary solution, just documenting the current state
-		assertThat(proposals.map[(it as StyledCompletionProposal).replacementString], 
+		assertThat(
+			proposals.map[(it as StyledCompletionProposal).replacementString],
 			hasItems("_key_:")
 		)
-	}	
+	}
 
 	@Test
 	def void testStringsInOauthFlowScopes() {
@@ -354,7 +369,8 @@ components:
 
 		// _key_ is a temporary solution, just documenting the current state
 		val proposals = test.apply(processor, "1")
-		assertThat(proposals.map[(it as StyledCompletionProposal).replacementString], 
+		assertThat(
+			proposals.map[(it as StyledCompletionProposal).replacementString],
 			hasItems("_key_:")
 		)
 	}
@@ -362,29 +378,30 @@ components:
 	@Test
 	def void testResponseSchemaStillContainsKeyProposal() {
 		val document = setUpContentAssistTest('''
-		openapi: "3.0.0"
-		info:
-		  version: 1.0.0
-		  title: Test
-		paths:
-		  /:
-		    get:
-		      summary: All
-		      responses:
-		        200:
-		          description: Ok          
-		          content:
-		            application/json:    
-		              schema:
-		                <1>$ref: "#/components/schemas/Pets"
-		components:
-		  schemas:
-		    Pets:
-		      type: object
+			openapi: "3.0.0"
+			info:
+			  version: 1.0.0
+			  title: Test
+			paths:
+			  /:
+			    get:
+			      summary: All
+			      responses:
+			        200:
+			          description: Ok          
+			          content:
+			            application/json:    
+			              schema:
+			                <1>$ref: "#/components/schemas/Pets"
+			components:
+			  schemas:
+			    Pets:
+			      type: object
 		''', new OpenApi3Document(new OpenApi3Schema))
 
 		val proposals = document.apply(processor, "1")
-		assertThat(proposals.map[(it as StyledCompletionProposal).replacementString], 
+		assertThat(
+			proposals.map[(it as StyledCompletionProposal).replacementString],
 			hasItems("_key_:")
 		)
 	}
@@ -509,7 +526,7 @@ components:
 			hasItems("'100':", "'200':", "'300':", "'400':", "'500':", "default:", "x-")
 		)
 	}
-	
+
 	@Test
 	def void testResponseStatusCodeWithPrefix() {
 		val document = new OpenApi3Document(new OpenApi3Schema)

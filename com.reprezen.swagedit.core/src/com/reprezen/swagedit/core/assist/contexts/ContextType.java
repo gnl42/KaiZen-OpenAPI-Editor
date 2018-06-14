@@ -20,7 +20,7 @@ import com.fasterxml.jackson.core.JsonPointer;
 import com.fasterxml.jackson.databind.JsonNode;
 import com.google.common.collect.Lists;
 import com.reprezen.swagedit.core.assist.Proposal;
-import com.reprezen.swagedit.core.json.JsonModel;
+import com.reprezen.swagedit.core.editor.JsonDocument;
 import com.reprezen.swagedit.core.utils.URLUtils;
 
 /**
@@ -30,7 +30,7 @@ public abstract class ContextType {
     public static final ContextType UNKNOWN = new ContextType(null, "") {
 
         @Override
-        public boolean canProvideProposal(JsonModel document, JsonPointer pointer) {
+        public boolean canProvideProposal(JsonDocument document, JsonPointer pointer) {
             return false;
         }
     };
@@ -51,7 +51,7 @@ public abstract class ContextType {
         this.isLocalOnly = isLocalOnly;
     }
     
-    public abstract boolean canProvideProposal(JsonModel document, JsonPointer pointer);
+    public abstract boolean canProvideProposal(JsonDocument document, JsonPointer pointer);
 
     public String value() {
         return value;
@@ -65,8 +65,8 @@ public abstract class ContextType {
         return isLocalOnly;
     }
     
-    public Collection<Proposal> collectProposals(JsonModel document, IPath path) {
-        return collectProposals(document.getContent(), path);
+    public Collection<Proposal> collectProposals(JsonDocument document, IPath path) {
+        return collectProposals(document.asJson(), path);
     }
 
     /**
@@ -83,10 +83,7 @@ public abstract class ContextType {
             return results;
         }
 
-        System.out.println(value() + " " + this.getClass().getName());
-        System.out.println(document);
         final JsonNode nodes = document.at(value());
-        System.out.println("HERE " + nodes);
         if (nodes == null) {
             return results;
         }

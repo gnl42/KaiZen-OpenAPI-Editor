@@ -10,6 +10,7 @@
  *******************************************************************************/
 package com.reprezen.swagedit.core.editor;
 
+import java.net.MalformedURLException;
 import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.List;
@@ -75,6 +76,7 @@ import org.eclipse.ui.swt.IFocusService;
 import org.eclipse.ui.texteditor.IDocumentProvider;
 import org.eclipse.ui.views.contentoutline.IContentOutlinePage;
 
+import com.reprezen.swagedit.core.Activator;
 import com.reprezen.swagedit.core.editor.outline.JsonContentOutlinePage;
 import com.reprezen.swagedit.core.handlers.OpenQuickOutlineHandler;
 import com.reprezen.swagedit.core.model.AbstractNode;
@@ -122,20 +124,20 @@ public abstract class JsonEditor extends YEdit implements IShowInSource, IShowIn
 
     /*
      * This listener is added to the preference store when the editor is initialized. It listens to changes to color
-     * preferences. Once a color change happens, the editor is re-initialized.
-     * It also handles changes in validation preferences
+     * preferences. Once a color change happens, the editor is re-initialized. It also handles changes in validation
+     * preferences
      */
     protected final IPropertyChangeListener preferenceChangeListener = new JsonPreferenceChangeListener();
 
-	private JsonContentOutlinePage contentOutline;
+    private JsonContentOutlinePage contentOutline;
 
-	private final IPreferenceStore preferenceStore;
-	
-	public JsonEditor(JsonDocumentProvider documentProvider, IPreferenceStore preferenceStore) {
-		super();
-		this.preferenceStore = preferenceStore;
-		setDocumentProvider(documentProvider);
-	}
+    private final IPreferenceStore preferenceStore;
+
+    public JsonEditor(JsonDocumentProvider documentProvider, IPreferenceStore preferenceStore) {
+        super();
+        this.preferenceStore = preferenceStore;
+        setDocumentProvider(documentProvider);
+    }
 
     @Override
     public void init(IEditorSite site, IEditorInput input) throws PartInitException {
@@ -151,7 +153,7 @@ public abstract class JsonEditor extends YEdit implements IShowInSource, IShowIn
         setSourceViewerConfiguration(createSourceViewerConfiguration());
     }
 
-    protected abstract YEditSourceViewerConfiguration createSourceViewerConfiguration() ;
+    protected abstract YEditSourceViewerConfiguration createSourceViewerConfiguration();
 
     @Override
     protected void doSetInput(IEditorInput input) throws CoreException {
@@ -279,9 +281,9 @@ public abstract class JsonEditor extends YEdit implements IShowInSource, IShowIn
             @Override
             public void configure(SourceViewerConfiguration configuration) {
                 super.configure(configuration);
- 
+
                 if (configuration instanceof JsonSourceViewerConfiguration) {
-                	JsonSourceViewerConfiguration c = (JsonSourceViewerConfiguration) configuration;
+                    JsonSourceViewerConfiguration c = (JsonSourceViewerConfiguration) configuration;
                     outlinePresenter = c.getOutlinePresenter(this);
 
                     if (outlinePresenter != null) {
@@ -373,9 +375,11 @@ public abstract class JsonEditor extends YEdit implements IShowInSource, IShowIn
             }
         }.schedule();
     }
-    
-    /* Copy of AbstractTextEditor#doSave(IProgressMonitor) which is shadowed by YEdit.
-     * Saves the file, but does NOT perform any validation. The validation should be done in a workspace job*/
+
+    /*
+     * Copy of AbstractTextEditor#doSave(IProgressMonitor) which is shadowed by YEdit. Saves the file, but does NOT
+     * perform any validation. The validation should be done in a workspace job
+     */
     private void hack_AbstractTextEditor_doSave(IProgressMonitor progressMonitor) {
 
         IDocumentProvider p = getDocumentProvider();
@@ -461,10 +465,15 @@ public abstract class JsonEditor extends YEdit implements IShowInSource, IShowIn
     }
 
     protected void validateSwagger(IFile file, JsonDocument document, IFileEditorInput editorInput) {
-        final Set<SwaggerError> errors = validator.validate(document, editorInput);
+        try {
+            Set<SwaggerError> errors = validator.validate(document, editorInput);
 
-        for (SwaggerError error : errors) {
-            addMarker(error, file, document);
+            for (SwaggerError error : errors) {
+                addMarker(error, file, document);
+            }
+
+        } catch (MalformedURLException e) {
+            Activator.getDefault().logError(e.getMessage(), e);
         }
     }
 
@@ -557,11 +566,11 @@ public abstract class JsonEditor extends YEdit implements IShowInSource, IShowIn
     public ShowInContext getShowInContext() {
         return new ShowInContext(getEditorInput(), new StructuredSelection());
     }
-    
+
     protected Validator createValidator() {
         return new Validator();
     }
-    
+
     public class JsonPreferenceChangeListener implements IPropertyChangeListener {
 
         private final List<String> colorPreferenceKeys = new ArrayList<>();
@@ -616,7 +625,7 @@ public abstract class JsonEditor extends YEdit implements IShowInSource, IShowIn
             colorPreferenceKeys.add(PreferenceConstants.ITALIC_CONSTANT);
             colorPreferenceKeys.add(PreferenceConstants.UNDERLINE_CONSTANT);
         }
-        
+
         @Override
         public void propertyChange(PropertyChangeEvent event) {
             if (colorPreferenceKeys.contains(event.getProperty())) {
