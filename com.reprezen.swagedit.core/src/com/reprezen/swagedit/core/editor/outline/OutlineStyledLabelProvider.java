@@ -10,6 +10,7 @@
  *******************************************************************************/
 package com.reprezen.swagedit.core.editor.outline;
 
+import org.apache.commons.lang3.tuple.Pair;
 import org.eclipse.jface.viewers.StyledCellLabelProvider;
 import org.eclipse.jface.viewers.StyledString;
 import org.eclipse.jface.viewers.StyledString.Styler;
@@ -20,10 +21,11 @@ import org.eclipse.swt.graphics.RGB;
 import org.eclipse.swt.graphics.TextStyle;
 import org.eclipse.swt.widgets.Display;
 
-import com.google.common.collect.Iterables;
+import com.fasterxml.jackson.core.JsonPointer;
+import com.fasterxml.jackson.databind.JsonNode;
 import com.reprezen.swagedit.core.Activator;
 import com.reprezen.swagedit.core.Activator.Icons;
-import com.reprezen.swagedit.core.model.AbstractNode;
+import com.reprezen.swagedit.core.json.JsonModel;
 import com.reprezen.swagedit.core.schema.TypeDefinition;
 
 public class OutlineStyledLabelProvider extends StyledCellLabelProvider {
@@ -55,25 +57,32 @@ public class OutlineStyledLabelProvider extends StyledCellLabelProvider {
         return TEXT_STYLER;
     }
 
+    @SuppressWarnings("unchecked")
     @Override
     public void update(ViewerCell cell) {
         Object element = cell.getElement();
 
-        if (element instanceof AbstractNode) {
-            StyledString styledString = getStyledString((AbstractNode) element);
+        if (element instanceof Pair) {
+            JsonModel model = ((Pair<JsonModel, JsonPointer>) element).getLeft();
+            JsonPointer ptr = ((Pair<JsonModel, JsonPointer>) element).getRight();
+
+            StyledString styledString = getStyledString(model, ptr);
 
             cell.setText(styledString.toString());
             cell.setStyleRanges(styledString.getStyleRanges());
-            cell.setImage(getImage(getIcon((AbstractNode) element)));
+            cell.setImage(getImage(getIcon(model, ptr)));
         }
     }
 
-    public StyledString getStyledString(AbstractNode element) {
-        StyledString styledString = new StyledString(element.getText(), getTextStyler());
+    public StyledString getStyledString(JsonModel model, JsonPointer ptr) {
+        JsonNode node = model.getContent().at(ptr);
+        JsonNode parent = ptr.head() == null ? null : model.getContent().at(ptr.head());
 
-        if (element.getParent() != null && (element.isObject() || element.isArray())) {
+        StyledString styledString = new StyledString(getText(node, ptr), getTextStyler());
 
-            TypeDefinition definition = element.getType();
+        if (parent != null && (node.isObject() || node.isArray())) {
+
+            TypeDefinition definition = model.getTypes().get(ptr);
 
             String label = null;
             if (definition != null && definition.asJson() != null) {
@@ -89,32 +98,39 @@ public class OutlineStyledLabelProvider extends StyledCellLabelProvider {
                 styledString.append(label, getTagStyler());
             }
 
-        } else if (element.getParent() == null) {
-
-            if (element.getModel().getPath() != null) {
+        } else if (parent == null) {
+            if (model.getPath() != null) {
                 styledString.append(" ");
-                styledString.append(element.getModel().getPath().toString(), getTagStyler());
+                styledString.append(model.getPath().toString(), getTagStyler());
             }
         }
-
         return styledString;
     }
 
-    protected Icons getIcon(AbstractNode element) {
-        AbstractNode parent = element.getParent();
+    public String getText(JsonNode node, JsonPointer ptr) {
+        if (node.isObject() || node.isArray()) {
+            return ptr.getMatchingProperty();
+        } else {
+            return ptr.getMatchingProperty() + " : " + node.asText();
+        }
+    }
+
+    protected Icons getIcon(JsonModel model, JsonPointer ptr) {
+        JsonNode parent = ptr.head() == null ? null : model.getContent().at(ptr.head());
+        JsonNode node = model.getContent().at(ptr);
 
         if (parent == null) {
             return Icons.outline_document;
         }
 
         if (parent.isObject()) {
-            if (Iterables.isEmpty(element.elements())) {
+            if (!node.elements().hasNext()) {
                 return Icons.outline_mapping_scalar;
             } else {
                 return Icons.outline_mapping;
             }
         } else if (parent.isArray()) {
-            if (Iterables.isEmpty(element.elements())) {
+            if (!node.elements().hasNext()) {
                 return Icons.outline_scalar;
             } else {
                 return Icons.outline_sequence;

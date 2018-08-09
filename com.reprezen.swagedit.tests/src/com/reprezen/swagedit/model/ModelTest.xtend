@@ -1,5 +1,6 @@
 package com.reprezen.swagedit.model
 
+import com.reprezen.swagedit.core.json.JsonModel
 import com.reprezen.swagedit.core.schema.JsonType
 import com.reprezen.swagedit.core.schema.ObjectTypeDefinition
 import com.reprezen.swagedit.core.schema.ReferenceTypeDefinition
@@ -8,7 +9,6 @@ import com.reprezen.swagedit.tests.utils.PointerHelpers
 import org.junit.Test
 
 import static org.junit.Assert.*
-import com.reprezen.swagedit.core.model.Model
 
 class ModelTest {
 
@@ -25,25 +25,24 @@ class ModelTest {
 			  title: Simple API
 		'''
 
-		val model = Model.parseYaml(schema, text)
-		val root = model.root
+		val model = new JsonModel(schema, text, false)
 
-		assertTrue(root.type instanceof ObjectTypeDefinition)
+		assertTrue(model.getType("".ptr) instanceof ObjectTypeDefinition)
 
-		val swagger = root.get("swagger").type
+		val swagger = model.getType("/swagger".ptr)
 		assertEquals("swagger", swagger.containingProperty)
 		assertEquals(schema.asJson.at("/properties/swagger".ptr), swagger.asJson)
 
-		val info = root.get("info").type
+		val info = model.getType("/info".ptr)
 		assertTrue(info instanceof ReferenceTypeDefinition)
 		assertEquals("info", info.containingProperty)
 		assertEquals(schema.asJson.at("/definitions/info".ptr), info.asJson)
 
-		val version = root.get("info").get("version").type
+		val version = model.getType("/info/version".ptr)
 		assertEquals("version", version.containingProperty)
 		assertEquals(schema.asJson.at("/definitions/info/properties/version".ptr), version.asJson)
 
-		val title = root.get("info").get("title").type
+		val title = model.getType("/info/title".ptr)
 		assertEquals("title", title.containingProperty)
 		assertEquals(schema.asJson.at("/definitions/info/properties/title".ptr), title.asJson)
 	}
@@ -54,22 +53,23 @@ class ModelTest {
 			schemes:
 			  - http
 			  - https
+			foo:
+			  bar: hello
 		'''
 
-		val model = Model.parseYaml(schema, text)
-		val root = model.root
+		val model = new JsonModel(schema, text, false)
 
-		val schemes = root.get("schemes").type
-
+		val schemes = model.getType("/schemes".ptr)
 		assertTrue(schemes instanceof ReferenceTypeDefinition)
 
 		assertEquals(JsonType.ARRAY, schemes.getType)
 		assertEquals(schema.asJson.at("/definitions/schemesList".ptr), schemes.asJson)
 
-		val http = root.get("schemes").get(0).type
+		val http = model.getType("/schemes/0".ptr)
 		assertEquals(schema.asJson.at("/definitions/schemesList".ptr).get("items"), http.asJson)
 
-		val https = root.get("schemes").get(1).type
+		val https = model.getType("/schemes/1".ptr)
+		println(https)
 		assertEquals(schema.asJson.at("/definitions/schemesList".ptr).get("items"), https.asJson)
 	}
 
@@ -81,18 +81,17 @@ class ModelTest {
 			  - text/xml
 		'''
 
-		val model = Model.parseYaml(schema, text)
-		val root = model.root
+		val model = new JsonModel(schema, text, false)
 
-		val consumes = root.get("consumes").type
+		val consumes = model.getType("/consumes".ptr)
 		assertTrue(consumes instanceof ReferenceTypeDefinition)
 		assertEquals(JsonType.ARRAY, consumes.type)
 		assertEquals(schema.asJson.at("/definitions/mediaTypeList".ptr), consumes.asJson)
 
-		val http = root.get("consumes").get(0).type
+		val http = model.getType("/consumes/0".ptr)
 		assertEquals(schema.asJson.at("/definitions/mimeType".ptr), http.asJson)
 
-		val https = root.get("consumes").get(1).type
+		val https = model.getType("/consumes/1".ptr)
 		assertEquals(schema.asJson.at("/definitions/mimeType".ptr), https.asJson)
 	}
 
@@ -112,22 +111,21 @@ class ModelTest {
 			          maximum: 10000
 		'''
 
-		val model = Model.parseYaml(schema, text)
-		val root = model.root
+		val model = new JsonModel(schema, text, false)
 
-		val paths = root.get("paths").type
+		val paths = model.getType("/paths".ptr)
 		assertEquals(schema.asJson.at("/definitions/paths".ptr), paths.asJson)
 
-		val pathItem = root.get("paths").get("/pets").type
+		val pathItem = model.getType("/paths/~1pets".ptr)
 		assertEquals(schema.asJson.at("/definitions/pathItem".ptr), pathItem.asJson)
 
-		val get = root.get("paths").get("/pets").get("get").type
+		val get = model.getType("/paths/~1pets/get".ptr)
 		assertEquals(schema.asJson.at("/definitions/operation".ptr), get.asJson)
 
-		val parameters = root.get("paths").get("/pets").get("get").get("parameters").type
+		val parameters = model.getType("/paths/~1pets/get/parameters".ptr)
 		assertEquals(schema.asJson.at("/definitions/parametersList".ptr), parameters.asJson)
 
-		val param1 = root.get("paths").get("/pets").get("get").get("parameters").get(0).type
+		val param1 = model.getType("/paths/~1pets/get/parameters/0".ptr)
 		assertEquals(schema.asJson.at("/definitions/parametersList/items".ptr), param1.asJson)
 	}
 

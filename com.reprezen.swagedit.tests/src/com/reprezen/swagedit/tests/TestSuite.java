@@ -21,7 +21,6 @@ import com.reprezen.swagedit.editor.SwaggerDocumentTest;
 import com.reprezen.swagedit.editor.hyperlinks.DefinitionHyperlinkDetectorTest;
 import com.reprezen.swagedit.editor.hyperlinks.JsonReferenceHyperlinkDetectorTest;
 import com.reprezen.swagedit.editor.hyperlinks.PathParamHyperlinkDetectorTest;
-import com.reprezen.swagedit.editor.outline.AbstractNodeTest;
 import com.reprezen.swagedit.editor.outline.OutlineStyledLabelProviderTest;
 import com.reprezen.swagedit.json.references.JsonReferenceFactoryTest;
 import com.reprezen.swagedit.model.ModelTest;
@@ -42,7 +41,6 @@ import com.reprezen.swagedit.validation.ValidatorTest;
         DefinitionHyperlinkDetectorTest.class, //
         JsonReferenceHyperlinkDetectorTest.class, //
         PathParamHyperlinkDetectorTest.class, //
-        AbstractNodeTest.class, //
         OutlineStyledLabelProviderTest.class, //
         JsonReferenceFactoryTest.class, //
         ModelTest.class, //

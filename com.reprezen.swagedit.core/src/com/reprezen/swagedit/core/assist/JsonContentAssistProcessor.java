@@ -54,9 +54,8 @@ import com.reprezen.swagedit.core.Activator.Icons;
 import com.reprezen.swagedit.core.assist.contexts.ContextType;
 import com.reprezen.swagedit.core.editor.JsonDocument;
 import com.reprezen.swagedit.core.json.JsonModel;
-import com.reprezen.swagedit.core.json.RangeNode;
+import com.reprezen.swagedit.core.json.JsonRegion;
 import com.reprezen.swagedit.core.json.references.Messages;
-import com.reprezen.swagedit.core.model.Model;
 import com.reprezen.swagedit.core.templates.SwaggerTemplateContext;
 import com.reprezen.swagedit.core.utils.SwaggerFileFinder.Scope;
 
@@ -145,7 +144,7 @@ public abstract class JsonContentAssistProcessor extends TemplateCompletionProce
             }
         }
 
-        RangeNode range = model.findRegion(line + 1, column + 1);
+        JsonRegion range = model.findRegion(line + 1, column + 1);
         currentPath = JsonPointer.compile(range.pointer.toString());
 
         isRefCompletion = referenceProposalProvider.canProvideProposal(model, currentPath);
@@ -286,7 +285,7 @@ public abstract class JsonContentAssistProcessor extends TemplateCompletionProce
 
     @Override
     protected TemplateContextType getContextType(ITextViewer viewer, IRegion region) {
-        Model model = null;
+        JsonModel model = null;
         // if (viewer.getDocument() instanceof JsonDocument) {
         // model = ((JsonDocument)viewer.getDocument()).getModel();
         // }

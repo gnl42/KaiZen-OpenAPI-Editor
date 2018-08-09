@@ -28,32 +28,32 @@ class RangeNodeTest {
 
 		val root = ranges.get(JsonPointer.compile(""))
 		assertNotNull(root)
-		assertNull(root.fieldLocation)
-		assertEquals(1, root.contentLocation.startLine)
+		assertNull(root.getFieldLocation)
+		assertEquals(1, root.getContentLocation.startLine)
 		
 		val swagger = ranges.get(JsonPointer.compile("/swagger"))
 		assertNotNull(swagger)
-		assertNotNull(swagger.fieldLocation)
-		assertEquals(1, swagger.fieldLocation.startLine)
-		assertEquals(1, swagger.contentLocation.startLine)
+		assertNotNull(swagger.getFieldLocation)
+		assertEquals(1, swagger.getFieldLocation.startLine)
+		assertEquals(1, swagger.getContentLocation.startLine)
 
 		val info = ranges.get(JsonPointer.compile("/info"))
 		assertNotNull(info)
-		assertNotNull(info.fieldLocation)
-		assertEquals(2, info.fieldLocation.startLine)
-		assertEquals(3, info.contentLocation.startLine)
+		assertNotNull(info.getFieldLocation)
+		assertEquals(2, info.getFieldLocation.startLine)
+		assertEquals(3, info.getContentLocation.startLine)
 
 		val info_version = ranges.get(JsonPointer.compile("/info/version"))
 		assertNotNull(info_version)
-		assertNotNull(info_version.fieldLocation)
-		assertEquals(3, info_version.fieldLocation.startLine)
-		assertEquals(3, info_version.contentLocation.startLine)
+		assertNotNull(info_version.getFieldLocation)
+		assertEquals(3, info_version.getFieldLocation.startLine)
+		assertEquals(3, info_version.getContentLocation.startLine)
 
 		val info_title = ranges.get(JsonPointer.compile("/info/title"))
 		assertNotNull(info_title)
-		assertNotNull(info_title.fieldLocation)
-		assertEquals(4, info_title.fieldLocation.startLine)
-		assertEquals(4, info_title.contentLocation.startLine)
+		assertNotNull(info_title.getFieldLocation)
+		assertEquals(4, info_title.getFieldLocation.startLine)
+		assertEquals(4, info_title.getContentLocation.startLine)
 	}
 
 	@Test
@@ -70,20 +70,20 @@ class RangeNodeTest {
 		
 		val definitions = ranges.get(JsonPointer.compile("/definitions"))
 		assertNotNull(definitions)
-		assertNotNull(definitions.fieldLocation)
-		assertEquals(1, definitions.fieldLocation.startLine)
-		assertEquals(2, definitions.contentLocation.startLine)
+		assertNotNull(definitions.getFieldLocation)
+		assertEquals(1, definitions.getFieldLocation.startLine)
+		assertEquals(2, definitions.getContentLocation.startLine)
 		
 		val definitions_foo = ranges.get(JsonPointer.compile("/definitions/foo"))
 		assertNotNull(definitions_foo)
-		assertNotNull(definitions_foo.fieldLocation)
-		assertEquals(2, definitions_foo.fieldLocation.startLine)
-		assertEquals(3, definitions_foo.contentLocation.startLine)
+		assertNotNull(definitions_foo.getFieldLocation)
+		assertEquals(2, definitions_foo.getFieldLocation.startLine)
+		assertEquals(3, definitions_foo.getContentLocation.startLine)
 
 		val definitions_foo_type = ranges.get(JsonPointer.compile("/definitions/foo/type"))
 		assertNotNull(definitions_foo_type)
-		assertNotNull(definitions_foo_type.fieldLocation)
-		assertEquals(3, definitions_foo_type.fieldLocation.startLine)
-		assertEquals(3, definitions_foo_type.contentLocation.startLine)
+		assertNotNull(definitions_foo_type.getFieldLocation)
+		assertEquals(3, definitions_foo_type.getFieldLocation.startLine)
+		assertEquals(3, definitions_foo_type.getContentLocation.startLine)
 	}
 }

@@ -5,6 +5,8 @@ import java.io.Reader;
 import java.util.Map;
 import java.util.Set;
 
+import org.eclipse.core.resources.IMarker;
+
 import com.fasterxml.jackson.core.JsonLocation;
 import com.fasterxml.jackson.core.JsonPointer;
 import com.fasterxml.jackson.core.JsonStreamContext;
@@ -15,11 +17,17 @@ import com.fasterxml.jackson.core.util.BufferRecycler;
 import com.fasterxml.jackson.dataformat.yaml.YAMLParser;
 import com.google.common.collect.Maps;
 import com.google.common.collect.Sets;
-import com.reprezen.swagedit.core.json.RangeNode.Location;
+import com.reprezen.swagedit.core.json.JsonRegion.Location;
+import com.reprezen.swagedit.core.validation.Messages;
+import com.reprezen.swagedit.core.validation.SwaggerError;
 
 public class LineRecorderYamlParser extends YAMLParser {
-    private final Map<JsonPointer, RangeNode> ranges = Maps.newHashMap();
+    private final Map<JsonPointer, JsonRegion> ranges = Maps.newHashMap();
     private final Map<JsonPointer, Set<JsonPointer>> paths = Maps.newHashMap();
+    private final Set<SwaggerError> errors = Sets.newHashSet();
+    private final Set<JsonPointer> duplicateKeys = Sets.newHashSet();
+
+    private final Map<JsonPointer, Integer> arrayContent = Maps.newHashMap();
 
     private JsonPointer ptr = JsonPointer.compile("");
     private boolean seenRoot = false;
@@ -30,7 +38,7 @@ public class LineRecorderYamlParser extends YAMLParser {
         super(ctxt, br, parserFeatures, formatFeatures, codec, reader);
     }
 
-    public Map<JsonPointer, RangeNode> getLines() {
+    public Map<JsonPointer, JsonRegion> getLines() {
         return ranges;
     }
 
@@ -38,17 +46,21 @@ public class LineRecorderYamlParser extends YAMLParser {
         return paths;
     }
 
+    public Set<SwaggerError> getErrors() {
+        return errors;
+    }
+
     @Override
     public JsonToken nextToken() throws IOException {
         JsonToken token = null;
-        // try {
+        try {
             token = super.nextToken();
-        // } catch (Exception e) {
-        // e.printStackTrace();
-        // if (strictMode) {
-        // throw e;
-        // }
-        // }
+        } catch (Exception e) {
+            e.printStackTrace();
+            // if (strictMode) {
+            // throw e;
+            // }
+        }
 
         if (token != null) {
             processLineEntry(token, getCurrentLocation(), getParsingContext());
@@ -62,7 +74,7 @@ public class LineRecorderYamlParser extends YAMLParser {
          * Root needs to be handled specially.
          */
         if (!seenRoot) {
-            RangeNode range = getOrCreateRange(ptr);
+            JsonRegion range = getOrCreateRange(ptr);
             range.setContentLocation(new Location( //
                     location.getLineNr(), //
                     location.getColumnNr(), //
@@ -80,7 +92,7 @@ public class LineRecorderYamlParser extends YAMLParser {
          * We get that if JSON Pointer "" points to a container... We need to skip that
          */
         if (context.inRoot()) {
-            RangeNode range = ranges.get(ptr);
+            JsonRegion range = ranges.get(ptr);
             Location previousLocation = range.getContentLocation();
             range.setContentLocation(new Location( //
                     previousLocation.startLine, //
@@ -95,7 +107,7 @@ public class LineRecorderYamlParser extends YAMLParser {
          * If the end of a container, "pop" one level
          */
         if (token == JsonToken.END_OBJECT || token == JsonToken.END_ARRAY) {
-            RangeNode range = getOrCreateRange(ptr);
+            JsonRegion range = getOrCreateRange(ptr);
             Location previousLocation = range.getContentLocation();
             range.setContentLocation(new Location( //
                     previousLocation.startLine, //
@@ -120,7 +132,17 @@ public class LineRecorderYamlParser extends YAMLParser {
 
             JsonPointer fieldPointer = append(ptr, context);
 
-            RangeNode range = getOrCreateRange(fieldPointer);
+            // Add error if object already contains field with same name
+            if (ranges.containsKey(fieldPointer)) {
+                if (!isInDuplicateParent(fieldPointer)) {
+                    duplicateKeys.add(fieldPointer);
+
+                    errors.add(new SwaggerError(location.getLineNr(), IMarker.SEVERITY_WARNING,
+                            String.format(Messages.error_duplicate_keys, context.getCurrentName())));
+                }
+            }
+
+            JsonRegion range = getOrCreateRange(fieldPointer);
             range.setFieldLocation(new Location( //
                     location.getLineNr(), //
                     location.getColumnNr(), //
@@ -137,7 +159,7 @@ public class LineRecorderYamlParser extends YAMLParser {
          * But this is; however we need to know what the parent is to do things correctly, delegate to another method
          */
         if (token == JsonToken.START_ARRAY || token == JsonToken.START_OBJECT) {
-            startContainer(parent, location);
+            startContainer(parent, location, token == JsonToken.START_ARRAY);
             return;
         }
 
@@ -146,7 +168,7 @@ public class LineRecorderYamlParser extends YAMLParser {
          */
         final JsonPointer entryPointer = append(ptr, context);
 
-        RangeNode range = getOrCreateRange(entryPointer);
+        JsonRegion range = getOrCreateRange(entryPointer);
         range.setContentLocation(new Location( //
                 location.getLineNr(), //
                 location.getColumnNr(), //
@@ -162,18 +184,25 @@ public class LineRecorderYamlParser extends YAMLParser {
         paths.put(top, list);
     }
 
-    protected RangeNode getOrCreateRange(JsonPointer pointer) {
-        RangeNode range = ranges.get(pointer);
+    protected JsonRegion getOrCreateRange(JsonPointer pointer) {
+        JsonRegion range = ranges.get(pointer);
         if (range == null) {
-            ranges.put(pointer, range = new RangeNode(pointer));
+            ranges.put(pointer, range = new JsonRegion(pointer));
         }
         return range;
     }
 
-    private void startContainer(final JsonStreamContext parent, JsonLocation location) {
+    private void startContainer(final JsonStreamContext parent, JsonLocation location, boolean isArray) {
         ptr = append(ptr, parent);
 
-        RangeNode range = getOrCreateRange(ptr);
+        if (isArray) {
+            Integer count = arrayContent.get(ptr);
+            if (count == null) {
+                arrayContent.put(ptr, 0);
+            }
+        }
+
+        JsonRegion range = getOrCreateRange(ptr);
         range.setContentLocation(new Location( //
                 location.getLineNr(), //
                 location.getColumnNr(), //
@@ -189,16 +218,37 @@ public class LineRecorderYamlParser extends YAMLParser {
     }
 
     private JsonPointer append(JsonPointer ptr, JsonStreamContext context) {
-        if (context.inArray())
-            return ptr.append(JsonPointer.compile("/" + context.getCurrentIndex()));
-        else if (context.inObject()) {
-            return ptr.append(JsonPointer.compile("/" + context.getCurrentName().replaceAll("/", "~1")));
+        JsonPointer result = ptr;
+
+        if (context.inArray()) {
+            // context.getCurrentIndex() does not return anything other than 0
+            // so we keep track of number of elements in an array with the arrayContent map by
+            // incrementing it each time we append something to the array pointer.
+
+            int count = arrayContent.get(ptr);
+            result = ptr.append(JsonPointer.compile("/" + count));
+            arrayContent.put(ptr, ++count);
+        } else if (context.inObject()) {
+            result = ptr.append(JsonPointer.compile("/" + context.getCurrentName().replaceAll("/", "~1")));
         }
-        else
-            return ptr;
+
+        return result;
     }
 
     public void setStrict(boolean strict) {
         this.strictMode = strict;
     }
+
+    private boolean isInDuplicateParent(JsonPointer ptr) {
+        boolean result = false;
+        JsonPointer parent = ptr;
+
+        while ((parent = parent.head()) != null && result == false) {
+            if (duplicateKeys.contains(parent)) {
+                result = true;
+            }
+        }
+        return result;
+    }
+
 }

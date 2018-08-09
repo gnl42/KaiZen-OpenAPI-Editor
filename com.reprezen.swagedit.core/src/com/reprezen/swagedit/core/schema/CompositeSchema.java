@@ -17,7 +17,6 @@ import com.fasterxml.jackson.core.JsonPointer;
 import com.fasterxml.jackson.databind.JsonNode;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import com.google.common.base.Strings;
-import com.reprezen.swagedit.core.model.AbstractNode;
 
 /**
  * Represents the Swagger Schema.
@@ -39,19 +38,19 @@ public abstract class CompositeSchema {
         return swaggerType.getType().asJson();
     }
 
-    /**
-     * Returns the type of a node.
-     * 
-     * <br/>
-     * 
-     * Note: this method should be used only during initialization of a model.
-     * 
-     * @param node
-     * @return node's type
-     */
-    public TypeDefinition getType(AbstractNode node) {
-        return getType(node.getPointer());
-    }
+    // /**
+    // * Returns the type of a node.
+    // *
+    // * <br/>
+    // *
+    // * Note: this method should be used only during initialization of a model.
+    // *
+    // * @param node
+    // * @return node's type
+    // */
+    // public TypeDefinition getType(AbstractNode node) {
+    // return getType(node.getPointer());
+    // }
 
     public TypeDefinition getType(JsonPointer pointer) {
         if (JsonPointer.compile("").equals(pointer)) {

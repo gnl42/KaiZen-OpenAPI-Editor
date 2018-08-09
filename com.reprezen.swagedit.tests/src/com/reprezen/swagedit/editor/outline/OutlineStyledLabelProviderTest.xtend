@@ -1,6 +1,5 @@
 package com.reprezen.swagedit.editor.outline
 
-import com.reprezen.swagedit.core.model.Model
 import org.eclipse.swt.graphics.RGB
 import org.junit.Before
 import org.junit.Test
@@ -8,6 +7,8 @@ import org.junit.Test
 import static org.junit.Assert.*
 import com.reprezen.swagedit.schema.SwaggerSchema
 import com.reprezen.swagedit.core.editor.outline.OutlineStyledLabelProvider
+import com.reprezen.swagedit.core.json.JsonModel
+import com.fasterxml.jackson.core.JsonPointer
 
 class OutlineStyledLabelProviderTest {
 
@@ -30,11 +31,12 @@ class OutlineStyledLabelProviderTest {
 			  key: value
 		'''
 
-		val root = Model.parseYaml(schema, text).root
-		val el = root.elements.get(0).elements.get(0)
+		val model = new JsonModel(schema, text, false)
+		val root =  model.content
+		val el = root.get(0)
 
-		assertEquals("key: value", el.text)
-		assertEquals(el.text, provider.getStyledString(el).toString)
+		assertEquals("key: value", provider.getText(el, JsonPointer.compile("/foo/key")))
+		assertEquals("key: value", provider.getStyledString(model, JsonPointer.compile("/foo/key")).toString)
 	}
 
 	@Test
@@ -45,18 +47,22 @@ class OutlineStyledLabelProviderTest {
 			  - https
 		'''
 
-		val els = Model.parseYaml(schema, text).root
+		val model = new JsonModel(schema, text, false)
+		val els = model.content
+		println(els)
 
-		assertEquals("schemes", els.get(0).text)
-		assertEquals("schemes schemesList", provider.getStyledString(els.get(0)).toString)
+		assertEquals("schemes", provider.getText(els, "/schemes".ptr))
+		assertEquals("schemes schemesList", provider.getStyledString(model, "/schemes".ptr).toString)
 
-		val http = els.get(0).elements.get(0)
-		assertEquals("http", http.text)
-		assertEquals("http", provider.getStyledString(http).toString)
+println(els.get("schemes"))
+		val http = els.get("schemes").get(0)
+		println(http)
+		assertEquals("http", provider.getText(http, "/schemes/0/http".ptr))
+		assertEquals("http", provider.getStyledString(model, "/schemes/0/http".ptr).toString)
 
-		val https = els.get(0).elements.get(1)
-		assertEquals("https", https.text)
-		assertEquals("https", provider.getStyledString(https).toString)
+		val https = els.get("schemes").get(1)
+		assertEquals("https", provider.getText(https, "/schemes/1/https".ptr))
+		assertEquals("https", provider.getStyledString(model, "/schemes/1/https".ptr).toString)
 	}
 
 	@Test
@@ -67,10 +73,11 @@ class OutlineStyledLabelProviderTest {
 			  value: world
 		'''
 
-		val els = Model.parseYaml(schema, text).root
-		assertEquals("object", els.get(0).text)
+		val model = new JsonModel(schema, text, false)
+		val els = model.content
 
-	// TODO
+		assertEquals("object", provider.getText(els, "/object".ptr))
+		// TODO
 	}
 
 	@Test
@@ -83,10 +90,11 @@ class OutlineStyledLabelProviderTest {
 			    value: world
 		'''
 
-		val els = Model.parseYaml(schema, text).root
-		assertEquals("objects", els.get(0).text)
+		val model = new JsonModel(schema, text, false)
+		val els = model.content
 
-	// TODO
+		assertEquals("objects", provider.getText(els, "/objects".ptr))
+		// TODO
 	}
 
 	@Test
@@ -97,10 +105,14 @@ class OutlineStyledLabelProviderTest {
 			  value: world
 		'''
 
-		val els = Model.parseYaml(schema, text).root
-		assertEquals("object", els.get(0).text)
+		val model = new JsonModel(schema, text, false)
+		val els = model.content
 
-	// TODO
+		assertEquals("object", provider.getText(els, "/object".ptr))
+		// TODO
 	}
 
+	def ptr(String ptr) {
+		JsonPointer.compile(ptr)
+	}
 }

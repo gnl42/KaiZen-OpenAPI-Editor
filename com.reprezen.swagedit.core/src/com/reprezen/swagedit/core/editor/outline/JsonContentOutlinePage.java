@@ -22,8 +22,8 @@ import org.eclipse.ui.part.ShowInContext;
 import org.eclipse.ui.texteditor.IDocumentProvider;
 import org.eclipse.ui.views.contentoutline.ContentOutlinePage;
 
-import com.fasterxml.jackson.databind.JsonNode;
 import com.reprezen.swagedit.core.editor.JsonDocument;
+import com.reprezen.swagedit.core.json.JsonModel;
 
 public class JsonContentOutlinePage extends ContentOutlinePage {
 
@@ -70,7 +70,7 @@ public class JsonContentOutlinePage extends ContentOutlinePage {
         final IDocument document = documentProvider.getDocument(currentInput);
 
         if (document instanceof JsonDocument) {
-            JsonNode model = ((JsonDocument) document).asJson();
+            JsonModel model = ((JsonDocument) document).getContent();
             if (model == null) {
                 return;
             }

@@ -14,7 +14,6 @@ import com.fasterxml.jackson.databind.JsonNode
 import com.google.common.collect.ImmutableMap
 import com.google.common.collect.Maps
 import com.reprezen.swagedit.core.json.references.JsonDocumentManager
-import com.reprezen.swagedit.core.model.AbstractNode
 import com.reprezen.swagedit.core.validation.ErrorProcessor
 import com.reprezen.swagedit.core.validation.SwaggerError
 import com.reprezen.swagedit.openapi3.schema.OpenApi3Schema
@@ -27,7 +26,7 @@ import static org.junit.Assert.*
 
 class ValidationHelper {
 
-	def public void validate(JsonNode documentAsJson) {
+	def void validate(JsonNode documentAsJson) {
 		val JsonNode schemaAsJson = getSchema().asJson()
 		val ErrorProcessor processor = new ErrorProcessor(null, null) {
 			override protected Set<SwaggerError> fromNode(JsonNode error, int indent) {

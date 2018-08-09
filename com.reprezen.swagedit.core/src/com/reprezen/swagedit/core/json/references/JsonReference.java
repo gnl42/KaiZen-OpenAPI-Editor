@@ -12,17 +12,10 @@ package com.reprezen.swagedit.core.json.references;
 
 import java.net.URI;
 
-import org.yaml.snakeyaml.nodes.NodeId;
-import org.yaml.snakeyaml.nodes.NodeTuple;
-import org.yaml.snakeyaml.nodes.ScalarNode;
-
 import com.fasterxml.jackson.core.JsonPointer;
 import com.fasterxml.jackson.databind.JsonNode;
 import com.google.common.base.Strings;
 import com.reprezen.swagedit.core.editor.JsonDocument;
-import com.reprezen.swagedit.core.model.AbstractNode;
-import com.reprezen.swagedit.core.model.ObjectNode;
-import com.reprezen.swagedit.core.model.ValueNode;
 
 /**
  * Represents a JSON reference as defined by https://tools.ietf.org/html/draft-pbryan-zyp-json-ref-03.
@@ -167,10 +160,6 @@ public class JsonReference {
         return value != null && value.isObject() && value.has(PROPERTY) && value.get(PROPERTY).isTextual();
     }
 
-    public static boolean isReference(AbstractNode value) {
-        return value != null && value.isObject() && value.get(PROPERTY) != null;
-    }
-
     public static JsonPointer getPointer(JsonNode node) {
         JsonNode value = node.get(PROPERTY);
 
@@ -192,30 +181,20 @@ public class JsonReference {
         return JsonPointer.compile(text);
     }
 
-    /**
-     * Returns true if the argument can be identified as a JSON reference node.
-     * 
-     * @param tuple
-     * @return true if a reference node
-     */
-    public static boolean isReference(NodeTuple tuple) {
-        if (tuple.getKeyNode().getNodeId() == NodeId.scalar) {
-            String value = ((ScalarNode) tuple.getKeyNode()).getValue();
-
-            return JsonReference.PROPERTY.equals(value) && tuple.getValueNode().getNodeId() == NodeId.scalar;
-        }
-        return false;
-    }
-
-    public static JsonPointer getPointer(ObjectNode node) {
-        ValueNode value = node.get(PROPERTY).asValue();
-
-        if (value != null) {
-            return createPointer((String) value.getValue());
-        } else {
-            return createPointer(null);
-        }
-    }
+    // /**
+    // * Returns true if the argument can be identified as a JSON reference node.
+    // *
+    // * @param tuple
+    // * @return true if a reference node
+    // */
+    // public static boolean isReference(NodeTuple tuple) {
+    // if (tuple.getKeyNode().getNodeId() == NodeId.scalar) {
+    // String value = ((ScalarNode) tuple.getKeyNode()).getValue();
+    //
+    // return JsonReference.PROPERTY.equals(value) && tuple.getValueNode().getNodeId() == NodeId.scalar;
+    // }
+    // return false;
+    // }
 
     /**
      * Returns the JSON document that contains the node referenced by this reference.

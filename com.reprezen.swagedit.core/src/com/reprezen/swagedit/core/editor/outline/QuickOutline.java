@@ -51,15 +51,13 @@ import org.eclipse.ui.IEditorInput;
 import org.eclipse.ui.IFileEditorInput;
 import org.eclipse.ui.PlatformUI;
 import org.eclipse.ui.keys.IBindingService;
-import org.eclipse.ui.part.ShowInContext;
 
+import com.fasterxml.jackson.databind.JsonNode;
 import com.google.common.base.Strings;
 import com.reprezen.swagedit.core.Messages;
 import com.reprezen.swagedit.core.editor.JsonEditor;
-import com.reprezen.swagedit.core.model.AbstractNode;
-import com.reprezen.swagedit.core.model.Model;
+import com.reprezen.swagedit.core.json.JsonModel;
 import com.reprezen.swagedit.core.schema.CompositeSchema;
-import com.reprezen.swagedit.core.utils.DocumentUtils;
 import com.reprezen.swagedit.core.utils.SwaggerFileFinder;
 import com.reprezen.swagedit.core.utils.SwaggerFileFinder.Scope;
 
@@ -190,7 +188,8 @@ public abstract class QuickOutline extends PopupDialog
             treeViewer.setAutoExpandLevel(0);
         }
 
-        setInput(Model.parseYaml(files, getSchema()));
+        // TODO
+        // setInput(Model.parseYaml(files, getSchema()));
     }
 
     protected String statusMessage() {
@@ -284,14 +283,15 @@ public abstract class QuickOutline extends PopupDialog
         if (selection != null) {
             Object element = selection.getFirstElement();
 
-            if (element instanceof AbstractNode) {
-                Model model = ((AbstractNode) element).getModel();
-
-                if (model.getPath() != null) {
-                    DocumentUtils.openAndReveal(model.getPath(), selection);
-                } else {
-                    editor.show(new ShowInContext(null, selection));
-                }
+            if (element instanceof JsonNode) {
+                // TODO
+                // Model model = ((AbstractNode) element).getModel();
+                //
+                // if (model.getPath() != null) {
+                // DocumentUtils.openAndReveal(model.getPath(), selection);
+                // } else {
+                // editor.show(new ShowInContext(null, selection));
+                // }
             }
         }
     }
@@ -304,19 +304,20 @@ public abstract class QuickOutline extends PopupDialog
 
     @Override
     public void setInput(Object input) {
-        if (input instanceof Model) {
-            Model model = (Model) input;
-            if (model.getPath() == null) {
-                IFile currentFile = null;
-                IEditorInput editorInput = editor.getEditorInput();
-
-                if (editorInput instanceof IFileEditorInput) {
-                    currentFile = ((IFileEditorInput) editorInput).getFile();
-                }
-                if (currentFile != null) {
-                    model.setPath(currentFile.getFullPath());
-                }
-            }
+        if (input instanceof JsonModel) {
+            JsonModel model = (JsonModel) input;
+            // TODO
+            // if (model.getPath() == null) {
+            // IFile currentFile = null;
+            // IEditorInput editorInput = editor.getEditorInput();
+            //
+            // if (editorInput instanceof IFileEditorInput) {
+            // currentFile = ((IFileEditorInput) editorInput).getFile();
+            // }
+            // if (currentFile != null) {
+            // model.setPath(currentFile.getFullPath());
+            // }
+            // }
         }
 
         treeViewer.setInput(input);
@@ -418,8 +419,8 @@ public abstract class QuickOutline extends PopupDialog
             return true;
         }
 
-        if (element instanceof AbstractNode) {
-            String matchName = ((AbstractNode) element).getText();
+        if (element instanceof JsonNode) {
+            String matchName = ((JsonNode) element).asText();
             String text = filterText.getText();
 
             if (Strings.emptyToNull(text) == null) {

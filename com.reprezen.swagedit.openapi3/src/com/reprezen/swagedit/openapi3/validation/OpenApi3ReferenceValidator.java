@@ -11,7 +11,6 @@
 package com.reprezen.swagedit.openapi3.validation;
 
 import java.net.URI;
-import java.util.Objects;
 import java.util.Set;
 
 import com.fasterxml.jackson.core.JsonPointer;
@@ -20,9 +19,6 @@ import com.reprezen.swagedit.core.editor.JsonDocument;
 import com.reprezen.swagedit.core.json.references.JsonReference;
 import com.reprezen.swagedit.core.json.references.JsonReferenceFactory;
 import com.reprezen.swagedit.core.json.references.JsonReferenceValidator;
-import com.reprezen.swagedit.core.model.AbstractNode;
-import com.reprezen.swagedit.core.model.ValueNode;
-import com.reprezen.swagedit.core.schema.TypeDefinition;
 import com.reprezen.swagedit.core.validation.SwaggerError;
 
 public class OpenApi3ReferenceValidator extends JsonReferenceValidator {
@@ -63,31 +59,31 @@ public class OpenApi3ReferenceValidator extends JsonReferenceValidator {
         // }
     }
 
-    protected boolean isValidOperation(AbstractNode operation) {
-        TypeDefinition type = operation != null ? operation.getType() : null;
-
-        return type != null && Objects.equals(operationTypePointer, type.getPointer());
-    }
+    // protected boolean isValidOperation(JsonNode operation) {
+    // TypeDefinition type = operation != null ? operation.getType() : null;
+    //
+    // return type != null && Objects.equals(operationTypePointer, type.getPointer());
+    // }
 
     public static class OpenApi3ReferenceFactory extends JsonReferenceFactory {
 
         private static final String OPERATION_REF = "operationRef";
 
         @Override
-        protected Boolean isReference(AbstractNode node) {
+        protected Boolean isReference(JsonNode node) {
             return super.isReference(node) || node.get(OPERATION_REF) != null;
         }
 
-        @Override
-        protected ValueNode getReferenceValue(AbstractNode node) {
-            ValueNode valueNode = super.getReferenceValue(node);
-            if (valueNode == null) {
-                AbstractNode other = node.get(OPERATION_REF);
-                if (other != null && other.isValue()) {
-                    valueNode = other.asValue();
-                }
-            }
-            return valueNode;
-        }
+        // @Override
+        // protected JsonNode getReferenceValue(JsonNode node) {
+        // JsonNode valueNode = super.getReferenceValue(node);
+        // if (valueNode == null) {
+        // AbstractNode other = node.get(OPERATION_REF);
+        // if (other != null && other.isValue()) {
+        // valueNode = other.asValue();
+        // }
+        // }
+        // return valueNode;
+        // }
     }
 }

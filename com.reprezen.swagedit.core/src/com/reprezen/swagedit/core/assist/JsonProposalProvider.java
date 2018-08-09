@@ -62,7 +62,7 @@ public class JsonProposalProvider {
         if (node == null) {
             return Collections.emptyList();
         }
-        return getProposals(document.getTypes().get(pointer), node, prefix);
+        return getProposals(document.getType(pointer), node, prefix);
     }
 
     protected Collection<Proposal> getProposals(TypeDefinition type, JsonNode node, String prefix) {

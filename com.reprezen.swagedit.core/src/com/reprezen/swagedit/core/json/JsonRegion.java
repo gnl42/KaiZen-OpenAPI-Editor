@@ -9,7 +9,7 @@ import org.eclipse.jface.text.Position;
 import com.fasterxml.jackson.core.JsonPointer;
 import com.google.common.collect.Sets;
 
-public class RangeNode {
+public class JsonRegion {
 
     public JsonPointer pointer;
 
@@ -46,9 +46,9 @@ public class RangeNode {
     private Location fieldLocation = null;
     private Location contentLocation = new Location(1, 1, 1, 1);
 
-    private final Set<RangeNode> children = Sets.newHashSet();
+    private final Set<JsonRegion> children = Sets.newHashSet();
 
-    public RangeNode(JsonPointer pointer) {
+    public JsonRegion(JsonPointer pointer) {
         this.pointer = pointer;
     }
 
@@ -68,7 +68,7 @@ public class RangeNode {
         this.contentLocation = location;
     }
 
-    public Set<RangeNode> getChildren() {
+    public Set<JsonRegion> getChildren() {
         return children;
     }
 

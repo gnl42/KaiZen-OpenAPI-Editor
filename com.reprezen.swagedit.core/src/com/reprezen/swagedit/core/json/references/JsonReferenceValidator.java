@@ -25,7 +25,6 @@ import com.fasterxml.jackson.databind.JsonNode;
 import com.github.fge.jsonschema.main.JsonSchemaFactory;
 import com.google.common.collect.Sets;
 import com.reprezen.swagedit.core.editor.JsonDocument;
-import com.reprezen.swagedit.core.model.AbstractNode;
 import com.reprezen.swagedit.core.validation.SwaggerError;
 
 /**
@@ -134,11 +133,11 @@ public class JsonReferenceValidator {
     protected SwaggerError createReferenceError(int severity, String message, JsonReference reference) {
         Object source = reference.getSource();
         int line;
-        if (source instanceof AbstractNode) {
-            line = ((AbstractNode) source).getStart().getLine() + 1;
-        } else {
+        // if (source instanceof AbstractNode) {
+        // line = ((AbstractNode) source).getStart().getLine() + 1;
+        // } else {
             line = 1;
-        }
+        // }
 
         return new SwaggerError(line, severity, message);
     }

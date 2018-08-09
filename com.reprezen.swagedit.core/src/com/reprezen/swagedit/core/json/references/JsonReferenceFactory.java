@@ -19,8 +19,6 @@ import org.yaml.snakeyaml.nodes.ScalarNode;
 import com.fasterxml.jackson.core.JsonPointer;
 import com.fasterxml.jackson.databind.JsonNode;
 import com.google.common.base.Strings;
-import com.reprezen.swagedit.core.model.AbstractNode;
-import com.reprezen.swagedit.core.model.ValueNode;
 import com.reprezen.swagedit.core.utils.URLUtils;
 
 /**
@@ -123,20 +121,20 @@ public class JsonReferenceFactory {
         return new JsonReference(uri, pointer, absolute, local, warnings, source);
     }
 
-    protected Boolean isReference(AbstractNode node) {
+    protected Boolean isReference(JsonNode node) {
         return JsonReference.isReference(node);
     }
 
-    protected ValueNode getReferenceValue(AbstractNode node) {
-        if (node.isValue()) {
-            return node.asValue();
-        }
-        AbstractNode value = node.get(PROPERTY);
-        if (value != null && value.isValue()) {
-            return value.asValue();
-        }
-        return null;
-    }
+    // protected JsonNode getReferenceValue(JsonNode node) {
+    // if (node.isValue()) {
+    // return node.asValue();
+    // }
+    // AbstractNode value = node.get(PROPERTY);
+    // if (value != null && value.isValue()) {
+    // return value.asValue();
+    // }
+    // return null;
+    // }
 
     protected String getReferenceValue(JsonNode node) {
         return node.isTextual() ? node.asText() : node.get(PROPERTY).asText();

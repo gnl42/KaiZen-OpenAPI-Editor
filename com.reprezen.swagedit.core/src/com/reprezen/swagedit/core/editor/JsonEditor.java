@@ -77,7 +77,6 @@ import org.eclipse.ui.views.contentoutline.IContentOutlinePage;
 
 import com.reprezen.swagedit.core.editor.outline.JsonContentOutlinePage;
 import com.reprezen.swagedit.core.handlers.OpenQuickOutlineHandler;
-import com.reprezen.swagedit.core.model.AbstractNode;
 import com.reprezen.swagedit.core.validation.SwaggerError;
 import com.reprezen.swagedit.core.validation.Validator;
 
@@ -543,11 +542,12 @@ public abstract class JsonEditor extends YEdit implements IShowInSource, IShowIn
         if (selection instanceof IStructuredSelection) {
             Object selected = ((IStructuredSelection) selection).getFirstElement();
 
-            if (selected instanceof AbstractNode) {
-                Position position = ((AbstractNode) selected).getPosition(getSourceViewer().getDocument());
-                selectAndReveal(position.getOffset(), position.getLength());
-                return true;
-            }
+            // TODO
+            // if (selected instanceof AbstractNode) {
+            // Position position = ((AbstractNode) selected).getPosition(getSourceViewer().getDocument());
+            // selectAndReveal(position.getOffset(), position.getLength());
+            // return true;
+            // }
         }
 
         return false;

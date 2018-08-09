@@ -11,7 +11,6 @@
 package com.reprezen.swagedit.core.editor;
 
 import java.io.IOException;
-import java.util.List;
 
 import org.eclipse.jface.text.BadLocationException;
 import org.eclipse.jface.text.Document;
@@ -22,9 +21,8 @@ import org.yaml.snakeyaml.parser.ParserException;
 
 import com.fasterxml.jackson.core.JsonPointer;
 import com.fasterxml.jackson.databind.JsonNode;
-import com.google.common.collect.Lists;
 import com.reprezen.swagedit.core.json.JsonModel;
-import com.reprezen.swagedit.core.json.RangeNode;
+import com.reprezen.swagedit.core.json.JsonRegion;
 import com.reprezen.swagedit.core.schema.CompositeSchema;
 
 /**
@@ -42,10 +40,6 @@ public class JsonDocument extends Document {
 
     public JsonModel getContent() {
         return model;
-    }
-
-    public List<Exception> getErrors() {
-        return model != null ? model.getErrors() : Lists.<Exception> newArrayList();
     }
 
     /**
@@ -114,12 +108,12 @@ public class JsonDocument extends Document {
             e.printStackTrace();
             return null;
         }
-        RangeNode range = model.findRegion(line, column);
+        JsonRegion range = model.findRegion(line, column);
 
         return getPointer(range);
     }
 
-    private JsonPointer getPointer(RangeNode range) {
+    private JsonPointer getPointer(JsonRegion range) {
         return JsonPointer.compile(range.pointer.toString());
     }
 
@@ -146,8 +140,7 @@ public class JsonDocument extends Document {
     }
 
     public IRegion getRegion(JsonPointer pointer) {
-        String[] paths = pointer.toString().split("/");
-        RangeNode range = model.getRanges().get(com.github.fge.jackson.jsonpointer.JsonPointer.of(paths));
+        JsonRegion range = model.getRegion(pointer);
 
         if (range == null) {
             return new Region(0, 0);
