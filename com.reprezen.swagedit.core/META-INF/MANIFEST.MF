@@ -20,7 +20,7 @@ Require-Bundle: org.eclipse.ui,
  org.yaml.snakeyaml;bundle-version="1.14.0",
  org.slf4j.api;bundle-version="1.7.2",
  org.eclipse.ui.workbench.texteditor
-Bundle-RequiredExecutionEnvironment: JavaSE-1.7
+Bundle-RequiredExecutionEnvironment: JavaSE-1.8
 Bundle-ActivationPolicy: lazy
 Export-Package: com.github.fge.jsonschema.core.exceptions,
  com.github.fge.jsonschema.core.load.configuration,
