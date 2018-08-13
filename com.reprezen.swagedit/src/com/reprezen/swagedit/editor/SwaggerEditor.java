@@ -10,7 +10,10 @@
  *******************************************************************************/
 package com.reprezen.swagedit.editor;
 
+import org.dadacoalition.yedit.YEditLog;
 import org.dadacoalition.yedit.editor.YEditSourceViewerConfiguration;
+import org.eclipse.core.runtime.CoreException;
+import org.eclipse.core.runtime.NullProgressMonitor;
 import org.eclipse.jface.util.IPropertyChangeListener;
 import org.eclipse.jface.util.PropertyChangeEvent;
 
@@ -37,7 +40,11 @@ public class SwaggerEditor extends JsonEditor {
                 boolean newValue = event.getNewValue() instanceof Boolean ? (Boolean) event.getNewValue()
                         : Boolean.valueOf((String) event.getNewValue());
                 Activator.getDefault().getSchema().allowJsonRefInContext(event.getProperty(), newValue);
-                validate();
+                try {
+                    createValidationOperation(false).run(new NullProgressMonitor());
+                } catch (CoreException e) {
+                    YEditLog.logException(e);
+                }
             }
         }
     };
