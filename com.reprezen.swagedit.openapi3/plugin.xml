@@ -20,16 +20,13 @@
    <extension
          point="org.eclipse.core.contenttype.contentTypes">
       <content-type
-            base-type="org.eclipse.core.runtime.text"
+            base-type="org.dadacoalition.yedit.yamlsource"
             describer="com.reprezen.swagedit.openapi3.editor.OpenApi3ContentDescriber"
             file-extensions="yaml"
             default-charset="UTF-8"
             id="com.reprezen.swagedit.contenttype.openapi3.yaml"
             name="%content-type.name"
             priority="high">
-         <describer
-               class="com.reprezen.swagedit.editor.SwaggerContentDescriber">
-         </describer>
       </content-type>
    </extension>
    
