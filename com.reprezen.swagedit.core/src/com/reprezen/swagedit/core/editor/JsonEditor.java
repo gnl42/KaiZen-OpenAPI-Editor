@@ -14,7 +14,6 @@ import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
-import java.util.Set;
 
 import org.dadacoalition.yedit.YEditLog;
 import org.dadacoalition.yedit.editor.IDocumentIdleListener;
@@ -28,6 +27,7 @@ import org.eclipse.core.resources.WorkspaceJob;
 import org.eclipse.core.runtime.CoreException;
 import org.eclipse.core.runtime.IProgressMonitor;
 import org.eclipse.core.runtime.IStatus;
+import org.eclipse.core.runtime.OperationCanceledException;
 import org.eclipse.core.runtime.Status;
 import org.eclipse.core.runtime.jobs.Job;
 import org.eclipse.jface.dialogs.MessageDialog;
@@ -63,7 +63,6 @@ import org.eclipse.swt.widgets.Display;
 import org.eclipse.swt.widgets.Shell;
 import org.eclipse.ui.IEditorInput;
 import org.eclipse.ui.IEditorSite;
-import org.eclipse.ui.IFileEditorInput;
 import org.eclipse.ui.PartInitException;
 import org.eclipse.ui.PlatformUI;
 import org.eclipse.ui.contexts.IContextService;
@@ -74,9 +73,7 @@ import org.eclipse.ui.part.ShowInContext;
 import org.eclipse.ui.swt.IFocusService;
 import org.eclipse.ui.texteditor.IDocumentProvider;
 import org.eclipse.ui.views.contentoutline.IContentOutlinePage;
-import org.yaml.snakeyaml.error.YAMLException;
 
-import com.fasterxml.jackson.core.JsonProcessingException;
 import com.reprezen.swagedit.core.editor.outline.JsonContentOutlinePage;
 import com.reprezen.swagedit.core.handlers.OpenQuickOutlineHandler;
 import com.reprezen.swagedit.core.model.AbstractNode;
@@ -91,7 +88,6 @@ public abstract class JsonEditor extends YEdit implements IShowInSource, IShowIn
 
     public static final String CONTEXT = "com.reprezen.swagedit.context";
 
-    private final Validator validator = createValidator();
     private ProjectionSupport projectionSupport;
     private Annotation[] oldAnnotations;
     private ProjectionAnnotationModel annotationModel;
@@ -344,7 +340,7 @@ public abstract class JsonEditor extends YEdit implements IShowInSource, IShowIn
                         }
                     });
                 }
-                validate();
+                createValidationOperation(false).run(monitor);
                 return Status.OK_STATUS;
             }
         }.schedule();
@@ -370,7 +366,7 @@ public abstract class JsonEditor extends YEdit implements IShowInSource, IShowIn
                         }
                     });
                 }
-                validate();
+                createValidationOperation(false).run(monitor);
                 return Status.OK_STATUS;
             }
         }.schedule();
@@ -410,50 +406,32 @@ public abstract class JsonEditor extends YEdit implements IShowInSource, IShowIn
         }
     }
 
-    protected void validate() {
-        validate(false);
+    protected ValidationOperation createValidationOperation(boolean parseFileContents) {
+        return new ValidationOperation(createValidator(), getEditorInput(), getDocumentProvider(), parseFileContents);
     }
 
     protected void runValidate(final boolean onOpen) {
-        new SafeWorkspaceJob("Update KaiZen Editor validation markers") {
-
+        ValidationOperation validationOperation = createValidationOperation(onOpen);
+        SafeWorkspaceJob validationJob = new SafeWorkspaceJob("Update KaiZen Editor validation markers") {
             @Override
             public IStatus doRunInWorkspace(IProgressMonitor monitor) throws CoreException {
-                validate(onOpen);
+                validationOperation.run(monitor);
                 return Status.OK_STATUS;
             }
-        }.schedule();
-    }
-
-    private void validate(boolean onOpen) {
-        IEditorInput editorInput = getEditorInput();
-        final IDocument document = getDocumentProvider().getDocument(getEditorInput());
-
-        // if the file is not part of a workspace it does not seems that it is a
-        // IFileEditorInput
-        // but instead a FileStoreEditorInput. Unclear if markers are valid for
-        // such files.
-        if (!(editorInput instanceof IFileEditorInput)) {
-            YEditLog.logError("Marking errors not supported for files outside of a project.");
-            YEditLog.logger.info("editorInput is not a part of a project.");
-            return;
-        }
-
-        if (document instanceof JsonDocument) {
-            final IFileEditorInput fileEditorInput = (IFileEditorInput) editorInput;
-            final IFile file = fileEditorInput.getFile();
-
-            if (onOpen) {
-                // force parsing of yaml to init parsing errors
-                ((JsonDocument) document).onChange();
+            
+            @Override
+            public boolean belongsTo(Object family) {
+                if (family instanceof ValidationOperation) {
+                    return getEditorInput().equals(((ValidationOperation)family).getEditorInput());
+                }
+                return false;
             }
-            clearMarkers(file);
-            validateYaml(file, (JsonDocument) document);
-            validateSwagger(file, (JsonDocument) document, fileEditorInput);
-        }
+        };
+        Job.getJobManager().cancel(validationOperation);
+        validationJob.schedule();
     }
 
-    protected void clearMarkers(IFile file) {
+    protected static void clearMarkers(IFile file) {
         int depth = IResource.DEPTH_INFINITE;
         try {
             file.deleteMarkers(IMarker.PROBLEM, true, depth);
@@ -463,24 +441,7 @@ public abstract class JsonEditor extends YEdit implements IShowInSource, IShowIn
         }
     }
 
-    protected void validateYaml(IFile file, JsonDocument document) {
-        if (document.getYamlError() instanceof YAMLException) {
-            addMarker(SwaggerError.newYamlError((YAMLException) document.getYamlError()), file, document);
-        }
-        if (document.getJsonError() instanceof JsonProcessingException) {
-            addMarker(SwaggerError.newJsonError((JsonProcessingException) document.getJsonError()), file, document);
-        }
-    }
-
-    protected void validateSwagger(IFile file, JsonDocument document, IFileEditorInput editorInput) {
-        final Set<SwaggerError> errors = validator.validate(document, editorInput);
-
-        for (SwaggerError error : errors) {
-            addMarker(error, file, document);
-        }
-    }
-
-    private IMarker addMarker(SwaggerError error, IFile target, IDocument document) {
+    static IMarker addMarker(SwaggerError error, IFile target, IDocument document) {
         IMarker marker = null;
         try {
             marker = target.createMarker(IMarker.PROBLEM);
@@ -529,6 +490,10 @@ public abstract class JsonEditor extends YEdit implements IShowInSource, IShowIn
         public IStatus runInWorkspace(IProgressMonitor monitor) throws CoreException {
             try {
                 return doRunInWorkspace(monitor);
+            } catch (CoreException e) {
+                return e.getStatus();
+            } catch (OperationCanceledException e) {
+                return Status.CANCEL_STATUS;
             } catch (Exception e) {
                 // in case of an exception the Worker treats it with
                 // an ERROR status in org.eclipse.core.internal.jobs.Worker.handleException(InternalJob, Throwable)
