@@ -14,9 +14,11 @@ import java.util.Set;
 
 import org.dadacoalition.yedit.YEditLog;
 import org.eclipse.core.resources.IFile;
+import org.eclipse.core.resources.IWorkspaceRunnable;
 import org.eclipse.core.runtime.CoreException;
-import org.eclipse.core.runtime.ICoreRunnable;
 import org.eclipse.core.runtime.IProgressMonitor;
+import org.eclipse.core.runtime.OperationCanceledException;
+import org.eclipse.core.runtime.Status;
 import org.eclipse.core.runtime.SubMonitor;
 import org.eclipse.jface.text.IDocument;
 import org.eclipse.ui.IEditorInput;
@@ -28,7 +30,7 @@ import com.fasterxml.jackson.core.JsonProcessingException;
 import com.reprezen.swagedit.core.validation.SwaggerError;
 import com.reprezen.swagedit.core.validation.Validator;
 
-public class ValidationOperation implements ICoreRunnable {
+public class ValidationOperation implements IWorkspaceRunnable {
 
     private final Validator validator;
 
@@ -65,17 +67,32 @@ public class ValidationOperation implements ICoreRunnable {
             if (parseFileContents) {
                 // force parsing of yaml to init parsing errors
                 // subMonitor.split() should NOT be executed before this code
-                // as it checks for job cancellation and we want to be sure that 
+                // as it checks for job cancellation and we want to be sure that
                 // the document is parsed on opening
                 ((JsonDocument) document).onChange();
             }
-            subMonitor.split(20);
+            if (subMonitor.isCanceled()) {
+                throw new OperationCanceledException();
+            }
+            subMonitor.newChild(20);
+            
             JsonEditor.clearMarkers(file);
-            subMonitor.split(30);
+            if (subMonitor.isCanceled()) {
+                throw new OperationCanceledException();
+            }
+            subMonitor.newChild(30);
+
             validateYaml(file, (JsonDocument) document);
-            subMonitor.split(20);
+            if (subMonitor.isCanceled()) {
+                throw new OperationCanceledException();
+            }
+            subMonitor.newChild(20);
+
             validateSwagger(file, (JsonDocument) document, fileEditorInput);
-            subMonitor.split(30);
+            if (subMonitor.isCanceled()) {
+                throw new OperationCanceledException();
+            }
+            subMonitor.newChild(30);
         }
     }
 
