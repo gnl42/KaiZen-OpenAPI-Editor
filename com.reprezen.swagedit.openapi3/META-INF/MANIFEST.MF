@@ -20,7 +20,9 @@ Require-Bundle: org.eclipse.ui,
  com.fasterxml.jackson.core.jackson-databind;bundle-version="2.5.0",
  com.fasterxml.jackson.dataformat.jackson-dataformat-yaml;bundle-version="2.5.0",
  org.yaml.snakeyaml;bundle-version="1.14.0",
- org.slf4j.api;bundle-version="1.7.2"
+ org.slf4j.api;bundle-version="1.7.2",
+ com.google.inject,
+ org.apache.log4j;bundle-version="1.2.15"
 Bundle-RequiredExecutionEnvironment: JavaSE-1.8
 Bundle-ActivationPolicy: lazy
 Export-Package: com.reprezen.swagedit.openapi3,
@@ -35,4 +37,9 @@ Export-Package: com.reprezen.swagedit.openapi3,
  com.reprezen.swagedit.openapi3.schema,
  com.reprezen.swagedit.openapi3.templates,
  com.reprezen.swagedit.openapi3.validation
-Bundle-ClassPath: .
+Bundle-ClassPath: .,
+ lib /javax.mail-api-1.6.1.jar,
+ lib /commons-lang3-3.7.jar,
+ lib /norconex-commons-lang-1.15.0.jar,
+ lib /jsonoverlay-3.0.2-201808131204.jar,
+ lib /openapi-parser-3.0.1-201808151133.jar

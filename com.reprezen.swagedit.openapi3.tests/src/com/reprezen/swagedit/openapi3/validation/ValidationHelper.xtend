@@ -13,45 +13,46 @@ package com.reprezen.swagedit.openapi3.validation
 import com.fasterxml.jackson.databind.JsonNode
 import com.google.common.collect.ImmutableMap
 import com.google.common.collect.Maps
+import com.reprezen.swagedit.core.editor.JsonDocument
 import com.reprezen.swagedit.core.json.references.JsonDocumentManager
 import com.reprezen.swagedit.core.model.AbstractNode
-import com.reprezen.swagedit.core.validation.ErrorProcessor
-import com.reprezen.swagedit.core.validation.SwaggerError
 import com.reprezen.swagedit.openapi3.schema.OpenApi3Schema
 import com.reprezen.swagedit.openapi3.validation.OpenApi3ReferenceValidator.OpenApi3ReferenceFactory
+import com.reprezen.swagedit.openapi3.validation.OpenApi3Validator.OpenApi3SchemaValidator
 import java.net.URI
 import java.util.Map
-import java.util.Set
-
-import static org.junit.Assert.*
 
 class ValidationHelper {
 
-	def public void validate(JsonNode documentAsJson) {
-		val JsonNode schemaAsJson = getSchema().asJson()
-		val ErrorProcessor processor = new ErrorProcessor(null, null) {
-			override protected Set<SwaggerError> fromNode(JsonNode error, int indent) {
-				fail('''JSON Schema validation error: «super.fromNode(error, indent)»''')
-				return super.fromNode(error, indent)
-			}
-		}
-		val Map<String, JsonNode> preloadedSchemas = Maps.newHashMap();
-		preloadedSchemas.put("http://openapis.org/v3/schema.json", getSchema().getRootType().asJson());
-		new OpenApi3Validator(new OpenApi3ReferenceValidator(), preloadedSchemas).
-			validateAgainstSchema(processor, schemaAsJson, documentAsJson)
+	def validate(JsonDocument document) {
+		val Map<String, JsonNode> preloadedSchemas = Maps.newHashMap()
+		preloadedSchemas.put(OpenApi3Schema.URL, getSchema().getRootType().asJson())
+		schemaValidator.validate(document)
 	}
 
 	def protected getSchema() {
 		return new OpenApi3Schema();
 	}
 
+	def static schemaValidator() {
+		val schemas = ImmutableMap.of(OpenApi3Schema.URL, new OpenApi3Schema().asJson)
+		new OpenApi3SchemaValidator(new OpenApi3Schema().asJson, schemas)
+	}
+
 	def static validator() {
+		validator(false)
+	}
+
+	def static validator(boolean advanced) {
 		val docManager = new JsonDocumentManager() {
 			override getFile(URI uri) {
 				null
 			}
 		}
-		val validator = new OpenApi3ReferenceValidator(new OpenApi3ReferenceFactory() {
+		val schemas = ImmutableMap.of(OpenApi3Schema.URL, new OpenApi3Schema().asJson)
+		val schemaVal = new OpenApi3SchemaValidator(new OpenApi3Schema().asJson, schemas)
+
+		val validator = new OpenApi3ReferenceValidator(schemaVal, new OpenApi3ReferenceFactory() {
 			override create(AbstractNode node) {
 				val reference = super.create(node)
 				if (reference !== null) {
@@ -69,10 +70,16 @@ class ValidationHelper {
 			}
 		})
 
-		new OpenApi3Validator(
-			validator,
-			ImmutableMap.of("http://openapis.org/v3/schema.json", new OpenApi3Schema().asJson)
-		)
+		new OpenApi3Validator(schemas, advanced) {
+			override getReferenceValidator() {
+				validator
+			}
+
+			override getSchemaValidator() {
+				schemaVal
+			}
+
+		}
 	}
 
 }

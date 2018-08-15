@@ -535,9 +535,7 @@ public abstract class JsonEditor extends YEdit implements IShowInSource, IShowIn
         return new ShowInContext(getEditorInput(), new StructuredSelection());
     }
     
-    protected Validator createValidator() {
-        return new Validator();
-    }
+    protected abstract Validator createValidator();
     
     public class JsonPreferenceChangeListener implements IPropertyChangeListener {
 

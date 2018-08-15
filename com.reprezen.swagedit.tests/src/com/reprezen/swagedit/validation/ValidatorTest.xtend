@@ -11,20 +11,19 @@
 package com.reprezen.swagedit.validation
 
 import com.reprezen.swagedit.core.validation.Messages
+import com.reprezen.swagedit.core.validation.SwaggerError
 import com.reprezen.swagedit.editor.SwaggerDocument
 import java.io.IOException
+import java.net.URI
 import org.eclipse.core.resources.IMarker
 import org.junit.Test
 
 import static org.hamcrest.CoreMatchers.*
 import static org.junit.Assert.*
-import com.reprezen.swagedit.core.validation.Validator
-import com.reprezen.swagedit.core.validation.SwaggerError
-import java.net.URI
 
 class ValidatorTest {
 
-	val validator = new Validator
+	val validator = new SwaggerValidator
 	val document = new SwaggerDocument
 
 	@Test

@@ -34,6 +34,7 @@ import com.reprezen.swagedit.openapi3.hyperlinks.LinkOperationHyperlinkDetector;
 import com.reprezen.swagedit.openapi3.hyperlinks.LinkOperationRefHyperlinkDetector;
 import com.reprezen.swagedit.openapi3.hyperlinks.OpenApi3ReferenceHyperlinkDetector;
 import com.reprezen.swagedit.openapi3.hyperlinks.SecuritySchemeHyperlinkDetector;
+import com.reprezen.swagedit.openapi3.schema.OpenApi3Schema;
 import com.reprezen.swagedit.openapi3.validation.OpenApi3Validator;
 
 public class OpenApi3Editor extends JsonEditor {
@@ -89,8 +90,8 @@ public class OpenApi3Editor extends JsonEditor {
     protected Validator createValidator() {
         Map<String, JsonNode> preloadedSchemas = Maps.newHashMap();
         JsonNode schema = Activator.getDefault().getSchema().getRootType().asJson();
-        preloadedSchemas.put("http://openapis.org/v3/schema.json", schema);
+        preloadedSchemas.put(OpenApi3Schema.URL, schema);
 
-        return new OpenApi3Validator(preloadedSchemas);
+        return new OpenApi3Validator(preloadedSchemas, true);
     }
 }
