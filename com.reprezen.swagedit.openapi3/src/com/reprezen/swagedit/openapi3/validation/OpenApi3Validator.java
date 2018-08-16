@@ -54,15 +54,18 @@ public class OpenApi3Validator extends Validator {
 
     private final JsonNode schema;
     private final Map<String, JsonNode> preloadedSchemas;
-    private final boolean advancedValidation;
+    private boolean advancedValidation = false;
 
     private JsonSchemaValidator schemaValidator;
     private JsonReferenceValidator referenceValidator;
 
-    public OpenApi3Validator(Map<String, JsonNode> preloadedSchemas, boolean advancedValidation) {
+    public OpenApi3Validator(Map<String, JsonNode> preloadedSchemas) {
         this.preloadedSchemas = preloadedSchemas;
-        this.advancedValidation = advancedValidation;
         this.schema = preloadedSchemas.get(OpenApi3Schema.URL);
+    }
+
+    public void setAdvancedValidation(boolean advancedValidation) {
+        this.advancedValidation = advancedValidation;
     }
 
     @Override

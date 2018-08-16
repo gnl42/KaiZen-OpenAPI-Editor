@@ -127,11 +127,9 @@ public abstract class JsonEditor extends YEdit implements IShowInSource, IShowIn
 
 	private JsonContentOutlinePage contentOutline;
 
-	private final IPreferenceStore preferenceStore;
-	
 	public JsonEditor(JsonDocumentProvider documentProvider, IPreferenceStore preferenceStore) {
 		super();
-		this.preferenceStore = preferenceStore;
+        setPreferenceStore(preferenceStore);
 		setDocumentProvider(documentProvider);
 	}
 
@@ -199,13 +197,13 @@ public abstract class JsonEditor extends YEdit implements IShowInSource, IShowIn
         viewer.doOperation(ProjectionViewer.TOGGLE);
 
         annotationModel = viewer.getProjectionAnnotationModel();
-        preferenceStore.addPropertyChangeListener(preferenceChangeListener);
+        getPreferenceStore().addPropertyChangeListener(preferenceChangeListener);
     }
 
     @Override
     public void dispose() {
         super.dispose();
-        preferenceStore.removePropertyChangeListener(preferenceChangeListener);
+        getPreferenceStore().removePropertyChangeListener(preferenceChangeListener);
     }
 
     @Override

@@ -62,6 +62,12 @@
             id="com.reprezen.swagedit.openapi3.preferences.OpenApiTemplatePreferences"
             name="Templates">
       </page>
+      <page
+            category="com.reprezen.swagedit.openapi3.preferences"
+            class="com.reprezen.swagedit.openapi3.preferences.OpenApi3ValidationPreferences"
+            id="com.reprezen.swagedit.openapi3.preferences.OpenApi3ValidationPreferences"
+            name="Validation">
+      </page>
    </extension>
    <extension
          point="org.eclipse.core.runtime.preferences">

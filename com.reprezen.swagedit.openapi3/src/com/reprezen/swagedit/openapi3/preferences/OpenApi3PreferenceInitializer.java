@@ -10,16 +10,21 @@
  *******************************************************************************/
 package com.reprezen.swagedit.openapi3.preferences;
 
+import static com.reprezen.swagedit.openapi3.preferences.OpenApi3PreferenceConstants.ADVANCED_VALIDATION;
+
 import org.eclipse.jface.preference.IPreferenceStore;
 
 import com.reprezen.swagedit.core.preferences.JsonPreferenceInitializer;
+import com.reprezen.swagedit.openapi3.Activator;
 
 public class OpenApi3PreferenceInitializer extends JsonPreferenceInitializer {
 
     @Override
     public void initializeDefaultPreferences() {
-        IPreferenceStore store = com.reprezen.swagedit.openapi3.Activator.getDefault().getPreferenceStore();
+        IPreferenceStore store = Activator.getDefault().getPreferenceStore();
         setColorPreferences(store);
+
+        store.setDefault(ADVANCED_VALIDATION, true);
     }
 
 }

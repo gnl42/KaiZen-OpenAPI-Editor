@@ -52,7 +52,7 @@ class ValidationHelper {
 		val schemas = ImmutableMap.of(OpenApi3Schema.URL, new OpenApi3Schema().asJson)
 		val schemaVal = new OpenApi3SchemaValidator(new OpenApi3Schema().asJson, schemas)
 
-		val validator = new OpenApi3ReferenceValidator(schemaVal, new OpenApi3ReferenceFactory() {
+		val refVal = new OpenApi3ReferenceValidator(schemaVal, new OpenApi3ReferenceFactory() {
 			override create(AbstractNode node) {
 				val reference = super.create(node)
 				if (reference !== null) {
@@ -70,16 +70,17 @@ class ValidationHelper {
 			}
 		})
 
-		new OpenApi3Validator(schemas, advanced) {
+		val validator = new OpenApi3Validator(schemas) {
 			override getReferenceValidator() {
-				validator
+				refVal
 			}
 
 			override getSchemaValidator() {
 				schemaVal
 			}
-
 		}
+		validator.advancedValidation = advanced
+		validator
 	}
 
 }
