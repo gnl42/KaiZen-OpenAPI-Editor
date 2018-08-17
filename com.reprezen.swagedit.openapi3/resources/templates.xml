@@ -3,7 +3,7 @@
        id="com.reprezen.swagedit.openapi3.templates.openapi_template" 
        description="OpenAPI version declaration" 
        context="com.reprezen.swagedit.openapi3.templates.root" 
-       enabled="true">openapi: "3.0.0"</template>
+       enabled="true">openapi: "3.0.1"</template>
 
 <!--
 	INFO  
@@ -17,21 +17,21 @@
   version: "1.0.0"
   title: ${API_title}
   description: ${API_description}
-  termsOfService: ${terms_url}
+  termsOfService: https://${terms_url}
   contact:
     name: ${contact_name}
-    url: ${contact_url}
+    url: https://${contact_url}
     email: ${contact_email}
   license:
     name: ${MIT}
-    url: http://opensource.org/licenses/MIT</template>
+    url: https://opensource.org/licenses/MIT</template>
 
 	<template name="OpenAPI contact" 
        id="com.reprezen.swagedit.openapi3.templates.info_contact_template" 
        description="Provides contact metadata about this API specification" 
        context="com.reprezen.swagedit.openapi3.templates.info.contact" 
        enabled="true">name: ${contact_name}
-url: ${contact_url}
+url: https://${contact_url}
 email: ${contact_email}</template>
 
 <!--
@@ -43,7 +43,7 @@ email: ${contact_email}</template>
        description="OpenAPI servers declaration" 
        context="com.reprezen.swagedit.openapi3.templates.root" 
        enabled="true">servers:
-- url: ${url}
+- url: https://${url}
   description: ${description}</template>
  
  <!--
@@ -59,7 +59,7 @@ email: ${contact_email}</template>
     description: ${description}
     responses:
       '200':
-        description: Ok
+        description: OK
         content:
           application/json:
             schema:
@@ -85,7 +85,7 @@ email: ${contact_email}</template>
   summary: Read
   description: Provide details for the entire list (for collection resources) or an item (for object resources)
   responses:
-    '${200}':
+    '2${20}':
       description: ${OK}
       content:
         application/json:
@@ -106,7 +106,7 @@ email: ${contact_email}</template>
         schema:
           $$ref: "${input}"
   responses:
-    '${200}':
+    '2${00}':
       description: OK</template>
 
      <template name="put" 
@@ -117,7 +117,7 @@ email: ${contact_email}</template>
   summary: Update
   description: Update the entire list (for collection resources) or an item (for object resources)   
   responses:
-    '${200}':
+    '2${00}':
       description: OK</template>
 
      <template name="delete" 
@@ -128,7 +128,7 @@ email: ${contact_email}</template>
   summary: Delete 
   description: Delete the entire list (for collection resources) or an item (for object resources)
   responses:
-    '${200}':
+    '2${00}':
       description: ${OK}
       content:
         application/json:
@@ -143,7 +143,7 @@ email: ${contact_email}</template>
   summary: Partial update
   description: ${Update}   
   responses:
-    '${200}':
+    '2${00}':
       description: ${OK}
       content:
         application/json:
@@ -158,7 +158,7 @@ email: ${contact_email}</template>
   summary: Request resource options
   description: Request information about methods available for resource manipulation 
   responses:
-    '${200}':
+    '2${00}':
       description: OK</template>
 
     <template name="head" 
@@ -222,7 +222,7 @@ in: path
 description: ${ID}
 required: true
 schema:
-  type: ${integer}  
+  type: ${string}  
 </template>
 
      <template name="header parameter" 
@@ -238,7 +238,7 @@ schema:
   items:
     type: ${integer}
     format: int64
-style: commaDelimited
+style: simple
 </template>
 
      <template name="query parameter" 
@@ -248,7 +248,7 @@ style: commaDelimited
        enabled="true">name: ${name}
 in: query
 description: ${ID}
-required: true
+required: false
 schema:
   type: array
   items:
@@ -347,18 +347,18 @@ properties:
        id="com.reprezen.swagedit.openapi3.templates.callbacks" 
        description="Callback definition template" 
        context="com.reprezen.swagedit.openapi3.templates.callbacks" 
-       enabled="true">${name}:
-    '${url}':
+       enabled="true">${webhook}:
+    'https://${url}':
       post:
         requestBody:
-          description: callback payload
+          description: Callback payload
           content: 
             'application/json':
               schema:
                 $$ref: '${schema}'
         responses:
           '200':
-            description: response description</template>
+            description: webhook successfully processed</template>
             
  <!--
  	CALLBACK 
