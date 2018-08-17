@@ -104,16 +104,18 @@ public abstract class JsonEditor extends YEdit implements IShowInSource, IShowIn
             if (event.getDocument() instanceof JsonDocument) {
                 final JsonDocument document = (JsonDocument) event.getDocument();
 
+                document.onChange();
                 Display.getCurrent().asyncExec(new Runnable() {
                     @Override
                     public void run() {
-                        document.onChange();
                         if (contentOutline != null) {
+                            // depends on the results of document.onChange()
                             contentOutline.setInput(getEditorInput());
                         }
-                        runValidate(false);
                     }
                 });
+                // depends on the results of document.onChange()
+                runValidate(false);
             }
         }
     };
