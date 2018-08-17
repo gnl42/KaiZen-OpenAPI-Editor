@@ -340,7 +340,11 @@ public abstract class JsonEditor extends YEdit implements IShowInSource, IShowIn
                         }
                     });
                 }
-                createValidationOperation(false).run(monitor);
+                // ZEN-4351 Invalid Thread Access Exception thrown when saving documents
+                // Don't use the same monitor for the validation as it makes checks for monitor.isCancelled()
+                // The monitor passed to the doSave() operation is `EventLoopProgressMonitor` whose operations
+                // must run in the Main thread
+                runValidate(false);
                 return Status.OK_STATUS;
             }
         }.schedule();
@@ -366,7 +370,11 @@ public abstract class JsonEditor extends YEdit implements IShowInSource, IShowIn
                         }
                     });
                 }
-                createValidationOperation(false).run(monitor);
+                // ZEN-4351 Invalid Thread Access Exception thrown when saving documents
+                // Don't use the same monitor for the validation as it makes checks for monitor.isCancelled()
+                // The monitor passed to the doSave() operation is `EventLoopProgressMonitor` whose operations
+                // must run in the Main thread
+                runValidate(false);
                 return Status.OK_STATUS;
             }
         }.schedule();
