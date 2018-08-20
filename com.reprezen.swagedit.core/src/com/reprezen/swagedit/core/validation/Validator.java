@@ -126,12 +126,13 @@ public class Validator {
 
         if (jsonContent != null) {
             Node yaml = document.getYaml();
-            if (yaml != null) {
+            Model model = document.getModel();
+            if (yaml != null && model != null) {
                 errors.addAll(validateAgainstSchema(
                         new ErrorProcessor(yaml, document.getSchema().getRootType().getContent()), document));
-                errors.addAll(validateModel(document.getModel()));
+                errors.addAll(validateModel(model));
                 errors.addAll(checkDuplicateKeys(yaml));
-                errors.addAll(referenceValidator.validate(baseURI, document));
+                errors.addAll(referenceValidator.validate(baseURI, document, model));
             }
         }
 

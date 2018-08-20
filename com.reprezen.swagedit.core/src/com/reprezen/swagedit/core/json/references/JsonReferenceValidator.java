@@ -35,6 +35,7 @@ import com.reprezen.swagedit.core.Activator;
 import com.reprezen.swagedit.core.editor.JsonDocument;
 import com.reprezen.swagedit.core.model.AbstractNode;
 import com.reprezen.swagedit.core.model.Location;
+import com.reprezen.swagedit.core.model.Model;
 import com.reprezen.swagedit.core.validation.SwaggerError;
 
 /**
@@ -63,8 +64,8 @@ public class JsonReferenceValidator {
      * @param document
      * @return collection of errors
      */
-    public Collection<? extends SwaggerError> validate(URI baseURI, JsonDocument doc) {
-        return doValidate(baseURI, doc, collector.collect(baseURI, doc.getModel()));
+    public Collection<? extends SwaggerError> validate(URI baseURI, JsonDocument doc, Model model) {
+        return doValidate(baseURI, doc, collector.collect(baseURI, model));
     }
 
     /*
