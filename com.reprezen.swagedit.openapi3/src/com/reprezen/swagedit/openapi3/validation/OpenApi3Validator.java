@@ -88,7 +88,7 @@ public class OpenApi3Validator extends Validator {
     public Set<SwaggerError> validate(JsonDocument document, URI baseURI) {
         final Set<SwaggerError> errors = super.validate(document, baseURI);
 
-        if (advancedValidation && errors.isEmpty()) {
+        if (advancedValidation) {
             try {
                 OpenApi3 result = new OpenApi3Parser().parse(baseURI.toURL(), true);
 
