@@ -20,6 +20,8 @@ import com.reprezen.swagedit.core.schema.ObjectTypeDefinition;
 
 public class OpenApi3Schema extends CompositeSchema {
 
+    public static final String URL = "http://openapis.org/v3/schema.json";
+
     private JsonSchema coreType;
    
     public OpenApi3Schema() {

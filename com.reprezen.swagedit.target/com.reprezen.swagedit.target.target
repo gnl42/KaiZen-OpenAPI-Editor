@@ -1,5 +1,5 @@
 <?xml version="1.0" encoding="UTF-8" standalone="no"?>
-<?pde version="3.8"?><target name="com.reprezen.swagedit.target" sequenceNumber="14">
+<?pde version="3.8"?><target name="com.reprezen.swagedit.target" sequenceNumber="17">
 <locations>
 <location includeAllPlatforms="false" includeConfigurePhase="true" includeMode="planner" includeSource="true" type="InstallableUnit">
 <unit id="org.eclipse.rcp.feature.group" version="4.4.2.v20150204-1700"/>
@@ -24,14 +24,31 @@
 </location>
 <location includeAllPlatforms="false" includeConfigurePhase="true" includeMode="planner" includeSource="true" type="InstallableUnit">
 <unit id="org.slf4j.api" version="1.7.2.v20121108-1250"/>
-<unit id="com.google.guava" version="15.0.0.v201403281430"/>
+<unit id="com.google.guava" version="21.0.0.v20170206-1425"/>
+<unit id="com.google.guava.source" version="21.0.0.v20170206-1425"/>
+<unit id="org.yaml.snakeyaml" version="1.14.0.v201604211500"/>
+<unit id="com.fasterxml.jackson.core.jackson-annotations" version="2.6.2.v20161117-2150"/>
+<unit id="com.fasterxml.jackson.core.jackson-annotations.source" version="2.6.2.v20161117-2150"/>
+<unit id="com.fasterxml.jackson.core.jackson-core" version="2.6.2.v20161117-2150"/>
+<unit id="com.fasterxml.jackson.core.jackson-core.source" version="2.6.2.v20161117-2150"/>
+<unit id="com.fasterxml.jackson.core.jackson-databind" version="2.6.2.v20161117-2150"/>
+<unit id="com.fasterxml.jackson.core.jackson-databind.source" version="2.6.2.v20161117-2150"/>
+<unit id="org.apache.httpcomponents.httpcore" version="4.4.6.v20170210-0925"/>
+<unit id="org.apache.httpcomponents.httpcore.source" version="4.4.6.v20170210-0925"/>
+<repository location="http://download.eclipse.org/tools/orbit/downloads/drops/R20170516192513/repository"/>
+</location>
+<location includeAllPlatforms="false" includeConfigurePhase="true" includeMode="planner" includeSource="true" type="InstallableUnit">
 <unit id="com.fasterxml.jackson.dataformat.jackson-dataformat-yaml" version="2.5.0.v201504151636"/>
-<unit id="com.fasterxml.jackson.core.jackson-annotations" version="2.5.0.v201504151636"/>
-<unit id="org.yaml.snakeyaml" version="1.14.0.v201505061500"/>
-<unit id="com.google.guava.source" version="15.0.0.v201403281430"/>
-<unit id="com.fasterxml.jackson.core.jackson-databind" version="2.5.0.v201504151636"/>
-<unit id="com.fasterxml.jackson.core.jackson-core" version="2.5.0.v201504151636"/>
 <repository location="http://download.eclipse.org/tools/orbit/downloads/drops/R20160221192158/repository"/>
+</location>
+<location includeAllPlatforms="false" includeConfigurePhase="true" includeMode="planner" includeSource="true" type="InstallableUnit">
+<unit id="com.norconex.commons.norconex-commons-lang" version="1.15.0"/>
+<unit id="com.reprezen.jsonoverlay" version="3.1.0.201808201358"/>
+<unit id="com.reprezen.kaizen.openapi-parser" version="3.0.1.201808210242"/>
+<unit id="org.apache.commons.lang" version="2.6.0"/>
+<unit id="com.sun.mail.javax.mail" version="1.6.1"/>
+<unit id="javax.mail-api" version="1.6.1"/>
+<repository location="http://products-internal.reprezen.com/kaizen/openapi-parser/updates/3.0.1-201808210242/"/>
 </location>
 </locations>
 <targetJRE path="org.eclipse.jdt.launching.JRE_CONTAINER/org.eclipse.jdt.internal.debug.ui.launcher.StandardVMType/JavaSE-1.8"/>

@@ -10,6 +10,8 @@
  *******************************************************************************/
 package com.reprezen.swagedit.openapi3.editor;
 
+import static com.reprezen.swagedit.openapi3.preferences.OpenApi3PreferenceConstants.ADVANCED_VALIDATION;
+
 import java.util.Map;
 
 import org.dadacoalition.yedit.editor.YEditSourceViewerConfiguration;
@@ -18,6 +20,7 @@ import org.eclipse.jface.text.contentassist.ContentAssistant;
 import org.eclipse.jface.text.hyperlink.IHyperlinkDetector;
 import org.eclipse.jface.text.hyperlink.URLHyperlinkDetector;
 import org.eclipse.jface.text.source.ISourceViewer;
+import org.eclipse.jface.util.IPropertyChangeListener;
 
 import com.fasterxml.jackson.databind.JsonNode;
 import com.google.common.collect.Maps;
@@ -34,11 +37,22 @@ import com.reprezen.swagedit.openapi3.hyperlinks.LinkOperationHyperlinkDetector;
 import com.reprezen.swagedit.openapi3.hyperlinks.LinkOperationRefHyperlinkDetector;
 import com.reprezen.swagedit.openapi3.hyperlinks.OpenApi3ReferenceHyperlinkDetector;
 import com.reprezen.swagedit.openapi3.hyperlinks.SecuritySchemeHyperlinkDetector;
+import com.reprezen.swagedit.openapi3.schema.OpenApi3Schema;
 import com.reprezen.swagedit.openapi3.validation.OpenApi3Validator;
 
 public class OpenApi3Editor extends JsonEditor {
 
     public static final String ID = "com.reprezen.swagedit.openapi3.editor";
+
+    private OpenApi3Validator validator;
+
+    private final IPropertyChangeListener advancedValidationListener = event -> {
+        if (validator != null) {
+            if (ADVANCED_VALIDATION.equals(event.getProperty())) {
+                validator.setAdvancedValidation(getPreferenceStore().getBoolean(ADVANCED_VALIDATION));
+            }
+        }
+    };
 
     public OpenApi3Editor() {
         super(new OpenApi3DocumentProvider(), Activator.getDefault().getPreferenceStore());
@@ -49,6 +63,13 @@ public class OpenApi3Editor extends JsonEditor {
         sourceViewerConfiguration = new OpenApi3SourceViewerConfiguration();
         sourceViewerConfiguration.setEditor(this);
         return sourceViewerConfiguration;
+    }
+
+    @Override
+    public void dispose() {
+        // preference store is removed in AbstractTextEditor.dispose()
+        getPreferenceStore().removePropertyChangeListener(advancedValidationListener);
+        super.dispose();
     }
 
     public static class OpenApi3SourceViewerConfiguration extends JsonSourceViewerConfiguration {
@@ -87,10 +108,17 @@ public class OpenApi3Editor extends JsonEditor {
 
     @Override
     protected Validator createValidator() {
-        Map<String, JsonNode> preloadedSchemas = Maps.newHashMap();
-        JsonNode schema = Activator.getDefault().getSchema().getRootType().asJson();
-        preloadedSchemas.put("http://openapis.org/v3/schema.json", schema);
+        if (validator == null) {
+            Map<String, JsonNode> preloadedSchemas = Maps.newHashMap();
+            JsonNode schema = Activator.getDefault().getSchema().getRootType().asJson();
+            preloadedSchemas.put(OpenApi3Schema.URL, schema);
 
-        return new OpenApi3Validator(preloadedSchemas);
+            validator = new OpenApi3Validator(preloadedSchemas);
+            validator.setAdvancedValidation(getPreferenceStore().getBoolean(ADVANCED_VALIDATION));
+
+            getPreferenceStore().addPropertyChangeListener(advancedValidationListener);
+        }
+
+        return validator;
     }
 }

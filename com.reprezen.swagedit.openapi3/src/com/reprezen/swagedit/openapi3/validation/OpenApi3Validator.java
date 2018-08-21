@@ -10,6 +10,9 @@
  *******************************************************************************/
 package com.reprezen.swagedit.openapi3.validation;
 
+import static org.eclipse.core.resources.IMarker.SEVERITY_ERROR;
+
+import java.net.URI;
 import java.util.Iterator;
 import java.util.List;
 import java.util.Map;
@@ -17,28 +20,107 @@ import java.util.Objects;
 import java.util.Set;
 
 import org.eclipse.core.resources.IMarker;
+import org.eclipse.core.runtime.Status;
 
 import com.fasterxml.jackson.core.JsonPointer;
 import com.fasterxml.jackson.databind.JsonNode;
 import com.google.common.collect.Lists;
+import com.reprezen.jsonoverlay.PositionInfo;
+import com.reprezen.kaizen.oasparser.OpenApi3Parser;
+import com.reprezen.kaizen.oasparser.model3.OpenApi3;
+import com.reprezen.kaizen.oasparser.val.ValidationResults.Severity;
+import com.reprezen.kaizen.oasparser.val.ValidationResults.ValidationItem;
+import com.reprezen.swagedit.core.editor.JsonDocument;
+import com.reprezen.swagedit.core.json.references.JsonReferenceValidator;
 import com.reprezen.swagedit.core.model.AbstractNode;
 import com.reprezen.swagedit.core.model.ArrayNode;
 import com.reprezen.swagedit.core.model.Model;
+import com.reprezen.swagedit.core.validation.JsonSchemaValidator;
 import com.reprezen.swagedit.core.validation.Messages;
 import com.reprezen.swagedit.core.validation.SwaggerError;
 import com.reprezen.swagedit.core.validation.Validator;
+import com.reprezen.swagedit.openapi3.Activator;
+import com.reprezen.swagedit.openapi3.schema.OpenApi3Schema;
 
 public class OpenApi3Validator extends Validator {
+
+    public static class OpenApi3SchemaValidator extends JsonSchemaValidator {
+
+        public OpenApi3SchemaValidator(JsonNode schema, Map<String, JsonNode> preloadSchemas) {
+            super(schema, preloadSchemas);
+        }
+    }
 
     private final JsonPointer operationPointer = JsonPointer.compile("/definitions/operation");
     private final JsonPointer securityPointer = JsonPointer.compile("/components/securitySchemes");
 
+    private final JsonNode schema;
+    private final Map<String, JsonNode> preloadedSchemas;
+    private boolean advancedValidation = false;
+
+    private JsonSchemaValidator schemaValidator;
+    private JsonReferenceValidator referenceValidator;
+
     public OpenApi3Validator(Map<String, JsonNode> preloadedSchemas) {
-        super(new OpenApi3ReferenceValidator(), preloadedSchemas);
+        this.preloadedSchemas = preloadedSchemas;
+        this.schema = preloadedSchemas.get(OpenApi3Schema.URL);
     }
 
-    OpenApi3Validator(OpenApi3ReferenceValidator validator, Map<String, JsonNode> preloadedSchemas) {
-        super(validator, preloadedSchemas);
+    public void setAdvancedValidation(boolean advancedValidation) {
+        this.advancedValidation = advancedValidation;
+    }
+
+    @Override
+    public JsonReferenceValidator getReferenceValidator() {
+        if (referenceValidator == null) {
+            referenceValidator = new OpenApi3ReferenceValidator(getSchemaValidator());
+        }
+        return referenceValidator;
+    }
+
+    @Override
+    public JsonSchemaValidator getSchemaValidator() {
+        if (schemaValidator == null) {
+            schemaValidator = new OpenApi3SchemaValidator(schema, preloadedSchemas);
+        }
+        return schemaValidator;
+    }
+
+    @Override
+    public Set<SwaggerError> validate(JsonDocument document, URI baseURI) {
+        final Set<SwaggerError> errors = super.validate(document, baseURI);
+        final long nbOfErrors = errors.stream().filter(e -> e.getLevel() == SEVERITY_ERROR).count();
+
+        // Advanced validation is enable if no errors are detected (does not include warnings and infos),
+        // and option in UI is enable.
+        if (advancedValidation && nbOfErrors == 0) {
+            try {
+                OpenApi3 result = new OpenApi3Parser().parse(baseURI.toURL(), true);
+
+                for (ValidationItem item : result.getValidationResults().getItems()) {
+                    PositionInfo pos = item.getPositionInfo();
+                    int line = pos != null ? pos.getLine() : 1;
+
+                    errors.add(new SwaggerError(line, getSeverity(item.getSeverity()), item.getMsg()));
+                }
+            } catch (Exception e) {
+                Activator.getDefault().getLog()
+                        .log(new Status(Status.ERROR, Activator.PLUGIN_ID, e.getLocalizedMessage()));
+            }
+        }
+
+        return errors;
+    }
+
+    private int getSeverity(Severity severity) {
+        switch (severity) {
+        case ERROR:
+            return IMarker.SEVERITY_ERROR;
+        case WARNING:
+            return IMarker.SEVERITY_WARNING;
+        default:
+            return IMarker.SEVERITY_INFO;
+        }
     }
 
     @Override

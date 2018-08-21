@@ -13,12 +13,10 @@ package com.reprezen.swagedit.core.validation;
 import java.io.IOException;
 import java.net.URI;
 import java.util.HashSet;
-import java.util.Map;
 import java.util.Objects;
 import java.util.Set;
 
 import org.apache.commons.lang3.tuple.Pair;
-import org.dadacoalition.yedit.YEditLog;
 import org.eclipse.core.resources.IMarker;
 import org.eclipse.ui.IFileEditorInput;
 import org.yaml.snakeyaml.nodes.MappingNode;
@@ -32,19 +30,11 @@ import org.yaml.snakeyaml.parser.ParserException;
 import com.fasterxml.jackson.core.JsonPointer;
 import com.fasterxml.jackson.databind.JsonNode;
 import com.fasterxml.jackson.databind.ObjectMapper;
-import com.github.fge.jsonschema.core.exceptions.ProcessingException;
-import com.github.fge.jsonschema.core.load.configuration.LoadingConfiguration;
-import com.github.fge.jsonschema.core.load.configuration.LoadingConfigurationBuilder;
-import com.github.fge.jsonschema.core.report.ProcessingReport;
-import com.github.fge.jsonschema.main.JsonSchema;
-import com.github.fge.jsonschema.main.JsonSchemaFactory;
 import com.google.common.collect.HashMultimap;
-import com.google.common.collect.Maps;
 import com.google.common.collect.Multimap;
 import com.google.common.collect.Sets;
 import com.reprezen.swagedit.core.editor.JsonDocument;
 import com.reprezen.swagedit.core.json.references.JsonReference;
-import com.reprezen.swagedit.core.json.references.JsonReferenceFactory;
 import com.reprezen.swagedit.core.json.references.JsonReferenceValidator;
 import com.reprezen.swagedit.core.model.AbstractNode;
 import com.reprezen.swagedit.core.model.ArrayNode;
@@ -59,43 +49,14 @@ import com.reprezen.swagedit.core.model.ValueNode;
  * 
  * @see SwaggerError
  */
-public class Validator {
+public abstract class Validator {
 
-    private final JsonReferenceValidator referenceValidator;
     private final JsonNode schemaRefTemplate = new ObjectMapper().createObjectNode() //
             .put("$ref", "#/definitions/schema");
-    private final LoadingConfiguration loadingConfiguration;
-    private final JsonSchemaFactory factory;
 
-    public Validator() {
-        this(new JsonReferenceValidator(new JsonReferenceFactory()));
-    }
+    public abstract JsonSchemaValidator getSchemaValidator();
 
-    public Validator(JsonReferenceValidator referenceValidator) {
-        this(referenceValidator, Maps.<String, JsonNode> newHashMap());
-    }
-
-    public Validator(JsonReferenceValidator referenceValidator, Map<String, JsonNode> preloadSchemas) {
-        this.referenceValidator = referenceValidator;
-        this.loadingConfiguration = getLoadingConfiguration(preloadSchemas);
-        this.factory = JsonSchemaFactory.newBuilder() //
-                .setLoadingConfiguration(loadingConfiguration) //
-                .freeze();
-        this.referenceValidator.setFactory(factory);
-    }
-
-
-    private LoadingConfiguration getLoadingConfiguration(Map<String, JsonNode> preloadSchemas) {
-        LoadingConfigurationBuilder loadingConfigurationBuilder = LoadingConfiguration.newBuilder();
-        for (String nextSchemaUri : preloadSchemas.keySet()) {
-            loadingConfigurationBuilder.preloadSchema(nextSchemaUri, preloadSchemas.get(nextSchemaUri));
-        }
-        return loadingConfigurationBuilder.freeze();
-    }
-
-    public JsonSchemaFactory getFactory() {
-        return factory;
-    }
+    public abstract JsonReferenceValidator getReferenceValidator();
 
     /**
      * Returns a list or errors if validation fails.
@@ -113,7 +74,7 @@ public class Validator {
         URI baseURI = editorInput != null ? editorInput.getFile().getLocationURI() : null;
         return validate(document, baseURI);
     }
-    
+
     public Set<SwaggerError> validate(JsonDocument document, URI baseURI) {
         Set<SwaggerError> errors = Sets.newHashSet();
 
@@ -127,45 +88,11 @@ public class Validator {
         if (jsonContent != null) {
             Node yaml = document.getYaml();
             if (yaml != null) {
-                errors.addAll(validateAgainstSchema(
-                        new ErrorProcessor(yaml, document.getSchema().getRootType().getContent()), document));
+                errors.addAll(getSchemaValidator().validate(document));
                 errors.addAll(validateModel(document.getModel()));
                 errors.addAll(checkDuplicateKeys(yaml));
-                errors.addAll(referenceValidator.validate(baseURI, document));
+                errors.addAll(getReferenceValidator().validate(baseURI, document));
             }
-        }
-
-        return errors;
-    }
-    
-    /**
-     * Validates the YAML document against the Swagger schema
-     * 
-     * @param processor
-     * @param document
-     * @return error
-     */
-    protected Set<SwaggerError> validateAgainstSchema(ErrorProcessor processor, JsonDocument document) {
-        return validateAgainstSchema(processor, document.getSchema().asJson(), document.asJson());
-    }
-    
-    public Set<SwaggerError> validateAgainstSchema(ErrorProcessor processor, JsonNode schemaAsJson, JsonNode documentAsJson) {
-        final Set<SwaggerError> errors = Sets.newHashSet();
-
-        JsonSchema schema = null;
-        try {
-            schema = factory.getJsonSchema(schemaAsJson);
-        } catch (ProcessingException e) {
-            YEditLog.logException(e);
-            return errors;
-        }
-
-        try {
-            ProcessingReport report = schema.validate(documentAsJson, true);
-
-            errors.addAll(processor.processReport(report));
-        } catch (ProcessingException e) {
-            errors.addAll(processor.processMessage(e.getProcessingMessage()));
         }
 
         return errors;

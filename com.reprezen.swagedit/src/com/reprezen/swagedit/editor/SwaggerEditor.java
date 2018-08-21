@@ -19,7 +19,9 @@ import org.eclipse.jface.util.PropertyChangeEvent;
 
 import com.reprezen.swagedit.Activator;
 import com.reprezen.swagedit.core.editor.JsonEditor;
+import com.reprezen.swagedit.core.validation.Validator;
 import com.reprezen.swagedit.preferences.SwaggerPreferenceConstants;
+import com.reprezen.swagedit.validation.SwaggerValidator;
 
 /**
  * SwagEdit editor.
@@ -60,4 +62,8 @@ public class SwaggerEditor extends JsonEditor {
         return sourceViewerConfiguration;
     }
     
+    @Override
+    protected Validator createValidator() {
+        return new SwaggerValidator();
+    }
 }

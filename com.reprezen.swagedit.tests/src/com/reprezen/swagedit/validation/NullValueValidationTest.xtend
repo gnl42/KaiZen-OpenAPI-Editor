@@ -11,16 +11,15 @@
 package com.reprezen.swagedit.validation
 
 import com.reprezen.swagedit.editor.SwaggerDocument
+import java.net.URI
 import org.junit.Test
 
 import static org.hamcrest.CoreMatchers.*
 import static org.junit.Assert.*
-import com.reprezen.swagedit.core.validation.Validator
-import java.net.URI
 
 class NullValueValidationTest {
 
-	val validator = new Validator
+	val validator = new SwaggerValidator
 	val SwaggerDocument document = new SwaggerDocument
 
 	@Test
@@ -47,7 +46,8 @@ class NullValueValidationTest {
 
 		val errors = validator.validate(document, null as URI)
 		assertEquals(1, errors.size())
-		assertThat(errors.findFirst[true].getMessage(), containsString('The null value is not allowed for type, did you mean the "null" string (quoted)?'))
+		assertThat(errors.findFirst[true].getMessage(),
+			containsString('The null value is not allowed for type, did you mean the "null" string (quoted)?'))
 		assertThat(errors.findFirst[true].line, equalTo(14))
 	}
 
