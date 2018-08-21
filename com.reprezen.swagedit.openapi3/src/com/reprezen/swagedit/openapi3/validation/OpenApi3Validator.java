@@ -10,6 +10,8 @@
  *******************************************************************************/
 package com.reprezen.swagedit.openapi3.validation;
 
+import static org.eclipse.core.resources.IMarker.SEVERITY_ERROR;
+
 import java.net.URI;
 import java.util.Iterator;
 import java.util.List;
@@ -87,8 +89,11 @@ public class OpenApi3Validator extends Validator {
     @Override
     public Set<SwaggerError> validate(JsonDocument document, URI baseURI) {
         final Set<SwaggerError> errors = super.validate(document, baseURI);
+        final long nbOfErrors = errors.stream().filter(e -> e.getLevel() == SEVERITY_ERROR).count();
 
-        if (advancedValidation && errors.isEmpty()) {
+        // Advanced validation is enable if no errors are detected (does not include warnings and infos),
+        // and option in UI is enable.
+        if (advancedValidation && nbOfErrors == 0) {
             try {
                 OpenApi3 result = new OpenApi3Parser().parse(baseURI.toURL(), true);
 
