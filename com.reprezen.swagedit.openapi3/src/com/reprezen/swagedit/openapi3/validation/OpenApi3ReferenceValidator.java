@@ -12,6 +12,7 @@ package com.reprezen.swagedit.openapi3.validation;
 
 import static com.reprezen.swagedit.core.validation.Messages.error_invalid_operation_ref;
 import static com.reprezen.swagedit.core.validation.Messages.error_invalid_reference_type;
+import static org.eclipse.core.resources.IMarker.SEVERITY_WARNING;
 
 import java.net.URI;
 import java.util.Collection;
@@ -20,7 +21,7 @@ import java.util.Map;
 import java.util.Set;
 
 import com.fasterxml.jackson.databind.JsonNode;
-import com.github.fge.jsonschema.main.JsonSchema;
+import com.github.fge.jsonschema.core.report.ProcessingReport;
 import com.google.common.collect.Sets;
 import com.reprezen.swagedit.core.editor.JsonDocument;
 import com.reprezen.swagedit.core.json.references.JsonReference;
@@ -28,6 +29,7 @@ import com.reprezen.swagedit.core.json.references.JsonReferenceFactory;
 import com.reprezen.swagedit.core.json.references.JsonReferenceValidator;
 import com.reprezen.swagedit.core.model.AbstractNode;
 import com.reprezen.swagedit.core.model.ValueNode;
+import com.reprezen.swagedit.core.validation.JsonSchemaValidator;
 import com.reprezen.swagedit.core.validation.SwaggerError;
 
 public class OpenApi3ReferenceValidator extends JsonReferenceValidator {
@@ -35,17 +37,17 @@ public class OpenApi3ReferenceValidator extends JsonReferenceValidator {
     private final String linkTypePointer = "/definitions/linkOrReference";
     private final String operationTypePointer = "/definitions/operation";
 
-    public OpenApi3ReferenceValidator() {
-        super(new OpenApi3ReferenceFactory());
+    public OpenApi3ReferenceValidator(JsonSchemaValidator schemaValidator) {
+        this(schemaValidator, new OpenApi3ReferenceFactory());
     }
 
-    OpenApi3ReferenceValidator(OpenApi3ReferenceFactory factory) {
-        super(factory);
+    public OpenApi3ReferenceValidator(JsonSchemaValidator schemaValidator, OpenApi3ReferenceFactory factory) {
+        super(schemaValidator, factory);
     }
 
     @Override
     protected Set<SwaggerError> validateType(JsonDocument doc, URI baseURI, JsonReference reference,
-            Collection<AbstractNode> sources, Map<String, JsonSchema> schemas) {
+            Collection<AbstractNode> sources) {
 
         Set<SwaggerError> errors = Sets.newHashSet();
         Map<String, List<AbstractNode>> sourceTypes = groupSourcesByType(sources);
@@ -57,8 +59,10 @@ public class OpenApi3ReferenceValidator extends JsonReferenceValidator {
             String ptr = isOperationValidation ? operationTypePointer.toString() : type;
             String message = isOperationValidation ? error_invalid_operation_ref : error_invalid_reference_type;
 
-            JsonSchema jsonSchema = getSchema(doc, ptr, schemas);
-            errors.addAll(validate(jsonSchema, target, message, sourceTypes.get(type)));
+            ProcessingReport report = getSchemaValidator().validateSubSchema(target, ptr);
+            if (!report.isSuccess()) {
+                errors.addAll(createReferenceError(SEVERITY_WARNING, message, sources));
+            }
         }
 
         return errors;

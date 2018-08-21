@@ -24,18 +24,15 @@ import java.util.Map;
 import java.util.Set;
 
 import com.fasterxml.jackson.databind.JsonNode;
-import com.github.fge.jsonschema.core.exceptions.ProcessingException;
 import com.github.fge.jsonschema.core.report.ProcessingReport;
-import com.github.fge.jsonschema.main.JsonSchema;
-import com.github.fge.jsonschema.main.JsonSchemaFactory;
 import com.google.common.collect.Lists;
 import com.google.common.collect.Maps;
 import com.google.common.collect.Sets;
-import com.reprezen.swagedit.core.Activator;
 import com.reprezen.swagedit.core.editor.JsonDocument;
 import com.reprezen.swagedit.core.model.AbstractNode;
 import com.reprezen.swagedit.core.model.Location;
 import com.reprezen.swagedit.core.model.Model;
+import com.reprezen.swagedit.core.validation.JsonSchemaValidator;
 import com.reprezen.swagedit.core.validation.SwaggerError;
 
 /**
@@ -45,16 +42,16 @@ public class JsonReferenceValidator {
 
     private final JsonReferenceCollector collector;
     private final JsonReferenceFactory referenceFactory;
+    private final JsonSchemaValidator schemaValidator;
 
-    protected JsonSchemaFactory factory = null;
-
-    public JsonReferenceValidator(JsonReferenceFactory factory) {
+    public JsonReferenceValidator(JsonSchemaValidator validator, JsonReferenceFactory factory) {
         this.referenceFactory = factory;
         this.collector = new JsonReferenceCollector(factory);
+        this.schemaValidator = validator;
     }
 
-    public void setFactory(JsonSchemaFactory factory) {
-        this.factory = factory;
+    protected JsonSchemaValidator getSchemaValidator() {
+        return schemaValidator;
     }
 
     /**
@@ -80,9 +77,6 @@ public class JsonReferenceValidator {
             Map<JsonReference, List<AbstractNode>> references) {
 
         Set<SwaggerError> errors = Sets.newHashSet();
-        // Cache of JSON schemas (subsets of the main schema). The key identifies a schema by it's pointer
-        // in the main schema.
-        Map<String, JsonSchema> schemas = Maps.newHashMap();
 
         for (JsonReference reference : references.keySet()) {
             if (reference instanceof JsonReference.SimpleReference) {
@@ -97,7 +91,7 @@ public class JsonReferenceValidator {
                 errors.addAll(
                         createReferenceError(SEVERITY_WARNING, error_invalid_reference, references.get(reference)));
             } else {
-                errors.addAll(validateType(doc, baseURI, reference, references.get(reference), schemas));
+                errors.addAll(validateType(doc, baseURI, reference, references.get(reference)));
             }
         }
 
@@ -121,53 +115,23 @@ public class JsonReferenceValidator {
      *            current set of errors
      */
     protected Set<SwaggerError> validateType(JsonDocument doc, URI baseURI, JsonReference reference,
-            Collection<AbstractNode> sources, Map<String, JsonSchema> schemas) {
+            Collection<AbstractNode> sources) {
 
         Set<SwaggerError> errors = Sets.newHashSet();
 
         JsonNode target = findTarget(doc, baseURI, reference);
         // To avoid performing even more cycles, the sources are grouped by their type.
         // Validation is done only once for each sources having same type.
+
         Map<String, List<AbstractNode>> sourceTypes = groupSourcesByType(sources);
 
         for (String type : sourceTypes.keySet()) {
-            JsonSchema jsonSchema = getSchema(doc, type, schemas);
-            errors.addAll(validate(jsonSchema, target, error_invalid_reference_type, sourceTypes.get(type)));
-        }
-
-        return errors;
-    }
-
-    protected JsonSchema getSchema(JsonDocument doc, String type, Map<String, JsonSchema> schemas) {
-        JsonSchema schema = schemas.get(type);
-        if (schema == null) {
-            try {
-                schema = factory.getJsonSchema(doc.getSchema().asJson(), type);
-                schemas.put(type, schema);
-            } catch (ProcessingException e) {
-                Activator.getDefault().logError(e.getLocalizedMessage(), e);
-            }
-        }
-        return schema;
-    }
-
-    /*
-     * Executes JSON schema validation against given target. If the target fails to be recognize as an instance of the
-     * actual schema, an error is returned with the given message on all sources.
-     * 
-     */
-    protected Set<SwaggerError> validate(JsonSchema schema, JsonNode target, String message,
-            Collection<AbstractNode> sources) {
-
-        Set<SwaggerError> errors = Sets.newHashSet();
-        try {
-            ProcessingReport report = schema.validate(target);
+            ProcessingReport report = schemaValidator.validateSubSchema(target, type);
             if (!report.isSuccess()) {
-                errors = createReferenceError(SEVERITY_WARNING, message, sources);
+                errors.addAll(createReferenceError(SEVERITY_WARNING, error_invalid_reference_type, sources));
             }
-        } catch (ProcessingException e) {
-            Activator.getDefault().logError(e.getLocalizedMessage(), e);
         }
+
         return errors;
     }
 

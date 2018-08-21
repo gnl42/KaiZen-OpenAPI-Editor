@@ -11,12 +11,11 @@
 package com.reprezen.swagedit.validation
 
 import com.reprezen.swagedit.editor.SwaggerDocument
-import com.reprezen.swagedit.core.validation.Validator
+import java.net.URI
 import org.junit.Test
 
 import static org.hamcrest.core.IsCollectionContaining.*
 import static org.junit.Assert.*
-import java.net.URI
 
 /**
  * Tests as documentation for #9 - User-friendly validation messages
@@ -25,7 +24,7 @@ import java.net.URI
  */
 class ValidationMessageTest {
 
-	val validator = new Validator
+	val validator = new SwaggerValidator
 	val document = new SwaggerDocument
 
 	@Test

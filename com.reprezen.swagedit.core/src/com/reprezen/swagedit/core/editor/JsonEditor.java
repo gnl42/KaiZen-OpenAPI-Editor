@@ -122,20 +122,18 @@ public abstract class JsonEditor extends YEdit implements IShowInSource, IShowIn
 
     /*
      * This listener is added to the preference store when the editor is initialized. It listens to changes to color
-     * preferences. Once a color change happens, the editor is re-initialized.
-     * It also handles changes in validation preferences
+     * preferences. Once a color change happens, the editor is re-initialized. It also handles changes in validation
+     * preferences
      */
     protected final IPropertyChangeListener preferenceChangeListener = new JsonPreferenceChangeListener();
 
-	private JsonContentOutlinePage contentOutline;
+    private JsonContentOutlinePage contentOutline;
 
-	private final IPreferenceStore preferenceStore;
-	
-	public JsonEditor(JsonDocumentProvider documentProvider, IPreferenceStore preferenceStore) {
-		super();
-		this.preferenceStore = preferenceStore;
-		setDocumentProvider(documentProvider);
-	}
+    public JsonEditor(JsonDocumentProvider documentProvider, IPreferenceStore preferenceStore) {
+        super();
+        setPreferenceStore(preferenceStore);
+        setDocumentProvider(documentProvider);
+    }
 
     @Override
     public void init(IEditorSite site, IEditorInput input) throws PartInitException {
@@ -151,7 +149,7 @@ public abstract class JsonEditor extends YEdit implements IShowInSource, IShowIn
         setSourceViewerConfiguration(createSourceViewerConfiguration());
     }
 
-    protected abstract YEditSourceViewerConfiguration createSourceViewerConfiguration() ;
+    protected abstract YEditSourceViewerConfiguration createSourceViewerConfiguration();
 
     @Override
     protected void doSetInput(IEditorInput input) throws CoreException {
@@ -201,13 +199,14 @@ public abstract class JsonEditor extends YEdit implements IShowInSource, IShowIn
         viewer.doOperation(ProjectionViewer.TOGGLE);
 
         annotationModel = viewer.getProjectionAnnotationModel();
-        preferenceStore.addPropertyChangeListener(preferenceChangeListener);
+        getPreferenceStore().addPropertyChangeListener(preferenceChangeListener);
     }
 
     @Override
     public void dispose() {
+        // preference store is removed in AbstractTextEditor.dispose()
+        getPreferenceStore().removePropertyChangeListener(preferenceChangeListener);
         super.dispose();
-        preferenceStore.removePropertyChangeListener(preferenceChangeListener);
     }
 
     @Override
@@ -279,9 +278,9 @@ public abstract class JsonEditor extends YEdit implements IShowInSource, IShowIn
             @Override
             public void configure(SourceViewerConfiguration configuration) {
                 super.configure(configuration);
- 
+
                 if (configuration instanceof JsonSourceViewerConfiguration) {
-                	JsonSourceViewerConfiguration c = (JsonSourceViewerConfiguration) configuration;
+                    JsonSourceViewerConfiguration c = (JsonSourceViewerConfiguration) configuration;
                     outlinePresenter = c.getOutlinePresenter(this);
 
                     if (outlinePresenter != null) {
@@ -381,9 +380,11 @@ public abstract class JsonEditor extends YEdit implements IShowInSource, IShowIn
             }
         }.schedule();
     }
-    
-    /* Copy of AbstractTextEditor#doSave(IProgressMonitor) which is shadowed by YEdit.
-     * Saves the file, but does NOT perform any validation. The validation should be done in a workspace job*/
+
+    /*
+     * Copy of AbstractTextEditor#doSave(IProgressMonitor) which is shadowed by YEdit. Saves the file, but does NOT
+     * perform any validation. The validation should be done in a workspace job
+     */
     private void hack_AbstractTextEditor_doSave(IProgressMonitor progressMonitor) {
 
         IDocumentProvider p = getDocumentProvider();
@@ -428,11 +429,11 @@ public abstract class JsonEditor extends YEdit implements IShowInSource, IShowIn
                 validationOperation.run(monitor);
                 return Status.OK_STATUS;
             }
-            
+
             @Override
             public boolean belongsTo(Object family) {
                 if (family instanceof ValidationOperation) {
-                    return getEditorInput().equals(((ValidationOperation)family).getEditorInput());
+                    return getEditorInput().equals(((ValidationOperation) family).getEditorInput());
                 }
                 return false;
             }
@@ -544,11 +545,9 @@ public abstract class JsonEditor extends YEdit implements IShowInSource, IShowIn
     public ShowInContext getShowInContext() {
         return new ShowInContext(getEditorInput(), new StructuredSelection());
     }
-    
-    protected Validator createValidator() {
-        return new Validator();
-    }
-    
+
+    protected abstract Validator createValidator();
+
     public class JsonPreferenceChangeListener implements IPropertyChangeListener {
 
         private final List<String> colorPreferenceKeys = new ArrayList<>();
@@ -603,7 +602,7 @@ public abstract class JsonEditor extends YEdit implements IShowInSource, IShowIn
             colorPreferenceKeys.add(PreferenceConstants.ITALIC_CONSTANT);
             colorPreferenceKeys.add(PreferenceConstants.UNDERLINE_CONSTANT);
         }
-        
+
         @Override
         public void propertyChange(PropertyChangeEvent event) {
             if (colorPreferenceKeys.contains(event.getProperty())) {
