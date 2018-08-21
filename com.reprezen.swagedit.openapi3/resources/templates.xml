@@ -51,12 +51,70 @@ email: ${contact_email}</template>
   -->
 
      <template name="Object resource" 
-       id="com.reprezen.swagedit.openapi3.templates.collection_resource_template" 
+       id="com.reprezen.swagedit.openapi3.templates.object_resource_template" 
        description="object resource template" 
        context="com.reprezen.swagedit.openapi3.templates.paths" 
-       enabled="true">/${resource}:
+       enabled="true">/${item}s/${id}:
   get:
-    description: ${description}
+    description: Get an ${item} with the given ID
+    parameters:
+      - name: ${id}
+        in: path
+        required: true
+        description: The id of the ${item} to retrieve
+        schema:
+          type: string
+    responses:
+      '200':
+        description: OK
+        content:
+          application/json:
+            schema:
+              $$ref: '${itemSchema}' 
+      '404':
+        description: Not Found
+  put:
+    description: Create a new ${item}
+    requestBody:
+      description: description
+      content: 
+        "application/json":
+          schema:
+            $$ref: "${itemSchema}"
+    parameters:
+      - name: ${id}
+        in: path
+        required: true
+        description: The id of the ${item} to retrieve
+        schema:
+          type: string
+    responses:
+      '200':
+        description: OK
+      '404':
+        description: Not Found
+  delete:
+    description: Delete the ${item}
+    parameters:
+      - name: ${id}
+        in: path
+        required: true
+        description: The id of the ${item} to retrieve
+        schema:
+          type: string
+    responses:
+      '200':
+        description: OK
+      '404':
+        description: Not Found</template>
+
+     <template name="Collection resource" 
+       id="com.reprezen.swagedit.openapi3.templates.collection_resource_template" 
+       description="collection resource template" 
+       context="com.reprezen.swagedit.openapi3.templates.paths" 
+       enabled="true">/${item}s:
+  get:
+    description: A list of ${item}s
     responses:
       '200':
         description: OK
@@ -65,14 +123,24 @@ email: ${contact_email}</template>
             schema:
               type: array
               items:
-                $$ref: '${responseModel}'
-      default:
-        description: Error
-        content:
-          'text/html':
+                $$ref: '${itemSchema}' 
+  post:
+    description: Create a new ${item}
+    requestBody:
+      description: description
+      content: 
+        "application/json":
+          schema:
+            $$ref: "${itemSchema}"
+    responses:
+      '201':
+        description: Created
+        headers:
+          location: 
             schema:
-              $$ref: '${errorModel}'</template>
-
+              type: string
+            description: URL of the created resource        
+</template>
 <!--
 	PATH ITEMS 
  -->
@@ -85,7 +153,7 @@ email: ${contact_email}</template>
   summary: Read
   description: Provide details for the entire list (for collection resources) or an item (for object resources)
   responses:
-    '2${20}':
+    '200':
       description: ${OK}
       content:
         application/json:
@@ -106,9 +174,13 @@ email: ${contact_email}</template>
         schema:
           $$ref: "${input}"
   responses:
-    '2${00}':
-      description: OK</template>
-
+    '201':
+      description: Created
+      headers:
+        location: 
+          schema:
+            type: string
+          description: URL of the created resource</template>
      <template name="put" 
        id="com.reprezen.swagedit.openapi3.templates.path_put_template" 
        description="PUT template" 
@@ -128,12 +200,14 @@ email: ${contact_email}</template>
   summary: Delete 
   description: Delete the entire list (for collection resources) or an item (for object resources)
   responses:
-    '2${00}':
-      description: ${OK}
+    '200':
+      description: OK
       content:
         application/json:
           schema:
-            $$ref: ${model}</template>
+            $$ref: ${model}
+    '404':
+      description: Not Found</template>
     
     <template name="patch" 
        id="com.reprezen.swagedit.openapi3.templates.path_patch_template" 
