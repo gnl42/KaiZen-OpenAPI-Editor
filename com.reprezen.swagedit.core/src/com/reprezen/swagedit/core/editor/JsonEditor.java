@@ -202,8 +202,9 @@ public abstract class JsonEditor extends YEdit implements IShowInSource, IShowIn
 
     @Override
     public void dispose() {
-        super.dispose();
+        // preference store is removed in AbstractTextEditor.dispose()
         getPreferenceStore().removePropertyChangeListener(preferenceChangeListener);
+        super.dispose();
     }
 
     @Override

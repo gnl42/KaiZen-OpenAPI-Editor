@@ -67,8 +67,9 @@ public class OpenApi3Editor extends JsonEditor {
 
     @Override
     public void dispose() {
-        super.dispose();
+        // preference store is removed in AbstractTextEditor.dispose()
         getPreferenceStore().removePropertyChangeListener(advancedValidationListener);
+        super.dispose();
     }
 
     public static class OpenApi3SourceViewerConfiguration extends JsonSourceViewerConfiguration {
