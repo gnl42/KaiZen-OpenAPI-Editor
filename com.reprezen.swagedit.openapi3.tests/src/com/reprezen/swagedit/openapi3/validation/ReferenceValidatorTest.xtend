@@ -11,9 +11,12 @@
 package com.reprezen.swagedit.openapi3.validation
 
 import com.fasterxml.jackson.databind.JsonNode
+import com.fasterxml.jackson.databind.ObjectMapper
+import com.fasterxml.jackson.dataformat.yaml.YAMLFactory
 import com.reprezen.swagedit.core.validation.Messages
 import com.reprezen.swagedit.core.validation.SwaggerError
 import com.reprezen.swagedit.openapi3.editor.OpenApi3Document
+import com.reprezen.swagedit.openapi3.schema.OpenApi3Schema
 import com.reprezen.swagedit.openapi3.utils.Mocks
 import java.net.URI
 import java.util.Map
@@ -21,17 +24,14 @@ import org.eclipse.core.resources.IMarker
 import org.junit.Test
 
 import static org.junit.Assert.*
-import com.fasterxml.jackson.dataformat.yaml.YAMLFactory
-import com.fasterxml.jackson.databind.ObjectMapper
-import com.reprezen.swagedit.openapi3.schema.OpenApi3Schema
 
 class ReferenceValidatorTest {
 
 	val document = new OpenApi3Document(new OpenApi3Schema)
 
 	def validator(Map<URI, JsonNode> entries) {
-		val validator = new OpenApi3ReferenceValidator(Mocks.mockJsonReferenceFactory(entries))
-		validator.factory =  ValidationHelper.validator.factory
+		val schemaValidator = ValidationHelper.schemaValidator
+		val validator = new OpenApi3ReferenceValidator(schemaValidator, Mocks.mockJsonReferenceFactory(entries))		
 		validator
 	}
 

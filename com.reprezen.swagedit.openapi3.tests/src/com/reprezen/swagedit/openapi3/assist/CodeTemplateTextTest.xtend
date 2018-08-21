@@ -103,10 +103,13 @@ class CodeTemplateTextTest {
 		val templateString = swaggerContext.evaluate(template).getString();
 		document.replace(offset, 0, templateString + "\n");
 		
-		if (document.asJson == null) {
+		if (document.asJson === null) {
 			fail("Null document for " + templateString)
 		}
-		validate(document.asJson)
+		val errors = validate(document)
+		if (!errors.empty) {
+			fail('JSON Schema validation error')
+		}
 	}
 	
 }
