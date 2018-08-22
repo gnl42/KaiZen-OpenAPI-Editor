@@ -104,16 +104,18 @@ public abstract class JsonEditor extends YEdit implements IShowInSource, IShowIn
             if (event.getDocument() instanceof JsonDocument) {
                 final JsonDocument document = (JsonDocument) event.getDocument();
 
+                document.onChange();
                 Display.getCurrent().asyncExec(new Runnable() {
                     @Override
                     public void run() {
-                        document.onChange();
                         if (contentOutline != null) {
+                            // depends on the results of document.onChange()
                             contentOutline.setInput(getEditorInput());
                         }
-                        runValidate(false);
                     }
                 });
+                // depends on the results of document.onChange()
+                runValidate(false);
             }
         }
     };
@@ -339,7 +341,11 @@ public abstract class JsonEditor extends YEdit implements IShowInSource, IShowIn
                         }
                     });
                 }
-                createValidationOperation(false).run(monitor);
+                // ZEN-4351 Invalid Thread Access Exception thrown when saving documents
+                // Don't use the same monitor for the validation as it makes checks for monitor.isCancelled()
+                // The monitor passed to the doSave() operation is `EventLoopProgressMonitor` whose operations
+                // must run in the Main thread
+                runValidate(false);
                 return Status.OK_STATUS;
             }
         }.schedule();
@@ -365,7 +371,11 @@ public abstract class JsonEditor extends YEdit implements IShowInSource, IShowIn
                         }
                     });
                 }
-                createValidationOperation(false).run(monitor);
+                // ZEN-4351 Invalid Thread Access Exception thrown when saving documents
+                // Don't use the same monitor for the validation as it makes checks for monitor.isCancelled()
+                // The monitor passed to the doSave() operation is `EventLoopProgressMonitor` whose operations
+                // must run in the Main thread
+                runValidate(false);
                 return Status.OK_STATUS;
             }
         }.schedule();
