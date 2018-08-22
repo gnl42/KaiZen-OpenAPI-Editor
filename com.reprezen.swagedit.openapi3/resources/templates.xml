@@ -141,6 +141,37 @@ email: ${contact_email}</template>
               type: string
             description: URL of the created resource        
 </template>
+     <template name="Singleton resource" 
+       id="com.reprezen.swagedit.openapi3.templates.singleton_resource_template" 
+       description="singleton resource template" 
+       context="com.reprezen.swagedit.openapi3.templates.paths" 
+       enabled="true">/${item}:
+  get:
+    description: Retrieve the ${item}
+    responses:
+      '200':
+        description: OK
+        content:
+          application/json:
+            schema:
+              $$ref: '${itemSchema}' 
+  put:
+    description: Create a new ${item}
+    requestBody:
+      description: description
+      content: 
+        "application/json":
+          schema:
+            $$ref: "${itemSchema}"
+    responses:
+      '201':
+        description: Created
+  delete:
+    description: Delete the ${item}
+    responses:
+      '200':
+        description: OK
+</template>
 <!--
 	PATH ITEMS 
  -->
