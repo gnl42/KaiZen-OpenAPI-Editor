@@ -448,6 +448,34 @@ properties:
        context="com.reprezen.swagedit.openapi3.templates.properties" 
        enabled="true">propertyName:
   $$ref: "#/components/schemas/${schema}"</template>
+ 
+	<template name="Error schema" 
+       id="com.reprezen.swagedit.openapi3.templates.schema.error_schema" 
+       description="Error schema definition" 
+       context="com.reprezen.swagedit.openapi3.templates.schema" 
+       enabled="true">type: object
+required:
+  - code
+  - message
+properties:
+  code:
+    type: integer
+    format: int32
+  message:
+    type: string</template>  
+    
+	<template name="Links schema" 
+       id="com.reprezen.swagedit.openapi3.templates.schema.links_schema" 
+       description="Link schema definition" 
+       context="com.reprezen.swagedit.openapi3.templates.schema" 
+       enabled="true">type: array
+items:       
+  properties:
+    rel:
+      type: string
+    href:
+      type: string</template>      
+        
 
 <!--
 	CALLBACKS 
