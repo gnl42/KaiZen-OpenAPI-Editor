@@ -103,8 +103,8 @@ email: ${contact_email}</template>
         schema:
           type: string
     responses:
-      '200':
-        description: OK
+      '204':
+        description: Success (no content)
       '404':
         description: Not Found</template>
 
@@ -174,8 +174,8 @@ email: ${contact_email}</template>
   delete:
     description: Delete the ${item}
     responses:
-      '200':
-        description: OK
+      '204':
+        description: Success (no content)
 </template>
 <!--
 	PATH ITEMS 
@@ -195,7 +195,50 @@ email: ${contact_email}</template>
         application/json:
           schema:
             $$ref: ${model}</template>
+	<template name="get" 
+       id="com.reprezen.swagedit.openapi3.templates.path_GET_on_collection_template" 
+       description="GET collection resource" 
+       context="com.reprezen.swagedit.openapi3.templates.pathItem" 
+       enabled="true">get:
+  description: A list of ${item}s
+  responses:
+    '200':
+      description: OK
+      headers:
+        x-next:
+          description: A link to the next page of responses
+          schema:
+            type: string
+      content:
+        application/json:
+          schema:
+            type: array
+            items:
+              $$ref: '${itemSchema}'</template>
 
+	<template name="get" 
+       id="com.reprezen.swagedit.openapi3.templates.path_get_on_object_template" 
+       description="GET object resource" 
+       context="com.reprezen.swagedit.openapi3.templates.pathItem" 
+       enabled="true">  get:
+  description: Get an ${item} with the given ID
+  parameters:
+    - name: ${id}
+      in: path
+      required: true
+      description: The id of the ${item} to retrieve
+      schema:
+        type: string
+  responses:
+    '200':
+      description: OK
+      content:
+        application/json:
+          schema:
+            $$ref: '${itemSchema}' 
+    '404':
+      description: Not Found</template>
+            
      <template name="post" 
        id="com.reprezen.swagedit.openapi3.templates.path_post_template" 
        description="POST template" 
@@ -236,12 +279,8 @@ email: ${contact_email}</template>
   summary: Delete 
   description: Delete the entire list (for collection resources) or an item (for object resources)
   responses:
-    '200':
-      description: OK
-      content:
-        application/json:
-          schema:
-            $$ref: ${model}
+    '204':
+      description: Success (no content)
     '404':
       description: Not Found</template>
     
