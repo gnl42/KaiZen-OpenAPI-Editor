@@ -10,7 +10,8 @@
  *******************************************************************************/
 package com.reprezen.swagedit.assist;
 
-import com.google.common.collect.Lists;
+import java.util.Arrays;
+
 import com.reprezen.swagedit.core.assist.JsonReferenceProposalProvider;
 import com.reprezen.swagedit.core.assist.contexts.ContextType;
 import com.reprezen.swagedit.core.assist.contexts.ContextTypeCollection;
@@ -39,7 +40,7 @@ public class SwaggerReferenceProposalProvider extends JsonReferenceProposalProvi
 	public static final ContextType PATH_RESPONSE = new RegexContextType("responses", "responses", RESPONSE_REGEX);
 
     public static final ContextTypeCollection SWAGGER_CONTEXT_TYPES = ContextType
-            .newContentTypeCollection(Lists.newArrayList( //
+            .newContentTypeCollection(Arrays.asList( //
                     SCHEMA_DEFINITION, //
                     PATH_ITEM, //
                     PATH_PARAMETER, //

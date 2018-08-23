@@ -10,13 +10,12 @@
  *******************************************************************************/
 package com.reprezen.swagedit.templates;
 
+import java.util.Arrays;
 import java.util.Collection;
 import java.util.Collections;
 
 import org.eclipse.jface.text.templates.GlobalTemplateVariables;
 import org.eclipse.jface.text.templates.TemplateContextType;
-
-import com.google.common.collect.Lists;
 
 public abstract class SwaggerContextType extends TemplateContextType {
 
@@ -83,7 +82,7 @@ public abstract class SwaggerContextType extends TemplateContextType {
     }
 
     public static Collection<String> allContextTypes() {
-        return Collections.unmodifiableList(Lists.newArrayList(//
+        return Collections.unmodifiableList(Arrays.asList(//
                 RootContextType.CONTEXT_ID, //
                 SecurityDefContextType.CONTEXT_ID, //
                 PathsContextType.CONTEXT_ID, //

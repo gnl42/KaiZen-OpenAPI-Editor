@@ -10,45 +10,51 @@
  *******************************************************************************/
 package com.reprezen.swagedit.openapi3.assist.ext;
 
+import static java.util.Arrays.asList;
+
 import java.util.Collection;
+import java.util.Collections;
 import java.util.List;
 import java.util.Map;
+import java.util.stream.Collectors;
+import java.util.stream.Stream;
 
 import com.fasterxml.jackson.core.JsonPointer;
-import com.google.common.collect.ImmutableList;
-import com.google.common.collect.ImmutableMap;
-import com.google.common.collect.Lists;
 import com.reprezen.swagedit.core.assist.Proposal;
 import com.reprezen.swagedit.core.assist.ext.ContentAssistExt;
 import com.reprezen.swagedit.core.model.AbstractNode;
 import com.reprezen.swagedit.core.schema.TypeDefinition;
+import java.util.AbstractMap.SimpleEntry;
+import java.util.ArrayList;
 
 public class SchemaFormatContentAssistExt implements ContentAssistExt {
 
     private static final JsonPointer pointer = JsonPointer.compile("/definitions/schema/properties/format");
 
-    private static final Map<String, List<Proposal>> values = ImmutableMap.<String, List<Proposal>> builder()
-            .put("boolean", ImmutableList.<Proposal> of()) //
-            .put("array", ImmutableList.<Proposal> of()) //
-            .put("object", ImmutableList.<Proposal> of()) //
-            .put("null", ImmutableList.<Proposal> of()) //
-            .put("integer",
-                    ImmutableList.of( //
-                    new Proposal("int32", "int32", null, "string"), //
-                            new Proposal("int64", "int64", null, "string"))) //
-            .put("number",
-                    ImmutableList.of( //
-                    new Proposal("float", "float", null, "string"), //
-                            new Proposal("double", "double", null, "string"))) //
-            .put("string",
-                    ImmutableList.of( //
-                    new Proposal("byte", "byte", null, "string"), //
-                    new Proposal("binary", "binary", null, "string"), //
-                    new Proposal("date", "date", null, "string"), //
-                    new Proposal("date-time", "date-time", null, "string"), //
-                    new Proposal("password", "password", null, "string"), //
-                            new Proposal("", "", null, "string")))
-            .build();
+    private static final Map<String, List<Proposal>> values = Collections.unmodifiableMap(Stream
+            .of(//
+                    new SimpleEntry<>("boolean", asList()), //
+                    new SimpleEntry<>("array", asList()), //
+                    new SimpleEntry<>("object", asList()), //
+                    new SimpleEntry<>("null", asList()), //
+                    new SimpleEntry<>("integer",
+                            asList( //
+                                    new Proposal("int32", "int32", null, "string"), //
+                                    new Proposal("int64", "int64", null, "string"))), //
+                    new SimpleEntry<>("number",
+                            asList( //
+                                    new Proposal("float", "float", null, "string"), //
+                                    new Proposal("double", "double", null, "string"))), //
+                    new SimpleEntry<>("string",
+                            asList( //
+                                    new Proposal("byte", "byte", null, "string"), //
+                                    new Proposal("binary", "binary", null, "string"), //
+                                    new Proposal("date", "date", null, "string"), //
+                                    new Proposal("date-time", "date-time", null, "string"), //
+                                    new Proposal("password", "password", null, "string"), //
+                                    new Proposal("", "", null, "string")))) //
+            .collect(Collectors.toMap((e) -> e.getKey(), (e) -> (List<Proposal>) e.getValue())));
+            
 
     @Override
     public boolean canProvideContentAssist(TypeDefinition type) {
@@ -57,7 +63,7 @@ public class SchemaFormatContentAssistExt implements ContentAssistExt {
 
     @Override
     public Collection<Proposal> getProposals(TypeDefinition type, AbstractNode node, String prefix) {
-        List<Proposal> proposals = Lists.newArrayList();
+        List<Proposal> proposals = new ArrayList<>();
 
         if (node.getParent() != null && node.getParent().get("type") != null) {
             String filter = (String) node.getParent().get("type").asValue().getValue();

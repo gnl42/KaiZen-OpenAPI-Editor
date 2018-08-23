@@ -21,7 +21,6 @@ import org.yaml.snakeyaml.nodes.ScalarNode;
 
 import com.fasterxml.jackson.databind.JsonNode;
 import com.google.common.base.Strings;
-import com.google.common.collect.Lists;
 
 public class ValidationUtil {
     
@@ -119,7 +118,7 @@ public class ValidationUtil {
     }
     
     public static JsonNode findNode(String path, JsonNode root) {
-    	return findNode(Lists.newLinkedList(Arrays.asList(path.split("/"))), root);
+    	return findNode(new LinkedList<>(Arrays.asList(path.split("/"))), root);
     }
     
     private static JsonNode findNode(LinkedList<String> path, JsonNode root) {

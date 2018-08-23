@@ -17,6 +17,8 @@ import static com.reprezen.swagedit.core.model.NodeDeserializer.ATTRIBUTE_POINTE
 import java.io.IOException;
 import java.io.UnsupportedEncodingException;
 import java.net.URLDecoder;
+import java.util.ArrayList;
+import java.util.Arrays;
 import java.util.Iterator;
 import java.util.LinkedHashMap;
 import java.util.List;
@@ -34,7 +36,6 @@ import com.fasterxml.jackson.databind.module.SimpleModule;
 import com.fasterxml.jackson.dataformat.yaml.YAMLFactory;
 import com.google.common.base.Strings;
 import com.google.common.collect.Iterables;
-import com.google.common.collect.Lists;
 import com.reprezen.swagedit.core.schema.CompositeSchema;
 
 /**
@@ -116,10 +117,10 @@ public class Model {
      */
     public static Iterable<Model> parseYaml(Iterable<IFile> files, final CompositeSchema schema) {
         if (files == null || Iterables.isEmpty(files)) {
-            return Lists.newArrayList();
+            return Arrays.asList();
         }
 
-        final List<Model> models = Lists.newArrayList();
+        final List<Model> models = new ArrayList<>();
         for (IFile file : files) {
             Model model = new Model(schema, file.getFullPath());
             try {
@@ -392,7 +393,7 @@ public class Model {
      * @return list of nodes being instance of the type
      */
     public List<AbstractNode> findByType(JsonPointer typePointer) {
-        List<AbstractNode> instances = Lists.newArrayList();
+        List<AbstractNode> instances = new ArrayList<>();
         for (AbstractNode node : allNodes()) {
             if (node.getType() != null && typePointer.equals(node.getType().getPointer())) {
                 instances.add(node);

@@ -18,6 +18,7 @@ import static org.eclipse.core.resources.IMarker.SEVERITY_ERROR;
 import static org.eclipse.core.resources.IMarker.SEVERITY_WARNING;
 
 import java.net.URI;
+import java.util.Arrays;
 import java.util.Collection;
 import java.util.List;
 import java.util.Map;
@@ -25,7 +26,6 @@ import java.util.Set;
 
 import com.fasterxml.jackson.databind.JsonNode;
 import com.github.fge.jsonschema.core.report.ProcessingReport;
-import com.google.common.collect.Lists;
 import com.google.common.collect.Maps;
 import com.google.common.collect.Sets;
 import com.reprezen.swagedit.core.editor.JsonDocument;
@@ -147,7 +147,7 @@ public class JsonReferenceValidator {
                 if (result.containsKey(type)) {
                     result.get(type).add(source);
                 } else {
-                    result.put(type, Lists.newArrayList(source));
+                    result.put(type, Arrays.asList(source));
                 }
             }
         }

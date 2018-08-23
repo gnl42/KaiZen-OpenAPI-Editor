@@ -13,6 +13,8 @@ package com.reprezen.swagedit.openapi3.validation;
 import static org.eclipse.core.resources.IMarker.SEVERITY_ERROR;
 
 import java.net.URI;
+import java.util.ArrayList;
+import java.util.Arrays;
 import java.util.Iterator;
 import java.util.List;
 import java.util.Map;
@@ -24,7 +26,6 @@ import org.eclipse.core.runtime.Status;
 
 import com.fasterxml.jackson.core.JsonPointer;
 import com.fasterxml.jackson.databind.JsonNode;
-import com.google.common.collect.Lists;
 import com.reprezen.jsonoverlay.PositionInfo;
 import com.reprezen.kaizen.oasparser.OpenApi3Parser;
 import com.reprezen.kaizen.oasparser.model3.OpenApi3;
@@ -152,7 +153,7 @@ public class OpenApi3Validator extends Validator {
         }
     }
 
-    private List<String> oauthScopes = Lists.newArrayList("oauth2", "openIdConnect");
+    private List<String> oauthScopes = Arrays.asList("oauth2", "openIdConnect");
 
     private void validateSecuritySchemeScopes(AbstractNode node, String name, AbstractNode securityScheme,
             Set<SwaggerError> errors) {
@@ -204,7 +205,7 @@ public class OpenApi3Validator extends Validator {
     }
 
     private List<String> getSecurityScopes(AbstractNode securityScheme) {
-        List<String> scopes = Lists.newArrayList();
+        List<String> scopes = new ArrayList<>();
 
         try {
             AbstractNode flows = securityScheme.get("flows");
@@ -251,7 +252,7 @@ public class OpenApi3Validator extends Validator {
                 try {
                     Object value = valueNode.asValue().getValue();
 
-                    if (!Lists.newArrayList("query", "header", "path", "cookie").contains(value)) {
+                    if (!Arrays.asList("query", "header", "path", "cookie").contains(value)) {
                         errors.add(error(valueNode, IMarker.SEVERITY_ERROR, Messages.error_invalid_parameter_location));
                     }
                 } catch (Exception e) {

@@ -13,6 +13,7 @@ package com.reprezen.swagedit.core.assist;
 import static org.eclipse.ui.IWorkbenchCommandConstants.EDIT_CONTENT_ASSIST;
 
 import java.util.ArrayList;
+import java.util.Arrays;
 import java.util.Collection;
 import java.util.List;
 
@@ -46,8 +47,6 @@ import org.eclipse.ui.PlatformUI;
 import org.eclipse.ui.keys.IBindingService;
 
 import com.fasterxml.jackson.core.JsonPointer;
-import com.google.common.base.Strings;
-import com.google.common.collect.Lists;
 import com.reprezen.swagedit.core.Activator;
 import com.reprezen.swagedit.core.Activator.Icons;
 import com.reprezen.swagedit.core.assist.contexts.ContextType;
@@ -149,7 +148,7 @@ public abstract class JsonContentAssistProcessor extends TemplateCompletionProce
         if (!isRefCompletion) {
             final ICompletionProposal[] templateProposals = super.computeCompletionProposals(viewer, documentOffset);
             if (templateProposals != null && templateProposals.length > 0) {
-                proposals.addAll(Lists.newArrayList(templateProposals));
+                proposals.addAll(Arrays.asList(templateProposals));
             }
         }
 
@@ -196,7 +195,7 @@ public abstract class JsonContentAssistProcessor extends TemplateCompletionProce
             int offset) {
         final List<ICompletionProposal> result = new ArrayList<>();
 
-        prefix = Strings.emptyToNull(prefix);
+        prefix = "".equals(prefix) ? null : prefix;
 
         for (Proposal proposal : proposals) {
             StyledCompletionProposal styledProposal = proposal.asStyledCompletionProposal(prefix, offset);

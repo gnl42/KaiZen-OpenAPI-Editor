@@ -13,6 +13,7 @@ package com.reprezen.swagedit.core.assist.ext;
 import java.io.IOException;
 import java.net.URL;
 import java.util.ArrayList;
+import java.util.Arrays;
 import java.util.Collection;
 import java.util.List;
 
@@ -20,7 +21,6 @@ import com.fasterxml.jackson.core.JsonPointer;
 import com.fasterxml.jackson.databind.JsonNode;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import com.google.common.base.Strings;
-import com.google.common.collect.Lists;
 import com.reprezen.swagedit.core.Activator;
 import com.reprezen.swagedit.core.assist.Proposal;
 import com.reprezen.swagedit.core.model.AbstractNode;
@@ -33,7 +33,7 @@ import com.reprezen.swagedit.core.schema.TypeDefinition;
  */
 public class MediaTypeContentAssistExt implements ContentAssistExt {
 
-    private final List<JsonPointer> validPointers = Lists.newArrayList(//
+    private final List<JsonPointer> validPointers = Arrays.asList(//
             JsonPointer.compile("/definitions/mediaTypeList"), // Swagger v2
             JsonPointer.compile("/definitions/mimeType"), // OAS3
             JsonPointer.compile("/definitions/mediaTypes") // OAS3

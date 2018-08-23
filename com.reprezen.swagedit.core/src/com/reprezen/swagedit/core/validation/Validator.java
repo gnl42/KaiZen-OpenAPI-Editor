@@ -76,7 +76,7 @@ public abstract class Validator {
     }
 
     public Set<SwaggerError> validate(JsonDocument document, URI baseURI) {
-        Set<SwaggerError> errors = Sets.newHashSet();
+        Set<SwaggerError> errors = new HashSet<>();
 
         JsonNode jsonContent = null;
         try {

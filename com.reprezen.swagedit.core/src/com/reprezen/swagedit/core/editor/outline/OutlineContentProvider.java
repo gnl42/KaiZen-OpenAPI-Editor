@@ -10,13 +10,15 @@
  *******************************************************************************/
 package com.reprezen.swagedit.core.editor.outline;
 
+import java.util.ArrayList;
+import java.util.Arrays;
+import java.util.Collection;
 import java.util.List;
 
 import org.eclipse.jface.viewers.ITreeContentProvider;
 import org.eclipse.jface.viewers.Viewer;
 
 import com.google.common.collect.Iterables;
-import com.google.common.collect.Lists;
 import com.reprezen.swagedit.core.model.AbstractNode;
 import com.reprezen.swagedit.core.model.Model;
 
@@ -26,16 +28,16 @@ public class OutlineContentProvider implements ITreeContentProvider {
 
     @Override
     public void dispose() {
-        models = Lists.newArrayList();
+        models = new ArrayList<>();
     }
 
     @SuppressWarnings("unchecked")
     @Override
     public void inputChanged(Viewer viewer, Object oldInput, Object newInput) {
         if (newInput == null) {
-            this.models = Lists.newArrayList();
+            this.models = Arrays.asList();
         } else if (newInput instanceof Model) {
-            this.models = Lists.newArrayList((Model) newInput);
+            this.models = Arrays.asList((Model) newInput);
         } else if (Iterable.class.isAssignableFrom(newInput.getClass())) {
             this.models = (Iterable<Model>) newInput;
         }
@@ -47,7 +49,7 @@ public class OutlineContentProvider implements ITreeContentProvider {
             return null;
         }
 
-        List<Object> roots = Lists.newArrayList();
+        List<Object> roots = Arrays.asList();
         for (Model model : models) {
             roots.add(model.getRoot());
         }
