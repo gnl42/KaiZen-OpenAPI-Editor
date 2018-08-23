@@ -87,11 +87,12 @@ public abstract class Validator {
 
         if (jsonContent != null) {
             Node yaml = document.getYaml();
-            if (yaml != null) {
+            Model model = document.getModel();
+            if (yaml != null && model != null) {
                 errors.addAll(getSchemaValidator().validate(document));
                 errors.addAll(validateModel(document.getModel()));
                 errors.addAll(checkDuplicateKeys(yaml));
-                errors.addAll(getReferenceValidator().validate(baseURI, document));
+                errors.addAll(getReferenceValidator().validate(baseURI, document, model));
             }
         }
 

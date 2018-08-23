@@ -12,6 +12,7 @@ package com.reprezen.swagedit.core.editor;
 
 import java.io.IOException;
 import java.io.StringReader;
+import java.util.concurrent.atomic.AtomicReference;
 
 import org.eclipse.jface.text.BadLocationException;
 import org.eclipse.jface.text.Document;
@@ -41,24 +42,21 @@ public class JsonDocument extends Document {
 
     private final Yaml yaml = new Yaml();
 
-    private JsonNode jsonContent;
-    private Node yamlContent;
+    private AtomicReference<Result<JsonNode>> jsonContent = new AtomicReference<>(new Failure<>(null));
+    private AtomicReference<Result<Node>> yamlContent = new AtomicReference<>(new Failure<>(null));
+    private AtomicReference<Model> model = new AtomicReference<>();
 
-    private Exception yamlError;
-    private Exception jsonError;
-    private Model model;
-    
     public JsonDocument(ObjectMapper mapper, CompositeSchema schema) {
         this.mapper = mapper;
         this.schema = schema;
     }
 
     public Exception getYamlError() {
-        return yamlError;
+        return yamlContent.get().getError();
     }
 
     public Exception getJsonError() {
-        return jsonError;
+        return jsonContent.get().getError();
     }
 
     /**
@@ -67,11 +65,10 @@ public class JsonDocument extends Document {
      * @return Node
      */
     public Node getYaml() {
-        if (yamlContent == null) {
-            parseYaml(get());
+        if (yamlContent.get() == null || yamlContent.get().getResult() == null) {
+            updateYaml(get());
         }
-
-        return yamlContent;
+        return yamlContent.get().getResult();
     }
 
     /**
@@ -84,11 +81,10 @@ public class JsonDocument extends Document {
      * @throws IOException
      */
     public JsonNode asJson() {
-        if (jsonContent == null) {
-            parseJson(get());
+        if (jsonContent.get() == null || jsonContent.get().getResult() == null) {
+            updateJson(get());
         }
-
-        return jsonContent;
+        return jsonContent.get().getResult();
     }
     
     public CompositeSchema getSchema() {
@@ -128,44 +124,52 @@ public class JsonDocument extends Document {
     public void onChange() {
         final String content = get();
 
-        parseModel();
-        parseYaml(content);
+        updateModel();
+        updateYaml(content);
 
         // No need to parse json if
         // there is already a yaml parsing error.
-        if (yamlError != null) {
-            jsonContent = null;
+        if (!yamlContent.get().isSuccess()) {
+            jsonContent.getAndSet(new Failure<>(null));
         } else {
-            parseJson(content);
+            updateJson(content);
         }
     }
 
-    private void parseYaml(String content) {
+    private void updateYaml(String content) {
+        yamlContent.getAndSet(parseYaml(content));
+    }
+
+    private Result<Node> parseYaml(String content) {
         try {
-            yamlContent = yaml.compose(new StringReader(content));
-            yamlError = null;
+            return new Success<>(yaml.compose(new StringReader(content)));
         } catch (Exception e) {
-            yamlContent = null;
-            yamlError = e;
+            return new Failure<>(e);
         }
     }
 
-    private void parseJson(String content) {
+    private void updateJson(String content) {
+        jsonContent.getAndSet(parseJson(content));
+    }
+    
+    private Result<JsonNode> parseJson(String content) {
         try {
             Object expandedYamlObject = new Yaml().load(content);
-            jsonContent = mapper.valueToTree(expandedYamlObject);
-            jsonError = null;
+            return new Success<>(mapper.valueToTree(expandedYamlObject));
         } catch (Exception e) {
-            jsonContent = null;
-            jsonError = e;
+            return new Failure<>(e);
         }
     }
 
-    private void parseModel() {
+    private void updateModel() {
+        model.getAndSet(parseModel());
+    }
+    
+    private Model parseModel() {
         try {
-            model = Model.parseYaml(schema, get());
+            return Model.parseYaml(schema, get());
         } catch (Exception e) {
-            model = null;
+            return null;
         }
     }
 
@@ -173,18 +177,22 @@ public class JsonDocument extends Document {
      * @return the Model, or null if the spec is invalid YAML
      */
     public Model getModel() {
-        if (model == null) {
-            parseModel();
+        if (model.get() == null) {
+            model.getAndSet(parseModel());
         }
-        return model;
+        return model.get();
     }
 
+    /*
+     * Used by code-assist
+     */
     public Model getModel(int offset) {
         // no parse errors
-        if (model != null) {
-            return model;
+        final Model modelValue = model.get();
+        if (modelValue != null) {
+            return modelValue;
         }
-
+        // parse errors -> return the model at offset, do NOT update the `model` field
         try {
             if (0 > offset || offset > getLength()) {
                 return Model.parseYaml(schema, get());
@@ -236,6 +244,58 @@ public class JsonDocument extends Document {
         Position position = node.getPosition(this);
 
         return new Region(position.getOffset(), position.getLength());
+    }
+    
+    public interface Result<T> {
+        boolean isSuccess();
+
+        T getResult();
+
+        Exception getError();
+    }
+    
+    public final class Success<T> implements Result<T> {
+        private final T result;
+
+        public Success(T result) {
+            this.result = result;
+        }
+
+        public boolean isSuccess() {
+            return true;
+        }
+
+        @Override
+        public Exception getError() {
+            return null;
+        }
+
+        @Override
+        public T getResult() {
+            return result;
+        }
+    }
+
+    public final class Failure<T> implements Result<T> {
+        private final Exception error;
+
+        public Failure(Exception error) {
+            this.error = error;
+        }
+
+        public boolean isSuccess() {
+            return false;
+        }
+
+        @Override
+        public Exception getError() {
+            return error;
+        }
+
+        @Override
+        public T getResult() {
+            return null;
+        }
     }
 
 }
