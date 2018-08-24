@@ -220,7 +220,7 @@ email: ${contact_email}</template>
        id="com.reprezen.swagedit.openapi3.templates.path_get_on_object_template" 
        description="GET object resource" 
        context="com.reprezen.swagedit.openapi3.templates.pathItem" 
-       enabled="true">  get:
+       enabled="true">get:
   description: Get an ${item} with the given ID
   parameters:
     - name: ${id}
