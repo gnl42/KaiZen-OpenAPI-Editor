@@ -390,22 +390,34 @@ schema:
 style: simple
 </template>
 
-     <template name="query parameter" 
-       id="com.reprezen.swagedit.openapi3.templates.query_parameter" 
-       description="query parameter template" 
+     <template name="string query parameter" 
+       id="com.reprezen.swagedit.openapi3.templates.string_query_parameter" 
+       description="string query parameter template" 
        context="com.reprezen.swagedit.openapi3.templates.parameter" 
        enabled="true">name: ${name}
 in: query
-description: ${ID}
+description: ${name}
 required: false
 schema:
-  type: array
-  items:
-    type: ${string}
+  type: ${string}
 style: ${form}
 explode: true
 </template>
 
+     <template name="integer query parameter" 
+       id="com.reprezen.swagedit.openapi3.templates.integer_query_parameter" 
+       description="integer query parameter template" 
+       context="com.reprezen.swagedit.openapi3.templates.parameter" 
+       enabled="true">name: ${name}
+in: query
+description: ${name}
+required: false
+schema:
+  type: integer
+  format: int64
+style: ${form}
+explode: true
+</template>
 <!--
 Request Body 
  -->
