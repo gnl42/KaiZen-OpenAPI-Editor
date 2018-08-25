@@ -23,8 +23,7 @@ Require-Bundle: org.eclipse.ui,
  org.apache.log4j;bundle-version="1.2.15",
  com.reprezen.jsonoverlay;bundle-version="3.1.0",
  com.reprezen.kaizen.openapi-parser;bundle-version="3.0.1",
- com.norconex.commons.norconex-commons-lang;bundle-version="1.15.0",
- javax.mail-api;bundle-version="1.6.1"
+ com.norconex.commons.norconex-commons-lang;bundle-version="1.15.0"
 Bundle-RequiredExecutionEnvironment: JavaSE-1.8
 Bundle-ActivationPolicy: lazy
 Export-Package: com.reprezen.swagedit.openapi3,
