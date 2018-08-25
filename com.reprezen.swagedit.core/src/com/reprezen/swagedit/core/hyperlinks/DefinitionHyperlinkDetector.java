@@ -10,7 +10,7 @@
  *******************************************************************************/
 package com.reprezen.swagedit.core.hyperlinks;
 
-import static com.google.common.base.Strings.emptyToNull;
+import static com.reprezen.swagedit.core.utils.StringUtils.emptyToNull;
 
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;

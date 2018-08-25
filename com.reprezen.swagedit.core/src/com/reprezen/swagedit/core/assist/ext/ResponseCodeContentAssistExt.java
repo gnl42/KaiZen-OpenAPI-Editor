@@ -22,7 +22,7 @@ import com.fasterxml.jackson.core.JsonPointer;
 import com.fasterxml.jackson.databind.JsonNode;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import com.fasterxml.jackson.databind.node.ArrayNode;
-import com.google.common.base.Strings;
+import com.reprezen.swagedit.core.utils.StringUtils;
 import com.reprezen.swagedit.core.Activator;
 import com.reprezen.swagedit.core.assist.Proposal;
 import com.reprezen.swagedit.core.model.AbstractNode;
@@ -79,7 +79,7 @@ public class ResponseCodeContentAssistExt implements ContentAssistExt {
     }
 
     private Iterator<JsonNode> statusCodes(final String prefix) {
-        final boolean noPrefix = Strings.emptyToNull(prefix) == null;
+        final boolean noPrefix = StringUtils.emptyToNull(prefix) == null;
         final List<JsonNode> result = new ArrayList<>();
         if (noPrefix) {
             statusCodes.elements()//

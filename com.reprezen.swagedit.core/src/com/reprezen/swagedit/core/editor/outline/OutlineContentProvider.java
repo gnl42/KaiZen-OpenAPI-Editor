@@ -12,19 +12,17 @@ package com.reprezen.swagedit.core.editor.outline;
 
 import java.util.ArrayList;
 import java.util.Arrays;
-import java.util.Collection;
 import java.util.List;
 
 import org.eclipse.jface.viewers.ITreeContentProvider;
 import org.eclipse.jface.viewers.Viewer;
 
-import com.google.common.collect.Iterables;
 import com.reprezen.swagedit.core.model.AbstractNode;
 import com.reprezen.swagedit.core.model.Model;
 
 public class OutlineContentProvider implements ITreeContentProvider {
 
-    private Iterable<Model> models;
+    private List<Model> models;
 
     @Override
     public void dispose() {
@@ -39,13 +37,14 @@ public class OutlineContentProvider implements ITreeContentProvider {
         } else if (newInput instanceof Model) {
             this.models = Arrays.asList((Model) newInput);
         } else if (Iterable.class.isAssignableFrom(newInput.getClass())) {
-            this.models = (Iterable<Model>) newInput;
+            this.models = new ArrayList<>();
+            ((Iterable<Model>) newInput).forEach(models::add);
         }
     }
 
     @Override
     public Object[] getElements(Object inputElement) {
-        if (models == null || Iterables.isEmpty(models)) {
+        if (models == null || models.isEmpty()) {
             return null;
         }
 
@@ -60,7 +59,7 @@ public class OutlineContentProvider implements ITreeContentProvider {
     @Override
     public Object[] getChildren(Object parentElement) {
         if (parentElement instanceof AbstractNode) {
-            return Iterables.toArray(((AbstractNode) parentElement).elements(), AbstractNode.class);
+            return ((AbstractNode) parentElement).elements();
         }
         return null;
     }
@@ -76,7 +75,7 @@ public class OutlineContentProvider implements ITreeContentProvider {
     @Override
     public boolean hasChildren(Object element) {
         if (element instanceof AbstractNode) {
-            return !Iterables.isEmpty(((AbstractNode) element).elements());
+            return ((AbstractNode) element).elements().length != 0;
         }
         return false;
     }

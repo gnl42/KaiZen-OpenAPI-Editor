@@ -20,14 +20,14 @@ import static org.eclipse.core.resources.IMarker.SEVERITY_WARNING;
 import java.net.URI;
 import java.util.Arrays;
 import java.util.Collection;
+import java.util.HashMap;
+import java.util.HashSet;
 import java.util.List;
 import java.util.Map;
 import java.util.Set;
 
 import com.fasterxml.jackson.databind.JsonNode;
 import com.github.fge.jsonschema.core.report.ProcessingReport;
-import com.google.common.collect.Maps;
-import com.google.common.collect.Sets;
 import com.reprezen.swagedit.core.editor.JsonDocument;
 import com.reprezen.swagedit.core.model.AbstractNode;
 import com.reprezen.swagedit.core.model.Location;
@@ -76,7 +76,7 @@ public class JsonReferenceValidator {
     protected Collection<? extends SwaggerError> doValidate(URI baseURI, JsonDocument doc,
             Map<JsonReference, List<AbstractNode>> references) {
 
-        Set<SwaggerError> errors = Sets.newHashSet();
+        Set<SwaggerError> errors = new HashSet<>();
 
         for (JsonReference reference : references.keySet()) {
             if (reference instanceof JsonReference.SimpleReference) {
@@ -117,7 +117,7 @@ public class JsonReferenceValidator {
     protected Set<SwaggerError> validateType(JsonDocument doc, URI baseURI, JsonReference reference,
             Collection<AbstractNode> sources) {
 
-        Set<SwaggerError> errors = Sets.newHashSet();
+        Set<SwaggerError> errors = new HashSet<>();
 
         JsonNode target = findTarget(doc, baseURI, reference);
         // To avoid performing even more cycles, the sources are grouped by their type.
@@ -139,7 +139,7 @@ public class JsonReferenceValidator {
      * Groups all source nodes by their JSON type.
      */
     protected Map<String, List<AbstractNode>> groupSourcesByType(Collection<AbstractNode> sources) {
-        Map<String, List<AbstractNode>> result = Maps.newHashMap();
+        Map<String, List<AbstractNode>> result = new HashMap<>();
         for (AbstractNode source : sources) {
             if (source.getType() != null && source.getType().getPointer() != null) {
                 String type = source.getType().getPointer().toString();
@@ -177,7 +177,7 @@ public class JsonReferenceValidator {
     }
 
     protected Set<SwaggerError> createReferenceError(int severity, String message, Collection<AbstractNode> sources) {
-        Set<SwaggerError> errors = Sets.newHashSet();
+        Set<SwaggerError> errors = new HashSet<>();
         for (AbstractNode source : sources) {
             errors.add(createReferenceError(severity, message, source));
         }

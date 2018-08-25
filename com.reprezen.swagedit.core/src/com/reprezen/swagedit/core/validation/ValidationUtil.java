@@ -20,7 +20,7 @@ import org.yaml.snakeyaml.nodes.NodeTuple;
 import org.yaml.snakeyaml.nodes.ScalarNode;
 
 import com.fasterxml.jackson.databind.JsonNode;
-import com.google.common.base.Strings;
+import com.reprezen.swagedit.core.utils.StringUtils;
 
 public class ValidationUtil {
     
@@ -127,7 +127,7 @@ public class ValidationUtil {
         }
         // retrieves the first element, and also *removes* it
         String firstSegment = path.pop();
-        if (Strings.isNullOrEmpty(firstSegment)) {
+        if (StringUtils.isNullOrEmpty(firstSegment)) {
             return findNode(path, root);
         }
         int firstSegmentAsNumber = -1;

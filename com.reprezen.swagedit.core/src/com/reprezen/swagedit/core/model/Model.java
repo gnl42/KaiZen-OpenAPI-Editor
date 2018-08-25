@@ -34,9 +34,8 @@ import com.fasterxml.jackson.databind.ObjectMapper;
 import com.fasterxml.jackson.databind.ObjectReader;
 import com.fasterxml.jackson.databind.module.SimpleModule;
 import com.fasterxml.jackson.dataformat.yaml.YAMLFactory;
-import com.google.common.base.Strings;
-import com.google.common.collect.Iterables;
 import com.reprezen.swagedit.core.schema.CompositeSchema;
+import com.reprezen.swagedit.core.utils.StringUtils;
 
 /**
  * Represents the content of a YAML/JSON document.
@@ -79,7 +78,7 @@ public class Model {
      * @return model
      */
     public static Model parseYaml(CompositeSchema schema, String text) {
-        if (Strings.emptyToNull(text) == null) {
+        if (StringUtils.emptyToNull(text) == null) {
             return empty(schema);
         }
 
@@ -116,7 +115,7 @@ public class Model {
      * @return list of models
      */
     public static Iterable<Model> parseYaml(Iterable<IFile> files, final CompositeSchema schema) {
-        if (files == null || Iterables.isEmpty(files)) {
+        if (files == null) {
             return Arrays.asList();
         }
 
@@ -132,7 +131,7 @@ public class Model {
 
             models.add(model);
         }
-        return models;
+        return models; 
     }
 
     protected static ObjectMapper createMapper() {
@@ -216,7 +215,7 @@ public class Model {
     }
 
     public AbstractNode find(String pointer) {
-        if (Strings.emptyToNull(pointer) == null) {
+        if (StringUtils.emptyToNull(pointer) == null) {
             return null;
         }
         if (pointer.startsWith("#")) {
@@ -377,7 +376,7 @@ public class Model {
     }
 
     protected int contentColumn(AbstractNode n) {
-        String property = Strings.emptyToNull(n.getProperty());
+        String property = StringUtils.emptyToNull(n.getProperty());
         if (property == null) {
             return n.getStart().getColumn();
         }

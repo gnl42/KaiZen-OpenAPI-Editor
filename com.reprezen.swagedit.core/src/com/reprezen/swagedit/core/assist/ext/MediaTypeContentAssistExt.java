@@ -20,12 +20,12 @@ import java.util.List;
 import com.fasterxml.jackson.core.JsonPointer;
 import com.fasterxml.jackson.databind.JsonNode;
 import com.fasterxml.jackson.databind.ObjectMapper;
-import com.google.common.base.Strings;
 import com.reprezen.swagedit.core.Activator;
 import com.reprezen.swagedit.core.assist.Proposal;
 import com.reprezen.swagedit.core.model.AbstractNode;
 import com.reprezen.swagedit.core.schema.ArrayTypeDefinition;
 import com.reprezen.swagedit.core.schema.TypeDefinition;
+import com.reprezen.swagedit.core.utils.StringUtils;
 
 /**
  * Content assist extension providing completion proposals for mime types.
@@ -68,7 +68,7 @@ public class MediaTypeContentAssistExt implements ContentAssistExt {
     public Collection<Proposal> getProposals(TypeDefinition type, AbstractNode node, String prefix) {
         Collection<Proposal> proposals = new ArrayList<>();
 
-        prefix = Strings.emptyToNull(prefix);
+        prefix = StringUtils.emptyToNull(prefix);
 
         for (JsonNode mediaType : mediaTypes) {
             String asText = mediaType.asText();

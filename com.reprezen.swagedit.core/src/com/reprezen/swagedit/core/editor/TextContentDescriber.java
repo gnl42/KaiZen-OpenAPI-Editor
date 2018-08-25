@@ -10,16 +10,14 @@
  *******************************************************************************/
 package com.reprezen.swagedit.core.editor;
 
-import java.io.ByteArrayOutputStream;
 import java.io.IOException;
 import java.io.InputStream;
-import java.io.InputStreamReader;
 
 import org.eclipse.core.runtime.QualifiedName;
 import org.eclipse.core.runtime.content.IContentDescriber;
 import org.eclipse.core.runtime.content.IContentDescription;
 
-import com.google.common.io.CharStreams;
+import com.reprezen.swagedit.core.utils.StringUtils;
 
 public abstract class TextContentDescriber implements IContentDescriber {
 
@@ -27,7 +25,7 @@ public abstract class TextContentDescriber implements IContentDescriber {
 
     @Override
     public int describe(InputStream contents, IContentDescription description) throws IOException {
-        String content = CharStreams.toString(new InputStreamReader(contents));
+        String content = StringUtils.toString(contents);
         if (content.trim().isEmpty()) {
             return INDETERMINATE;
         }
@@ -38,16 +36,6 @@ public abstract class TextContentDescriber implements IContentDescriber {
     @Override
     public QualifiedName[] getSupportedOptions() {
         return null;
-    }
-
-    protected String toString(InputStream contents) throws IOException {
-        ByteArrayOutputStream result = new ByteArrayOutputStream();
-        byte[] buffer = new byte[1024];
-        int length;
-        while ((length = contents.read(buffer)) != -1) {
-            result.write(buffer, 0, length);
-        }
-        return result.toString("UTF-8");
     }
 
 }

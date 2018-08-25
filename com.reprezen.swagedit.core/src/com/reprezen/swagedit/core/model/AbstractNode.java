@@ -10,7 +10,6 @@
  *******************************************************************************/
 package com.reprezen.swagedit.core.model;
 
-import java.util.Collections;
 import java.util.Objects;
 
 import org.eclipse.jface.text.BadLocationException;
@@ -18,7 +17,6 @@ import org.eclipse.jface.text.IDocument;
 import org.eclipse.jface.text.Position;
 
 import com.fasterxml.jackson.core.JsonPointer;
-import com.google.common.collect.Iterables;
 import com.reprezen.swagedit.core.schema.TypeDefinition;
 
 /**
@@ -172,8 +170,8 @@ public abstract class AbstractNode {
      * 
      * @return node's children
      */
-    public Iterable<AbstractNode> elements() {
-        return Collections.emptyList();
+    public AbstractNode[] elements() {
+        return new AbstractNode[0];
     }
 
     /**
@@ -182,7 +180,7 @@ public abstract class AbstractNode {
      * @return size of children
      */
     public int size() {
-        return Iterables.size(elements());
+        return elements().length;
     }
 
     public abstract String getText();

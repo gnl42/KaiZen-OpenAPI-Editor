@@ -10,10 +10,11 @@
  *******************************************************************************/
 package com.reprezen.swagedit.core.hyperlinks;
 
-import static com.google.common.base.Strings.emptyToNull;
+import static com.reprezen.swagedit.core.utils.StringUtils.emptyToNull;
 
 import java.util.ArrayList;
 import java.util.Arrays;
+import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 import java.util.regex.Matcher;
@@ -25,7 +26,6 @@ import org.eclipse.jface.text.Region;
 import org.eclipse.jface.text.hyperlink.IHyperlink;
 
 import com.fasterxml.jackson.core.JsonPointer;
-import com.google.common.collect.Maps;
 import com.reprezen.swagedit.core.editor.JsonDocument;
 import com.reprezen.swagedit.core.json.references.JsonReference;
 import com.reprezen.swagedit.core.model.AbstractNode;
@@ -84,7 +84,7 @@ public class PathParamHyperlinkDetector extends AbstractJsonHyperlinkDetector {
      * Returns a Map having for keys a method name and for value the pointer to the parameter.
      */
     private Map<String, JsonPointer> findParameterPath(JsonDocument doc, JsonPointer basePath, String parameter) {
-        Map<String, JsonPointer> paths = Maps.newHashMap();
+        Map<String, JsonPointer> paths = new HashMap<>();
 
         AbstractNode parent = doc.getModel().find(basePath);
         if (parent == null || !parent.isObject()) {

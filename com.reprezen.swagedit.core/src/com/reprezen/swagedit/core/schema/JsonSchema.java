@@ -15,7 +15,7 @@ import java.util.Map;
 
 import com.fasterxml.jackson.core.JsonPointer;
 import com.fasterxml.jackson.databind.JsonNode;
-import com.google.common.base.Strings;
+import com.reprezen.swagedit.core.utils.StringUtils;
 import com.reprezen.swagedit.core.json.references.JsonReference;
 
 public class JsonSchema {
@@ -96,7 +96,7 @@ public class JsonSchema {
     }
 
     public TypeDefinition get(JsonPointer pointer) {
-        if (pointer == null || Strings.emptyToNull(pointer.toString()) == null) {
+        if (pointer == null || StringUtils.emptyToNull(pointer.toString()) == null) {
             return type;
         }
         return types.get(pointer);

@@ -20,7 +20,6 @@ import org.eclipse.swt.graphics.RGB;
 import org.eclipse.swt.graphics.TextStyle;
 import org.eclipse.swt.widgets.Display;
 
-import com.google.common.collect.Iterables;
 import com.reprezen.swagedit.core.Activator;
 import com.reprezen.swagedit.core.Activator.Icons;
 import com.reprezen.swagedit.core.model.AbstractNode;
@@ -108,13 +107,13 @@ public class OutlineStyledLabelProvider extends StyledCellLabelProvider {
         }
 
         if (parent.isObject()) {
-            if (Iterables.isEmpty(element.elements())) {
+            if (element.elements().length == 0) {
                 return Icons.outline_mapping_scalar;
             } else {
                 return Icons.outline_mapping;
             }
         } else if (parent.isArray()) {
-            if (Iterables.isEmpty(element.elements())) {
+            if (element.elements().length == 0) {
                 return Icons.outline_scalar;
             } else {
                 return Icons.outline_sequence;
