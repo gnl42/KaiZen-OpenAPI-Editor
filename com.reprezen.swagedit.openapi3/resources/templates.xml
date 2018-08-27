@@ -73,7 +73,7 @@ email: ${contact_email}</template>
               $$ref: '${itemSchema}' 
       '404':
         description: Not Found
-  put:
+  patch:
     description: Create a new ${item}
     requestBody:
       description: description
