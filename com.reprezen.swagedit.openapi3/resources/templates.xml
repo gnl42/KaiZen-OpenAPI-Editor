@@ -70,7 +70,7 @@ email: ${contact_email}</template>
         content:
           application/json:
             schema:
-              $$ref: "${itemSchema}" 
+              $$ref: ${itemSchema}
       '404':
         description: Not Found
   patch:
@@ -80,7 +80,7 @@ email: ${contact_email}</template>
       content: 
         "application/json":
           schema:
-            $$ref: "${itemSchema}"
+            $$ref: ${itemSchema}
     parameters:
       - name: ${id}
         in: path
@@ -128,7 +128,7 @@ email: ${contact_email}</template>
             schema:
               type: array
               items:
-                $$ref: "${itemSchema}" 
+                $$ref: ${itemSchema}
   post:
     description: Create a new ${item}
     requestBody:
@@ -136,7 +136,7 @@ email: ${contact_email}</template>
       content: 
         "application/json":
           schema:
-            $$ref: "${itemSchema}"
+            $$ref: ${itemSchema}
     responses:
       '201':
         description: Created
@@ -159,7 +159,7 @@ email: ${contact_email}</template>
         content:
           application/json:
             schema:
-              $$ref: "${itemSchema}" 
+              $$ref: ${itemSchema}
   put:
     description: Create a new ${item}
     requestBody:
@@ -167,7 +167,7 @@ email: ${contact_email}</template>
       content: 
         "application/json":
           schema:
-            $$ref: "${itemSchema}"
+            $$ref: ${itemSchema}
     responses:
       '201':
         description: Created
