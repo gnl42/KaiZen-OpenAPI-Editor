@@ -13,5 +13,7 @@
 		<mapping pluginKey="colorTagPropertyPreferences" themeKey="foreground" />
 		<mapping pluginKey="colorFlowCharacterPreferences" themeKey="foreground" />
 		<mapping pluginKey="colorConstantPreferences" themeKey="method" />
+        <mapping pluginKey="AbstractTextEditor.Color.Foreground" themeKey="foreground"/>
+        <mapping pluginKey="AbstractTextEditor.Color.Background" themeKey="background"/>
 	</mappings>
 </eclipseColorThemeMapping>

@@ -14,8 +14,11 @@ import org.dadacoalition.yedit.YEditLog;
 import org.dadacoalition.yedit.editor.YEditSourceViewerConfiguration;
 import org.eclipse.core.runtime.CoreException;
 import org.eclipse.core.runtime.NullProgressMonitor;
+import org.eclipse.jface.preference.IPreferenceStore;
 import org.eclipse.jface.util.IPropertyChangeListener;
 import org.eclipse.jface.util.PropertyChangeEvent;
+import org.eclipse.ui.internal.editors.text.EditorsPlugin;
+import org.eclipse.ui.texteditor.ChainedPreferenceStore;
 
 import com.reprezen.swagedit.Activator;
 import com.reprezen.swagedit.core.editor.JsonEditor;
@@ -52,7 +55,12 @@ public class SwaggerEditor extends JsonEditor {
     };
   
     public SwaggerEditor() {
-        super(new SwaggerDocumentProvider(), Activator.getDefault().getPreferenceStore());
+        super(new SwaggerDocumentProvider(), //
+                // ZEN-4361 Missing marker location indicators (Overview Ruler) next to editor scrollbar in KZOE
+                new ChainedPreferenceStore(new IPreferenceStore[] { //
+                        Activator.getDefault().getPreferenceStore(), //
+                        // Preferences store for EditorsPlugin has settings to show/hide the rules and markers
+                        EditorsPlugin.getDefault().getPreferenceStore() }));
     }
     
     @Override

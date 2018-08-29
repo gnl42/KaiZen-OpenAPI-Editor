@@ -54,7 +54,7 @@ email: ${contact_email}</template>
        id="com.reprezen.swagedit.openapi3.templates.object_resource_template" 
        description="object resource template" 
        context="com.reprezen.swagedit.openapi3.templates.paths" 
-       enabled="true">/${item}s/${id}:
+       enabled="true">/${item}s/{${id}}:
   get:
     description: Get an ${item} with the given ID
     parameters:
@@ -70,17 +70,17 @@ email: ${contact_email}</template>
         content:
           application/json:
             schema:
-              $$ref: '${itemSchema}' 
+              $$ref: ${itemSchema}
       '404':
         description: Not Found
-  put:
+  patch:
     description: Create a new ${item}
     requestBody:
       description: description
       content: 
         "application/json":
           schema:
-            $$ref: "${itemSchema}"
+            $$ref: ${itemSchema}
     parameters:
       - name: ${id}
         in: path
@@ -128,7 +128,7 @@ email: ${contact_email}</template>
             schema:
               type: array
               items:
-                $$ref: '${itemSchema}' 
+                $$ref: ${itemSchema}
   post:
     description: Create a new ${item}
     requestBody:
@@ -136,7 +136,7 @@ email: ${contact_email}</template>
       content: 
         "application/json":
           schema:
-            $$ref: "${itemSchema}"
+            $$ref: ${itemSchema}
     responses:
       '201':
         description: Created
@@ -159,7 +159,7 @@ email: ${contact_email}</template>
         content:
           application/json:
             schema:
-              $$ref: '${itemSchema}' 
+              $$ref: ${itemSchema}
   put:
     description: Create a new ${item}
     requestBody:
@@ -167,7 +167,7 @@ email: ${contact_email}</template>
       content: 
         "application/json":
           schema:
-            $$ref: "${itemSchema}"
+            $$ref: ${itemSchema}
     responses:
       '201':
         description: Created
@@ -214,7 +214,7 @@ email: ${contact_email}</template>
           schema:
             type: array
             items:
-              $$ref: '${itemSchema}'</template>
+              $$ref: "${itemSchema}"</template>
 
 	<template name="get" 
        id="com.reprezen.swagedit.openapi3.templates.path_get_on_object_template" 
@@ -235,7 +235,7 @@ email: ${contact_email}</template>
       content:
         application/json:
           schema:
-            $$ref: '${itemSchema}' 
+            $$ref: "${itemSchema}" 
     '404':
       description: Not Found</template>
             
@@ -465,7 +465,7 @@ properties:
        description="ALL OF schema definition" 
        context="com.reprezen.swagedit.openapi3.templates.schema" 
        enabled="true">allOf:
-- $$ref: '${schema1}'
+- $$ref: "${schema1}"
 - type: object
   properties:
     ${name}:
@@ -476,7 +476,7 @@ properties:
        description="ANY OF schema definition" 
        context="com.reprezen.swagedit.openapi3.templates.schema" 
        enabled="true">anyOf:
-- $$ref: '${schema1}'
+- $$ref: "${schema1}"
 - type: object
   properties:
     ${name}:
@@ -487,7 +487,7 @@ properties:
        description="ONE OF schema definition" 
        context="com.reprezen.swagedit.openapi3.templates.schema" 
        enabled="true">oneOf:
-- $$ref: '${schema1}'
+- $$ref: "${schema1}"
 - type: object
   properties:
     ${name}:
@@ -544,7 +544,7 @@ items:
           content: 
             'application/json':
               schema:
-                $$ref: '${schema}'
+                $$ref: "${schema}"
         responses:
           '200':
             description: webhook successfully processed</template>
@@ -568,11 +568,11 @@ items:
             schema:
               type: array
               items:
-                $$ref: '${responseModel}'
+                $$ref: "${responseModel}"
       default:
         description: Error
         content:
           'text/html':
             schema:
-              $$ref: '${errorModel}'</template>            
+              $$ref: "${errorModel}"</template>
 </templates>

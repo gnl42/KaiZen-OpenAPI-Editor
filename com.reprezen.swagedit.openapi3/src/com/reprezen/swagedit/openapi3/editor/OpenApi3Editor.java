@@ -16,12 +16,15 @@ import java.util.HashMap;
 import java.util.Map;
 
 import org.dadacoalition.yedit.editor.YEditSourceViewerConfiguration;
+import org.eclipse.jface.preference.IPreferenceStore;
 import org.eclipse.jface.text.IInformationControlCreator;
 import org.eclipse.jface.text.contentassist.ContentAssistant;
 import org.eclipse.jface.text.hyperlink.IHyperlinkDetector;
 import org.eclipse.jface.text.hyperlink.URLHyperlinkDetector;
 import org.eclipse.jface.text.source.ISourceViewer;
 import org.eclipse.jface.util.IPropertyChangeListener;
+import org.eclipse.ui.internal.editors.text.EditorsPlugin;
+import org.eclipse.ui.texteditor.ChainedPreferenceStore;
 
 import com.fasterxml.jackson.databind.JsonNode;
 import com.reprezen.swagedit.core.assist.JsonContentAssistProcessor;
@@ -55,7 +58,12 @@ public class OpenApi3Editor extends JsonEditor {
     };
 
     public OpenApi3Editor() {
-        super(new OpenApi3DocumentProvider(), Activator.getDefault().getPreferenceStore());
+        super(new OpenApi3DocumentProvider(), //
+                // ZEN-4361 Missing marker location indicators (Overview Ruler) next to editor scrollbar in KZOE
+                new ChainedPreferenceStore(new IPreferenceStore[] { //
+                        Activator.getDefault().getPreferenceStore(), //
+                        // Preferences store for EditorsPlugin has settings to show/hide the rules and markers
+                        EditorsPlugin.getDefault().getPreferenceStore() }));
     }
 
     @Override

@@ -96,7 +96,7 @@ public class OpenApi3Validator extends Validator {
         // and option in UI is enable.
         if (advancedValidation && nbOfErrors == 0) {
             try {
-                OpenApi3 result = new OpenApi3Parser().parse(baseURI.toURL(), true);
+                OpenApi3 result = new OpenApi3Parser().parse(document.get(), baseURI.toURL(), true);
 
                 for (ValidationItem item : result.getValidationResults().getItems()) {
                     PositionInfo pos = item.getPositionInfo();
