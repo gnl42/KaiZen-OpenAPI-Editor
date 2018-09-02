@@ -25,7 +25,7 @@ import com.google.common.base.Strings;
 import com.google.common.collect.Iterators;
 import com.google.common.collect.Lists;
 import com.reprezen.swagedit.core.Activator;
-import com.reprezen.swagedit.core.assist.Proposal;
+import com.reprezen.swagedit.core.assist.ProposalBuilder;
 import com.reprezen.swagedit.core.model.AbstractNode;
 import com.reprezen.swagedit.core.schema.TypeDefinition;
 
@@ -60,8 +60,8 @@ public class ResponseCodeContentAssistExt implements ContentAssistExt {
     }
 
     @Override
-    public Collection<Proposal> getProposals(TypeDefinition type, AbstractNode node, String prefix) {
-        Collection<Proposal> proposals = Lists.newArrayList();
+    public Collection<ProposalBuilder> getProposals(TypeDefinition type, AbstractNode node, String prefix) {
+        Collection<ProposalBuilder> proposals = Lists.newArrayList();
 
         for (Iterator<JsonNode> it = statusCodes(prefix); it.hasNext();) {
             JsonNode current = it.next();
@@ -71,10 +71,10 @@ public class ResponseCodeContentAssistExt implements ContentAssistExt {
 
             String replacement = ("default".equals(code) ? code : "'" + code + "'") + ":";
 
-            proposals.add(new Proposal(replacement, code, description, phase));
+            proposals.add(new ProposalBuilder(code).replacementString(replacement).description(description).type(phase));
         }
 
-        proposals.add(new Proposal("x-", "x-", null, "vendorExtension"));
+        proposals.add(new ProposalBuilder("x-").replacementString("x-").type("vendorExtension"));
 
         return proposals;
     }

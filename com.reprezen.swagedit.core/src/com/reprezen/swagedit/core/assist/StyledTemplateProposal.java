@@ -26,6 +26,7 @@ public class StyledTemplateProposal extends TemplateProposal implements IComplet
             StyledString styledString, int relevance) {
         super(template, context, region, image, relevance);
         this.styledString = styledString;
+        System.out.println("StyledTemplateProposal: " + styledString);
     }
 
     @Override

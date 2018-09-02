@@ -10,7 +10,6 @@
  *******************************************************************************/
 package com.reprezen.swagedit.assist
 
-import com.reprezen.swagedit.core.assist.Proposal
 import com.reprezen.swagedit.core.assist.contexts.RegexContextType
 import com.reprezen.swagedit.core.utils.SwaggerFileFinder.Scope
 import com.reprezen.swagedit.editor.SwaggerDocument
@@ -21,6 +20,7 @@ import org.junit.Test
 
 import static org.hamcrest.core.IsCollectionContaining.*
 import static org.junit.Assert.*
+import com.reprezen.swagedit.core.assist.ProposalBuilder
 
 class JsonReferenceProposalProviderTest {
 
@@ -62,7 +62,7 @@ class JsonReferenceProposalProviderTest {
 		val proposals = provider.getProposals("/paths/~1foo/get/responses/200/schema/$ref".ptr, document, Scope.LOCAL)
 
 		assertThat(proposals, hasItems(
-			new Proposal("\"#/definitions/Valid\"", "Valid", null, "#/definitions/Valid")
+			new ProposalBuilder("Valid").replacementString("\"#/definitions/Valid\"").type("#/definitions/Valid")
 		))
 	}
 
@@ -89,7 +89,7 @@ class JsonReferenceProposalProviderTest {
 		val proposals = provider.getProposals("/definitions/Bar/properties/foo/$ref".ptr, document, Scope.LOCAL)
 
 		assertThat(proposals, hasItems(
-			new Proposal("\"#/definitions/Foo\"", "Foo", null, "#/definitions/Foo")
+			new ProposalBuilder("Foo").replacementString("\"#/definitions/Foo\"").type("#/definitions/Foo")
 		))
 	}
 
@@ -117,11 +117,9 @@ class JsonReferenceProposalProviderTest {
 		val proposals = contextType.collectProposals(document.asJson, path)
 
 		assertThat(proposals, hasItems(
-			new Proposal(
-				"\"../Path%20With%20Spaces/Other%20%20Spaces.yaml#/paths/~1foo\"",
-				"/foo",
-				null,
-				"../Path With Spaces/Other  Spaces.yaml#/paths/~1foo"
+			new ProposalBuilder("/foo")//
+				.replacementString("\"../Path%20With%20Spaces/Other%20%20Spaces.yaml#/paths/~1foo\"")
+				.type("../Path With Spaces/Other  Spaces.yaml#/paths/~1foo"
 			)
 		))
 	}

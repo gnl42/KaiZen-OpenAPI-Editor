@@ -70,7 +70,7 @@ email: ${contact_email}</template>
         content:
           application/json:
             schema:
-              $$ref: ${itemSchema}
+              $$ref: "${itemSchema}"
       '404':
         description: Not Found
   patch:
@@ -80,7 +80,7 @@ email: ${contact_email}</template>
       content: 
         "application/json":
           schema:
-            $$ref: ${itemSchema}
+            $$ref: "${itemSchema}"
     parameters:
       - name: ${id}
         in: path

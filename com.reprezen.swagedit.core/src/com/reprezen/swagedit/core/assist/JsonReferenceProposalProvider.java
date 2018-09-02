@@ -69,11 +69,11 @@ public class JsonReferenceProposalProvider {
      * @param scope
      * @return proposals
      */
-    public Collection<Proposal> getProposals(JsonPointer pointer, JsonDocument document, Scope scope) {
+    public Collection<ProposalBuilder> getProposals(JsonPointer pointer, JsonDocument document, Scope scope) {
         final ContextType type = contextTypes.get(document.getModel(), pointer);
         final IFile currentFile = getActiveFile();
         final IPath basePath = currentFile.getParent().getFullPath();
-        final List<Proposal> proposals = Lists.newArrayList();
+        final List<ProposalBuilder> proposals = Lists.newArrayList();
         
         if (scope == Scope.LOCAL) {
             proposals.addAll(type.collectProposals(document, null));

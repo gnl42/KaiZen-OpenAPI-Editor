@@ -22,7 +22,7 @@ import com.fasterxml.jackson.databind.ObjectMapper;
 import com.google.common.base.Strings;
 import com.google.common.collect.Lists;
 import com.reprezen.swagedit.core.Activator;
-import com.reprezen.swagedit.core.assist.Proposal;
+import com.reprezen.swagedit.core.assist.ProposalBuilder;
 import com.reprezen.swagedit.core.model.AbstractNode;
 import com.reprezen.swagedit.core.schema.ArrayTypeDefinition;
 import com.reprezen.swagedit.core.schema.TypeDefinition;
@@ -65,8 +65,8 @@ public class MediaTypeContentAssistExt implements ContentAssistExt {
     }
 
     @Override
-    public Collection<Proposal> getProposals(TypeDefinition type, AbstractNode node, String prefix) {
-        Collection<Proposal> proposals = new ArrayList<>();
+    public Collection<ProposalBuilder> getProposals(TypeDefinition type, AbstractNode node, String prefix) {
+        Collection<ProposalBuilder> proposals = new ArrayList<>();
 
         prefix = Strings.emptyToNull(prefix);
 
@@ -84,10 +84,10 @@ public class MediaTypeContentAssistExt implements ContentAssistExt {
         return proposals;
     }
 
-    private Proposal createProposal(TypeDefinition type, JsonNode mediaType) {
+    private ProposalBuilder createProposal(TypeDefinition type, JsonNode mediaType) {
         if (type instanceof ArrayTypeDefinition) {
-            return new Proposal("- " + mediaType.asText(), mediaType.asText(), "", "mimeType");
+            return new ProposalBuilder(mediaType.asText()).replacementString("- " + mediaType.asText()).description("").type("mimeType");
         }
-        return new Proposal(mediaType.asText(), mediaType.asText(), "", "mimeType");
+        return new ProposalBuilder(mediaType.asText()).replacementString(mediaType.asText()).description("").type("mimeType");
     }
 }

@@ -14,7 +14,7 @@ import java.util.Collection;
 
 import com.fasterxml.jackson.core.JsonPointer;
 import com.google.common.collect.Lists;
-import com.reprezen.swagedit.core.assist.Proposal;
+import com.reprezen.swagedit.core.assist.ProposalBuilder;
 import com.reprezen.swagedit.core.assist.ext.ContentAssistExt;
 import com.reprezen.swagedit.core.model.AbstractNode;
 import com.reprezen.swagedit.core.schema.TypeDefinition;
@@ -30,12 +30,12 @@ public class ParameterInContentAssistExt implements ContentAssistExt {
     }
 
     @Override
-    public Collection<Proposal> getProposals(TypeDefinition type, AbstractNode node, String prefix) {
+    public Collection<ProposalBuilder> getProposals(TypeDefinition type, AbstractNode node, String prefix) {
         return Lists.newArrayList( //
-                new Proposal("query", "query", description, "string"),
-                new Proposal("header", "header", description, "string"),
-                new Proposal("path", "path", description, "string"),
-                new Proposal("cookie", "cookie", description, "string"));
+                new ProposalBuilder("query").replacementString("query").description(description).type("string"),
+                new ProposalBuilder("header").replacementString("header").description(description).type("string"),
+                new ProposalBuilder("path").replacementString("path").description(description).type("string"),
+                new ProposalBuilder("cookie").replacementString("cookie").description(description).type("string"));
     }
 
 }

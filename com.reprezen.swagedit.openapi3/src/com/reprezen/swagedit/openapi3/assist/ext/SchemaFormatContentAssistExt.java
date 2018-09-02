@@ -18,7 +18,7 @@ import com.fasterxml.jackson.core.JsonPointer;
 import com.google.common.collect.ImmutableList;
 import com.google.common.collect.ImmutableMap;
 import com.google.common.collect.Lists;
-import com.reprezen.swagedit.core.assist.Proposal;
+import com.reprezen.swagedit.core.assist.ProposalBuilder;
 import com.reprezen.swagedit.core.assist.ext.ContentAssistExt;
 import com.reprezen.swagedit.core.model.AbstractNode;
 import com.reprezen.swagedit.core.schema.TypeDefinition;
@@ -27,27 +27,27 @@ public class SchemaFormatContentAssistExt implements ContentAssistExt {
 
     private static final JsonPointer pointer = JsonPointer.compile("/definitions/schema/properties/format");
 
-    private static final Map<String, List<Proposal>> values = ImmutableMap.<String, List<Proposal>> builder()
-            .put("boolean", ImmutableList.<Proposal> of()) //
-            .put("array", ImmutableList.<Proposal> of()) //
-            .put("object", ImmutableList.<Proposal> of()) //
-            .put("null", ImmutableList.<Proposal> of()) //
+    private static final Map<String, List<ProposalBuilder>> values = ImmutableMap.<String, List<ProposalBuilder>> builder()
+            .put("boolean", ImmutableList.<ProposalBuilder> of()) //
+            .put("array", ImmutableList.<ProposalBuilder> of()) //
+            .put("object", ImmutableList.<ProposalBuilder> of()) //
+            .put("null", ImmutableList.<ProposalBuilder> of()) //
             .put("integer",
                     ImmutableList.of( //
-                    new Proposal("int32", "int32", null, "string"), //
-                            new Proposal("int64", "int64", null, "string"))) //
+                            new ProposalBuilder("int32").replacementString("int32").type("string"), //
+                            new ProposalBuilder("int64").replacementString("int64").type("string"))) //
             .put("number",
                     ImmutableList.of( //
-                    new Proposal("float", "float", null, "string"), //
-                            new Proposal("double", "double", null, "string"))) //
+                            new ProposalBuilder("float").replacementString("float").type("string"), //
+                            new ProposalBuilder("double").replacementString("double").type("string"))) //
             .put("string",
                     ImmutableList.of( //
-                    new Proposal("byte", "byte", null, "string"), //
-                    new Proposal("binary", "binary", null, "string"), //
-                    new Proposal("date", "date", null, "string"), //
-                    new Proposal("date-time", "date-time", null, "string"), //
-                    new Proposal("password", "password", null, "string"), //
-                            new Proposal("", "", null, "string")))
+                            new ProposalBuilder("byte").replacementString("byte").type("string"), //
+                            new ProposalBuilder("binary").replacementString("binary").type("string"), //
+                            new ProposalBuilder("date").replacementString("date").type("string"), //
+                            new ProposalBuilder("date-time").replacementString("date-time").type("string"), //
+                            new ProposalBuilder("password").replacementString("password").type("string"), //
+                            new ProposalBuilder("").replacementString("").type("string")))
             .build();
 
     @Override
@@ -56,8 +56,8 @@ public class SchemaFormatContentAssistExt implements ContentAssistExt {
     }
 
     @Override
-    public Collection<Proposal> getProposals(TypeDefinition type, AbstractNode node, String prefix) {
-        List<Proposal> proposals = Lists.newArrayList();
+    public Collection<ProposalBuilder> getProposals(TypeDefinition type, AbstractNode node, String prefix) {
+        List<ProposalBuilder> proposals = Lists.newArrayList();
 
         if (node.getParent() != null && node.getParent().get("type") != null) {
             String filter = (String) node.getParent().get("type").asValue().getValue();
@@ -67,13 +67,13 @@ public class SchemaFormatContentAssistExt implements ContentAssistExt {
             }
         }
 
-        for (List<Proposal> value : values.values()) {
-            for (Proposal v : value) {
+        for (List<ProposalBuilder> value : values.values()) {
+            for (ProposalBuilder v : value) {
                 proposals.add(v);
             }
         }
 
-        proposals.add(new Proposal("", "", null, "string"));
+        proposals.add(new ProposalBuilder("").replacementString("").type("string"));
 
         return proposals;
     }
