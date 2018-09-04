@@ -54,6 +54,7 @@ import com.reprezen.swagedit.core.editor.JsonDocument;
 import com.reprezen.swagedit.core.json.references.Messages;
 import com.reprezen.swagedit.core.model.Model;
 import com.reprezen.swagedit.core.templates.SwaggerTemplateContext;
+import com.reprezen.swagedit.core.utils.StringUtils;
 import com.reprezen.swagedit.core.utils.SwaggerFileFinder.Scope;
 
 /**
@@ -195,7 +196,7 @@ public abstract class JsonContentAssistProcessor extends TemplateCompletionProce
             int offset) {
         final List<ICompletionProposal> result = new ArrayList<>();
 
-        prefix = "".equals(prefix) ? null : prefix;
+        prefix = StringUtils.emptyToNull(prefix);
 
         for (Proposal proposal : proposals) {
             StyledCompletionProposal styledProposal = proposal.asStyledCompletionProposal(prefix, offset);

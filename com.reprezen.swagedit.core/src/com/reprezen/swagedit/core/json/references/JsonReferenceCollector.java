@@ -13,7 +13,7 @@ package com.reprezen.swagedit.core.json.references;
 import static com.reprezen.swagedit.core.json.references.JsonReference.PROPERTY;
 
 import java.net.URI;
-import java.util.Arrays;
+import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
@@ -56,7 +56,10 @@ public class JsonReferenceCollector {
                     if (references.containsKey(reference)) {
                         references.get(reference).add(node);
                     } else {
-                        references.put(reference, Arrays.asList(node));
+                        List<AbstractNode> values = new ArrayList<>();
+                        values.add(node);
+
+                        references.put(reference, values);
                     }
                 }
             }

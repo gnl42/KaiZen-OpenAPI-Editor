@@ -18,7 +18,7 @@ import static org.eclipse.core.resources.IMarker.SEVERITY_ERROR;
 import static org.eclipse.core.resources.IMarker.SEVERITY_WARNING;
 
 import java.net.URI;
-import java.util.Arrays;
+import java.util.ArrayList;
 import java.util.Collection;
 import java.util.HashMap;
 import java.util.HashSet;
@@ -147,7 +147,10 @@ public class JsonReferenceValidator {
                 if (result.containsKey(type)) {
                     result.get(type).add(source);
                 } else {
-                    result.put(type, Arrays.asList(source));
+                    List<AbstractNode> values = new ArrayList<>();
+                    values.add(source);
+
+                    result.put(type, values);
                 }
             }
         }
