@@ -10,6 +10,7 @@
  *******************************************************************************/
 package com.reprezen.swagedit.core.assist;
 
+import java.util.ArrayList;
 import java.util.Iterator;
 import java.util.List;
 
@@ -32,7 +33,6 @@ import org.eclipse.ui.IMarkerResolution;
 import org.eclipse.ui.IMarkerResolutionGenerator2;
 import org.eclipse.ui.texteditor.MarkerAnnotation;
 
-import com.google.common.collect.Lists;
 import com.reprezen.swagedit.core.Activator;
 import com.reprezen.swagedit.core.quickfix.TextDocumentMarkerResolution;
 
@@ -78,7 +78,7 @@ public class JsonQuickAssistProcessor implements IQuickAssistProcessor {
             errorMessage = e.getMessage();
             return new ICompletionProposal[0];
         }
-        List<ICompletionProposal> result = Lists.newArrayList();
+        List<ICompletionProposal> result = new ArrayList<>();
         for (IMarker marker : markers) {
             for (IMarkerResolution markerResolution : quickFixer.getResolutions(marker)) {
                 result.add(new MarkerResolutionProposal(marker, markerResolution, invocationContext.getSourceViewer()));
@@ -101,7 +101,7 @@ public class JsonQuickAssistProcessor implements IQuickAssistProcessor {
     }
 
     protected List<IMarker> getMarkersFor(ISourceViewer sourceViewer, int lineOffset, int lineLength) {
-        List<IMarker> result = Lists.newArrayList();
+        List<IMarker> result = new ArrayList<>();
         IAnnotationModel annotationModel = sourceViewer.getAnnotationModel();
         Iterator annotationIter = annotationModel.getAnnotationIterator();
         while (annotationIter.hasNext()) {

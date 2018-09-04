@@ -10,9 +10,8 @@
  *******************************************************************************/
 package com.reprezen.swagedit.preferences;
 
+import java.util.Arrays;
 import java.util.List;
-
-import com.google.common.collect.Lists;
 
 public class SwaggerPreferenceConstants {
 
@@ -21,7 +20,7 @@ public class SwaggerPreferenceConstants {
     public static String VALIDATION_REF_SECURITY_REQUIREMENTS_ARRAY = "validation.ref.security_requirements_array"; //$NON-NLS-1$
     public static String VALIDATION_REF_SECURITY_REQUIREMENT_OBJECT = "validation.ref.security_requirement_object"; //$NON-NLS-1$
 
-    public static final List<String> ALL_VALIDATION_PREFS = Lists.newArrayList(//
+    public static final List<String> ALL_VALIDATION_PREFS = Arrays.asList(//
             VALIDATION_REF_SECURITY_DEFINITIONS_OBJECT, //
             VALIDATION_REF_SECURITY_SCHEME_OBJECT, //
             VALIDATION_REF_SECURITY_REQUIREMENTS_ARRAY, //

@@ -15,7 +15,6 @@ import java.util.LinkedHashMap;
 import java.util.Map;
 
 import com.fasterxml.jackson.core.JsonPointer;
-import com.google.common.collect.Iterables;
 
 public class ObjectNode extends AbstractNode {
 
@@ -27,7 +26,7 @@ public class ObjectNode extends AbstractNode {
 
     @Override
     public AbstractNode get(int pos) {
-        return Iterables.get(elements.values(), pos);
+        return elements()[pos];
     }
 
     @Override
@@ -55,8 +54,8 @@ public class ObjectNode extends AbstractNode {
     }
 
     @Override
-    public Iterable<AbstractNode> elements() {
-        return elements.values();
+    public AbstractNode[] elements() {
+        return elements.values().toArray(new AbstractNode[elements.size()]);
     }
 
     @Override

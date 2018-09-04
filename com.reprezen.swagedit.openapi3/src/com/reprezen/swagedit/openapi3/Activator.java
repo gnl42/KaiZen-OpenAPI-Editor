@@ -11,6 +11,7 @@
 package com.reprezen.swagedit.openapi3;
 
 import java.io.IOException;
+import java.util.Arrays;
 
 import org.dadacoalition.yedit.YEditLog;
 import org.eclipse.jface.text.templates.ContextTypeRegistry;
@@ -22,7 +23,6 @@ import org.eclipse.ui.editors.text.templates.ContributionTemplateStore;
 import org.eclipse.ui.plugin.AbstractUIPlugin;
 import org.osgi.framework.BundleContext;
 
-import com.google.common.base.Strings;
 import com.reprezen.swagedit.core.preferences.KaiZenPreferencesUtils;
 import com.reprezen.swagedit.openapi3.schema.OpenApi3Schema;
 import com.reprezen.swagedit.openapi3.templates.OpenApi3ContextTypeProvider;
@@ -136,7 +136,10 @@ public class Activator extends AbstractUIPlugin {
     }
 
     private Template createNamedTemplate(Template inlineTemplate, String newTemplateId, String key) {
-        String indent = Strings.repeat(" ", getTabWidth());
+        char[] indentChars = new char[getTabWidth()];
+        Arrays.fill(indentChars, ' ');
+        String indent = String.valueOf(indentChars);
+        
         String newPattern = inlineTemplate.getPattern().replaceAll("\n", "\n" + indent);
         String pattern = String.format("${element_name:element_name('(%s name)')}:\n%s%s", key, indent, newPattern);
         Template template = new Template(inlineTemplate.getName(), //

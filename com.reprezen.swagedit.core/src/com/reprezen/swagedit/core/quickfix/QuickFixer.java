@@ -14,6 +14,7 @@ import static com.reprezen.swagedit.core.preferences.KaiZenPreferencesUtils.getT
 
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
+import java.util.stream.IntStream;
 
 import org.eclipse.core.resources.IMarker;
 import org.eclipse.core.runtime.CoreException;
@@ -25,7 +26,6 @@ import org.eclipse.jface.text.TextUtilities;
 import org.eclipse.ui.IMarkerResolution;
 import org.eclipse.ui.IMarkerResolutionGenerator2;
 
-import com.google.common.base.Strings;
 import com.reprezen.swagedit.core.validation.Messages;
 
 public class QuickFixer implements IMarkerResolutionGenerator2 {
@@ -80,7 +80,10 @@ public class QuickFixer implements IMarkerResolutionGenerator2 {
             String definitionLine = document.get(document.getLineOffset(line - 1), document.getLineLength(line - 1));
             Matcher m = WHITESPACE_PATTERN.matcher(definitionLine);
             final String definitionIndent = m.matches() ? m.group(1) : "";
-            return definitionIndent + Strings.repeat(" ", getTabWidth());
+            StringBuilder indent = new StringBuilder();
+            indent.append(definitionIndent);
+            IntStream.range(0, getTabWidth()).forEach(el->indent.append(" "));
+            return indent.toString();
         }
 
     }

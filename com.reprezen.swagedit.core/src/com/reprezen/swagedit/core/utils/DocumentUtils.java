@@ -12,7 +12,6 @@ package com.reprezen.swagedit.core.utils;
 
 import java.io.IOException;
 import java.io.InputStream;
-import java.io.InputStreamReader;
 import java.net.URI;
 
 import org.eclipse.core.filesystem.EFS;
@@ -36,8 +35,6 @@ import org.eclipse.ui.part.FileEditorInput;
 import org.eclipse.ui.part.IShowInTarget;
 import org.eclipse.ui.part.ShowInContext;
 import org.eclipse.ui.texteditor.ITextEditor;
-
-import com.google.common.io.CharStreams;
 
 public class DocumentUtils {
 
@@ -88,7 +85,7 @@ public class DocumentUtils {
             return null;
         }
 
-        return CharStreams.toString(new InputStreamReader(content));
+        return StringUtils.toString(content);
     }
 
     /**

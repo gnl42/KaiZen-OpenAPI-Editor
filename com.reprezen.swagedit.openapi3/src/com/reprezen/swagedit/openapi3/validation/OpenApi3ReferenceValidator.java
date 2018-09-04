@@ -16,13 +16,13 @@ import static org.eclipse.core.resources.IMarker.SEVERITY_WARNING;
 
 import java.net.URI;
 import java.util.Collection;
+import java.util.HashSet;
 import java.util.List;
 import java.util.Map;
 import java.util.Set;
 
 import com.fasterxml.jackson.databind.JsonNode;
 import com.github.fge.jsonschema.core.report.ProcessingReport;
-import com.google.common.collect.Sets;
 import com.reprezen.swagedit.core.editor.JsonDocument;
 import com.reprezen.swagedit.core.json.references.JsonReference;
 import com.reprezen.swagedit.core.json.references.JsonReferenceFactory;
@@ -49,7 +49,7 @@ public class OpenApi3ReferenceValidator extends JsonReferenceValidator {
     protected Set<SwaggerError> validateType(JsonDocument doc, URI baseURI, JsonReference reference,
             Collection<AbstractNode> sources) {
 
-        Set<SwaggerError> errors = Sets.newHashSet();
+        Set<SwaggerError> errors = new HashSet<>();
         Map<String, List<AbstractNode>> sourceTypes = groupSourcesByType(sources);
         JsonNode target = findTarget(doc, baseURI, reference);
 

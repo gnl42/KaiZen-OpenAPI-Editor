@@ -20,7 +20,6 @@ import org.eclipse.swt.graphics.RGB;
 import org.eclipse.swt.graphics.TextStyle;
 import org.eclipse.swt.widgets.Display;
 
-import com.google.common.base.Strings;
 import com.reprezen.swagedit.core.utils.StringUtils;
 import com.reprezen.swagedit.core.utils.StringUtils.QuoteStyle;
 
@@ -98,7 +97,7 @@ public class Proposal {
         }
 
         StyledCompletionProposal proposal = null;
-        if (Strings.emptyToNull(prefix) == null) {
+        if (StringUtils.emptyToNull(prefix) == null) {
             proposal = new StyledCompletionProposal(replacementString, styledString, null, description, offset,
                     selection);
         } else if (rString.toLowerCase().contains(prefix.toLowerCase())) {

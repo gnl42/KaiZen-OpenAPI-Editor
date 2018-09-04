@@ -12,6 +12,8 @@ package com.reprezen.swagedit.core.assist.ext;
 
 import java.io.IOException;
 import java.net.URL;
+import java.util.ArrayList;
+import java.util.Arrays;
 import java.util.Collection;
 import java.util.Iterator;
 import java.util.List;
@@ -20,10 +22,7 @@ import com.fasterxml.jackson.core.JsonPointer;
 import com.fasterxml.jackson.databind.JsonNode;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import com.fasterxml.jackson.databind.node.ArrayNode;
-import com.google.common.base.Predicate;
-import com.google.common.base.Strings;
-import com.google.common.collect.Iterators;
-import com.google.common.collect.Lists;
+import com.reprezen.swagedit.core.utils.StringUtils;
 import com.reprezen.swagedit.core.Activator;
 import com.reprezen.swagedit.core.assist.Proposal;
 import com.reprezen.swagedit.core.model.AbstractNode;
@@ -33,7 +32,7 @@ public class ResponseCodeContentAssistExt implements ContentAssistExt {
 
     private static final JsonPointer pointer = JsonPointer.compile("/definitions/responses");
 
-    private final List<String> baseCodes = Lists.newArrayList("100", "200", "300", "400", "500", "default");
+    private final List<String> baseCodes = Arrays.asList("100", "200", "300", "400", "500", "default");
     private final ArrayNode statusCodes;
 
     public ResponseCodeContentAssistExt() {
@@ -61,7 +60,7 @@ public class ResponseCodeContentAssistExt implements ContentAssistExt {
 
     @Override
     public Collection<Proposal> getProposals(TypeDefinition type, AbstractNode node, String prefix) {
-        Collection<Proposal> proposals = Lists.newArrayList();
+        Collection<Proposal> proposals = new ArrayList<>();
 
         for (Iterator<JsonNode> it = statusCodes(prefix); it.hasNext();) {
             JsonNode current = it.next();
@@ -80,19 +79,21 @@ public class ResponseCodeContentAssistExt implements ContentAssistExt {
     }
 
     private Iterator<JsonNode> statusCodes(final String prefix) {
-        final boolean noPrefix = Strings.emptyToNull(prefix) == null;
-
-        return Iterators.filter(statusCodes.elements(), new Predicate<JsonNode>() {
-            @Override
-            public boolean apply(JsonNode node) {
-                String key = node.get("code").asText();
-
-                if (noPrefix) {
-                    return baseCodes.contains(key);
-                }
-
-                return key.startsWith(prefix);
-            }
-        });
+        final boolean noPrefix = StringUtils.emptyToNull(prefix) == null;
+        final List<JsonNode> result = new ArrayList<>();
+        if (noPrefix) {
+            statusCodes.elements()//
+                    .forEachRemaining(node -> {
+                        if (baseCodes.contains(node.get("code").asText())) //
+                            result.add(node);
+                    });
+        } else {
+            statusCodes.elements()//
+                    .forEachRemaining(node -> {
+                        if (node.get("code").asText().startsWith(prefix)) //
+                            result.add(node);
+                    });
+        }
+        return result.iterator();
     }
 }

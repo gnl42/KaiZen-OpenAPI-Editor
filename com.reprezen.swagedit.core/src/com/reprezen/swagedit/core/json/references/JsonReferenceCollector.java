@@ -13,11 +13,11 @@ package com.reprezen.swagedit.core.json.references;
 import static com.reprezen.swagedit.core.json.references.JsonReference.PROPERTY;
 
 import java.net.URI;
+import java.util.ArrayList;
+import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 
-import com.google.common.collect.Lists;
-import com.google.common.collect.Maps;
 import com.reprezen.swagedit.core.model.AbstractNode;
 import com.reprezen.swagedit.core.model.Model;
 
@@ -43,7 +43,7 @@ public class JsonReferenceCollector {
      * @return all reference nodes
      */
     public Map<JsonReference, List<AbstractNode>> collect(URI baseURI, Model model) {
-        final Map<JsonReference, List<AbstractNode>> references = Maps.newHashMap();
+        final Map<JsonReference, List<AbstractNode>> references = new HashMap<>();
 
         for (AbstractNode node : model.allNodes()) {
             if (factory.isReference(node)) {
@@ -56,7 +56,10 @@ public class JsonReferenceCollector {
                     if (references.containsKey(reference)) {
                         references.get(reference).add(node);
                     } else {
-                        references.put(reference, Lists.newArrayList(node));
+                        List<AbstractNode> values = new ArrayList<>();
+                        values.add(node);
+
+                        references.put(reference, values);
                     }
                 }
             }

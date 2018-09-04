@@ -53,7 +53,7 @@ import org.eclipse.ui.PlatformUI;
 import org.eclipse.ui.keys.IBindingService;
 import org.eclipse.ui.part.ShowInContext;
 
-import com.google.common.base.Strings;
+import com.reprezen.swagedit.core.utils.StringUtils;
 import com.reprezen.swagedit.core.Messages;
 import com.reprezen.swagedit.core.editor.JsonEditor;
 import com.reprezen.swagedit.core.model.AbstractNode;
@@ -148,7 +148,7 @@ public abstract class QuickOutline extends PopupDialog
                             @Override
                             public void run() {
                                 // refreshing the tree will execute the filter.
-                                if (Strings.emptyToNull(filterText.getText()) == null) {
+                                if (StringUtils.emptyToNull(filterText.getText()) == null) {
                                     treeViewer.refresh();
                                     treeViewer.collapseAll();
                                 } else {
@@ -422,7 +422,7 @@ public abstract class QuickOutline extends PopupDialog
             String matchName = ((AbstractNode) element).getText();
             String text = filterText.getText();
 
-            if (Strings.emptyToNull(text) == null) {
+            if (StringUtils.emptyToNull(text) == null) {
                 return true;
             }
 

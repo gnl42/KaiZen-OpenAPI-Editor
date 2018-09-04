@@ -18,7 +18,7 @@ import org.yaml.snakeyaml.nodes.ScalarNode;
 
 import com.fasterxml.jackson.core.JsonPointer;
 import com.fasterxml.jackson.databind.JsonNode;
-import com.google.common.base.Strings;
+import com.reprezen.swagedit.core.utils.StringUtils;
 import com.reprezen.swagedit.core.editor.JsonDocument;
 import com.reprezen.swagedit.core.model.AbstractNode;
 import com.reprezen.swagedit.core.model.ObjectNode;
@@ -182,7 +182,7 @@ public class JsonReference {
     }
 
     private static JsonPointer createPointer(String text) {
-        if (Strings.emptyToNull(text) == null) {
+        if (StringUtils.emptyToNull(text) == null) {
             return JsonPointer.compile("");
         }
 

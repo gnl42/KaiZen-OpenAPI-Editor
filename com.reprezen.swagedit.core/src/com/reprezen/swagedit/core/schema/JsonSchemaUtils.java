@@ -10,14 +10,12 @@
  *******************************************************************************/
 package com.reprezen.swagedit.core.schema;
 
-import static com.google.common.collect.Iterators.transform;
-
-import java.util.Iterator;
+import java.util.ArrayList;
+import java.util.List;
+import java.util.StringJoiner;
 
 import com.fasterxml.jackson.databind.JsonNode;
 import com.fasterxml.jackson.databind.node.ArrayNode;
-import com.google.common.base.Function;
-import com.google.common.base.Joiner;
 
 public class JsonSchemaUtils {
     public static String getHumanFriendlyText(JsonNode swaggerSchemaNode, final String defaultValue) {
@@ -40,14 +38,11 @@ public class JsonSchemaUtils {
             if (oneOf instanceof ArrayNode) {
                 ArrayNode arrayNode = (ArrayNode) oneOf;
                 if (arrayNode.size() > 0) {
-                    Iterator<String> labels = transform(arrayNode.elements(), new Function<JsonNode, String>() {
-
-                        @Override
-                        public String apply(JsonNode el) {
-                            return getHumanFriendlyText(el, defaultValue);
-                        }
-                    });
-                    return "[" + Joiner.on(", ").join(labels) + "]";
+                    List<String> labels = new ArrayList<>();
+                    arrayNode.elements().forEachRemaining(el -> labels.add(getHumanFriendlyText(el, defaultValue)));
+                    StringJoiner joiner = new StringJoiner(", ", "[", "]");
+                    labels.forEach(joiner::add);
+                    return joiner.toString();
                 }
             }
         }

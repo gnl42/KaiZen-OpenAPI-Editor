@@ -12,7 +12,9 @@ package com.reprezen.swagedit.core.validation;
 
 import java.io.IOException;
 import java.net.URI;
+import java.util.HashMap;
 import java.util.HashSet;
+import java.util.Map;
 import java.util.Objects;
 import java.util.Set;
 
@@ -30,9 +32,6 @@ import org.yaml.snakeyaml.parser.ParserException;
 import com.fasterxml.jackson.core.JsonPointer;
 import com.fasterxml.jackson.databind.JsonNode;
 import com.fasterxml.jackson.databind.ObjectMapper;
-import com.google.common.collect.HashMultimap;
-import com.google.common.collect.Multimap;
-import com.google.common.collect.Sets;
 import com.reprezen.swagedit.core.editor.JsonDocument;
 import com.reprezen.swagedit.core.json.references.JsonReference;
 import com.reprezen.swagedit.core.json.references.JsonReferenceValidator;
@@ -76,7 +75,7 @@ public abstract class Validator {
     }
 
     public Set<SwaggerError> validate(JsonDocument document, URI baseURI) {
-        Set<SwaggerError> errors = Sets.newHashSet();
+        Set<SwaggerError> errors = new HashSet<>();
 
         JsonNode jsonContent = null;
         try {
@@ -242,12 +241,12 @@ public abstract class Validator {
      * Finds all duplicate keys in all objects present in the YAML document.
      */
     protected Set<SwaggerError> checkDuplicateKeys(Node document) {
-        HashMultimap<Pair<Node, String>, Node> acc = HashMultimap.<Pair<Node, String>, Node> create();
+        Map<Pair<Node, String>, Set<Node>> acc = new HashMap<>();
 
         collectDuplicates(document, acc);
 
-        Set<SwaggerError> errors = Sets.newHashSet();
-        for (Pair<Node, String> key : acc.keys()) {
+        Set<SwaggerError> errors = new HashSet<>();
+        for (Pair<Node, String> key : acc.keySet()) {
             Set<Node> duplicates = acc.get(key);
 
             if (duplicates.size() > 1) {
@@ -266,14 +265,16 @@ public abstract class Validator {
      * and having for value the pair's key. Once the iteration is done, the resulting map should be traversed. Each pair
      * having more than one element in its associated Set are duplicate keys.
      */
-    protected void collectDuplicates(Node parent, Multimap<Pair<Node, String>, Node> acc) {
+    protected void collectDuplicates(Node parent, Map<Pair<Node, String>, Set<Node>> acc) {
         switch (parent.getNodeId()) {
         case mapping: {
             for (NodeTuple value : ((MappingNode) parent).getValue()) {
                 Node keyNode = value.getKeyNode();
 
                 if (keyNode.getNodeId() == NodeId.scalar) {
-                    acc.put(Pair.of(parent, ((ScalarNode) keyNode).getValue()), keyNode);
+                    Pair<Node, String> key = Pair.of(parent, ((ScalarNode) keyNode).getValue());
+                    acc.putIfAbsent(key, new HashSet<>());
+                    acc.get(key).add(keyNode);
                 }
 
                 collectDuplicates(value.getValueNode(), acc);

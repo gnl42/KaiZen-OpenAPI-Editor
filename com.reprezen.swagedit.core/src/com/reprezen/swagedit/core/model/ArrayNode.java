@@ -43,8 +43,8 @@ public class ArrayNode extends AbstractNode {
     }
 
     @Override
-    public Iterable<AbstractNode> elements() {
-        return elements;
+    public AbstractNode[] elements() {
+        return elements.toArray(new AbstractNode[elements.size()]);
     }
 
     @Override

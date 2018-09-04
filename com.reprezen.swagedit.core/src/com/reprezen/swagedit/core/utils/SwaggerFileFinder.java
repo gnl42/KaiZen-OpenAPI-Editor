@@ -11,6 +11,7 @@
 package com.reprezen.swagedit.core.utils;
 
 import java.util.ArrayList;
+import java.util.Arrays;
 import java.util.List;
 
 import org.eclipse.core.resources.IContainer;
@@ -19,8 +20,6 @@ import org.eclipse.core.resources.IResource;
 import org.eclipse.core.resources.IResourceProxy;
 import org.eclipse.core.resources.IResourceProxyVisitor;
 import org.eclipse.core.runtime.CoreException;
-
-import com.google.common.collect.Lists;
 
 /**
  * Utility class used to located swagger files depending on a scope.
@@ -93,7 +92,7 @@ public class SwaggerFileFinder {
      */
     public Iterable<IFile> collectFiles(Scope scope, IFile currentFile) {
         if (currentFile == null) {
-            return Lists.newArrayList();
+            return Arrays.asList();
         }
 
         switch (scope) {
@@ -102,7 +101,7 @@ public class SwaggerFileFinder {
         case WORKSPACE:
             return collectFiles(currentFile.getWorkspace().getRoot(), currentFile);
         default:
-            return Lists.newArrayList(currentFile);
+            return Arrays.asList(currentFile);
         }
     }
 
@@ -112,7 +111,7 @@ public class SwaggerFileFinder {
         try {
             parent.accept(visitor, 0);
         } catch (CoreException e) {
-            return Lists.newArrayList();
+            return Arrays.asList();
         }
         return visitor.getFiles();
     }

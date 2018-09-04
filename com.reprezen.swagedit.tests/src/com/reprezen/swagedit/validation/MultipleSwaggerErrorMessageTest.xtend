@@ -3,7 +3,6 @@ package com.reprezen.swagedit.validation
 import com.fasterxml.jackson.databind.JsonNode
 import com.fasterxml.jackson.databind.node.ArrayNode
 import com.google.common.base.Strings
-import com.google.common.collect.Lists
 import com.reprezen.swagedit.core.schema.JsonSchemaUtils
 import com.reprezen.swagedit.schema.SwaggerSchema
 import io.swagger.util.Json
@@ -87,7 +86,7 @@ class MultipleSwaggerErrorMessageTest {
 		// oneOf and anyOf are usually ArrayNodes
 		swaggerSchema.findValues(propertyName).forEach [
 			if (it instanceof ArrayNode) {
-				combinedSchemas.addAll(Lists.newArrayList(it.elements))
+				it.elements.forEach[combinedSchemas.add(it)]
 			} else {
 				combinedSchemas.add(it)
 			}

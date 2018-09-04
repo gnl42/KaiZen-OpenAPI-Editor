@@ -16,7 +16,7 @@ import java.util.Map;
 import com.fasterxml.jackson.core.JsonPointer;
 import com.fasterxml.jackson.databind.JsonNode;
 import com.fasterxml.jackson.databind.ObjectMapper;
-import com.google.common.base.Strings;
+import com.reprezen.swagedit.core.utils.StringUtils;
 import com.reprezen.swagedit.core.model.AbstractNode;
 
 /**
@@ -93,7 +93,7 @@ public abstract class CompositeSchema {
      * @return type
      */
     public TypeDefinition getType(String reference) {
-        if (Strings.emptyToNull(reference) == null) {
+        if (StringUtils.emptyToNull(reference) == null) {
             return swaggerType.getType();
         }
 
@@ -127,11 +127,11 @@ public abstract class CompositeSchema {
     }
 
     protected JsonSchema getSchema(String id) {
-        return Strings.emptyToNull(id) == null ? swaggerType : schemas.get(id);
+        return StringUtils.emptyToNull(id) == null ? swaggerType : schemas.get(id);
     }
 
     protected String baseURI(String href) {
-        if (Strings.emptyToNull(href) == null || href.startsWith("/")) {
+        if (StringUtils.emptyToNull(href) == null || href.startsWith("/")) {
             return null;
         }
 

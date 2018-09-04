@@ -10,6 +10,7 @@
  *******************************************************************************/
 package com.reprezen.swagedit.core.assist;
 
+import java.util.Arrays;
 import java.util.Collection;
 import java.util.Collections;
 import java.util.Iterator;
@@ -21,8 +22,6 @@ import org.apache.commons.lang3.math.NumberUtils;
 
 import com.fasterxml.jackson.core.JsonPointer;
 import com.fasterxml.jackson.databind.JsonNode;
-import com.google.common.base.Strings;
-import com.google.common.collect.Lists;
 import com.reprezen.swagedit.core.assist.ext.ContentAssistExt;
 import com.reprezen.swagedit.core.model.AbstractNode;
 import com.reprezen.swagedit.core.model.Model;
@@ -33,6 +32,7 @@ import com.reprezen.swagedit.core.schema.MultipleTypeDefinition;
 import com.reprezen.swagedit.core.schema.ObjectTypeDefinition;
 import com.reprezen.swagedit.core.schema.ReferenceTypeDefinition;
 import com.reprezen.swagedit.core.schema.TypeDefinition;
+import com.reprezen.swagedit.core.utils.StringUtils;
 
 /**
  * Provider of completion proposals.
@@ -46,7 +46,7 @@ public class JsonProposalProvider {
     }
 
     public JsonProposalProvider(ContentAssistExt... extensions) {
-        this.extensions = Lists.newArrayList(extensions);
+        this.extensions = Arrays.asList(extensions);
     }
 
     /**
@@ -134,7 +134,7 @@ public class JsonProposalProvider {
             label = type.getType().getValue();
         }
 
-        return Lists.newArrayList(new Proposal("", "", type.getDescription(), label));
+        return Arrays.asList(new Proposal("", "", type.getDescription(), label));
     }
 
     protected Collection<Proposal> createBooleanProposals(TypeDefinition type) {
@@ -174,7 +174,7 @@ public class JsonProposalProvider {
         for (String property : type.getProperties().keySet()) {
             Proposal proposal = createPropertyProposal(property, type.getProperties().get(property));
             if (proposal != null) {
-                if (Strings.emptyToNull(prefix) != null && property.startsWith(prefix)) {
+                if (StringUtils.emptyToNull(prefix) != null && property.startsWith(prefix)) {
                     proposals.add(proposal);
                 } else if (element.get(property) == null) {
                     proposals.add(proposal);

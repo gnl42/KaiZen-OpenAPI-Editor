@@ -10,7 +10,8 @@
  *******************************************************************************/
 package com.reprezen.swagedit.validation;
 
-import com.google.common.collect.Maps;
+import java.util.HashMap;
+
 import com.reprezen.swagedit.Activator;
 import com.reprezen.swagedit.core.json.references.JsonReferenceFactory;
 import com.reprezen.swagedit.core.json.references.JsonReferenceValidator;
@@ -45,7 +46,7 @@ public class SwaggerValidator extends Validator {
                 Activator.getDefault().getSchema() : new SwaggerSchema();
 
         public SwaggerSchemaValidator() {
-            super(schema.asJson(), Maps.newHashMap());
+            super(schema.asJson(), new HashMap<>());
         }
     }
 }

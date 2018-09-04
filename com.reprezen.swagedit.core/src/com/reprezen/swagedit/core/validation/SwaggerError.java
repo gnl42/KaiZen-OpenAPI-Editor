@@ -12,13 +12,13 @@ package com.reprezen.swagedit.core.validation;
 
 import java.util.Map;
 import java.util.Set;
+import java.util.stream.IntStream;
 
 import org.eclipse.core.resources.IMarker;
 import org.yaml.snakeyaml.error.MarkedYAMLException;
 import org.yaml.snakeyaml.error.YAMLException;
 
 import com.fasterxml.jackson.core.JsonProcessingException;
-import com.google.common.base.Strings;
 
 public class SwaggerError {
     
@@ -71,7 +71,7 @@ public class SwaggerError {
 
     String getIndentedMessage() {
         final StringBuilder builder = new StringBuilder();
-        builder.append(Strings.repeat("\t", indent));
+        IntStream.range(0, indent).forEach(i->builder.append("\t"));
         builder.append(" - ");
         builder.append(message);
         builder.append("\n");

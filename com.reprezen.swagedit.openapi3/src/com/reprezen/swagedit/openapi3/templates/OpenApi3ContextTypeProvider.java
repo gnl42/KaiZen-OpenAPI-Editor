@@ -10,13 +10,11 @@
  *******************************************************************************/
 package com.reprezen.swagedit.openapi3.templates;
 
+import java.util.Arrays;
 import java.util.List;
 
 import org.eclipse.jface.text.templates.TemplateContextType;
 
-import com.google.common.base.Predicate;
-import com.google.common.collect.Iterables;
-import com.google.common.collect.Lists;
 import com.reprezen.swagedit.core.model.Model;
 import com.reprezen.swagedit.core.templates.SchemaBasedTemplateContextType;
 
@@ -28,18 +26,10 @@ public class OpenApi3ContextTypeProvider {
         if (OpenApi3ContextTypeProvider.RootContextType.isRoot(path)) {
             return new RootContextType();
         }
-        return Iterables
-                .getFirst(Iterables.filter(allContextTypes(), new Predicate<TemplateContextType>() {
-
-                    @Override
-                    public boolean apply(TemplateContextType input) {
-                        if (input instanceof SchemaBasedTemplateContextType) {
-                            return ((SchemaBasedTemplateContextType) input).matches(model, path);
-                        }
-                        return false;
-                    }
-
-                }), null);
+        return allContextTypes().stream()//
+                .filter(input -> input instanceof SchemaBasedTemplateContextType
+                        && ((SchemaBasedTemplateContextType) input).matches(model, path))//
+                .findFirst().orElse(null);
     }
     
     public static class RootContextType extends TemplateContextType {
@@ -56,7 +46,7 @@ public class OpenApi3ContextTypeProvider {
         return new SchemaBasedTemplateContextType(TEMPLATE_ID_PREFIX + name, name, pathToSchemaType);
     }
 
-    private List<TemplateContextType> allContextTypes = Lists.newArrayList( //
+    private List<TemplateContextType> allContextTypes = Arrays.asList( //
             new RootContextType(), //
             createOpenApi3TemplateContextType("info.contact", "/definitions/info"), //
             createOpenApi3TemplateContextType("paths", "/definitions/paths"), //
