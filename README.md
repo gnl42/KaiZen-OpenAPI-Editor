@@ -10,7 +10,7 @@ We welcome your suggestions and contributions!
 
 ## Eclipse Installer
 
-KaiZen OpenAPI Editor is available on [Eclipse Marketplace](https://marketplace.eclipse.org/content/kaizen-openapi-editor). Drag-and-drop this button into Eclipse Mars.2 or later to install, or [see below](#installing-kaizen-openapi-editor) for other options:
+KaiZen OpenAPI Editor is available on [Eclipse Marketplace](https://marketplace.eclipse.org/content/kaizen-openapi-editor). Drag-and-drop this button into Eclipse Oxygen or later to install, or [see below](#installing-kaizen-openapi-editor) for other options:
 
 [![Drag to your running Eclipse* workspace. *Requires Eclipse Marketplace Client](https://marketplace.eclipse.org/sites/all/themes/solstice/public/images/marketplace/btn-install.png)](http://marketplace.eclipse.org/marketplace-client-intro?mpc_install=3429028 "Drag to your running Eclipse* workspace. *Requires Eclipse Marketplace Client")
 
@@ -56,7 +56,7 @@ Outline View shows the contents of the active OpenAPI spec:
 <img src="http://i.imgur.com/iv49CLn.png" alt="Navigation_to_references" width="400">
 
 ## Installing KaiZen OpenAPI Editor
-KaiZen OpenAPI Editor requires Java 8 (64-bit) and Eclipse Mars.2 or later.
+KaiZen OpenAPI Editor requires Java 8 (64-bit) and Eclipse Oxygen or later.
 
 ### Installing from Eclipse Marketplace
 The [Eclipse Marketplace solution](https://marketplace.eclipse.org/content/kaizen-openapi-editor) is the easiest way to install KaiZen Editor into an Eclipse IDE. You can drag-and-drop the Install button from the browser into your Eclipse IDE, or use the built-in Eclipse Marketplace Client.
