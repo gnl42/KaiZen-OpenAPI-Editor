@@ -39,6 +39,8 @@ import org.eclipse.jface.text.rules.WordPatternRule;
 import org.eclipse.swt.SWT;
 import org.eclipse.swt.graphics.RGB;
 
+import com.reprezen.swagedit.core.editor.scanner.PathRule;
+
 /*
  * Identical implementation of a BufferedRuleBasedScanner than YAMLScanner but makes 
  * use of KaiZen Editor PreferenceStore to set KaiZen Editor colors instead of YEdit colors.
@@ -109,6 +111,7 @@ public class JsonScanner extends YAMLScanner implements IPartitionTokenScanner {
         rules.add(new KeyRule(keyToken));
         rules.add(new SingleQuotedKeyRule(keyToken));
         rules.add(new DoubleQuotedKeyRule(keyToken));
+        rules.add(new PathRule(scalarToken));
         rules.add(new MultiLineRule("\"", "\"", scalarToken, '\\'));
         rules.add(new MultiLineRule("'", "'", scalarToken));
         rules.add(new EndOfLineRule("#", commentToken));
