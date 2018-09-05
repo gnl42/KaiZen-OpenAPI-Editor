@@ -16,7 +16,9 @@ import static org.mockito.Mockito.when;
 import java.net.URI;
 import java.util.Map;
 
+import org.eclipse.core.resources.IContainer;
 import org.eclipse.core.resources.IFile;
+import org.eclipse.core.runtime.IPath;
 import org.eclipse.jface.text.ITextSelection;
 import org.eclipse.jface.text.ITextViewer;
 import org.eclipse.jface.viewers.ISelectionProvider;
@@ -81,5 +83,16 @@ public class Mocks {
 
     public static ITextSelection mockSelection() {
         return mock(ITextSelection.class);
+    }
+    
+    public static IFile mockJsonReferenceProposalFile() {
+        IFile file = mock(IFile.class);
+        IContainer parent = mock(IContainer.class);
+        IPath parentPath = mock(IPath.class);
+
+        when(file.getParent()).thenReturn(parent);
+        when(parent.getFullPath()).thenReturn(parentPath);
+
+        return file;
     }
 }
