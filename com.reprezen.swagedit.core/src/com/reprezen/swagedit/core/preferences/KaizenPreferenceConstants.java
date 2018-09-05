@@ -8,23 +8,10 @@
  * Contributors:
  *    ModelSolv, Inc. - initial API and implementation and/or initial documentation
  *******************************************************************************/
-package com.reprezen.swagedit.openapi3.preferences;
+package com.reprezen.swagedit.core.preferences;
 
-import org.dadacoalition.yedit.preferences.ColorPreferences;
+public class KaizenPreferenceConstants {
 
-import com.reprezen.swagedit.openapi3.Activator;
-
-/*
- * This implementation of preference page overrides the YEdit implementation but 
- * uses it's own preference store.
- * 
- */
-public class OpenApiColorPreferences extends ColorPreferences {
-
-    public OpenApiColorPreferences() {
-        super();
-        setPreferenceStore(Activator.getDefault().getPreferenceStore());
-        setDescription("Swagger Color Preferences for syntax highlighting");
-    }
+    public static final String COLOR_PATH = "colorPathPreference";
 
 }

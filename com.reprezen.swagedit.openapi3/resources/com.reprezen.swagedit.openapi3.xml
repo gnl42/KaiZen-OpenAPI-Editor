@@ -5,6 +5,7 @@
 	<mappings>
 		<mapping pluginKey="colorCommentPreference" themeKey="singleLineComment" />
 		<mapping pluginKey="colorKeyPreference" themeKey="method" />
+		<mapping pluginKey="colorPathPreference" themeKey="field" />
 		<mapping pluginKey="colorScalarPreference" themeKey="string" />
 		<mapping pluginKey="colorDefaultPreference" themeKey="foreground" />
 		<mapping pluginKey="colorDocumentPreference" themeKey="foreground" />

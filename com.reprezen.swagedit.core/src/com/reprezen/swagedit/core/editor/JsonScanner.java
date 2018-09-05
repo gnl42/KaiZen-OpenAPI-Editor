@@ -40,6 +40,7 @@ import org.eclipse.swt.SWT;
 import org.eclipse.swt.graphics.RGB;
 
 import com.reprezen.swagedit.core.editor.scanner.PathRule;
+import com.reprezen.swagedit.core.preferences.KaizenPreferenceConstants;
 
 /*
  * BufferedRuleBasedScanner implementation based on YAMLScanner from YEdit. This implementation makes 
@@ -67,7 +68,7 @@ public class JsonScanner extends YAMLScanner implements IPartitionTokenScanner {
                 PreferenceConstants.ITALIC_KEY, PreferenceConstants.UNDERLINE_KEY);
         IToken keyToken = new YAMLToken(keyAttr, YAMLToken.KEY);
 
-        TextAttribute pathKeyAttr = tokenAttribute(PreferenceConstants.COLOR_SCALAR, PreferenceConstants.BOLD_KEY,
+        TextAttribute pathKeyAttr = tokenAttribute(KaizenPreferenceConstants.COLOR_PATH, PreferenceConstants.BOLD_KEY,
                 PreferenceConstants.ITALIC_KEY, PreferenceConstants.UNDERLINE_KEY);
         IToken pathKeyToken = new YAMLToken(pathKeyAttr, YAMLToken.KEY);
 
