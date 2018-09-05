@@ -24,8 +24,6 @@
 </location>
 <location includeAllPlatforms="false" includeConfigurePhase="true" includeMode="planner" includeSource="true" type="InstallableUnit">
 <unit id="org.slf4j.api" version="1.7.2.v20121108-1250"/>
-<unit id="com.google.guava" version="21.0.0.v20170206-1425"/>
-<unit id="com.google.guava.source" version="21.0.0.v20170206-1425"/>
 <unit id="org.yaml.snakeyaml" version="1.14.0.v201604211500"/>
 <unit id="com.fasterxml.jackson.core.jackson-annotations" version="2.6.2.v20161117-2150"/>
 <unit id="com.fasterxml.jackson.core.jackson-annotations.source" version="2.6.2.v20161117-2150"/>

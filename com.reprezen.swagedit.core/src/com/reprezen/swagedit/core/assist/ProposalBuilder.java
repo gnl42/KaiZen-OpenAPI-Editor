@@ -14,7 +14,7 @@ import java.util.Objects;
 
 import org.eclipse.jface.text.contentassist.CompletionProposal;
 
-import com.google.common.base.Strings;
+import com.reprezen.swagedit.core.utils.StringUtils;
 
 public class ProposalBuilder {
 
@@ -56,7 +56,7 @@ public class ProposalBuilder {
      * 
      */
     public StyledCompletionProposal build(String prefix, int offset, int preSelectedRegionLength) {
-        prefix = Strings.emptyToNull(prefix);
+        prefix = StringUtils.emptyToNull(prefix);
         StyledCompletionProposal proposal = null;
         if (prefix == null || replacementString.toLowerCase().contains(prefix.toLowerCase())) {
             proposal = new StyledCompletionProposal(this, prefix, offset, preSelectedRegionLength);

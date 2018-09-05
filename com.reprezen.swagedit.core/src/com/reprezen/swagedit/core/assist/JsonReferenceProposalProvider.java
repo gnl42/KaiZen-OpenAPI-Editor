@@ -10,6 +10,7 @@
  *******************************************************************************/
 package com.reprezen.swagedit.core.assist;
 
+import java.util.ArrayList;
 import java.util.Collection;
 import java.util.List;
 
@@ -17,7 +18,6 @@ import org.eclipse.core.resources.IFile;
 import org.eclipse.core.runtime.IPath;
 
 import com.fasterxml.jackson.core.JsonPointer;
-import com.google.common.collect.Lists;
 import com.reprezen.swagedit.core.assist.contexts.ContextType;
 import com.reprezen.swagedit.core.assist.contexts.ContextTypeCollection;
 import com.reprezen.swagedit.core.editor.JsonDocument;
@@ -73,7 +73,7 @@ public class JsonReferenceProposalProvider {
         final ContextType type = contextTypes.get(document.getModel(), pointer);
         final IFile currentFile = getActiveFile();
         final IPath basePath = currentFile.getParent().getFullPath();
-        final List<ProposalBuilder> proposals = Lists.newArrayList();
+        final List<ProposalBuilder> proposals = new ArrayList<>();
         
         if (scope == Scope.LOCAL) {
             proposals.addAll(type.collectProposals(document, null));

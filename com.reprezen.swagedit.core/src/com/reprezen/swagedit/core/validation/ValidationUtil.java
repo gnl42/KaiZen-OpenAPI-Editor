@@ -20,8 +20,7 @@ import org.yaml.snakeyaml.nodes.NodeTuple;
 import org.yaml.snakeyaml.nodes.ScalarNode;
 
 import com.fasterxml.jackson.databind.JsonNode;
-import com.google.common.base.Strings;
-import com.google.common.collect.Lists;
+import com.reprezen.swagedit.core.utils.StringUtils;
 
 public class ValidationUtil {
     
@@ -119,7 +118,7 @@ public class ValidationUtil {
     }
     
     public static JsonNode findNode(String path, JsonNode root) {
-    	return findNode(Lists.newLinkedList(Arrays.asList(path.split("/"))), root);
+    	return findNode(new LinkedList<>(Arrays.asList(path.split("/"))), root);
     }
     
     private static JsonNode findNode(LinkedList<String> path, JsonNode root) {
@@ -128,7 +127,7 @@ public class ValidationUtil {
         }
         // retrieves the first element, and also *removes* it
         String firstSegment = path.pop();
-        if (Strings.isNullOrEmpty(firstSegment)) {
+        if (StringUtils.isNullOrEmpty(firstSegment)) {
             return findNode(path, root);
         }
         int firstSegmentAsNumber = -1;

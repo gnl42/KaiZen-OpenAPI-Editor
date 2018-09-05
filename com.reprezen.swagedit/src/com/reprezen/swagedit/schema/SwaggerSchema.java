@@ -1,6 +1,8 @@
 package com.reprezen.swagedit.schema;
 
 import java.io.IOException;
+import java.util.ArrayList;
+import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 
@@ -8,8 +10,6 @@ import com.fasterxml.jackson.core.JsonPointer;
 import com.fasterxml.jackson.databind.JsonNode;
 import com.fasterxml.jackson.databind.node.ArrayNode;
 import com.fasterxml.jackson.databind.node.ObjectNode;
-import com.google.common.collect.Lists;
-import com.google.common.collect.Maps;
 import com.reprezen.swagedit.core.schema.CompositeSchema;
 import com.reprezen.swagedit.core.schema.JsonSchema;
 import com.reprezen.swagedit.core.schema.ObjectTypeDefinition;
@@ -18,7 +18,7 @@ import com.reprezen.swagedit.preferences.SwaggerPreferenceConstants;
 public class SwaggerSchema extends CompositeSchema {
 
     private JsonSchema coreType;
-    private final Map<String, JsonNode> jsonRefContexts = Maps.newHashMap();
+    private final Map<String, JsonNode> jsonRefContexts = new HashMap<>();
 
     private final JsonNode refToJsonReferenceNode = mapper.createObjectNode().put("$ref",
             "#/definitions/jsonReference");
@@ -75,7 +75,9 @@ public class SwaggerSchema extends CompositeSchema {
         }
         ArrayNode definition = (ArrayNode) jsonRefContexts.get(jsonReferenceContext);
         // should preserve order of the original ArrayNode._children
-        List<JsonNode> children = Lists.newArrayList(definition.elements());
+        List<JsonNode> children = new ArrayList<>();
+        definition.elements().forEachRemaining(children::add);
+        
         int indexOfJsonReference = children.indexOf(refToJsonReferenceNode);
         boolean alreadyHasJsonReference = indexOfJsonReference > -1;
         if (allow) {

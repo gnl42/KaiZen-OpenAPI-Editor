@@ -18,7 +18,6 @@ import java.util.List;
 import com.fasterxml.jackson.core.JsonPointer;
 import com.fasterxml.jackson.databind.JsonNode;
 import com.fasterxml.jackson.databind.node.ArrayNode;
-import com.google.common.collect.Iterables;
 
 /**
  * Represents a JSON schema type definition of a complex type, eg oneOf, allOf, anyOf types.
@@ -107,7 +106,7 @@ public class ComplexTypeDefinition extends TypeDefinition {
 
     @Override
     public String getLabel() {
-        TypeDefinition firstType = Iterables.getFirst(complexTypes, null);
+        TypeDefinition firstType = complexTypes.isEmpty() ? null : complexTypes.iterator().next();
         return firstType!=null ? firstType.getLabel() : null;
     }
 }

@@ -15,9 +15,9 @@ import java.util.HashMap;
 import java.util.Map;
 import java.util.Set;
 import java.util.TreeSet;
+import java.util.stream.IntStream;
 
 import com.fasterxml.jackson.databind.JsonNode;
-import com.google.common.base.Strings;
 import com.reprezen.swagedit.core.schema.JsonSchemaUtils;
 import com.reprezen.swagedit.core.validation.SwaggerError.MultipleSwaggerError;
 
@@ -71,7 +71,10 @@ public class MultipleSwaggerErrorBuilder {
         orderedErrorLocations.addAll(errors.keySet());
 
         final StringBuilder builder = new StringBuilder();
-        final String tabs = Strings.repeat("\t", indent);
+        
+        final StringBuilder tabs = new StringBuilder();
+        IntStream.range(0, indent).forEach(i->tabs.append("\t"));
+        
 
         builder.append(tabs);
         builder.append("Failed to match exactly one schema:");

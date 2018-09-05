@@ -10,10 +10,10 @@
  *******************************************************************************/
 package com.reprezen.swagedit.openapi3.assist.ext;
 
+import java.util.Arrays;
 import java.util.Collection;
 
 import com.fasterxml.jackson.core.JsonPointer;
-import com.google.common.collect.Lists;
 import com.reprezen.swagedit.core.assist.ProposalBuilder;
 import com.reprezen.swagedit.core.assist.ext.ContentAssistExt;
 import com.reprezen.swagedit.core.model.AbstractNode;
@@ -31,7 +31,7 @@ public class ParameterInContentAssistExt implements ContentAssistExt {
 
     @Override
     public Collection<ProposalBuilder> getProposals(TypeDefinition type, AbstractNode node, String prefix) {
-        return Lists.newArrayList( //
+        return Arrays.asList( //
                 new ProposalBuilder("query").replacementString("query").description(description).type("string"),
                 new ProposalBuilder("header").replacementString("header").description(description).type("string"),
                 new ProposalBuilder("path").replacementString("path").description(description).type("string"),

@@ -10,7 +10,8 @@
  *******************************************************************************/
 package com.reprezen.swagedit.openapi3.assist;
 
-import com.google.common.collect.Lists;
+import java.util.Arrays;
+
 import com.reprezen.swagedit.core.assist.JsonReferenceProposalProvider;
 import com.reprezen.swagedit.core.assist.contexts.ComponentContextType;
 import com.reprezen.swagedit.core.assist.contexts.ContextTypeCollection;
@@ -36,7 +37,7 @@ public class OpenApi3ReferenceProposalProvider extends JsonReferenceProposalProv
     public static class OpenApi3ContextTypeCollection extends ContextTypeCollection {
 
         protected OpenApi3ContextTypeCollection(CompositeSchema schema) {
-            super(Lists.newArrayList( //
+            super(Arrays.asList( //
                     // SCHEMA_EXAMPLE, // 
                     new ComponentContextType("components/schemas", "schemas", "schemaOrReference"), //
                     new ComponentContextType("components/parameters", "parameters", "parameterOrReference"), //

@@ -10,6 +10,7 @@
  *******************************************************************************/
 package com.reprezen.swagedit.core.assist.contexts;
 
+import java.util.ArrayList;
 import java.util.Collection;
 import java.util.Collections;
 import java.util.Iterator;
@@ -18,7 +19,6 @@ import org.eclipse.core.runtime.IPath;
 
 import com.fasterxml.jackson.core.JsonPointer;
 import com.fasterxml.jackson.databind.JsonNode;
-import com.google.common.collect.Lists;
 import com.reprezen.swagedit.core.assist.ProposalBuilder;
 import com.reprezen.swagedit.core.editor.JsonDocument;
 import com.reprezen.swagedit.core.model.Model;
@@ -80,7 +80,7 @@ public abstract class ContextType {
      * @return Collection of proposals
      */
     public Collection<ProposalBuilder> collectProposals(JsonNode document, IPath path) {
-        final Collection<ProposalBuilder> results = Lists.newArrayList();
+        final Collection<ProposalBuilder> results = new ArrayList<>();
         if (value() == null) {
             return results;
         }

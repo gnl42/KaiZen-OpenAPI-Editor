@@ -18,7 +18,7 @@ import org.yaml.snakeyaml.nodes.ScalarNode;
 
 import com.fasterxml.jackson.core.JsonPointer;
 import com.fasterxml.jackson.databind.JsonNode;
-import com.google.common.base.Strings;
+import com.reprezen.swagedit.core.utils.StringUtils;
 import com.reprezen.swagedit.core.model.AbstractNode;
 import com.reprezen.swagedit.core.model.Model;
 import com.reprezen.swagedit.core.model.ValueNode;
@@ -79,7 +79,7 @@ public class JsonReferenceFactory {
         }
 
         String stringValue = (String) value;
-        if (Strings.emptyToNull(stringValue) == null || stringValue.startsWith("#") || stringValue.contains("/")) {
+        if (StringUtils.emptyToNull(stringValue) == null || stringValue.startsWith("#") || stringValue.contains("/")) {
             return null;
         }
 
@@ -96,7 +96,7 @@ public class JsonReferenceFactory {
     }
 
     public JsonReference doCreate(String value, Object source) {
-        String notNull = Strings.nullToEmpty(value);
+        String notNull = StringUtils.nullToEmpty(value);
 
         URI uri;
         try {
@@ -118,7 +118,7 @@ public class JsonReferenceFactory {
                 fragment = fragment.substring(0, fragment.length() - 1);
             }
 
-            pointer = JsonPointer.compile(Strings.emptyToNull(fragment));
+            pointer = JsonPointer.compile(StringUtils.emptyToNull(fragment));
         } catch (IllegalArgumentException e) {
             // let the pointer be null
         }

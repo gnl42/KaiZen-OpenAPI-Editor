@@ -10,6 +10,7 @@
  *******************************************************************************/
 package com.reprezen.swagedit.core.validation;
 
+import java.util.HashSet;
 import java.util.Map;
 import java.util.Set;
 
@@ -22,7 +23,6 @@ import com.github.fge.jsonschema.core.load.configuration.LoadingConfigurationBui
 import com.github.fge.jsonschema.core.report.ProcessingReport;
 import com.github.fge.jsonschema.main.JsonSchema;
 import com.github.fge.jsonschema.main.JsonSchemaFactory;
-import com.google.common.collect.Sets;
 import com.reprezen.swagedit.core.Activator;
 import com.reprezen.swagedit.core.editor.JsonDocument;
 
@@ -50,7 +50,7 @@ public abstract class JsonSchemaValidator {
 
     public Set<SwaggerError> validate(JsonDocument document) {
         final ErrorProcessor processor = new ErrorProcessor(document.getYaml(), schema);
-        final Set<SwaggerError> errors = Sets.newHashSet();
+        final Set<SwaggerError> errors = new HashSet<>();
 
         JsonSchema jsonSchema = null;
         try {

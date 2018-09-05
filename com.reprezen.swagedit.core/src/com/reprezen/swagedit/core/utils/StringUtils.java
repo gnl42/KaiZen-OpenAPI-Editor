@@ -1,6 +1,8 @@
 package com.reprezen.swagedit.core.utils;
 
-import com.google.common.base.Strings;
+import java.io.ByteArrayOutputStream;
+import java.io.IOException;
+import java.io.InputStream;
 
 public class StringUtils {
 
@@ -31,7 +33,29 @@ public class StringUtils {
     }
 
     public static boolean isQuoted(String string) {
-        return Strings.emptyToNull(string) != null && (string.startsWith("\"") || string.startsWith("'"));
+        return emptyToNull(string) != null && (string.startsWith("\"") || string.startsWith("'"));
+    }
+    
+    public static boolean isNullOrEmpty(String string) {
+        return string == null || string.trim().isEmpty();
+    }
+    
+    public static String emptyToNull(String string) {
+        return (string == null || string.isEmpty()) ? null : string;
+    }
+
+    public static String nullToEmpty(String string) {
+        return string == null ? "" : string;
+    }
+    
+    public static String toString(InputStream contents) throws IOException {
+        ByteArrayOutputStream result = new ByteArrayOutputStream();
+        byte[] buffer = new byte[1024];
+        int length;
+        while ((length = contents.read(buffer)) != -1) {
+            result.write(buffer, 0, length);
+        }
+        return result.toString("UTF-8");
     }
 
 }

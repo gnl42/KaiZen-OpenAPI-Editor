@@ -12,6 +12,7 @@ package com.reprezen.swagedit.openapi3.editor;
 
 import static com.reprezen.swagedit.openapi3.preferences.OpenApi3PreferenceConstants.ADVANCED_VALIDATION;
 
+import java.util.HashMap;
 import java.util.Map;
 
 import org.dadacoalition.yedit.editor.YEditSourceViewerConfiguration;
@@ -26,7 +27,6 @@ import org.eclipse.ui.internal.editors.text.EditorsPlugin;
 import org.eclipse.ui.texteditor.ChainedPreferenceStore;
 
 import com.fasterxml.jackson.databind.JsonNode;
-import com.google.common.collect.Maps;
 import com.reprezen.swagedit.core.assist.JsonContentAssistProcessor;
 import com.reprezen.swagedit.core.editor.JsonEditor;
 import com.reprezen.swagedit.core.editor.JsonSourceViewerConfiguration;
@@ -117,7 +117,7 @@ public class OpenApi3Editor extends JsonEditor {
     @Override
     protected Validator createValidator() {
         if (validator == null) {
-            Map<String, JsonNode> preloadedSchemas = Maps.newHashMap();
+            Map<String, JsonNode> preloadedSchemas = new HashMap<>();
             JsonNode schema = Activator.getDefault().getSchema().getRootType().asJson();
             preloadedSchemas.put(OpenApi3Schema.URL, schema);
 

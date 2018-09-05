@@ -26,11 +26,11 @@ import org.eclipse.swt.graphics.RGB;
 import org.eclipse.swt.graphics.TextStyle;
 import org.eclipse.swt.widgets.Display;
 
-import com.google.common.base.Strings;
 import com.reprezen.swagedit.core.Activator;
 import com.reprezen.swagedit.core.Activator.Icons;
 import com.reprezen.swagedit.core.utils.StringUtils;
 import com.reprezen.swagedit.core.utils.StringUtils.QuoteStyle;
+
 
 public class StyledCompletionProposal
         implements ICompletionProposal, ICompletionProposalExtension5, ICompletionProposalExtension6 {
@@ -113,7 +113,7 @@ public class StyledCompletionProposal
         int offset = replacementOffset;
         String text = replacementString;
 
-        if (Strings.emptyToNull(prefix) != null) {
+        if (StringUtils.emptyToNull(prefix) != null) {
             if (replacementString.toLowerCase().contains(prefix)) {
                 text = text.substring(prefix.length());
             }
@@ -130,7 +130,7 @@ public class StyledCompletionProposal
     public Point getSelection(IDocument document) {
         int offset = replacementOffset;
 
-        if (Strings.emptyToNull(prefix) != null) {
+        if (StringUtils.emptyToNull(prefix) != null) {
             if (replacementString.toLowerCase().startsWith(prefix)) {
                 offset = replacementOffset - prefix.length();
             } else if (replacementString.toLowerCase().contains(prefix)) {
