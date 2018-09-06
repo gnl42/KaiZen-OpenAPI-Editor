@@ -64,6 +64,10 @@ public class Mocks {
     }
 
     public static ITextViewer mockTextViewer(OpenApi3Document document, int offset) {
+        return mockTextViewer(document, offset, "");
+    }
+    
+    public static ITextViewer mockTextViewer(OpenApi3Document document, int selectionOffset, String selectionText) {
         ITextViewer viewer = mock(ITextViewer.class);
         ISelectionProvider selectionProvider = mockSelectionProvider();
         ITextSelection selection = mockSelection();
@@ -72,7 +76,9 @@ public class Mocks {
         when(viewer.getSelectedRange()).thenReturn(new Point(0, 0));
         when(viewer.getSelectionProvider()).thenReturn(selectionProvider);
         when(selectionProvider.getSelection()).thenReturn(selection);
-        when(selection.getOffset()).thenReturn(offset);
+        when(selection.getOffset()).thenReturn(selectionOffset);
+        when(selection.getText()).thenReturn(selectionText);
+        when(selection.getLength()).thenReturn(selectionText.length());
 
         return viewer;
     }
