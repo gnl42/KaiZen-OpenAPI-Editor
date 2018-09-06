@@ -29,7 +29,6 @@ import org.eclipse.swt.widgets.Display;
 import com.reprezen.swagedit.core.Activator;
 import com.reprezen.swagedit.core.Activator.Icons;
 import com.reprezen.swagedit.core.utils.StringUtils;
-import com.reprezen.swagedit.core.utils.StringUtils.QuoteStyle;
 
 
 public class StyledCompletionProposal
@@ -41,6 +40,7 @@ public class StyledCompletionProposal
     private final String description;
     /** Lower-cased prefix - content assist typeahead should be case-insensitive */
     private final String prefix;
+    /** Non-null text to be selected after code completion is done*/
     private final String selection;
     
     private final int preSelectedRegionLength;
@@ -53,17 +53,12 @@ public class StyledCompletionProposal
     };
 
     public StyledCompletionProposal(ProposalBuilder builder, String prefix, int offset, int preSelectedRegionLength) {
-        final StyledString styledString = new StyledString(builder.getDisplayString());
+        styledDisplayString = new StyledString(builder.getDisplayString());
         if (builder.getType() != null) {
-            styledString.append(": ", typeStyler).append(builder.getType(), typeStyler);
+            styledDisplayString.append(": ", typeStyler).append(builder.getType(), typeStyler);
         }
-        this.styledDisplayString = styledString;
         this.prefix = prefix != null ? prefix.toLowerCase() : null;
-        if (prefix != null && builder.getReplacementString().toLowerCase().contains(prefix)) {
-            this.replacementString = handleQuotes(builder.getReplacementString(), prefix);
-        } else {
-            this.replacementString = builder.getReplacementString();
-        }
+        this.replacementString = builder.getReplacementString();
         this.selection = builder.getSelection() == null ? "" : builder.getSelection();
         this.replacementOffset = offset;
         this.description = builder.getDescription();
@@ -75,69 +70,37 @@ public class StyledCompletionProposal
         return styledDisplayString;
     }
     
-    private String handleQuotes(String replacementString, String prefix) {
-        // If the replacement string has quotes
-        // we should know which kind is it
-        QuoteStyle quote = QuoteStyle.INVALID;
-        if (StringUtils.isQuoted(replacementString)) {
-            quote = StringUtils.QuoteStyle.parse(replacementString.charAt(0));
-        }
-
-        // If prefix is a quote, which kind is it
-        QuoteStyle prefixQuote = QuoteStyle.INVALID;
-        if (StringUtils.isQuoted(prefix)) {
-            prefixQuote = StringUtils.QuoteStyle.parse(prefix.charAt(0));
-        }
-
-        // Handle quotes
-        String rString = replacementString;
-        if (quote != QuoteStyle.INVALID && prefixQuote != QuoteStyle.INVALID) {
-            if (quote != prefixQuote) {
-                // If quotes are not same, replace quotes from replacement
-                // string with one from prefix 
-                rString = rString.substring(1);
-                if (rString.endsWith(quote.getValue())) {
-                    rString = rString.substring(0, rString.length() - 1);
-                }
-                rString = prefixQuote.getValue() + rString;
-            } else {
-                // remove last quote to avoid duplicates
-                rString = rString.substring(0, rString.length() - 1);
-            }
-        }
-        return rString;
-    }
-
     @Override
     public void apply(IDocument document) {
+        int replacedLength = preSelectedRegionLength;
         int offset = replacementOffset;
         String text = replacementString;
 
-        if (StringUtils.emptyToNull(prefix) != null) {
-            if (replacementString.toLowerCase().contains(prefix)) {
+        if (StringUtils.emptyToNull(prefix) != null && replacementString.toLowerCase().contains(prefix)) {
+            if (replacementString.toLowerCase().startsWith(prefix)) {
                 text = text.substring(prefix.length());
+            } else {
+                offset = replacementOffset - prefix.length();
+                replacedLength = prefix.length();              
             }
         }
-      
+        
         try {
-            document.replace(offset, preSelectedRegionLength, text);
+            document.replace(offset, replacedLength, text);
         } catch (BadLocationException x) {
             // ignore
         }
     }
-
+    
     @Override
     public Point getSelection(IDocument document) {
         int offset = replacementOffset;
 
-        if (StringUtils.emptyToNull(prefix) != null) {
-            if (replacementString.toLowerCase().startsWith(prefix)) {
-                offset = replacementOffset - prefix.length();
-            } else if (replacementString.toLowerCase().contains(prefix)) {
-                offset = replacementOffset - prefix.length();
-            }
+        if (StringUtils.emptyToNull(prefix) != null && replacementString.toLowerCase().contains(prefix)) {
+            // offset at the start of the prefix
+            offset = replacementOffset - prefix.length();
         }
-        int replacementIndex = !"".equals(selection) ? replacementString.indexOf(selection) : -1;
+        int replacementIndex = !selection.isEmpty() ? replacementString.indexOf(selection) : -1;
         int selectionStart = offset + (replacementIndex < 0 ? replacementString.length() : replacementIndex);
         return new Point(selectionStart, selection.length());
     }

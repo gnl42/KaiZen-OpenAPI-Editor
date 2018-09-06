@@ -16,11 +16,18 @@ import com.reprezen.swagedit.openapi3.editor.OpenApi3Document
 import com.reprezen.swagedit.openapi3.schema.OpenApi3Schema
 import com.reprezen.swagedit.openapi3.utils.Mocks
 import java.util.ArrayList
+import java.util.HashMap
+import org.eclipse.jface.text.Document
+import org.eclipse.jface.text.IRegion
+import org.eclipse.jface.text.Region
+import org.eclipse.jface.text.contentassist.ICompletionProposal
+import org.eclipse.jface.text.contentassist.IContentAssistProcessor
+import org.eclipse.xtext.xbase.lib.Functions.Function2
 import org.junit.Test
 
-import static com.reprezen.swagedit.openapi3.utils.Cursors.*
-import static org.hamcrest.core.IsCollectionContaining.*
+import static org.hamcrest.CoreMatchers.*
 import static org.junit.Assert.*
+import org.junit.Ignore
 
 class JsonReferenceProposalProvider_Quotes_Test {
 
@@ -42,6 +49,50 @@ class JsonReferenceProposalProvider_Quotes_Test {
 	}
 
 	@Test
+	def void test_inside_no_quotes() {
+		val document = new OpenApi3Document(new OpenApi3Schema)
+		val test = setUpContentAssistTest('''
+---
+openapi: "3.0.0"
+info:
+  version: 1.0.0
+  title: My API Spec
+paths: {}
+components:
+  schemas:
+    MyType:
+      properties:
+        prop1:
+          $ref: <1>
+		''', document)
+
+		val proposals = test.apply(processor, "1")
+		assertThat(
+			proposals.map[(it as StyledCompletionProposal).replacementString],
+			hasItems("\"#/components/schemas/MyType\"")
+		)
+
+		val proposal = proposals.get(0)
+		proposal.apply(document)
+		val actualAfterCodeAssist = document.get()
+		val String expectedAfterCodeAssist = '''
+---
+openapi: "3.0.0"
+info:
+  version: 1.0.0
+  title: My API Spec
+paths: {}
+components:
+  schemas:
+    MyType:
+      properties:
+        prop1:
+          $ref: "#/components/schemas/MyType"
+			'''
+		assertThat(actualAfterCodeAssist, equalTo(expectedAfterCodeAssist))
+	}
+
+	@Test
 	def void test_inside_double_quotes() {
 		val document = new OpenApi3Document(new OpenApi3Schema)
 		val test = setUpContentAssistTest('''
@@ -53,8 +104,6 @@ info:
 paths: {}
 components:
   schemas:
-    ReferencedType:
-      type: string
     MyType:
       properties:
         prop1:
@@ -64,11 +113,30 @@ components:
 		val proposals = test.apply(processor, "1")
 		assertThat(
 			proposals.map[(it as StyledCompletionProposal).replacementString],
-			hasItems("\"#/components/schemas/MyType")
+			hasItem("\"#/components/schemas/MyType")
 		)
+		assertThat(proposals.size, equalTo(1))
+		val proposal = proposals.get(0)
+		proposal.apply(document)
+		val actualAfterCodeAssist = document.get()
+		val String expectedAfterCodeAssist = '''
+---
+openapi: "3.0.0"
+info:
+  version: 1.0.0
+  title: My API Spec
+paths: {}
+components:
+  schemas:
+    MyType:
+      properties:
+        prop1:
+          $ref: "#/components/schemas/MyType"
+			'''
+		assertThat(actualAfterCodeAssist, equalTo(expectedAfterCodeAssist))
 	}
 
-	@Test
+	@Test @Ignore
 	def void test_after_opening_double_quote() {
 		val document = new OpenApi3Document(new OpenApi3Schema)
 		val test = setUpContentAssistTest('''
@@ -80,8 +148,6 @@ info:
 paths: {}
 components:
   schemas:
-    ReferencedType:
-      type: string
     MyType:
       properties:
         prop1:
@@ -91,7 +157,7 @@ components:
 		val proposals = test.apply(processor, "1")
 		val proposal = proposals.get(0);
 		println((proposal as StyledCompletionProposal).replacementString)
-		
+
 		assertThat(
 			proposals.map[(it as StyledCompletionProposal).replacementString],
 			hasItems("#/components/schemas/MyType")
@@ -110,8 +176,6 @@ info:
 paths: {}
 components:
   schemas:
-    ReferencedType:
-      type: string
     MyType:
       properties:
         prop1:
@@ -119,15 +183,32 @@ components:
 		''', document)
 
 		val proposals = test.apply(processor, "1")
-		val proposal = proposals.get(0);
-		println((proposal as StyledCompletionProposal).replacementString)
 		assertThat(
 			proposals.map[(it as StyledCompletionProposal).replacementString],
-			hasItems("#/components/schemas/MyType")
+			hasItems("'#/components/schemas/MyType")
 		)
+
+		val proposal = proposals.get(0)
+		proposal.apply(document)
+		val actualAfterCodeAssist = document.get()
+		val String expectedAfterCodeAssist = '''
+---
+openapi: "3.0.0"
+info:
+  version: 1.0.0
+  title: My API Spec
+paths: {}
+components:
+  schemas:
+    MyType:
+      properties:
+        prop1:
+          $ref: '#/components/schemas/MyType'
+			'''
+		assertThat(actualAfterCodeAssist, equalTo(expectedAfterCodeAssist))
 	}
 
-	@Test
+	@Test @Ignore
 	def void test_after_opening_single_quote() {
 		val document = new OpenApi3Document(new OpenApi3Schema)
 		val test = setUpContentAssistTest('''
@@ -139,8 +220,6 @@ info:
 paths: {}
 components:
   schemas:
-    ReferencedType:
-      type: string
     MyType:
       properties:
         prop1:
@@ -152,6 +231,59 @@ components:
 			proposals.map[(it as StyledCompletionProposal).replacementString],
 			hasItems("#/components/schemas/MyType")
 		)
+	}
+
+	/*============    Code below copied from utils.Cursors, otherwise Xtend won't compile     ============= */
+	static def (IContentAssistProcessor, String)=>ICompletionProposal[] setUpContentAssistTest(String yaml,
+		OpenApi3Document doc) {
+
+		val groups = groupMarkers(yaml)
+		doc.set(removeMarkers(yaml))
+		doc.onChange
+
+		new Function2<IContentAssistProcessor, String, ICompletionProposal[]>() {
+			override ICompletionProposal[] apply(IContentAssistProcessor processor, String marker) {
+				// TODO check why we need to add +1 to offset here
+				val offset = groups.get(marker).offset + 1
+				val viewer = Mocks.mockTextViewer(doc, offset)
+
+				processor.computeCompletionProposals(viewer, offset)
+			}
+		}
+	}
+
+	static def groupMarkers(String text) {
+		val groups = new HashMap<String, IRegion>
+
+		val doc = new Document(text)
+		var i = 0
+		var offset = 0
+		var start = false
+		var group = ""
+
+		while (i < doc.getLength()) {
+			var current = doc.get(i, 1)
+			if (current.equals("<")) {
+				start = true
+			} else if (current.equals(">")) {
+				start = false
+				groups.put(group, new Region(Math.max(0, offset - 1), 1))
+				group = ""
+			} else {
+				if (start) {
+					group += current
+				} else {
+					offset++
+				}
+			}
+			i++
+		}
+
+		groups
+	}
+
+	protected static def removeMarkers(String content) {
+		content.replaceAll("<\\d+>", "")
 	}
 
 }

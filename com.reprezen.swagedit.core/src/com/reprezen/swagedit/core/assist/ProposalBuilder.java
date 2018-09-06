@@ -10,11 +10,14 @@
  *******************************************************************************/
 package com.reprezen.swagedit.core.assist;
 
+import static com.reprezen.swagedit.core.utils.StringUtils.tryGetQuotes;
+
 import java.util.Objects;
 
 import org.eclipse.jface.text.contentassist.CompletionProposal;
 
 import com.reprezen.swagedit.core.utils.StringUtils;
+import com.reprezen.swagedit.core.utils.StringUtils.QuoteStyle;
 
 public class ProposalBuilder {
 
@@ -58,10 +61,29 @@ public class ProposalBuilder {
     public StyledCompletionProposal build(String prefix, int offset, int preSelectedRegionLength) {
         prefix = StringUtils.emptyToNull(prefix);
         StyledCompletionProposal proposal = null;
-        if (prefix == null || replacementString.toLowerCase().contains(prefix.toLowerCase())) {
+        if (prefix == null || replacementString.toLowerCase().contains(tryRemoveOpeningQuote(prefix.toLowerCase()))) {
+            replacementString = alignQuotesWithPrefix(replacementString, prefix);
             proposal = new StyledCompletionProposal(this, prefix, offset, preSelectedRegionLength);
         }
         return proposal;
+    }
+    
+    private String alignQuotesWithPrefix(String replacementString, String prefix) {
+        QuoteStyle replacementStringQuote = tryGetQuotes(replacementString);
+        QuoteStyle prefixQuote = tryGetQuotes(prefix);
+ 
+        if (replacementStringQuote.isValid() && prefixQuote.isValid()) {
+            replacementString = prefixQuote.getValue() + trimQuotes(replacementString);
+        }
+        return replacementString;
+    }
+    
+    private static String trimQuotes(String quotedString) {
+        return quotedString.substring(1, quotedString.length() - 1);
+    }
+    
+    private static String tryRemoveOpeningQuote(String string) {
+        return StringUtils.isQuoted(string) ? string.substring(1): string;
     }
 
     public String getDisplayString() {
