@@ -17,7 +17,6 @@ import org.dadacoalition.yedit.editor.scanner.AnchorWordDetector;
 import org.dadacoalition.yedit.editor.scanner.DocumentStartAndEndRule;
 import org.dadacoalition.yedit.editor.scanner.DoubleQuotedKeyRule;
 import org.dadacoalition.yedit.editor.scanner.IndicatorCharacterRule;
-import org.dadacoalition.yedit.editor.scanner.KeyRule;
 import org.dadacoalition.yedit.editor.scanner.PredefinedValueRule;
 import org.dadacoalition.yedit.editor.scanner.ScalarRule;
 import org.dadacoalition.yedit.editor.scanner.SingleQuotedKeyRule;
@@ -39,8 +38,8 @@ import org.eclipse.jface.text.rules.WordPatternRule;
 import org.eclipse.swt.SWT;
 import org.eclipse.swt.graphics.RGB;
 
+import com.reprezen.swagedit.core.editor.scanner.KeyRule;
 import com.reprezen.swagedit.core.editor.scanner.PathRule;
-import com.reprezen.swagedit.core.preferences.KaizenPreferenceConstants;
 
 /*
  * BufferedRuleBasedScanner implementation based on YAMLScanner from YEdit. This implementation makes 
@@ -68,7 +67,7 @@ public class JsonScanner extends YAMLScanner implements IPartitionTokenScanner {
                 PreferenceConstants.ITALIC_KEY, PreferenceConstants.UNDERLINE_KEY);
         IToken keyToken = new YAMLToken(keyAttr, YAMLToken.KEY);
 
-        TextAttribute pathKeyAttr = tokenAttribute(KaizenPreferenceConstants.COLOR_PATH, PreferenceConstants.BOLD_KEY,
+        TextAttribute pathKeyAttr = tokenAttribute(PreferenceConstants.COLOR_KEY, PreferenceConstants.BOLD_KEY,
                 PreferenceConstants.ITALIC_KEY, PreferenceConstants.UNDERLINE_KEY);
         IToken pathKeyToken = new YAMLToken(pathKeyAttr, YAMLToken.KEY);
 

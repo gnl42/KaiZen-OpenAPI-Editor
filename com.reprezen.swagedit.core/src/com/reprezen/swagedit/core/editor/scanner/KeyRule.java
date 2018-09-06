@@ -13,16 +13,19 @@ package com.reprezen.swagedit.core.editor.scanner;
 import org.eclipse.jface.text.rules.IToken;
 
 /**
- * Scanner rule for matching keys that are paths (starting with /).
+ * Scanner rule for matching keys in a mapping.
+ * 
+ * This rule is based on YEdit KeyRule but uses a different regex that allows slash and dollar sign. It is necessary to
+ * allow media types such as `application/json` and references `$ref` as keys.
  */
-public class PathRule extends KeyRule {
+public class KeyRule extends org.dadacoalition.yedit.editor.scanner.KeyRule {
 
-    public PathRule(IToken token) {
+    public KeyRule(IToken token) {
         super(token);
     }
 
-    @Override
     protected String getKeyRegex() {
-        return "([/] [\\w \\s \\. \\\\ \\- _ + / { }]*:)\\s.*";
+        return "([\\w \\- _ + $] [\\w \\s \\. \\\\ \\- _ + /]*:)\\s.*";
     }
+
 }
