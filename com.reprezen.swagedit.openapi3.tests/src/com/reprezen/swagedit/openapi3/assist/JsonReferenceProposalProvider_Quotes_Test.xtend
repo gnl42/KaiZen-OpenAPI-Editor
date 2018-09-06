@@ -23,12 +23,11 @@ import org.eclipse.jface.text.Region
 import org.eclipse.jface.text.contentassist.ICompletionProposal
 import org.eclipse.jface.text.contentassist.IContentAssistProcessor
 import org.eclipse.xtext.xbase.lib.Functions.Function2
+import org.junit.Ignore
 import org.junit.Test
 
 import static org.hamcrest.CoreMatchers.*
 import static org.junit.Assert.*
-import org.junit.Ignore
-import static org.mockito.Mockito.when
 
 class JsonReferenceProposalProvider_Quotes_Test {
 
