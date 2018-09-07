@@ -16,7 +16,7 @@ import java.util.Collection;
 import org.eclipse.core.runtime.IPath;
 
 import com.fasterxml.jackson.core.JsonPointer;
-import com.reprezen.swagedit.core.assist.ProposalBuilder;
+import com.reprezen.swagedit.core.assist.ProposalDescriptor;
 import com.reprezen.swagedit.core.assist.contexts.SchemaContextType;
 import com.reprezen.swagedit.core.model.AbstractNode;
 import com.reprezen.swagedit.core.model.Model;
@@ -34,13 +34,13 @@ public class SecuritySchemeContextType extends SchemaContextType {
     }
 
     @Override
-    public Collection<ProposalBuilder> collectProposals(Model model, IPath path) {
-        final Collection<ProposalBuilder> results = new ArrayList<>();
+    public Collection<ProposalDescriptor> collectProposals(Model model, IPath path) {
+        final Collection<ProposalDescriptor> results = new ArrayList<>();
         AbstractNode securitySchemes = model.find(securityPointer);
 
         if (securitySchemes != null && securitySchemes.isObject()) {
             for (String key : securitySchemes.asObject().fieldNames()) {
-                results.add(new ProposalBuilder(key).replacementString(key).type(securitySchemes.getProperty()));
+                results.add(new ProposalDescriptor(key).replacementString(key).type(securitySchemes.getProperty()));
             }
         }
 

@@ -19,7 +19,7 @@ import org.eclipse.core.runtime.IPath;
 
 import com.fasterxml.jackson.core.JsonPointer;
 import com.fasterxml.jackson.databind.JsonNode;
-import com.reprezen.swagedit.core.assist.ProposalBuilder;
+import com.reprezen.swagedit.core.assist.ProposalDescriptor;
 import com.reprezen.swagedit.core.editor.JsonDocument;
 import com.reprezen.swagedit.core.model.Model;
 import com.reprezen.swagedit.core.utils.URLUtils;
@@ -67,7 +67,7 @@ public abstract class ContextType {
         return isLocalOnly;
     }
     
-    public Collection<ProposalBuilder> collectProposals(JsonDocument document, IPath path) {
+    public Collection<ProposalDescriptor> collectProposals(JsonDocument document, IPath path) {
         return collectProposals(document.asJson(), path);
     }
 
@@ -79,8 +79,8 @@ public abstract class ContextType {
      * @param path
      * @return Collection of proposals
      */
-    public Collection<ProposalBuilder> collectProposals(JsonNode document, IPath path) {
-        final Collection<ProposalBuilder> results = new ArrayList<>();
+    public Collection<ProposalDescriptor> collectProposals(JsonNode document, IPath path) {
+        final Collection<ProposalDescriptor> results = new ArrayList<>();
         if (value() == null) {
             return results;
         }
@@ -97,7 +97,7 @@ public abstract class ContextType {
             String value = basePath + key.replaceAll("/", "~1");
             String encoded = URLUtils.encodeURL(value);
 
-            results.add(new ProposalBuilder(key).replacementString("\"" + encoded + "\"").type(value));
+            results.add(new ProposalDescriptor(key).replacementString("\"" + encoded + "\"").type(value));
         }
 
         return results;

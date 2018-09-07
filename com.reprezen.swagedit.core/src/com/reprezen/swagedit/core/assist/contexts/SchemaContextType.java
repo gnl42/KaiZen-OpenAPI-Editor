@@ -15,7 +15,7 @@ import java.util.Collection;
 import org.eclipse.core.runtime.IPath;
 
 import com.fasterxml.jackson.databind.JsonNode;
-import com.reprezen.swagedit.core.assist.ProposalBuilder;
+import com.reprezen.swagedit.core.assist.ProposalDescriptor;
 import com.reprezen.swagedit.core.editor.JsonDocument;
 import com.reprezen.swagedit.core.model.Model;
 import com.reprezen.swagedit.core.schema.CompositeSchema;
@@ -39,15 +39,15 @@ public abstract class SchemaContextType extends RegexContextType {
     }
     
     @Override
-    public Collection<ProposalBuilder> collectProposals(JsonDocument document, IPath path) {
+    public Collection<ProposalDescriptor> collectProposals(JsonDocument document, IPath path) {
         return collectProposals(document.getModel(), path);
     }
 
     @Override
-    public Collection<ProposalBuilder> collectProposals(JsonNode document, IPath path) {
+    public Collection<ProposalDescriptor> collectProposals(JsonNode document, IPath path) {
         return collectProposals(Model.parse(getSchema(), document), path);
     }
 
-    public abstract Collection<ProposalBuilder> collectProposals(Model parse, IPath path);
+    public abstract Collection<ProposalDescriptor> collectProposals(Model parse, IPath path);
 
 }

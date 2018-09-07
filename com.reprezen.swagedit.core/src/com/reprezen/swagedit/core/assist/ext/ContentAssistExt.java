@@ -12,7 +12,7 @@ package com.reprezen.swagedit.core.assist.ext;
 
 import java.util.Collection;
 
-import com.reprezen.swagedit.core.assist.ProposalBuilder;
+import com.reprezen.swagedit.core.assist.ProposalDescriptor;
 import com.reprezen.swagedit.core.model.AbstractNode;
 import com.reprezen.swagedit.core.schema.TypeDefinition;
 
@@ -38,6 +38,6 @@ public interface ContentAssistExt {
      * @param prefix
      * @return proposals
      */
-    Collection<ProposalBuilder> getProposals(TypeDefinition type, AbstractNode node, String prefix);
+    Collection<ProposalDescriptor> getProposals(TypeDefinition type, AbstractNode node, String prefix);
 
 }

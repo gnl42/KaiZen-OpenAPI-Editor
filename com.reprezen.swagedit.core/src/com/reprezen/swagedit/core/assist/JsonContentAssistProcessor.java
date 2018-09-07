@@ -135,7 +135,7 @@ public abstract class JsonContentAssistProcessor extends TemplateCompletionProce
         currentPath = model.getPath(line, column);
         isRefCompletion = referenceProposalProvider.canProvideProposal(model, currentPath);
 
-        Collection<ProposalBuilder> kaizenProposals;
+        Collection<ProposalDescriptor> kaizenProposals;
         if (isRefCompletion) {
             updateStatus(model);
             kaizenProposals = referenceProposalProvider.getProposals(currentPath, document, currentScope);
@@ -192,15 +192,16 @@ public abstract class JsonContentAssistProcessor extends TemplateCompletionProce
 				String.format(Messages.content_assist_proposal_local, bindingKey, context) };
 	}
 
-    protected Collection<ICompletionProposal> getCompletionProposals(Collection<ProposalBuilder> proposals, String prefix,
-            int offset, String selection) {
+    protected Collection<ICompletionProposal> getCompletionProposals(Collection<ProposalDescriptor> proposals,
+            String prefix, int offset, String selection) {
         final List<ICompletionProposal> result = new ArrayList<>();
 
         prefix = StringUtils.emptyToNull(prefix);
 
-        for (ProposalBuilder proposal : proposals) {
+        for (ProposalDescriptor proposal : proposals) {
             int selectionLength = selection == null ? 0 : selection.length();
-            StyledCompletionProposal styledProposal = proposal.build(prefix, offset, selectionLength);
+            StyledCompletionProposal styledProposal = StyledCompletionProposal.create(proposal, prefix, offset,
+                    selectionLength);
             if (styledProposal != null) {
                 result.add(styledProposal);
             }

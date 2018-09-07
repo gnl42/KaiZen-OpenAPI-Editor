@@ -22,7 +22,7 @@ import java.util.stream.Collectors;
 import java.util.stream.Stream;
 
 import com.fasterxml.jackson.core.JsonPointer;
-import com.reprezen.swagedit.core.assist.ProposalBuilder;
+import com.reprezen.swagedit.core.assist.ProposalDescriptor;
 import com.reprezen.swagedit.core.assist.ext.ContentAssistExt;
 import com.reprezen.swagedit.core.model.AbstractNode;
 import com.reprezen.swagedit.core.schema.TypeDefinition;
@@ -31,7 +31,7 @@ public class SchemaFormatContentAssistExt implements ContentAssistExt {
 
     private static final JsonPointer pointer = JsonPointer.compile("/definitions/schema/properties/format");
 
-    private static final Map<String, List<ProposalBuilder>> values = Collections.unmodifiableMap(Stream
+    private static final Map<String, List<ProposalDescriptor>> values = Collections.unmodifiableMap(Stream
             .of(//
                     new SimpleEntry<>("boolean", asList()), //
                     new SimpleEntry<>("array", asList()), //
@@ -39,21 +39,21 @@ public class SchemaFormatContentAssistExt implements ContentAssistExt {
                     new SimpleEntry<>("null", asList()), //
                     new SimpleEntry<>("integer",
                             asList( //
-                                    new ProposalBuilder("int32").replacementString("int32").type("string"), //
-                                    new ProposalBuilder("int64").replacementString("int64").type("string"))), //
+                                    new ProposalDescriptor("int32").replacementString("int32").type("string"), //
+                                    new ProposalDescriptor("int64").replacementString("int64").type("string"))), //
                     new SimpleEntry<>("number",
                             asList( //
-                                    new ProposalBuilder("float").replacementString("float").type("string"), //
-                                    new ProposalBuilder("double").replacementString("double").type("string"))), //
+                                    new ProposalDescriptor("float").replacementString("float").type("string"), //
+                                    new ProposalDescriptor("double").replacementString("double").type("string"))), //
                     new SimpleEntry<>("string",
                             asList( //
-                                    new ProposalBuilder("byte").replacementString("byte").type("string"), //
-                                    new ProposalBuilder("binary").replacementString("binary").type("string"), //
-                                    new ProposalBuilder("date").replacementString("date").type("string"), //
-                                    new ProposalBuilder("date-time").replacementString("date-time").type("string"), //
-                                    new ProposalBuilder("password").replacementString("password").type("string"), //
-                                    new ProposalBuilder("").replacementString("").type("string"))))
-            .collect(Collectors.toMap((e) -> e.getKey(), (e) -> (List<ProposalBuilder>) e.getValue())));
+                                    new ProposalDescriptor("byte").replacementString("byte").type("string"), //
+                                    new ProposalDescriptor("binary").replacementString("binary").type("string"), //
+                                    new ProposalDescriptor("date").replacementString("date").type("string"), //
+                                    new ProposalDescriptor("date-time").replacementString("date-time").type("string"), //
+                                    new ProposalDescriptor("password").replacementString("password").type("string"), //
+                                    new ProposalDescriptor("").replacementString("").type("string"))))
+            .collect(Collectors.toMap((e) -> e.getKey(), (e) -> (List<ProposalDescriptor>) e.getValue())));
             
     @Override
     public boolean canProvideContentAssist(TypeDefinition type) {
@@ -61,8 +61,8 @@ public class SchemaFormatContentAssistExt implements ContentAssistExt {
     }
 
     @Override
-    public Collection<ProposalBuilder> getProposals(TypeDefinition type, AbstractNode node, String prefix) {
-        List<ProposalBuilder> proposals = new ArrayList<>();
+    public Collection<ProposalDescriptor> getProposals(TypeDefinition type, AbstractNode node, String prefix) {
+        List<ProposalDescriptor> proposals = new ArrayList<>();
 
         if (node.getParent() != null && node.getParent().get("type") != null) {
             String filter = (String) node.getParent().get("type").asValue().getValue();
@@ -72,13 +72,13 @@ public class SchemaFormatContentAssistExt implements ContentAssistExt {
             }
         }
 
-        for (List<ProposalBuilder> value : values.values()) {
-            for (ProposalBuilder v : value) {
+        for (List<ProposalDescriptor> value : values.values()) {
+            for (ProposalDescriptor v : value) {
                 proposals.add(v);
             }
         }
 
-        proposals.add(new ProposalBuilder("").replacementString("").type("string"));
+        proposals.add(new ProposalDescriptor("").replacementString("").type("string"));
 
         return proposals;
     }

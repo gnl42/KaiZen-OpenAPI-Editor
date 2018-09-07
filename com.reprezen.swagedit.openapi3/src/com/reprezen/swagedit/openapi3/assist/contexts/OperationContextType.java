@@ -17,7 +17,7 @@ import java.util.List;
 import org.eclipse.core.runtime.IPath;
 
 import com.fasterxml.jackson.core.JsonPointer;
-import com.reprezen.swagedit.core.assist.ProposalBuilder;
+import com.reprezen.swagedit.core.assist.ProposalDescriptor;
 import com.reprezen.swagedit.core.assist.contexts.SchemaContextType;
 import com.reprezen.swagedit.core.model.AbstractNode;
 import com.reprezen.swagedit.core.model.Model;
@@ -36,8 +36,8 @@ public class OperationContextType extends SchemaContextType {
     }
 
     @Override
-    public Collection<ProposalBuilder> collectProposals(Model model, IPath path) {
-        final Collection<ProposalBuilder> results = new ArrayList<>();
+    public Collection<ProposalDescriptor> collectProposals(Model model, IPath path) {
+        final Collection<ProposalDescriptor> results = new ArrayList<>();
         final List<AbstractNode> nodes = model.findByType(operationPointer);
 
         for (AbstractNode node : nodes) {
@@ -47,7 +47,7 @@ public class OperationContextType extends SchemaContextType {
             String value = basePath;
             String encoded = URLUtils.encodeURL(value);
 
-            results.add(new ProposalBuilder(key).replacementString("\"" + encoded + "\"").type(value));
+            results.add(new ProposalDescriptor(key).replacementString("\"" + encoded + "\"").type(value));
         }
 
         return results;

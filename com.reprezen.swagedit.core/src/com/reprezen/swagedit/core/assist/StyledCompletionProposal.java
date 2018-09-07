@@ -10,9 +10,12 @@
  *******************************************************************************/
 package com.reprezen.swagedit.core.assist;
 
+import static com.reprezen.swagedit.core.utils.StringUtils.tryGetQuotes;
+
 import org.eclipse.core.runtime.IProgressMonitor;
 import org.eclipse.jface.text.BadLocationException;
 import org.eclipse.jface.text.IDocument;
+import org.eclipse.jface.text.contentassist.CompletionProposal;
 import org.eclipse.jface.text.contentassist.ICompletionProposal;
 import org.eclipse.jface.text.contentassist.ICompletionProposalExtension5;
 import org.eclipse.jface.text.contentassist.ICompletionProposalExtension6;
@@ -29,11 +32,48 @@ import org.eclipse.swt.widgets.Display;
 import com.reprezen.swagedit.core.Activator;
 import com.reprezen.swagedit.core.Activator.Icons;
 import com.reprezen.swagedit.core.utils.StringUtils;
+import com.reprezen.swagedit.core.utils.StringUtils.QuoteStyle;
 
 
 public class StyledCompletionProposal
         implements ICompletionProposal, ICompletionProposalExtension5, ICompletionProposalExtension6 {
 
+    /**
+     * Returns a {@link CompletionProposal} or null.
+     * 
+     * The {@link CompletionProposal} will be returned only if the prefix is null, or if the replacement string starts
+     * with or contains the prefix. Otherwise this method returns null.
+     * 
+     */
+    public static StyledCompletionProposal create(ProposalDescriptor proposalDescriptor, String prefix, int offset, int preSelectedRegionLength) {
+        prefix = StringUtils.emptyToNull(prefix);
+        StyledCompletionProposal proposal = null;
+        if (prefix == null || proposalDescriptor.getReplacementString().toLowerCase().contains(tryRemoveOpeningQuote(prefix.toLowerCase()))) {
+            proposalDescriptor.replacementString(alignQuotesWithPrefix(proposalDescriptor.getReplacementString(), prefix));
+            proposal = new StyledCompletionProposal(proposalDescriptor, prefix, offset, preSelectedRegionLength);
+        }
+        return proposal;
+    }
+    
+    private static String alignQuotesWithPrefix(String replacementString, String prefix) {
+        QuoteStyle replacementStringQuote = tryGetQuotes(replacementString);
+        QuoteStyle prefixQuote = tryGetQuotes(prefix);
+ 
+        if (replacementStringQuote.isValid() && prefixQuote.isValid()) {
+            replacementString = prefixQuote.getValue() + trimQuotes(replacementString);
+        }
+        return replacementString;
+    }
+    
+    private static String trimQuotes(String quotedString) {
+        return quotedString.substring(1, quotedString.length() - 1);
+    }
+    
+    private static String tryRemoveOpeningQuote(String string) {
+        return StringUtils.isQuoted(string) ? string.substring(1): string;
+    }
+    
+    
     private final int replacementOffset;
     private final String replacementString;
     private final StyledString styledDisplayString;
@@ -52,7 +92,7 @@ public class StyledCompletionProposal
         }
     };
 
-    public StyledCompletionProposal(ProposalBuilder builder, String prefix, int offset, int preSelectedRegionLength) {
+    protected StyledCompletionProposal(ProposalDescriptor builder, String prefix, int offset, int preSelectedRegionLength) {
         styledDisplayString = new StyledString(builder.getDisplayString());
         if (builder.getType() != null) {
             styledDisplayString.append(": ", typeStyler).append(builder.getType(), typeStyler);
@@ -133,4 +173,11 @@ public class StyledCompletionProposal
     public Object getAdditionalProposalInfo(IProgressMonitor monitor) {
         return description;
     }
+
+    @Override
+    public String toString() {
+        return "StyledCompletionProposal [replacementString=" + replacementString + ", description=" + description
+                + ", prefix=" + prefix + ", preSelectedRegionLength=" + preSelectedRegionLength + "]";
+    }
+    
 }
