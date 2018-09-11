@@ -68,8 +68,6 @@ public abstract class JsonPreferenceInitializer extends AbstractPreferenceInitia
 		store.setDefault(PreferenceConstants.BOLD_CONSTANT, true);
 		store.setDefault(PreferenceConstants.ITALIC_CONSTANT, false);
 		store.setDefault(PreferenceConstants.UNDERLINE_CONSTANT, false);
-
-        PreferenceConverter.setDefault(store, KaizenPreferenceConstants.COLOR_PATH, new RGB(0, 0, 0));
 	}
 
 }
