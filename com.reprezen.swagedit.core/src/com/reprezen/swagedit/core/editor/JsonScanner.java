@@ -17,7 +17,6 @@ import org.dadacoalition.yedit.editor.scanner.AnchorWordDetector;
 import org.dadacoalition.yedit.editor.scanner.DocumentStartAndEndRule;
 import org.dadacoalition.yedit.editor.scanner.DoubleQuotedKeyRule;
 import org.dadacoalition.yedit.editor.scanner.IndicatorCharacterRule;
-import org.dadacoalition.yedit.editor.scanner.KeyRule;
 import org.dadacoalition.yedit.editor.scanner.PredefinedValueRule;
 import org.dadacoalition.yedit.editor.scanner.ScalarRule;
 import org.dadacoalition.yedit.editor.scanner.SingleQuotedKeyRule;
@@ -39,9 +38,13 @@ import org.eclipse.jface.text.rules.WordPatternRule;
 import org.eclipse.swt.SWT;
 import org.eclipse.swt.graphics.RGB;
 
+import com.reprezen.swagedit.core.editor.scanner.KeyRule;
+import com.reprezen.swagedit.core.editor.scanner.PathRule;
+
 /*
- * Identical implementation of a BufferedRuleBasedScanner than YAMLScanner but makes 
- * use of KaiZen Editor PreferenceStore to set KaiZen Editor colors instead of YEdit colors.
+ * BufferedRuleBasedScanner implementation based on YAMLScanner from YEdit. This implementation makes 
+ * use of KaiZen Editor PreferenceStore to set KaiZen Editor colors instead of YEdit colors. It also uses  
+ * a custom scanner rule for keys being paths. 
  * 
  * This implementation is necessary due to the lack of possibility to override YAMLScanner
  * usage of a preference store.
@@ -62,8 +65,11 @@ public class JsonScanner extends YAMLScanner implements IPartitionTokenScanner {
     protected void init() {
         TextAttribute keyAttr = tokenAttribute(PreferenceConstants.COLOR_KEY, PreferenceConstants.BOLD_KEY,
                 PreferenceConstants.ITALIC_KEY, PreferenceConstants.UNDERLINE_KEY);
-
         IToken keyToken = new YAMLToken(keyAttr, YAMLToken.KEY);
+
+        TextAttribute pathKeyAttr = tokenAttribute(PreferenceConstants.COLOR_KEY, PreferenceConstants.BOLD_KEY,
+                PreferenceConstants.ITALIC_KEY, PreferenceConstants.UNDERLINE_KEY);
+        IToken pathKeyToken = new YAMLToken(pathKeyAttr, YAMLToken.KEY);
 
         TextAttribute scalarAttr = tokenAttribute(PreferenceConstants.COLOR_SCALAR, PreferenceConstants.BOLD_SCALAR,
                 PreferenceConstants.ITALIC_SCALAR, PreferenceConstants.UNDERLINE_SCALAR);
@@ -109,6 +115,7 @@ public class JsonScanner extends YAMLScanner implements IPartitionTokenScanner {
         rules.add(new KeyRule(keyToken));
         rules.add(new SingleQuotedKeyRule(keyToken));
         rules.add(new DoubleQuotedKeyRule(keyToken));
+        rules.add(new PathRule(pathKeyToken));
         rules.add(new MultiLineRule("\"", "\"", scalarToken, '\\'));
         rules.add(new MultiLineRule("'", "'", scalarToken));
         rules.add(new EndOfLineRule("#", commentToken));
@@ -133,7 +140,8 @@ public class JsonScanner extends YAMLScanner implements IPartitionTokenScanner {
 
     }
 
-    private TextAttribute tokenAttribute(String colorPrefs, String boldPrefs, String italicPrefs, String underlinePrefs) {
+    private TextAttribute tokenAttribute(String colorPrefs, String boldPrefs, String italicPrefs,
+            String underlinePrefs) {
         int style = SWT.NORMAL;
 
         boolean isBold = store.getBoolean(boldPrefs);

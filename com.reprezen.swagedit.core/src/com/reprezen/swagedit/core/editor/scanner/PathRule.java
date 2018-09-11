@@ -8,23 +8,21 @@
  * Contributors:
  *    ModelSolv, Inc. - initial API and implementation and/or initial documentation
  *******************************************************************************/
-package com.reprezen.swagedit.openapi3.preferences;
+package com.reprezen.swagedit.core.editor.scanner;
 
-import org.dadacoalition.yedit.preferences.ColorPreferences;
+import org.eclipse.jface.text.rules.IToken;
 
-import com.reprezen.swagedit.openapi3.Activator;
-
-/*
- * This implementation of preference page overrides the YEdit implementation but 
- * uses it's own preference store.
- * 
+/**
+ * Scanner rule for matching keys that are paths (starting with /).
  */
-public class OpenApiColorPreferences extends ColorPreferences {
+public class PathRule extends KeyRule {
 
-    public OpenApiColorPreferences() {
-        super();
-        setPreferenceStore(Activator.getDefault().getPreferenceStore());
-        setDescription("Swagger Color Preferences for syntax highlighting");
+    public PathRule(IToken token) {
+        super(token);
     }
 
+    @Override
+    protected String getKeyRegex() {
+        return "([/] [\\w \\s \\. \\\\ \\- _ + / { }]*:)\\s.*";
+    }
 }

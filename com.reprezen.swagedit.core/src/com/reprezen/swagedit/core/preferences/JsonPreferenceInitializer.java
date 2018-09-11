@@ -24,11 +24,6 @@ public abstract class JsonPreferenceInitializer extends AbstractPreferenceInitia
 		store.setDefault(PreferenceConstants.ITALIC_DEFAULT, false);
 		store.setDefault(PreferenceConstants.UNDERLINE_DEFAULT, false);
 
-		PreferenceConverter.setDefault(store, PreferenceConstants.COLOR_DEFAULT, new RGB(0, 0, 0));
-		store.setDefault(PreferenceConstants.BOLD_DEFAULT, false);
-		store.setDefault(PreferenceConstants.ITALIC_DEFAULT, false);
-		store.setDefault(PreferenceConstants.UNDERLINE_DEFAULT, false);
-
 		PreferenceConverter.setDefault(store, PreferenceConstants.COLOR_COMMENT, new RGB(57, 127, 98));
 		store.setDefault(PreferenceConstants.BOLD_COMMENT, false);
 		store.setDefault(PreferenceConstants.ITALIC_COMMENT, false);
