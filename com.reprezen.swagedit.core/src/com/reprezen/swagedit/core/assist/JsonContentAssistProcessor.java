@@ -66,7 +66,7 @@ public abstract class JsonContentAssistProcessor extends TemplateCompletionProce
    private final JsonProposalProvider proposalProvider;
    private final JsonReferenceProposalProvider referenceProposalProvider;
    private final ContentAssistant contentAssistant;
-
+   
     /**
      * The pointer that helps us locate the current position of the cursor inside the document.
      * 
@@ -122,7 +122,7 @@ public abstract class JsonContentAssistProcessor extends TemplateCompletionProce
             column = selection.getOffset() - lineOffset;
         } catch (BadLocationException e) {
         }
-
+        
         final String prefix = extractPrefix(viewer, documentOffset);
         // we have to remove the length of
         // the prefix to obtain the correct
@@ -135,16 +135,16 @@ public abstract class JsonContentAssistProcessor extends TemplateCompletionProce
         currentPath = model.getPath(line, column);
         isRefCompletion = referenceProposalProvider.canProvideProposal(model, currentPath);
 
-        Collection<Proposal> p;
+        Collection<ProposalDescriptor> kaizenProposals;
         if (isRefCompletion) {
             updateStatus(model);
-            p = referenceProposalProvider.getProposals(currentPath, document, currentScope);
+            kaizenProposals = referenceProposalProvider.getProposals(currentPath, document, currentScope);
         } else {
             clearStatus();
-            p = proposalProvider.getProposals(currentPath, model, prefix);
+            kaizenProposals = proposalProvider.getProposals(currentPath, model, prefix);
         }
    
-        final Collection<ICompletionProposal> proposals = getCompletionProposals(p, prefix, documentOffset);
+        final Collection<ICompletionProposal> proposals = getCompletionProposals(kaizenProposals, prefix, documentOffset, selection.getText());
         // compute template proposals
         if (!isRefCompletion) {
             final ICompletionProposal[] templateProposals = super.computeCompletionProposals(viewer, documentOffset);
@@ -192,14 +192,16 @@ public abstract class JsonContentAssistProcessor extends TemplateCompletionProce
 				String.format(Messages.content_assist_proposal_local, bindingKey, context) };
 	}
 
-    protected Collection<ICompletionProposal> getCompletionProposals(Collection<Proposal> proposals, String prefix,
-            int offset) {
+    protected Collection<ICompletionProposal> getCompletionProposals(Collection<ProposalDescriptor> proposals,
+            String prefix, int offset, String selection) {
         final List<ICompletionProposal> result = new ArrayList<>();
 
         prefix = StringUtils.emptyToNull(prefix);
 
-        for (Proposal proposal : proposals) {
-            StyledCompletionProposal styledProposal = proposal.asStyledCompletionProposal(prefix, offset);
+        for (ProposalDescriptor proposal : proposals) {
+            int selectionLength = selection == null ? 0 : selection.length();
+            StyledCompletionProposal styledProposal = StyledCompletionProposal.create(proposal, prefix, offset,
+                    selectionLength);
             if (styledProposal != null) {
                 result.add(styledProposal);
             }

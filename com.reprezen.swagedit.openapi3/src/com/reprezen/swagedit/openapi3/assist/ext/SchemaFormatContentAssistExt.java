@@ -12,6 +12,8 @@ package com.reprezen.swagedit.openapi3.assist.ext;
 
 import static java.util.Arrays.asList;
 
+import java.util.AbstractMap.SimpleEntry;
+import java.util.ArrayList;
 import java.util.Collection;
 import java.util.Collections;
 import java.util.List;
@@ -20,18 +22,16 @@ import java.util.stream.Collectors;
 import java.util.stream.Stream;
 
 import com.fasterxml.jackson.core.JsonPointer;
-import com.reprezen.swagedit.core.assist.Proposal;
+import com.reprezen.swagedit.core.assist.ProposalDescriptor;
 import com.reprezen.swagedit.core.assist.ext.ContentAssistExt;
 import com.reprezen.swagedit.core.model.AbstractNode;
 import com.reprezen.swagedit.core.schema.TypeDefinition;
-import java.util.AbstractMap.SimpleEntry;
-import java.util.ArrayList;
 
 public class SchemaFormatContentAssistExt implements ContentAssistExt {
 
     private static final JsonPointer pointer = JsonPointer.compile("/definitions/schema/properties/format");
 
-    private static final Map<String, List<Proposal>> values = Collections.unmodifiableMap(Stream
+    private static final Map<String, List<ProposalDescriptor>> values = Collections.unmodifiableMap(Stream
             .of(//
                     new SimpleEntry<>("boolean", asList()), //
                     new SimpleEntry<>("array", asList()), //
@@ -39,31 +39,30 @@ public class SchemaFormatContentAssistExt implements ContentAssistExt {
                     new SimpleEntry<>("null", asList()), //
                     new SimpleEntry<>("integer",
                             asList( //
-                                    new Proposal("int32", "int32", null, "string"), //
-                                    new Proposal("int64", "int64", null, "string"))), //
+                                    new ProposalDescriptor("int32").replacementString("int32").type("string"), //
+                                    new ProposalDescriptor("int64").replacementString("int64").type("string"))), //
                     new SimpleEntry<>("number",
                             asList( //
-                                    new Proposal("float", "float", null, "string"), //
-                                    new Proposal("double", "double", null, "string"))), //
+                                    new ProposalDescriptor("float").replacementString("float").type("string"), //
+                                    new ProposalDescriptor("double").replacementString("double").type("string"))), //
                     new SimpleEntry<>("string",
                             asList( //
-                                    new Proposal("byte", "byte", null, "string"), //
-                                    new Proposal("binary", "binary", null, "string"), //
-                                    new Proposal("date", "date", null, "string"), //
-                                    new Proposal("date-time", "date-time", null, "string"), //
-                                    new Proposal("password", "password", null, "string"), //
-                                    new Proposal("", "", null, "string")))) //
-            .collect(Collectors.toMap((e) -> e.getKey(), (e) -> (List<Proposal>) e.getValue())));
+                                    new ProposalDescriptor("byte").replacementString("byte").type("string"), //
+                                    new ProposalDescriptor("binary").replacementString("binary").type("string"), //
+                                    new ProposalDescriptor("date").replacementString("date").type("string"), //
+                                    new ProposalDescriptor("date-time").replacementString("date-time").type("string"), //
+                                    new ProposalDescriptor("password").replacementString("password").type("string"), //
+                                    new ProposalDescriptor("").replacementString("").type("string"))))
+            .collect(Collectors.toMap((e) -> e.getKey(), (e) -> (List<ProposalDescriptor>) e.getValue())));
             
-
     @Override
     public boolean canProvideContentAssist(TypeDefinition type) {
         return type != null && pointer.equals(type.getPointer());
     }
 
     @Override
-    public Collection<Proposal> getProposals(TypeDefinition type, AbstractNode node, String prefix) {
-        List<Proposal> proposals = new ArrayList<>();
+    public Collection<ProposalDescriptor> getProposals(TypeDefinition type, AbstractNode node, String prefix) {
+        List<ProposalDescriptor> proposals = new ArrayList<>();
 
         if (node.getParent() != null && node.getParent().get("type") != null) {
             String filter = (String) node.getParent().get("type").asValue().getValue();
@@ -73,13 +72,13 @@ public class SchemaFormatContentAssistExt implements ContentAssistExt {
             }
         }
 
-        for (List<Proposal> value : values.values()) {
-            for (Proposal v : value) {
+        for (List<ProposalDescriptor> value : values.values()) {
+            for (ProposalDescriptor v : value) {
                 proposals.add(v);
             }
         }
 
-        proposals.add(new Proposal("", "", null, "string"));
+        proposals.add(new ProposalDescriptor("").replacementString("").type("string"));
 
         return proposals;
     }

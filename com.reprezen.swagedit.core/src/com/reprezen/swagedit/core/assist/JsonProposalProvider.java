@@ -58,7 +58,7 @@ public class JsonProposalProvider {
      * @param prefix
      * @return proposals
      */
-    public Collection<Proposal> getProposals(JsonPointer pointer, Model model, String prefix) {
+    public Collection<ProposalDescriptor> getProposals(JsonPointer pointer, Model model, String prefix) {
         final AbstractNode node = model.find(pointer);
         if (node == null) {
             return Collections.emptyList();
@@ -73,7 +73,7 @@ public class JsonProposalProvider {
      * @param model
      * @return proposals
      */
-    public Collection<Proposal> getProposals(JsonPointer pointer, Model model) {
+    public Collection<ProposalDescriptor> getProposals(JsonPointer pointer, Model model) {
         return getProposals(pointer, model, null);
     }
 
@@ -83,11 +83,11 @@ public class JsonProposalProvider {
      * @param node
      * @return proposals
      */
-    public Collection<Proposal> getProposals(AbstractNode node) {
+    public Collection<ProposalDescriptor> getProposals(AbstractNode node) {
         return getProposals(node.getType(), node, null);
     }
 
-    protected Collection<Proposal> getProposals(TypeDefinition type, AbstractNode node, String prefix) {
+    protected Collection<ProposalDescriptor> getProposals(TypeDefinition type, AbstractNode node, String prefix) {
         if (type instanceof ReferenceTypeDefinition) {
             type = ((ReferenceTypeDefinition) type).resolve();
         }
@@ -115,7 +115,7 @@ public class JsonProposalProvider {
         case ONE_OF:
             return createComplextTypeProposals((ComplexTypeDefinition) type, node, prefix);
         case UNDEFINED:
-            Collection<Proposal> proposals = new LinkedHashSet<>();
+            Collection<ProposalDescriptor> proposals = new LinkedHashSet<>();
             if (type instanceof MultipleTypeDefinition) {
                 for (TypeDefinition currentType : ((MultipleTypeDefinition) type).getMultipleTypes()) {
                     proposals.addAll(getProposals(currentType, node, prefix));
@@ -126,7 +126,7 @@ public class JsonProposalProvider {
         return Collections.emptyList();
     }
 
-    protected Collection<Proposal> createPrimitiveProposals(TypeDefinition type) {
+    protected Collection<ProposalDescriptor> createPrimitiveProposals(TypeDefinition type) {
         String label;
         if (type.getType() == JsonType.UNDEFINED) {
             label = type.getContainingProperty();
@@ -134,21 +134,21 @@ public class JsonProposalProvider {
             label = type.getType().getValue();
         }
 
-        return Arrays.asList(new Proposal("", "", type.getDescription(), label));
+        return Arrays.asList(new ProposalDescriptor("").replacementString("").description(type.getDescription()).type(label));
     }
 
-    protected Collection<Proposal> createBooleanProposals(TypeDefinition type) {
-        Collection<Proposal> proposals = new LinkedHashSet<>();
+    protected Collection<ProposalDescriptor> createBooleanProposals(TypeDefinition type) {
+        Collection<ProposalDescriptor> proposals = new LinkedHashSet<>();
 
         String labelType = type.getType().getValue();
 
-        proposals.add(new Proposal("true", "true", type.getDescription(), labelType));
-        proposals.add(new Proposal("false", "false", type.getDescription(), labelType));
+        proposals.add(new ProposalDescriptor("true").replacementString("true").description(type.getDescription()).type(labelType));
+        proposals.add(new ProposalDescriptor("false").replacementString("false").description(type.getDescription()).type(labelType));
 
         return proposals;
     }
 
-    protected Proposal createPropertyProposal(String key, TypeDefinition type) {
+    protected ProposalDescriptor createPropertyProposal(String key, TypeDefinition type) {
         if (type == null || "default".equals(key)) {
             return null;
         }
@@ -164,15 +164,15 @@ public class JsonProposalProvider {
             labelType = type.getContainingProperty();
         }
 
-        return new Proposal(key + ":", key, type.getDescription(), labelType);
+        return new ProposalDescriptor(key).replacementString(key + ":").description(type.getDescription()).type(labelType);
     }
 
-    protected Collection<Proposal> createObjectProposals(ObjectTypeDefinition type, AbstractNode element,
+    protected Collection<ProposalDescriptor> createObjectProposals(ObjectTypeDefinition type, AbstractNode element,
             String prefix) {
-        final Collection<Proposal> proposals = new LinkedHashSet<>();
+        final Collection<ProposalDescriptor> proposals = new LinkedHashSet<>();
 
         for (String property : type.getProperties().keySet()) {
-            Proposal proposal = createPropertyProposal(property, type.getProperties().get(property));
+            ProposalDescriptor proposal = createPropertyProposal(property, type.getProperties().get(property));
             if (proposal != null) {
                 if (StringUtils.emptyToNull(prefix) != null && property.startsWith(prefix)) {
                     proposals.add(proposal);
@@ -189,7 +189,7 @@ public class JsonProposalProvider {
                 property = property.substring(1);
             }
 
-            Proposal proposal = createPropertyProposal(property, typeDef);
+            ProposalDescriptor proposal = createPropertyProposal(property, typeDef);
             if (proposal != null) {
                 proposals.add(proposal);
             }
@@ -200,34 +200,34 @@ public class JsonProposalProvider {
             String elementName = elementTitle != null? elementTitle : type.getAdditionalProperties().getLabel();
             if (elementName != null) {
                 elementName = String.format("(%s name)", elementName);
-                proposals.add(new Proposal(elementName + ":", elementName, null, null, elementName));
+                proposals.add(new ProposalDescriptor(elementName).replacementString(elementName + ":").selection(elementName));
             }
         }
         if (proposals.isEmpty()) {
-            proposals.add(new Proposal("_key_" + ":", "_key_", null, null));
+            proposals.add(new ProposalDescriptor("_key_").replacementString("_key_" + ":"));
         }
         return proposals;
     }
 
-    protected Collection<Proposal> createArrayProposals(ArrayTypeDefinition type, AbstractNode node) {
-        Collection<Proposal> proposals = new LinkedHashSet<>();
+    protected Collection<ProposalDescriptor> createArrayProposals(ArrayTypeDefinition type, AbstractNode node) {
+        Collection<ProposalDescriptor> proposals = new LinkedHashSet<>();
 
         if (type.itemsType.getType() == JsonType.ENUM) {
             String labelType = type.itemsType.getContainingProperty();
 
             for (String literal : enumLiterals(type.itemsType)) {
-                proposals.add(new Proposal("- " + literal, literal, type.getDescription(), labelType));
+                proposals.add(new ProposalDescriptor(literal).replacementString("- " + literal).description(type.getDescription()).type(labelType));
             }
         } else {
-            proposals.add(new Proposal("-", "-", type.getDescription(), "array item"));
+            proposals.add(new ProposalDescriptor("-").replacementString("-").description(type.getDescription()).type("array item"));
         }
 
         return proposals;
     }
 
-    protected Collection<Proposal> createComplextTypeProposals(ComplexTypeDefinition type, AbstractNode node,
+    protected Collection<ProposalDescriptor> createComplextTypeProposals(ComplexTypeDefinition type, AbstractNode node,
             String prefix) {
-        final Collection<Proposal> proposals = new LinkedHashSet<>();
+        final Collection<ProposalDescriptor> proposals = new LinkedHashSet<>();
 
         for (TypeDefinition definition : type.getComplexTypes()) {
             proposals.addAll(getProposals(definition, node, prefix));
@@ -244,8 +244,8 @@ public class JsonProposalProvider {
         return literals;
     }
 
-    protected Collection<Proposal> createEnumProposals(TypeDefinition type, AbstractNode node) {
-        final Collection<Proposal> proposals = new LinkedHashSet<>();
+    protected Collection<ProposalDescriptor> createEnumProposals(TypeDefinition type, AbstractNode node) {
+        final Collection<ProposalDescriptor> proposals = new LinkedHashSet<>();
         final String subType = type.asJson().has("type") ? //
                 type.asJson().get("type").asText() : //
                 null;
@@ -264,7 +264,7 @@ public class JsonProposalProvider {
 
             String labelType = type.getType().getValue();
 
-            proposals.add(new Proposal(replStr, literal, type.getDescription(), labelType));
+            proposals.add(new ProposalDescriptor(literal).replacementString(replStr).description(type.getDescription()).type(labelType));
         }
 
         return proposals;

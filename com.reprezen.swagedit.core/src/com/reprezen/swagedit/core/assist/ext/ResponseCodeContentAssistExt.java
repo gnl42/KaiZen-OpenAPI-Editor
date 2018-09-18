@@ -22,11 +22,11 @@ import com.fasterxml.jackson.core.JsonPointer;
 import com.fasterxml.jackson.databind.JsonNode;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import com.fasterxml.jackson.databind.node.ArrayNode;
-import com.reprezen.swagedit.core.utils.StringUtils;
 import com.reprezen.swagedit.core.Activator;
-import com.reprezen.swagedit.core.assist.Proposal;
+import com.reprezen.swagedit.core.assist.ProposalDescriptor;
 import com.reprezen.swagedit.core.model.AbstractNode;
 import com.reprezen.swagedit.core.schema.TypeDefinition;
+import com.reprezen.swagedit.core.utils.StringUtils;
 
 public class ResponseCodeContentAssistExt implements ContentAssistExt {
 
@@ -59,8 +59,8 @@ public class ResponseCodeContentAssistExt implements ContentAssistExt {
     }
 
     @Override
-    public Collection<Proposal> getProposals(TypeDefinition type, AbstractNode node, String prefix) {
-        Collection<Proposal> proposals = new ArrayList<>();
+    public Collection<ProposalDescriptor> getProposals(TypeDefinition type, AbstractNode node, String prefix) {
+        Collection<ProposalDescriptor> proposals = new ArrayList<>();
 
         for (Iterator<JsonNode> it = statusCodes(prefix); it.hasNext();) {
             JsonNode current = it.next();
@@ -70,10 +70,10 @@ public class ResponseCodeContentAssistExt implements ContentAssistExt {
 
             String replacement = ("default".equals(code) ? code : "'" + code + "'") + ":";
 
-            proposals.add(new Proposal(replacement, code, description, phase));
+            proposals.add(new ProposalDescriptor(code).replacementString(replacement).description(description).type(phase));
         }
 
-        proposals.add(new Proposal("x-", "x-", null, "vendorExtension"));
+        proposals.add(new ProposalDescriptor("x-").replacementString("x-").type("vendorExtension"));
 
         return proposals;
     }

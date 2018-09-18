@@ -14,7 +14,7 @@ import java.util.Arrays;
 import java.util.Collection;
 
 import com.fasterxml.jackson.core.JsonPointer;
-import com.reprezen.swagedit.core.assist.Proposal;
+import com.reprezen.swagedit.core.assist.ProposalDescriptor;
 import com.reprezen.swagedit.core.assist.ext.ContentAssistExt;
 import com.reprezen.swagedit.core.model.AbstractNode;
 import com.reprezen.swagedit.core.schema.TypeDefinition;
@@ -29,15 +29,15 @@ public class SchemaTypeContentAssistExt implements ContentAssistExt {
     }
 
     @Override
-    public Collection<Proposal> getProposals(TypeDefinition type, AbstractNode node, String prefix) {
+    public Collection<ProposalDescriptor> getProposals(TypeDefinition type, AbstractNode node, String prefix) {
         return Arrays.asList( //
-                new Proposal("array", "array", null, "enum"), //
-                new Proposal("boolean", "boolean", null, "enum"), //
-                new Proposal("integer", "integer", null, "enum"), //
-                new Proposal("\"null\"", "null", null, "enum"), //
-                new Proposal("number", "number", null, "enum"), //
-                new Proposal("object", "object", null, "enum"), //
-                new Proposal("string", "string", null, "enum"));
+                new ProposalDescriptor("array").replacementString("array").type("enum"), //
+                new ProposalDescriptor("boolean").replacementString("boolean").type("enum"), //
+                new ProposalDescriptor("integer").replacementString("integer").type("enum"), //
+                new ProposalDescriptor("null").replacementString("\"null\"").type("enum"), //
+                new ProposalDescriptor("number").replacementString("number").type("enum"), //
+                new ProposalDescriptor("object").replacementString("object").type("enum"), //
+                new ProposalDescriptor("string").replacementString("string").type("enum"));
     }
 
 }

@@ -31,7 +31,7 @@ class SwaggerProposalProviderTest {
 		val node = model.objectNode(null, "".ptr)
 		node.type = schema.getType(node)
 
-		assertThat(provider.getProposals(node).map[replacementString], hasItems(
+		assertThat(provider.getProposals(node).map[getReplacementString], hasItems(
 			"swagger:",
 			"info:",
 			"host:",
@@ -57,7 +57,7 @@ class SwaggerProposalProviderTest {
 		node.type = schema.getType(node)
 
 		assertThat(provider.getProposals(node).map [
-			replacementString
+			getReplacementString
 		], hasItems("\"2.0\""))
 	}
 
@@ -67,7 +67,7 @@ class SwaggerProposalProviderTest {
 		node.type = schema.getType(node)
 
 		assertThat(provider.getProposals(node).map [
-			replacementString
+			getReplacementString
 		], hasItems(
 			"title:",
 			"version:",
@@ -84,7 +84,7 @@ class SwaggerProposalProviderTest {
 		node.type = schema.getType(node)
 
 		assertThat(provider.getProposals(node).map [
-			replacementString
+			getReplacementString
 		], hasItems(
 			"- http",
 			"- https",
@@ -99,7 +99,7 @@ class SwaggerProposalProviderTest {
 		node.type = schema.getType(node)
 
 		assertThat(provider.getProposals(node).map [
-			replacementString
+			getReplacementString
 		], hasItems(
 			"/:",
 			"x-:"
@@ -112,7 +112,7 @@ class SwaggerProposalProviderTest {
 		node.type = schema.getType(node)
 
 		assertThat(provider.getProposals(node).map [
-			replacementString
+			getReplacementString
 		], hasItems(
 			"(schema name):"
 		))
@@ -124,7 +124,7 @@ class SwaggerProposalProviderTest {
 		node.type = schema.getType(node)
 
 		assertThat(provider.getProposals(node).map [
-			replacementString
+			getReplacementString
 		], hasItems(
 			"(property name):"
 		))
@@ -136,7 +136,7 @@ class SwaggerProposalProviderTest {
 		node.type = schema.getType(node)
 
 		assertThat(provider.getProposals(node).map [
-			replacementString
+			getReplacementString
 		], hasItems(
 			"tags:",
 			"summary:",
@@ -160,7 +160,7 @@ class SwaggerProposalProviderTest {
 		node.type = schema.getType(node)
 
 		assertThat(provider.getProposals(node).map [
-			replacementString
+			getReplacementString
 		], hasItems(
 			"-"
 		))
@@ -172,7 +172,7 @@ class SwaggerProposalProviderTest {
 		node.type = schema.getType(node)
 
 		assertThat(provider.getProposals(node).map [
-			replacementString
+			getReplacementString
 		], hasItems(
 			"header",
 			"path",
@@ -188,7 +188,7 @@ class SwaggerProposalProviderTest {
 		node.type = schema.getType(node)
 
 		assertThat(provider.getProposals(node).map [
-			replacementString
+			getReplacementString
 		], hasItems(
 			"description:",
 			"schema:",
@@ -207,7 +207,7 @@ class SwaggerProposalProviderTest {
 		assertTrue(node.type instanceof MultipleTypeDefinition)
 
 		assertThat(provider.getProposals(node).map [
-			replacementString
+			getReplacementString
 		], hasItems(
 			"",
 			"byte",
@@ -230,7 +230,7 @@ class SwaggerProposalProviderTest {
 		assertEquals(JsonType.ONE_OF, node.type.type)
 
 		val values = provider.getProposals(node).map [
-			replacementString
+			getReplacementString
 		]
 
 		assertEquals(1, values.filter[equals("required:")].size)
@@ -242,7 +242,7 @@ class SwaggerProposalProviderTest {
 		node.type = schema.getType(node)
 
 		val values = provider.getProposals(node).map [
-			replacementString
+			getReplacementString
 		]
 
 		assertEquals(8, values.size)

@@ -20,6 +20,10 @@ public class StringUtils {
         public String getValue() {
             return value;
         }
+        
+        public boolean isValid() {
+            return this != INVALID;
+        }
 
         public static QuoteStyle parse(char c) {
             if (c == '"') {
@@ -33,7 +37,11 @@ public class StringUtils {
     }
 
     public static boolean isQuoted(String string) {
-        return emptyToNull(string) != null && (string.startsWith("\"") || string.startsWith("'"));
+        return emptyToNull(string) != null && (string.charAt(0) == '"' || string.charAt(0) == '\'');
+    }
+    
+    public static QuoteStyle tryGetQuotes(String string) {
+        return isQuoted(string) ? QuoteStyle.parse(string.charAt(0)): QuoteStyle.INVALID;
     }
     
     public static boolean isNullOrEmpty(String string) {
