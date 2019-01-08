@@ -152,7 +152,7 @@ public class ErrorProcessor {
         final StringJoiner missingStringJoiner = new StringJoiner(", ");
         missing.forEach(it -> missingStringJoiner.add(it.toString()));
 
-        return String.format(Messages.error_required_properties, missingStringJoiner.toString());
+        return String.format(Messages.error_missing_property, missingStringJoiner.toString());
     }
 
     protected String rewriteAdditionalProperties(JsonNode error) {
