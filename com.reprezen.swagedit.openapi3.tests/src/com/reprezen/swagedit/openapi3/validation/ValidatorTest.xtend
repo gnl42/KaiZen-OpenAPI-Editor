@@ -476,7 +476,7 @@ class ValidatorTest {
 
 		val errors = validator.validate(document, null as URI)
 		assertEquals(1, errors.size())
-		assertEquals(String.format(Messages.error_required_properties, "baz"), errors.get(0).message)
+		assertEquals(String.format(Messages.warning_required_properties, "baz"), errors.get(0).message)
 	}
 
 	@Test

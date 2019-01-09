@@ -216,7 +216,7 @@ public abstract class Validator {
 
             AbstractNode properties = node.get("properties");
             if (properties == null) {
-                errors.add(error(node, IMarker.SEVERITY_ERROR, Messages.error_missing_properties));
+                errors.add(error(node, IMarker.SEVERITY_WARNING, Messages.warning_missing_properties));
             } else {
                 for (AbstractNode prop : required.elements()) {
                     if (prop instanceof ValueNode) {
@@ -224,8 +224,8 @@ public abstract class Validator {
                         String value = valueNode.getValue().toString();
 
                         if (properties.get(value) == null) {
-                            errors.add(error(valueNode, IMarker.SEVERITY_ERROR,
-                                    String.format(Messages.error_required_properties, value)));
+                            errors.add(error(valueNode, IMarker.SEVERITY_WARNING,
+                                    String.format(Messages.warning_required_properties, value)));
                         }
                     }
                 }

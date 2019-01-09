@@ -31,7 +31,7 @@ public class Messages extends NLS {
     public static String error_typeNoMatch;
     public static String error_notInEnum;
     public static String error_additional_properties_not_allowed;
-    public static String error_required_properties;
+    public static String warning_required_properties;
     public static String error_duplicate_keys;
     public static String error_cannot_read_content;
     public static String error_missing_reference;
@@ -44,12 +44,12 @@ public class Messages extends NLS {
     public static String error_invalid_scope_reference;
     public static String error_invalid_operation_id;
     public static String error_invalid_operation_ref;
-
+    public static String error_missing_property;
     public static String error_array_missing_items;
     public static String error_object_type_missing;
     public static String error_type_missing;
     public static String error_wrong_type;
-    public static String error_missing_properties;
+    public static String warning_missing_properties;
     public static String warning_simple_reference;
 
     public static String error_yaml_parser_indentation;
