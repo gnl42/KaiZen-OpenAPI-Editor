@@ -23,6 +23,7 @@ import java.util.Iterator;
 import java.util.LinkedHashMap;
 import java.util.List;
 import java.util.Map;
+import java.util.Objects;
 
 import org.eclipse.core.resources.IFile;
 import org.eclipse.core.runtime.IPath;
@@ -408,6 +409,24 @@ public class Model {
      */
     public CompositeSchema getSchema() {
         return schema;
+    }
+
+    @Override
+    public int hashCode() {
+        return Objects.hash(nodes, path);
+    }
+
+    @Override
+    public boolean equals(Object obj) {
+        if (this == obj)
+            return true;
+        if (obj == null)
+            return false;
+        if (!(obj instanceof Model))
+            return false;
+
+        Model other = (Model) obj;
+        return Objects.equals(other.path, path);
     }
 
 }
