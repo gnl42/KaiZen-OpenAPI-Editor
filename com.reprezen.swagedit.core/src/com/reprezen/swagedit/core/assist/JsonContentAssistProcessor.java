@@ -15,7 +15,9 @@ import static org.eclipse.ui.IWorkbenchCommandConstants.EDIT_CONTENT_ASSIST;
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.Collection;
+import java.util.Collections;
 import java.util.List;
+import java.util.stream.Collectors;
 
 import org.eclipse.jface.text.BadLocationException;
 import org.eclipse.jface.text.IDocument;
@@ -72,6 +74,9 @@ public abstract class JsonContentAssistProcessor extends TemplateCompletionProce
      * 
      */
     private JsonPointer currentPath = null;
+
+    private Model currentModel = null;
+
     private int currentOffset = -1;
 
     /**
@@ -95,7 +100,7 @@ public abstract class JsonContentAssistProcessor extends TemplateCompletionProce
         this.contentAssistant = ca;
         this.proposalProvider = proposalProvider;
         this.referenceProposalProvider = referenceProposalProvider;
-        this.textMessages = initTextMessages(null);
+        this.textMessages = initTextMessages();
     }
     
     protected abstract TemplateStore getTemplateStore();
@@ -131,29 +136,47 @@ public abstract class JsonContentAssistProcessor extends TemplateCompletionProce
             column -= prefix.length();
         }
 
-        Model model = document.getModel(documentOffset - prefix.length());
-        currentPath = model.getPath(line, column);
-        isRefCompletion = referenceProposalProvider.canProvideProposal(model, currentPath);
+        currentModel = document.getModel(documentOffset - prefix.length());
+        currentPath = currentModel.getPath(line, column);
+        isRefCompletion = referenceProposalProvider.canProvideProposal(currentModel, currentPath);
 
         Collection<ProposalDescriptor> kaizenProposals;
         if (isRefCompletion) {
-            updateStatus(model);
+            updateStatus();
             kaizenProposals = referenceProposalProvider.getProposals(currentPath, document, currentScope);
         } else {
             clearStatus();
-            kaizenProposals = proposalProvider.getProposals(currentPath, model, prefix);
+            kaizenProposals = proposalProvider.getProposals(currentPath, currentModel, prefix);
         }
    
         final Collection<ICompletionProposal> proposals = getCompletionProposals(kaizenProposals, prefix, documentOffset, selection.getText());
-        // compute template proposals
+        // compute template proposals only if not trying to propose references
         if (!isRefCompletion) {
-            final ICompletionProposal[] templateProposals = super.computeCompletionProposals(viewer, documentOffset);
-            if (templateProposals != null && templateProposals.length > 0) {
-                proposals.addAll(Arrays.asList(templateProposals));
+            List<ICompletionProposal> templateProposals = filterTemplateProposals(
+                    super.computeCompletionProposals(viewer, documentOffset), prefix);
+            if (!templateProposals.isEmpty()) {
+                proposals.addAll(templateProposals);
             }
         }
 
         return proposals.toArray(new ICompletionProposal[proposals.size()]);
+    }
+
+    /*
+     * Returns template proposals that contain the current prefix if present, otherwise returns all template proposals.
+     */
+    private List<ICompletionProposal> filterTemplateProposals(ICompletionProposal[] templateProposals, String prefix) {
+        if (templateProposals != null && templateProposals.length > 0) {
+            List<ICompletionProposal> proposals = Arrays.asList(templateProposals);
+            if (!prefix.isEmpty()) {
+                return proposals.stream() //
+                        .filter(e -> e.getDisplayString().toLowerCase().contains(prefix.toLowerCase())) //
+                        .collect(Collectors.toList());
+            }
+            return proposals;
+        } else {
+            return Collections.emptyList();
+        }
     }
 
     private void maybeSwitchScope(int documentOffset) {
@@ -164,10 +187,10 @@ public abstract class JsonContentAssistProcessor extends TemplateCompletionProce
         currentOffset = documentOffset;
     }
 
-    protected void updateStatus(Model model) {
+    protected void updateStatus() {
         if (contentAssistant != null) {
             if (textMessages == null) {
-                textMessages = initTextMessages(model);
+                textMessages = initTextMessages();
             }
             contentAssistant.setStatusLineVisible(true);
             contentAssistant.setStatusMessage(textMessages[currentScope.getValue()]);
@@ -180,10 +203,12 @@ public abstract class JsonContentAssistProcessor extends TemplateCompletionProce
         }
     }
 
-	protected String[] initTextMessages(Model model) {
+    protected String[] initTextMessages() {
 		IBindingService bindingService = (IBindingService) PlatformUI.getWorkbench().getAdapter(IBindingService.class);
 		String bindingKey = bindingService.getBestActiveBindingFormattedFor(EDIT_CONTENT_ASSIST);
-     	ContextType contextType = referenceProposalProvider.getContextTypes().get(model, getCurrentPath());
+        ContextType contextType = currentModel != null
+                ? referenceProposalProvider.getContextTypes().get(currentModel, getCurrentPath())
+                : null;
 		String context = contextType != null ? contextType.label() : "";
 
 		return new String[] { //
@@ -273,11 +298,7 @@ public abstract class JsonContentAssistProcessor extends TemplateCompletionProce
 
     @Override
     protected TemplateContextType getContextType(ITextViewer viewer, IRegion region) {
-        Model model = null;
-        if (viewer.getDocument() instanceof JsonDocument) {
-            model = ((JsonDocument)viewer.getDocument()).getModel();
-        }
-        String contextType = getContextTypeId(model, currentPath.toString());
+        String contextType = getContextTypeId(currentModel, currentPath.toString());
         ContextTypeRegistry registry = getContextTypeRegistry();
         if (registry != null) {
             return registry.getContextType(contextType);

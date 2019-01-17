@@ -158,7 +158,7 @@ components:
 	}
 
 	val processor = new OpenApi3ContentAssistProcessor(null, referenceProvider) {
-		override protected initTextMessages(Model model) { new ArrayList }
+		override protected initTextMessages() { new ArrayList }
 
 		override protected getContextTypeRegistry() { null }
 

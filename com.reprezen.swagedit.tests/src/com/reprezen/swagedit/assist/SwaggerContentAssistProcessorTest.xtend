@@ -8,12 +8,11 @@ import static com.reprezen.swagedit.tests.utils.Cursors.*
 import static org.hamcrest.core.IsCollectionContaining.*
 import static org.junit.Assert.*
 import com.reprezen.swagedit.core.assist.StyledCompletionProposal
-import com.reprezen.swagedit.core.model.Model
 
 class SwaggerContentAssistProcessorTest {
 
 	val processor = new SwaggerContentAssistProcessor(null) {
-		override protected initTextMessages(Model model) {
+		override protected initTextMessages() {
 			new ArrayList
 		}
 

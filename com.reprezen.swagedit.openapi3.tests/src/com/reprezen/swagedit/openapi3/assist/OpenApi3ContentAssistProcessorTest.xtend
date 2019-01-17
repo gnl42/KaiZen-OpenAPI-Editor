@@ -25,7 +25,7 @@ import com.reprezen.swagedit.core.model.Model
 class OpenApi3ContentAssistProcessorTest {
 
 	val processor = new OpenApi3ContentAssistProcessor(null, new OpenApi3Schema) {
-		override protected initTextMessages(Model model) { new ArrayList }
+		override protected initTextMessages() { new ArrayList }
 
 		override protected getContextTypeRegistry() { null }
 
