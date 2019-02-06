@@ -337,6 +337,63 @@ class ValidatorTest {
 	}
 
 	@Test
+	def void testValidationShouldPass_WhenSecuritySchemesAreAbsent() {
+		val content = '''
+			openapi: "3.0.0"
+			info:
+			  title: Broken links Object
+			  version: "1.0.0"
+			security:
+			  - open: []
+			paths:
+			  /:
+			    get:
+			      operationId: opId
+			      responses:
+			        200:
+			          description: Ok
+		'''
+
+		document.set(content)
+		val errors = validator.validate(document, null as URI)
+		assertEquals(1, errors.size())
+		assertThat(
+			errors,
+			hasItems(
+				new SwaggerError(6, IMarker.SEVERITY_ERROR, Messages.error_invalid_security_scheme)
+			)
+		)
+	}
+
+	@Test
+	def void testValidationShouldPassInPaths_WhenSecuritySchemesAreAbsent() {
+		val content = '''
+			openapi: "3.0.0"
+			info:
+			  title: Broken links Object
+			  version: "1.0.0"
+			paths:
+			  /:
+			    get:
+			      operationId: opId
+			      security:
+			        - open: []
+			      responses:
+			        200:
+			          description: Ok
+		'''
+
+		document.set(content)
+		val errors = validator.validate(document, null as URI)
+		assertEquals(1, errors.size())
+		assertThat(
+			errors,
+			hasItems(
+				new SwaggerError(10, IMarker.SEVERITY_ERROR, Messages.error_invalid_security_scheme)
+			)
+		)
+	}
+	@Test
 	def void testValidationShouldPass_SecuritySchemes() {
 		val content = '''
 			openapi: "3.0.0"
@@ -727,7 +784,7 @@ class ValidatorTest {
 	}
 
 	private def shouldHaveInvalidReferenceType(String actual) {
-		expectedMessage(Messages.error_invalid_reference_type + " It should be a valid security scheme.").apply(actual)
+		expectedMessage(Messages.error_invalid_security_scheme).apply(actual)
 	}
 
 	private def shouldBeInvalidScopeReference(String actual, String scope, String name) {

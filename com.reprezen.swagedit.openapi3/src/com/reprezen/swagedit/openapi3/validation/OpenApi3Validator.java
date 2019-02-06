@@ -138,11 +138,10 @@ public class OpenApi3Validator extends Validator {
 
             if (node.isObject()) {
                 for (String field : node.asObject().fieldNames()) {
-                    AbstractNode securityScheme = securitySchemes.get(field);
+                    AbstractNode securityScheme = securitySchemes != null ? securitySchemes.get(field) : null;
 
                     if (securityScheme == null) {
-                        String message = Messages.error_invalid_reference_type
-                                + " It should be a valid security scheme.";
+                        String message = Messages.error_invalid_security_scheme;
 
                         errors.add(error(node.get(field), IMarker.SEVERITY_ERROR, message));
                     } else {
