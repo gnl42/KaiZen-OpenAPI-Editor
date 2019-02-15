@@ -12,7 +12,7 @@ We welcome your suggestions and contributions!
 
 KaiZen OpenAPI Editor is available on [Eclipse Marketplace](https://marketplace.eclipse.org/content/kaizen-openapi-editor). Drag-and-drop this button into Eclipse Oxygen or later to install, or [see below](#installing-kaizen-openapi-editor) for other options:
 
-[![Drag to your running Eclipse* workspace. *Requires Eclipse Marketplace Client](https://marketplace.eclipse.org/sites/all/themes/solstice/public/images/marketplace/btn-install.png)](http://marketplace.eclipse.org/marketplace-client-intro?mpc_install=3429028 "Drag to your running Eclipse* workspace. *Requires Eclipse Marketplace Client")
+[![Drag to your running Eclipse workspace.](./etc/img/btn-install.png)](http://marketplace.eclipse.org/marketplace-client-intro?mpc_install=3429028 "Drag to your running Eclipse workspace.")
 
 ## NEW! OpenAPI 3.0 Editing
 
