@@ -61,7 +61,7 @@ KaiZen OpenAPI Editor requires Java 8 (64-bit) and Eclipse Oxygen or later.
 ### Installing from Eclipse Marketplace
 The [Eclipse Marketplace solution](https://marketplace.eclipse.org/content/kaizen-openapi-editor) is the easiest way to install KaiZen Editor into an Eclipse IDE. You can drag-and-drop the Install button from the browser into your Eclipse IDE, or use the built-in Eclipse Marketplace Client.
 
-[![Drag to your running Eclipse* workspace. *Requires Eclipse Marketplace Client](https://marketplace.eclipse.org/sites/all/themes/solstice/public/images/marketplace/btn-install.png)](http://marketplace.eclipse.org/marketplace-client-intro?mpc_install=3429028 "Drag to your running Eclipse* workspace. *Requires Eclipse Marketplace Client")
+[![Drag to your running Eclipse workspace.](./etc/img/btn-install.png)](http://marketplace.eclipse.org/marketplace-client-intro?mpc_install=3429028 "Drag to your running Eclipse workspace.")
 
 ### Installing from the Update Site 
 You can install KaiZen OpenAPI Editor into your Eclipse IDE by clicking on `Help > Install New Software... > Add...`
@@ -74,7 +74,7 @@ KaiZen Editor is included as a core component of RepreZen API Studio, which adds
 RepreZen API Studio is available through two different installation options:  
 * [API Studio Desktop](http://www.reprezen.com/OpenAPI) installs as a standalone desktop application on Windows, MacOS or Linux.
 * [API Studio for Eclipse](https://marketplace.eclipse.org/content/reprezen-api-studio) installs into an Eclipse IDE distribution, allowing you to use RepreZen's API design, documentation and development features in your primary Eclipse development environment.<br/>
-[![Drag to your running Eclipse* workspace. *Requires Eclipse Marketplace Client](https://marketplace.eclipse.org/sites/all/themes/solstice/public/images/marketplace/btn-install.png)](http://marketplace.eclipse.org/marketplace-client-intro?mpc_install=3138718 "Drag to your running Eclipse* workspace. *Requires Eclipse Marketplace Client")
+[![Drag to your running Eclipse workspace.](./etc/img/btn-install.png)](http://marketplace.eclipse.org/marketplace-client-intro?mpc_install=3138718 "Drag to your running Eclipse workspace.")
 
 ## Troubleshooting
 See the [Troubleshooting Guide](https://github.com/RepreZen/SwagEdit/blob/master/TROUBLESHOOTING.md) for solutions to common problems.
