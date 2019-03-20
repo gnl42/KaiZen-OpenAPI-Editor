@@ -89,7 +89,7 @@ public abstract class Validator {
             Model model = document.getModel();
             if (yaml != null && model != null) {
                 errors.addAll(getSchemaValidator().validate(document));
-                errors.addAll(validateModel(document.getModel()));
+                errors.addAll(validateDocument(document));
                 errors.addAll(checkDuplicateKeys(yaml));
                 errors.addAll(getReferenceValidator().validate(baseURI, document, model));
             }
@@ -104,12 +104,15 @@ public abstract class Validator {
      * @param model
      * @return errors
      */
-    protected Set<SwaggerError> validateModel(Model model) {
+    protected Set<SwaggerError> validateDocument(JsonDocument document) {
         final Set<SwaggerError> errors = new HashSet<>();
+        final ExampleValidator exampleValidator = new ExampleValidator(document);
+        final Model model = document.getModel();
 
         if (model != null && model.getRoot() != null) {
             for (AbstractNode node : model.allNodes()) {
                 executeModelValidation(model, node, errors);
+                errors.addAll(exampleValidator.validate(node));
             }
         }
         return errors;
