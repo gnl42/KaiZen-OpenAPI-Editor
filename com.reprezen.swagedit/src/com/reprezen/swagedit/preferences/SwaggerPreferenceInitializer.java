@@ -10,6 +10,7 @@
  *******************************************************************************/
 package com.reprezen.swagedit.preferences;
 
+import static com.reprezen.swagedit.preferences.SwaggerPreferenceConstants.EXAMPLE_VALIDATION;
 import static com.reprezen.swagedit.preferences.SwaggerPreferenceConstants.VALIDATION_REF_SECURITY_DEFINITIONS_OBJECT;
 import static com.reprezen.swagedit.preferences.SwaggerPreferenceConstants.VALIDATION_REF_SECURITY_REQUIREMENTS_ARRAY;
 import static com.reprezen.swagedit.preferences.SwaggerPreferenceConstants.VALIDATION_REF_SECURITY_REQUIREMENT_OBJECT;
@@ -35,6 +36,7 @@ public class SwaggerPreferenceInitializer extends JsonPreferenceInitializer {
         store.setDefault(VALIDATION_REF_SECURITY_SCHEME_OBJECT, false);
         store.setDefault(VALIDATION_REF_SECURITY_REQUIREMENTS_ARRAY, false);
         store.setDefault(VALIDATION_REF_SECURITY_REQUIREMENT_OBJECT, false);
+        store.setDefault(EXAMPLE_VALIDATION, false);
     }
 
 }

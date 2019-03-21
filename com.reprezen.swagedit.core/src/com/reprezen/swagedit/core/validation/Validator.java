@@ -53,9 +53,15 @@ public abstract class Validator {
     private final JsonNode schemaRefTemplate = new ObjectMapper().createObjectNode() //
             .put("$ref", "#/definitions/schema");
 
+    private boolean exampleValidation = false;
+
     public abstract JsonSchemaValidator getSchemaValidator();
 
     public abstract JsonReferenceValidator getReferenceValidator();
+
+    public void setExampleValidation(boolean enable) {
+        this.exampleValidation = enable;
+    }
 
     /**
      * Returns a list or errors if validation fails.
@@ -89,7 +95,7 @@ public abstract class Validator {
             Model model = document.getModel();
             if (yaml != null && model != null) {
                 errors.addAll(getSchemaValidator().validate(document));
-                errors.addAll(validateDocument(document));
+                errors.addAll(validateDocument(baseURI, document));
                 errors.addAll(checkDuplicateKeys(yaml));
                 errors.addAll(getReferenceValidator().validate(baseURI, document, model));
             }
@@ -101,18 +107,21 @@ public abstract class Validator {
     /**
      * Validates the model against with different rules that cannot be verified only by JSON schema validation.
      * 
+     * @param baseURI
      * @param model
      * @return errors
      */
-    protected Set<SwaggerError> validateDocument(JsonDocument document) {
+    protected Set<SwaggerError> validateDocument(URI baseURI, JsonDocument document) {
         final Set<SwaggerError> errors = new HashSet<>();
-        final ExampleValidator exampleValidator = new ExampleValidator(document);
+        final ExampleValidator exampleValidator = new ExampleValidator(baseURI, document);
         final Model model = document.getModel();
 
         if (model != null && model.getRoot() != null) {
             for (AbstractNode node : model.allNodes()) {
                 executeModelValidation(model, node, errors);
-                errors.addAll(exampleValidator.validate(node));
+                if (exampleValidation) {
+                    errors.addAll(exampleValidator.validate(node));
+                }
             }
         }
         return errors;

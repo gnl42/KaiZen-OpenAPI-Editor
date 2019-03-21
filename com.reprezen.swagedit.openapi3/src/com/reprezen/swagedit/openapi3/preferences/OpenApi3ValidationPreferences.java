@@ -11,6 +11,7 @@
 package com.reprezen.swagedit.openapi3.preferences;
 
 import static com.reprezen.swagedit.openapi3.preferences.OpenApi3PreferenceConstants.ADVANCED_VALIDATION;
+import static com.reprezen.swagedit.openapi3.preferences.OpenApi3PreferenceConstants.EXAMPLE_VALIDATION;
 
 import org.eclipse.jface.layout.GridDataFactory;
 import org.eclipse.jface.layout.GridLayoutFactory;
@@ -46,5 +47,6 @@ public class OpenApi3ValidationPreferences extends FieldEditorPreferencePage
 
         addField(new BooleanFieldEditor(ADVANCED_VALIDATION, "Enable advanced validation",
                 composite));
+        addField(new BooleanFieldEditor(EXAMPLE_VALIDATION, "Enable examples validation", composite));
     }
 }

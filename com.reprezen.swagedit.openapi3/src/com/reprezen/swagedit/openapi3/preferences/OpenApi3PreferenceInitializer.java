@@ -11,6 +11,7 @@
 package com.reprezen.swagedit.openapi3.preferences;
 
 import static com.reprezen.swagedit.openapi3.preferences.OpenApi3PreferenceConstants.ADVANCED_VALIDATION;
+import static com.reprezen.swagedit.openapi3.preferences.OpenApi3PreferenceConstants.EXAMPLE_VALIDATION;
 
 import org.eclipse.jface.preference.IPreferenceStore;
 
@@ -25,6 +26,7 @@ public class OpenApi3PreferenceInitializer extends JsonPreferenceInitializer {
         setColorPreferences(store);
 
         store.setDefault(ADVANCED_VALIDATION, true);
+        store.setDefault(EXAMPLE_VALIDATION, false);
     }
 
 }

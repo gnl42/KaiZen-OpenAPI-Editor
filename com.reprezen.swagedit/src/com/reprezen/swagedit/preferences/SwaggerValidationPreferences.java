@@ -10,6 +10,7 @@
  *******************************************************************************/
 package com.reprezen.swagedit.preferences;
 
+import static com.reprezen.swagedit.preferences.SwaggerPreferenceConstants.EXAMPLE_VALIDATION;
 import static com.reprezen.swagedit.preferences.SwaggerPreferenceConstants.VALIDATION_REF_SECURITY_DEFINITIONS_OBJECT;
 import static com.reprezen.swagedit.preferences.SwaggerPreferenceConstants.VALIDATION_REF_SECURITY_REQUIREMENTS_ARRAY;
 import static com.reprezen.swagedit.preferences.SwaggerPreferenceConstants.VALIDATION_REF_SECURITY_REQUIREMENT_OBJECT;
@@ -44,23 +45,35 @@ public class SwaggerValidationPreferences extends FieldEditorPreferencePage
 
     @Override
     protected void createFieldEditors() {
+        Composite composite = new Composite(getFieldEditorParent(), SWT.NONE);
+        GridLayoutFactory.fillDefaults().applyTo(composite);
+        GridDataFactory.fillDefaults().grab(true, false).indent(0, 10).applyTo(composite);
+
+        // Example validation
+
+        addField(new BooleanFieldEditor(EXAMPLE_VALIDATION, "Enable examples validation", composite));
+
         // IMPORTANT: FieldEditorPreferencePage does not work very well with complex layouts and nested widgets.
         // Consider switching to com.modelsolv.reprezen.generators.ui.preferences.GroupedFieldEditorPreferencePage from
         // the RepreZen repo before modifying it
-        Composite refValidationComposite = new Composite(getFieldEditorParent(), SWT.BORDER);
-        GridLayoutFactory.fillDefaults().applyTo(refValidationComposite);
-        GridDataFactory.fillDefaults().grab(true, false).indent(0, 10).applyTo(refValidationComposite);
+        Composite refValidationComposite = new Composite(composite, SWT.BORDER);
+        GridLayoutFactory.fillDefaults().margins(5, 5).applyTo(refValidationComposite);
+        GridDataFactory.fillDefaults().grab(true, false).applyTo(refValidationComposite);
 
         Label header = new Label(refValidationComposite, SWT.NONE);
         header.setText("Allow JSON references in additional contexts:");
 
-        addField(new BooleanFieldEditor(VALIDATION_REF_SECURITY_DEFINITIONS_OBJECT, "Security Definitions Object",
-                refValidationComposite));
-        addField(new BooleanFieldEditor(VALIDATION_REF_SECURITY_SCHEME_OBJECT, "Security Scheme Object", refValidationComposite));
-        addField(new BooleanFieldEditor(VALIDATION_REF_SECURITY_REQUIREMENTS_ARRAY, "Security Requirements Array",
-                refValidationComposite));
-        addField(new BooleanFieldEditor(VALIDATION_REF_SECURITY_REQUIREMENT_OBJECT, "Security Requirement Object",
-                refValidationComposite));
+        Composite fieldComposite = new Composite(refValidationComposite, SWT.NONE);
+        GridLayoutFactory.fillDefaults().margins(8, 8).applyTo(fieldComposite);
+        GridDataFactory.fillDefaults().grab(true, false).applyTo(fieldComposite);
+
+        addField(
+                new BooleanFieldEditor(VALIDATION_REF_SECURITY_DEFINITIONS_OBJECT, "Security Definitions Object", fieldComposite));
+        addField(new BooleanFieldEditor(VALIDATION_REF_SECURITY_SCHEME_OBJECT, "Security Scheme Object", fieldComposite));
+        addField(
+                new BooleanFieldEditor(VALIDATION_REF_SECURITY_REQUIREMENTS_ARRAY, "Security Requirements Array", fieldComposite));
+        addField(
+                new BooleanFieldEditor(VALIDATION_REF_SECURITY_REQUIREMENT_OBJECT, "Security Requirement Object", fieldComposite));
     }
 
 }

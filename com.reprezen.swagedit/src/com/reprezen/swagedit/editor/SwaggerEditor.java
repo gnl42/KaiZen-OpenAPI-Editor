@@ -10,20 +10,21 @@
  *******************************************************************************/
 package com.reprezen.swagedit.editor;
 
+import static com.reprezen.swagedit.preferences.SwaggerPreferenceConstants.ALL_VALIDATION_PREFS;
+import static com.reprezen.swagedit.preferences.SwaggerPreferenceConstants.EXAMPLE_VALIDATION;
+
 import org.dadacoalition.yedit.YEditLog;
 import org.dadacoalition.yedit.editor.YEditSourceViewerConfiguration;
 import org.eclipse.core.runtime.CoreException;
 import org.eclipse.core.runtime.NullProgressMonitor;
 import org.eclipse.jface.preference.IPreferenceStore;
 import org.eclipse.jface.util.IPropertyChangeListener;
-import org.eclipse.jface.util.PropertyChangeEvent;
 import org.eclipse.ui.internal.editors.text.EditorsPlugin;
 import org.eclipse.ui.texteditor.ChainedPreferenceStore;
 
 import com.reprezen.swagedit.Activator;
 import com.reprezen.swagedit.core.editor.JsonEditor;
 import com.reprezen.swagedit.core.validation.Validator;
-import com.reprezen.swagedit.preferences.SwaggerPreferenceConstants;
 import com.reprezen.swagedit.validation.SwaggerValidator;
 
 /**
@@ -33,27 +34,24 @@ import com.reprezen.swagedit.validation.SwaggerValidator;
 public class SwaggerEditor extends JsonEditor {
 
     public static final String ID = "com.reprezen.swagedit.editor";
-    
-    protected final IPropertyChangeListener preferenceChangeListener = new JsonPreferenceChangeListener() {
 
-        @Override
-        public void propertyChange(PropertyChangeEvent event) {
-            super.propertyChange(event);
-            if (SwaggerPreferenceConstants.ALL_VALIDATION_PREFS.contains(event.getProperty())) {
-                // Boolean comes from changing a value, String comes when restoring the default value as it uses
-                // getDefaultString(name)
-                boolean newValue = event.getNewValue() instanceof Boolean ? (Boolean) event.getNewValue()
-                        : Boolean.valueOf((String) event.getNewValue());
+    private final IPropertyChangeListener validationChangeListener = event -> {
+
+        if (ALL_VALIDATION_PREFS.contains(event.getProperty())) {
+
+            if (!event.getProperty().equals(EXAMPLE_VALIDATION)) {
+                boolean newValue = getPreferenceStore().getBoolean(event.getProperty());
                 Activator.getDefault().getSchema().allowJsonRefInContext(event.getProperty(), newValue);
-                try {
-                    createValidationOperation(false).run(new NullProgressMonitor());
-                } catch (CoreException e) {
-                    YEditLog.logException(e);
-                }
+            }
+
+            try {
+                createValidationOperation(false).run(new NullProgressMonitor());
+            } catch (CoreException e) {
+                YEditLog.logException(e);
             }
         }
     };
-  
+
     public SwaggerEditor() {
         super(new SwaggerDocumentProvider(), //
                 // ZEN-4361 Missing marker location indicators (Overview Ruler) next to editor scrollbar in KZOE
@@ -61,17 +59,28 @@ public class SwaggerEditor extends JsonEditor {
                         Activator.getDefault().getPreferenceStore(), //
                         // Preferences store for EditorsPlugin has settings to show/hide the rules and markers
                         EditorsPlugin.getDefault().getPreferenceStore() }));
+
+        getPreferenceStore().addPropertyChangeListener(validationChangeListener);
     }
-    
+
+    @Override
+    public void dispose() {
+        getPreferenceStore().removePropertyChangeListener(validationChangeListener);
+        super.dispose();
+    }
+
     @Override
     protected YEditSourceViewerConfiguration createSourceViewerConfiguration() {
         sourceViewerConfiguration = new SwaggerSourceViewerConfiguration(Activator.getDefault().getPreferenceStore());
         sourceViewerConfiguration.setEditor(this);
         return sourceViewerConfiguration;
     }
-    
+
     @Override
     protected Validator createValidator() {
-        return new SwaggerValidator();
+        Validator validator = new SwaggerValidator();
+        validator.setExampleValidation(getPreferenceStore().getBoolean(EXAMPLE_VALIDATION));
+
+        return validator;
     }
 }

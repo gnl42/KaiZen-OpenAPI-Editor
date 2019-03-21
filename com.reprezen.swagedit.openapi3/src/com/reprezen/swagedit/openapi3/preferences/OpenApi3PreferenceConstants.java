@@ -12,4 +12,5 @@ package com.reprezen.swagedit.openapi3.preferences;
 
 public class OpenApi3PreferenceConstants {
     public static String ADVANCED_VALIDATION = "openapi.advanced.validation"; //$NON-NLS-1$
+    public static String EXAMPLE_VALIDATION = "openapi.example.validation"; //$NON-NLS-1$
 }

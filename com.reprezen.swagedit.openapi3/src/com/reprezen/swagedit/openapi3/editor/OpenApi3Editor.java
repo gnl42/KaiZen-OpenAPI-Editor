@@ -11,11 +11,15 @@
 package com.reprezen.swagedit.openapi3.editor;
 
 import static com.reprezen.swagedit.openapi3.preferences.OpenApi3PreferenceConstants.ADVANCED_VALIDATION;
+import static com.reprezen.swagedit.openapi3.preferences.OpenApi3PreferenceConstants.EXAMPLE_VALIDATION;
 
 import java.util.HashMap;
 import java.util.Map;
 
+import org.dadacoalition.yedit.YEditLog;
 import org.dadacoalition.yedit.editor.YEditSourceViewerConfiguration;
+import org.eclipse.core.runtime.CoreException;
+import org.eclipse.core.runtime.NullProgressMonitor;
 import org.eclipse.jface.preference.IPreferenceStore;
 import org.eclipse.jface.text.IInformationControlCreator;
 import org.eclipse.jface.text.contentassist.ContentAssistant;
@@ -49,10 +53,19 @@ public class OpenApi3Editor extends JsonEditor {
 
     private OpenApi3Validator validator;
 
-    private final IPropertyChangeListener advancedValidationListener = event -> {
+    private final IPropertyChangeListener validationChangeListener = event -> {
         if (validator != null) {
             if (ADVANCED_VALIDATION.equals(event.getProperty())) {
                 validator.setAdvancedValidation(getPreferenceStore().getBoolean(ADVANCED_VALIDATION));
+            }
+            if (EXAMPLE_VALIDATION.equals(event.getProperty())) {
+                validator.setExampleValidation(getPreferenceStore().getBoolean(EXAMPLE_VALIDATION));
+            }
+
+            try {
+                createValidationOperation(false).run(new NullProgressMonitor());
+            } catch (CoreException e) {
+                YEditLog.logException(e);
             }
         }
     };
@@ -64,6 +77,8 @@ public class OpenApi3Editor extends JsonEditor {
                         Activator.getDefault().getPreferenceStore(), //
                         // Preferences store for EditorsPlugin has settings to show/hide the rules and markers
                         EditorsPlugin.getDefault().getPreferenceStore() }));
+
+        getPreferenceStore().addPropertyChangeListener(validationChangeListener);
     }
 
     @Override
@@ -76,7 +91,7 @@ public class OpenApi3Editor extends JsonEditor {
     @Override
     public void dispose() {
         // preference store is removed in AbstractTextEditor.dispose()
-        getPreferenceStore().removePropertyChangeListener(advancedValidationListener);
+        getPreferenceStore().removePropertyChangeListener(validationChangeListener);
         super.dispose();
     }
 
@@ -123,8 +138,7 @@ public class OpenApi3Editor extends JsonEditor {
 
             validator = new OpenApi3Validator(preloadedSchemas);
             validator.setAdvancedValidation(getPreferenceStore().getBoolean(ADVANCED_VALIDATION));
-
-            getPreferenceStore().addPropertyChangeListener(advancedValidationListener);
+            validator.setExampleValidation(getPreferenceStore().getBoolean(EXAMPLE_VALIDATION));
         }
 
         return validator;

@@ -1,5 +1,18 @@
+/*******************************************************************************
+ * Copyright (c) 2019 ModelSolv, Inc. and others.
+ * All rights reserved. This program and the accompanying materials
+ * are made available under the terms of the Eclipse Public License v1.0
+ * which accompanies this distribution, and is available at
+ * http://www.eclipse.org/legal/epl-v10.html
+ *
+ * Contributors:
+ *    ModelSolv, Inc. - initial API and implementation and/or initial documentation
+ *******************************************************************************/
 package com.reprezen.swagedit.core.validation;
 
+import static com.reprezen.swagedit.core.json.references.JsonReference.isReference;
+
+import java.net.URI;
 import java.util.Collections;
 import java.util.HashSet;
 import java.util.Set;
@@ -9,14 +22,19 @@ import org.eclipse.core.resources.IMarker;
 import com.fasterxml.jackson.databind.JsonNode;
 import com.fasterxml.jackson.databind.node.ObjectNode;
 import com.reprezen.swagedit.core.editor.JsonDocument;
+import com.reprezen.swagedit.core.json.references.JsonReference;
+import com.reprezen.swagedit.core.json.references.JsonReferenceFactory;
 import com.reprezen.swagedit.core.model.AbstractNode;
 
 public class ExampleValidator {
 
-    private final JsonNode document;
+    private final JsonDocument document;
+    private final JsonReferenceFactory factory = new JsonReferenceFactory();
+    private final URI baseURI;
 
-    public ExampleValidator(JsonDocument document) {
-        this.document = document.asJson();
+    public ExampleValidator(URI baseURI, JsonDocument document) {
+        this.baseURI = baseURI;
+        this.document = document;
     }
 
     public static class ExampleSchemaValidator extends JsonSchemaValidator {
@@ -27,17 +45,25 @@ public class ExampleValidator {
 
     }
 
+    /**
+     * Validates the current node if it is an example. A node is an example if it's pointer ends with /example(s). The
+     * example node is validated against the schema that is referenced in it's parent node. This validation process will
+     * only work if the example is valid JSON.
+     * 
+     * @param node
+     *            - node to validate
+     */
     public Set<SwaggerError> validate(AbstractNode node) {
         if (node.getPointerString().matches(".*/example")) {
             if (node.getParent().get("schema") != null) {
-                JsonNode example = document.at(node.getPointer());
-                return doValidate(node, example);
+                JsonNode example = document.asJson().at(node.getPointer());
+                return doValidate(node, node.getParent(), example);
             }
         }
 
         if (node.getPointerString().matches(".*/examples")) {
             final Set<SwaggerError> errors = new HashSet<>();
-            final JsonNode examples = document.at(node.getPointer());
+            final JsonNode examples = document.asJson().at(node.getPointer());
 
             examples.fields().forEachRemaining(entry -> {
                 JsonNode example = entry.getValue();
@@ -46,7 +72,7 @@ public class ExampleValidator {
                     example = example.get("value");
                 }
 
-                errors.addAll(doValidate(node, example));
+                errors.addAll(doValidate(node.get(entry.getKey()), node.getParent(), example));
             });
 
             return errors;
@@ -55,15 +81,15 @@ public class ExampleValidator {
         return Collections.emptySet();
     }
 
-    private Set<SwaggerError> doValidate(AbstractNode node, JsonNode example) {
+    private Set<SwaggerError> doValidate(AbstractNode node, AbstractNode parent, JsonNode example) {
         final Set<SwaggerError> errors = new HashSet<>();
 
-        JsonNode schema = document.at(node.getParent().getPointer()).get("schema");
-        if (schema.has("$ref")) {
-            schema = document.at(schema.get("$ref").asText().substring(1));
+        JsonNode schema = document.asJson().at(parent.getPointer()).get("schema");
+        if (isReference(schema)) {
+            schema = factory.create(schema).resolve(document, baseURI);
         }
 
-        schema = resolve(schema);
+        normalize(schema);
 
         new ExampleSchemaValidator(schema).validateSubSchema(example, "").forEach(message -> {
             int line = node.getStart().getLine() + 1;
@@ -90,17 +116,28 @@ public class ExampleValidator {
         }
     }
 
-    private JsonNode resolve(JsonNode node) {
-        if (node.has("type")) {
-            String type = node.get("type").asText();
-            if ("array".equalsIgnoreCase(type)) {
-                if (node.has("items") && node.get("items").has("$ref")) {
-                    JsonNode items = node.get("items");
-                    JsonNode resolved = document.at(items.get("$ref").asText().substring(1));
-                    ((ObjectNode) node).set("items", resolved);
+    /**
+     * This method traverses the root schema object and resolves all references it encounters. This result in a single
+     * object in which all references have been normalized.
+     * 
+     * @param node
+     *            - object to normalize
+     */
+    private void normalize(JsonNode node) {
+        node.fields().forEachRemaining(entry -> {
+            JsonNode value = entry.getValue();
+
+            if (isReference(value)) {
+                JsonReference reference = factory.create(value);
+                value = reference.resolve(document, baseURI);
+
+                if (value != null && !value.isMissingNode()) {
+                    ((ObjectNode) node).set(entry.getKey(), value);
                 }
             }
-        }
-        return node;
+
+            normalize(value);
+        });
     }
+
 }
