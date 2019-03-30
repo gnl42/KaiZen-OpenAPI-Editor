@@ -10,6 +10,7 @@
  *******************************************************************************/
 package com.reprezen.swagedit.assist
 
+import com.reprezen.swagedit.core.assist.ProposalDescriptor
 import com.reprezen.swagedit.core.assist.contexts.RegexContextType
 import com.reprezen.swagedit.core.utils.SwaggerFileFinder.Scope
 import com.reprezen.swagedit.editor.SwaggerDocument
@@ -20,7 +21,6 @@ import org.junit.Test
 
 import static org.hamcrest.core.IsCollectionContaining.*
 import static org.junit.Assert.*
-import com.reprezen.swagedit.core.assist.ProposalDescriptor
 
 class JsonReferenceProposalProviderTest {
 
