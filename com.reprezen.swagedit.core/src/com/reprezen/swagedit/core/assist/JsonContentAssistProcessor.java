@@ -146,7 +146,7 @@ public abstract class JsonContentAssistProcessor extends TemplateCompletionProce
             kaizenProposals = referenceProposalProvider.getProposals(currentPath, document, currentScope);
         } else {
             clearStatus();
-            kaizenProposals = proposalProvider.getProposals(currentPath, currentModel, prefix);
+            kaizenProposals = proposalProvider.getProposals(currentPath, currentModel, prefix, document);
         }
    
         final Collection<ICompletionProposal> proposals = getCompletionProposals(kaizenProposals, prefix, documentOffset, selection.getText());

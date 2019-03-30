@@ -24,6 +24,7 @@ import java.util.stream.Stream;
 import com.fasterxml.jackson.core.JsonPointer;
 import com.reprezen.swagedit.core.assist.ProposalDescriptor;
 import com.reprezen.swagedit.core.assist.ext.ContentAssistExt;
+import com.reprezen.swagedit.core.editor.JsonDocument;
 import com.reprezen.swagedit.core.model.AbstractNode;
 import com.reprezen.swagedit.core.schema.TypeDefinition;
 
@@ -61,7 +62,7 @@ public class SchemaFormatContentAssistExt implements ContentAssistExt {
     }
 
     @Override
-    public Collection<ProposalDescriptor> getProposals(TypeDefinition type, AbstractNode node, String prefix) {
+    public Collection<ProposalDescriptor> getProposals(TypeDefinition type, AbstractNode node, String prefix, JsonDocument jsonDocument) {
         List<ProposalDescriptor> proposals = new ArrayList<>();
 
         if (node.getParent() != null && node.getParent().get("type") != null) {

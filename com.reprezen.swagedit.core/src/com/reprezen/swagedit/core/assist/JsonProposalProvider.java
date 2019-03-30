@@ -23,6 +23,7 @@ import org.apache.commons.lang3.math.NumberUtils;
 import com.fasterxml.jackson.core.JsonPointer;
 import com.fasterxml.jackson.databind.JsonNode;
 import com.reprezen.swagedit.core.assist.ext.ContentAssistExt;
+import com.reprezen.swagedit.core.editor.JsonDocument;
 import com.reprezen.swagedit.core.model.AbstractNode;
 import com.reprezen.swagedit.core.model.Model;
 import com.reprezen.swagedit.core.schema.ArrayTypeDefinition;
@@ -58,12 +59,12 @@ public class JsonProposalProvider {
      * @param prefix
      * @return proposals
      */
-    public Collection<ProposalDescriptor> getProposals(JsonPointer pointer, Model model, String prefix) {
+    public Collection<ProposalDescriptor> getProposals(JsonPointer pointer, Model model, String prefix, JsonDocument jsonDocument) {
         final AbstractNode node = model.find(pointer);
         if (node == null) {
             return Collections.emptyList();
         }
-        return getProposals(node.getType(), node, prefix);
+        return getProposals(node.getType(), node, prefix, jsonDocument);
     }
 
     /**
@@ -73,8 +74,8 @@ public class JsonProposalProvider {
      * @param model
      * @return proposals
      */
-    public Collection<ProposalDescriptor> getProposals(JsonPointer pointer, Model model) {
-        return getProposals(pointer, model, null);
+    public Collection<ProposalDescriptor> getProposals(JsonPointer pointer, Model model,  JsonDocument jsonDocument) {
+        return getProposals(pointer, model, null, jsonDocument);
     }
 
     /**
@@ -83,18 +84,18 @@ public class JsonProposalProvider {
      * @param node
      * @return proposals
      */
-    public Collection<ProposalDescriptor> getProposals(AbstractNode node) {
-        return getProposals(node.getType(), node, null);
+    public Collection<ProposalDescriptor> getProposals(AbstractNode node, JsonDocument jsonDocument) {
+        return getProposals(node.getType(), node, null, jsonDocument);
     }
 
-    protected Collection<ProposalDescriptor> getProposals(TypeDefinition type, AbstractNode node, String prefix) {
+    protected Collection<ProposalDescriptor> getProposals(TypeDefinition type, AbstractNode node, String prefix, JsonDocument jsonDocument) {
         if (type instanceof ReferenceTypeDefinition) {
             type = ((ReferenceTypeDefinition) type).resolve();
         }
 
         ContentAssistExt ext = findExtension(type);
         if (ext != null) {
-            return ext.getProposals(type, node, prefix);
+            return ext.getProposals(type, node, prefix, jsonDocument);
         }
 
         switch (type.getType()) {
@@ -113,12 +114,12 @@ public class JsonProposalProvider {
         case ALL_OF:
         case ANY_OF:
         case ONE_OF:
-            return createComplextTypeProposals((ComplexTypeDefinition) type, node, prefix);
+            return createComplextTypeProposals((ComplexTypeDefinition) type, node, prefix, jsonDocument);
         case UNDEFINED:
             Collection<ProposalDescriptor> proposals = new LinkedHashSet<>();
             if (type instanceof MultipleTypeDefinition) {
                 for (TypeDefinition currentType : ((MultipleTypeDefinition) type).getMultipleTypes()) {
-                    proposals.addAll(getProposals(currentType, node, prefix));
+                    proposals.addAll(getProposals(currentType, node, prefix, jsonDocument));
                 }
             }
             return proposals;
@@ -226,11 +227,11 @@ public class JsonProposalProvider {
     }
 
     protected Collection<ProposalDescriptor> createComplextTypeProposals(ComplexTypeDefinition type, AbstractNode node,
-            String prefix) {
+            String prefix, JsonDocument jsonDocument) {
         final Collection<ProposalDescriptor> proposals = new LinkedHashSet<>();
 
         for (TypeDefinition definition : type.getComplexTypes()) {
-            proposals.addAll(getProposals(definition, node, prefix));
+            proposals.addAll(getProposals(definition, node, prefix, jsonDocument));
         }
 
         return proposals;

@@ -3,19 +3,26 @@
  */
 package com.reprezen.swagedit.openapi3.assist.ext;
 
+import static com.reprezen.swagedit.core.json.references.JsonReference.isReference;
+
+import java.net.URI;
 import java.util.Arrays;
 import java.util.Collection;
 
 import org.eclipse.core.runtime.CoreException;
-import org.eclipse.core.runtime.IConfigurationElement;
-import org.eclipse.core.runtime.Platform;
 
 import com.fasterxml.jackson.core.JsonPointer;
+import com.fasterxml.jackson.databind.JsonNode;
 import com.reprezen.swagedit.core.assist.ProposalDescriptor;
 import com.reprezen.swagedit.core.assist.ext.ContentAssistExt;
+import com.reprezen.swagedit.core.editor.JsonDocument;
+import com.reprezen.swagedit.core.json.references.JsonReference;
+import com.reprezen.swagedit.core.json.references.JsonReferenceFactory;
 import com.reprezen.swagedit.core.model.AbstractNode;
-import com.reprezen.swagedit.core.model.ObjectNode;
 import com.reprezen.swagedit.core.schema.TypeDefinition;
+import com.reprezen.swagedit.core.utils.DocumentUtils;
+import com.reprezen.swagedit.core.utils.ExtensionUtils;
+import com.reprezen.swagedit.core.utils.ModelUtils;
 import com.reprezen.swagedit.openapi3.ExampleDataProvider;
 
 public class ExampleDataContentAssistExt implements ContentAssistExt {
@@ -25,96 +32,70 @@ public class ExampleDataContentAssistExt implements ContentAssistExt {
 	private static final ProposalDescriptor defaultProposal = new ProposalDescriptor("Generate Example")
 			.replacementString("example:").type("string");
 
+	private static final String extensionPointName = "com.reprezen.swagedit.openapi3.exampleprovider";
+
 	@Override
 	public boolean canProvideContentAssist(TypeDefinition type) {
 		return type != null && type.getPointer() != null && pointer.equals(type.getPointer());
 	}
 
 	@Override
-	public Collection<ProposalDescriptor> getProposals(TypeDefinition type, AbstractNode node, String prefix) {
-		final AbstractNode schemaNode = findSchemaNode(node);
+	public Collection<ProposalDescriptor> getProposals(TypeDefinition type, AbstractNode node, String prefix,
+			JsonDocument jsonDocument) {
+		final JsonNode jsonSchemaNode = getSchemaNode(node, jsonDocument);
+		// TODO: Can the jsonschemaNode be null???
+		new JsonSchemaNormalizer(jsonDocument, DocumentUtils.getActiveEditorInputURI()).normalize(jsonSchemaNode);
 
 		try {
-			final ExampleDataProvider exampleDataProvider = (ExampleDataProvider) getDataProvider();
-			if (exampleDataProvider != null) {
-				return Arrays.asList(new ProposalDescriptor("Generate Example:")
-						.replacementString(exampleDataProvider.getData(schemaNode.getPointerString())).type("string"));
-			} else {
-				return Arrays.asList(defaultProposal);
-			}
+			final ExampleDataProvider exampleDataProvider = (ExampleDataProvider) getExampleDataProvider();
+			final String exampleData = exampleDataProvider.getData(jsonSchemaNode);
+			return Arrays
+					.asList(new ProposalDescriptor("Generate Example:").replacementString(exampleData).type("string"));
 		} catch (CoreException e) {
+			// TODO: Log a message here and then return the default proposal
 			return Arrays.asList(defaultProposal);
 		}
 
 	}
 
-	private AbstractNode findSchemaNode(AbstractNode node) {
-		if (node instanceof ObjectNode) {
-			final ObjectNode objectNode = (ObjectNode) node;
-			if (objectNode.get("schema") != null) {
-				return objectNode;
-			}
+	private JsonNode getSchemaNode(AbstractNode node, JsonDocument jsonDocument) {
+		final AbstractNode schemaNode = ModelUtils.getParentNode(node, "schema");
+		// TODO: What happens if there is no schema node?????
+		final JsonPointer schemaPointer = JsonPointer.compile(schemaNode.getPointerString());
+		return jsonDocument.asJson().at(schemaPointer);
+	}
+
+	private ExampleDataProvider getExampleDataProvider() throws CoreException {
+		return (ExampleDataProvider) ExtensionUtils.createExecutableExtension(extensionPointName, "class");
+	}
+
+	private static class JsonSchemaNormalizer {
+
+		private final JsonDocument document;
+		private final URI baseURI;
+
+		private static final JsonReferenceFactory factory = new JsonReferenceFactory();
+
+		public JsonSchemaNormalizer(JsonDocument document, URI baseURI) {
+			this.document = document;
+			this.baseURI = baseURI;
 		}
-		return findSchemaNode(node.getParent());
+
+		private void normalize(JsonNode node) {
+			node.fields().forEachRemaining(entry -> {
+				JsonNode value = entry.getValue();
+				if (isReference(value)) {
+					final JsonReference reference = factory.create(value);
+					value = reference.resolve(document, baseURI);
+
+					if (value != null && !value.isMissingNode()) {
+						((com.fasterxml.jackson.databind.node.ObjectNode) node).set(entry.getKey(), value);
+					}
+				}
+				normalize(value);
+			});
+		}
+
 	}
-
-	private ExampleDataProvider getDataProvider() throws CoreException {
-		final IConfigurationElement[] configurationElementsFor = Platform.getExtensionRegistry()
-				.getConfigurationElementsFor("com.reprezen.swagedit.openapi3.exampleprovider");
-		return (ExampleDataProvider) configurationElementsFor[0].createExecutableExtension("class");
-	}
-
-//	private JsonNode getPointer(AbstractNode node) {
-//		final FileEditorInput activeEditorInput = DocumentUtils.getActiveEditorInput();
-//		final OpenApi3Document openApi3Document = new OpenApi3Document();
-//		try {
-//			openApi3Document.set(DocumentUtils.getDocumentContent(activeEditorInput.getPath()));
-//			return openApi3Document.asJson().at(node.getParent().getPointer());
-//		} catch (IOException e) {
-//			// TODO: Handle exception
-//		}
-//		return null;
-//	}
-
-//	@Override
-//	public Collection<ProposalDescriptor> getProposals(TypeDefinition type, AbstractNode node, String prefix) {
-//		final FileEditorInput activeEditorInput = DocumentUtils.getActiveEditorInput();
-//		try {
-//			final OpenApi3Document openApi3Document = new OpenApi3Document();
-//			openApi3Document.set(DocumentUtils.getDocumentContent(activeEditorInput.getPath()));
-//			
-//			final JsonNode at = openApi3Document.asJson().at(node.getParent().getPointer());
-//			JsonNode jsonNode = at.get("schema");
-//			System.out.println(jsonNode);
-//			
-//			final AbstractNode abstractNode = node.getParent().get("schema");
-//			final JsonReference create = factory.create(abstractNode);
-//
-//			final JsonNode resolve = create.resolve(openApi3Document, activeEditorInput.getURI());
-//			normalize(resolve, openApi3Document, activeEditorInput.getURI());
-//			return Arrays.asList(
-//					new ProposalDescriptor("Generate Example").replacementString(resolve.toString()).type("string"));
-//		} catch (IOException e1) {
-//			return Arrays
-//					.asList(new ProposalDescriptor("Generate Example").replacementString("example:").type("string"));
-//		}
-//
-//	}
-//
-//	private void normalize(JsonNode node, OpenApi3Document document, URI baseURI) {
-//		node.fields().forEachRemaining(entry -> {
-//			JsonNode value = entry.getValue();
-//			if (isReference(value)) {
-//				JsonReference reference = factory.create(value);
-//				value = reference.resolve(document, baseURI);
-//
-//				if (value != null && !value.isMissingNode()) {
-//					((ObjectNode) node).set(entry.getKey(), value);
-//				}
-//			}
-//
-//			normalize(value, document, baseURI);
-//		});
-//	}
 
 }
