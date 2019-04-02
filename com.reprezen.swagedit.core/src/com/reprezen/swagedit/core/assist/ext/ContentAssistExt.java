@@ -39,6 +39,6 @@ public interface ContentAssistExt {
      * @param prefix
      * @return proposals
      */
-    Collection<ProposalDescriptor> getProposals(TypeDefinition type, AbstractNode node, String prefix, JsonDocument jsonDocument);
+    Collection<ProposalDescriptor> getProposals(TypeDefinition type, AbstractNode node, String prefix);
 
 }

@@ -147,7 +147,7 @@ components:
     MyType:
       properties:
         prop1:
-          «ref�
+          «ref»
 		'''
 	}
 

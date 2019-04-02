@@ -24,7 +24,6 @@ import com.fasterxml.jackson.databind.ObjectMapper;
 import com.fasterxml.jackson.databind.node.ArrayNode;
 import com.reprezen.swagedit.core.Activator;
 import com.reprezen.swagedit.core.assist.ProposalDescriptor;
-import com.reprezen.swagedit.core.editor.JsonDocument;
 import com.reprezen.swagedit.core.model.AbstractNode;
 import com.reprezen.swagedit.core.schema.TypeDefinition;
 import com.reprezen.swagedit.core.utils.StringUtils;
@@ -60,7 +59,7 @@ public class ResponseCodeContentAssistExt implements ContentAssistExt {
     }
 
     @Override
-    public Collection<ProposalDescriptor> getProposals(TypeDefinition type, AbstractNode node, String prefix, JsonDocument jsonDocument) {
+    public Collection<ProposalDescriptor> getProposals(TypeDefinition type, AbstractNode node, String prefix) {
         Collection<ProposalDescriptor> proposals = new ArrayList<>();
 
         for (Iterator<JsonNode> it = statusCodes(prefix); it.hasNext();) {

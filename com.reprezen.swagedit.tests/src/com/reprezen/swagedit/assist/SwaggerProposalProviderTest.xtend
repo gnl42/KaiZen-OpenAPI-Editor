@@ -12,7 +12,6 @@ import static org.hamcrest.core.IsCollectionContaining.*
 import static org.junit.Assert.*
 import com.reprezen.swagedit.schema.SwaggerSchema
 import com.reprezen.swagedit.core.assist.JsonProposalProvider
-import com.reprezen.swagedit.editor.SwaggerDocument
 
 class SwaggerProposalProviderTest {
 
@@ -32,7 +31,7 @@ class SwaggerProposalProviderTest {
 		val node = model.objectNode(null, "".ptr)
 		node.type = schema.getType(node)
 
-		assertThat(provider.getProposals(node, new SwaggerDocument()).map[getReplacementString], hasItems(
+		assertThat(provider.getProposals(node).map[getReplacementString], hasItems(
 			"swagger:",
 			"info:",
 			"host:",
@@ -57,7 +56,7 @@ class SwaggerProposalProviderTest {
 		val node = model.valueNode(null, "/swagger".ptr, null)
 		node.type = schema.getType(node)
 
-		assertThat(provider.getProposals(node, new SwaggerDocument()).map [
+		assertThat(provider.getProposals(node).map [
 			getReplacementString
 		], hasItems("\"2.0\""))
 	}
@@ -67,7 +66,7 @@ class SwaggerProposalProviderTest {
 		val node = model.objectNode(null, "/info".ptr)
 		node.type = schema.getType(node)
 
-		assertThat(provider.getProposals(node, new SwaggerDocument()).map [
+		assertThat(provider.getProposals(node).map [
 			getReplacementString
 		], hasItems(
 			"title:",
@@ -84,7 +83,7 @@ class SwaggerProposalProviderTest {
 		val node = model.arrayNode(null, "/schemes".ptr)
 		node.type = schema.getType(node)
 
-		assertThat(provider.getProposals(node, new SwaggerDocument()).map [
+		assertThat(provider.getProposals(node).map [
 			getReplacementString
 		], hasItems(
 			"- http",
@@ -99,7 +98,7 @@ class SwaggerProposalProviderTest {
 		val node = model.objectNode(null, "/paths".ptr)
 		node.type = schema.getType(node)
 
-		assertThat(provider.getProposals(node, new SwaggerDocument()).map [
+		assertThat(provider.getProposals(node).map [
 			getReplacementString
 		], hasItems(
 			"/:",
@@ -112,7 +111,7 @@ class SwaggerProposalProviderTest {
 		val node = model.objectNode(null, "/definitions".ptr)
 		node.type = schema.getType(node)
 
-		assertThat(provider.getProposals(node, new SwaggerDocument()).map [
+		assertThat(provider.getProposals(node).map [
 			getReplacementString
 		], hasItems(
 			"(schema name):"
@@ -124,7 +123,7 @@ class SwaggerProposalProviderTest {
 		val node = model.objectNode(null, "/definitions/MyType/properties".ptr)
 		node.type = schema.getType(node)
 
-		assertThat(provider.getProposals(node, new SwaggerDocument()).map [
+		assertThat(provider.getProposals(node).map [
 			getReplacementString
 		], hasItems(
 			"(property name):"
@@ -136,7 +135,7 @@ class SwaggerProposalProviderTest {
 		val node = model.objectNode(null, "/paths/~1/get".ptr)
 		node.type = schema.getType(node)
 
-		assertThat(provider.getProposals(node, new SwaggerDocument()).map [
+		assertThat(provider.getProposals(node).map [
 			getReplacementString
 		], hasItems(
 			"tags:",
@@ -160,7 +159,7 @@ class SwaggerProposalProviderTest {
 		val node = model.arrayNode(null, "/paths/~1/get/parameters".ptr)
 		node.type = schema.getType(node)
 
-		assertThat(provider.getProposals(node, new SwaggerDocument()).map [
+		assertThat(provider.getProposals(node).map [
 			getReplacementString
 		], hasItems(
 			"-"
@@ -172,7 +171,7 @@ class SwaggerProposalProviderTest {
 		val node = model.valueNode(null, "/paths/~1/get/parameters/0/in".ptr, null)
 		node.type = schema.getType(node)
 
-		assertThat(provider.getProposals(node, new SwaggerDocument()).map [
+		assertThat(provider.getProposals(node).map [
 			getReplacementString
 		], hasItems(
 			"header",
@@ -188,7 +187,7 @@ class SwaggerProposalProviderTest {
 		val node = model.objectNode(null, "/paths/~1/get/responses/200".ptr)
 		node.type = schema.getType(node)
 
-		assertThat(provider.getProposals(node, new SwaggerDocument()).map [
+		assertThat(provider.getProposals(node).map [
 			getReplacementString
 		], hasItems(
 			"description:",
@@ -207,7 +206,7 @@ class SwaggerProposalProviderTest {
 
 		assertTrue(node.type instanceof MultipleTypeDefinition)
 
-		assertThat(provider.getProposals(node, new SwaggerDocument()).map [
+		assertThat(provider.getProposals(node).map [
 			getReplacementString
 		], hasItems(
 			"",
@@ -230,7 +229,7 @@ class SwaggerProposalProviderTest {
 
 		assertEquals(JsonType.ONE_OF, node.type.type)
 
-		val values = provider.getProposals(node, new SwaggerDocument()).map [
+		val values = provider.getProposals(node).map [
 			getReplacementString
 		]
 
@@ -242,7 +241,7 @@ class SwaggerProposalProviderTest {
 		val node = model.objectNode(null, "/paths/~1foo/get/responses/200/schema/type".ptr)
 		node.type = schema.getType(node)
 
-		val values = provider.getProposals(node, new SwaggerDocument()).map [
+		val values = provider.getProposals(node).map [
 			getReplacementString
 		]
 
