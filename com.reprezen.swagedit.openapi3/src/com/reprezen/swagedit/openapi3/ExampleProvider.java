@@ -12,7 +12,7 @@ package com.reprezen.swagedit.openapi3;
 
 import com.fasterxml.jackson.databind.JsonNode;
 
-public interface ExampleDataProvider {
+public interface ExampleProvider {
 	
-	String getData(JsonNode schemaNode);
+	String getData(JsonNode node);
 }

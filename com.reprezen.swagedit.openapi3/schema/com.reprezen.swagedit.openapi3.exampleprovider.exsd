@@ -55,7 +55,7 @@
                   
                </documentation>
                <appInfo>
-                  <meta.attribute kind="java" basedOn=":com.reprezen.swagedit.openapi3.ExampleDataProvider"/>
+                  <meta.attribute kind="java" basedOn=":com.reprezen.swagedit.openapi3.ExampleProvider"/>
                </appInfo>
             </annotation>
          </attribute>

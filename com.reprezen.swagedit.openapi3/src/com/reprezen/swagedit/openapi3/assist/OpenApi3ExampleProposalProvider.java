@@ -37,7 +37,7 @@ import com.reprezen.swagedit.core.utils.DocumentUtils;
 import com.reprezen.swagedit.core.utils.ExtensionUtils;
 import com.reprezen.swagedit.core.utils.ModelUtils;
 import com.reprezen.swagedit.core.utils.SwaggerFileFinder.Scope;
-import com.reprezen.swagedit.openapi3.ExampleDataProvider;
+import com.reprezen.swagedit.openapi3.ExampleProvider;
 import com.reprezen.swagedit.openapi3.editor.OpenApi3ContentDescriber;
 
 public class OpenApi3ExampleProposalProvider extends JsonReferenceProposalProvider {
@@ -111,7 +111,7 @@ public class OpenApi3ExampleProposalProvider extends JsonReferenceProposalProvid
 			}
 		}
 
-		final ExampleDataProvider exampleDataProvider = (ExampleDataProvider) getExampleDataProvider();
+		final ExampleProvider exampleDataProvider = (ExampleProvider) getExampleDataProvider();
 		final String exampleData = exampleDataProvider.getData(normalized);
 		return Arrays.asList(new ProposalDescriptor("Generate Example:").replacementString(exampleData).type("string"));
 
@@ -121,11 +121,11 @@ public class OpenApi3ExampleProposalProvider extends JsonReferenceProposalProvid
 		return jsonNode.get(REFERENCE_KEY) != null;
 	}
 
-	private ExampleDataProvider getExampleDataProvider() {
-		final ExampleDataProvider defaultDataProvider = (JsonNode jsonNode) -> "example:";
+	private ExampleProvider getExampleDataProvider() {
+		final ExampleProvider defaultDataProvider = (JsonNode jsonNode) -> "example:";
 
 		try {
-			final ExampleDataProvider exampleDataProvider = (ExampleDataProvider) ExtensionUtils
+			final ExampleProvider exampleDataProvider = (ExampleProvider) ExtensionUtils
 					.createExecutableExtension(EXTENSION_POINT_NAME, EXTENSION_PROPERTY_NAME);
 			return exampleDataProvider != null ? exampleDataProvider : defaultDataProvider;
 		} catch (CoreException e) {
