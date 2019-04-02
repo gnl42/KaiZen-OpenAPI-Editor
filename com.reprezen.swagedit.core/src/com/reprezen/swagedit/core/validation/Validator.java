@@ -20,6 +20,9 @@ import java.util.Set;
 
 import org.apache.commons.lang3.tuple.Pair;
 import org.eclipse.core.resources.IMarker;
+import org.eclipse.core.runtime.CoreException;
+import org.eclipse.core.runtime.IConfigurationElement;
+import org.eclipse.core.runtime.Platform;
 import org.eclipse.ui.IFileEditorInput;
 import org.yaml.snakeyaml.nodes.MappingNode;
 import org.yaml.snakeyaml.nodes.Node;
@@ -40,6 +43,7 @@ import com.reprezen.swagedit.core.model.ArrayNode;
 import com.reprezen.swagedit.core.model.Model;
 import com.reprezen.swagedit.core.model.ObjectNode;
 import com.reprezen.swagedit.core.model.ValueNode;
+import com.reprezen.swagedit.core.providers.ValidationProvider;
 
 /**
  * This class contains methods for validating a Swagger YAML document.
@@ -113,18 +117,41 @@ public abstract class Validator {
      */
     protected Set<SwaggerError> validateDocument(URI baseURI, JsonDocument document) {
         final Set<SwaggerError> errors = new HashSet<>();
-        final ExampleValidator exampleValidator = new ExampleValidator(baseURI, document);
+        // final ExampleValidator exampleValidator = new ExampleValidator(baseURI, document);
         final Model model = document.getModel();
 
         if (model != null && model.getRoot() != null) {
             for (AbstractNode node : model.allNodes()) {
                 executeModelValidation(model, node, errors);
-                if (exampleValidation) {
-                    errors.addAll(exampleValidator.validate(node));
-                }
+                executeValidationExtensions(document, baseURI, node, errors);
+                // if (exampleValidation) {
+                // errors.addAll(exampleValidator.validate(node));
+                // }
             }
         }
         return errors;
+    }
+
+    private void executeValidationExtensions(JsonDocument document, URI baseURI, AbstractNode node,
+            Set<SwaggerError> errors) {
+
+        IConfigurationElement[] elements = Platform.getExtensionRegistry()
+                .getConfigurationElementsFor("com.reprezen.swagedit.validator");
+        try {
+            for (IConfigurationElement e : elements) {
+                final Object o = e.createExecutableExtension("class");
+                System.out.println("Evaluating extension " + o);
+                if (o instanceof ValidationProvider) {
+                    Set<SwaggerError> result = ((ValidationProvider) o).validate(document, baseURI, node);
+                    if (result != null) {
+                        errors.addAll(result);
+                    }
+                }
+            }
+        } catch (CoreException ex) {
+            System.out.println(ex.getMessage());
+        }
+
     }
 
     protected void executeModelValidation(Model model, AbstractNode node, Set<SwaggerError> errors) {
