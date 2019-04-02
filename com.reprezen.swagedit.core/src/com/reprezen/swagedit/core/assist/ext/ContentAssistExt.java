@@ -13,7 +13,6 @@ package com.reprezen.swagedit.core.assist.ext;
 import java.util.Collection;
 
 import com.reprezen.swagedit.core.assist.ProposalDescriptor;
-import com.reprezen.swagedit.core.editor.JsonDocument;
 import com.reprezen.swagedit.core.model.AbstractNode;
 import com.reprezen.swagedit.core.schema.TypeDefinition;
 

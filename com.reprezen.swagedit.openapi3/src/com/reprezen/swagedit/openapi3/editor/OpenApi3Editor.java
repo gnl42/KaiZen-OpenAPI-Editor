@@ -56,12 +56,6 @@ public class OpenApi3Editor extends JsonEditor {
             }
         }
     };
-    
-    @Override
-    public boolean isDirty() {
-    	// TODO Auto-generated method stub
-    	return super.isDirty();
-    }
 
     public OpenApi3Editor() {
         super(new OpenApi3DocumentProvider(), //
