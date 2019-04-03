@@ -10,7 +10,6 @@
  *******************************************************************************/
 package com.reprezen.swagedit.preferences;
 
-import static com.reprezen.swagedit.preferences.SwaggerPreferenceConstants.EXAMPLE_VALIDATION;
 import static com.reprezen.swagedit.preferences.SwaggerPreferenceConstants.VALIDATION_REF_SECURITY_DEFINITIONS_OBJECT;
 import static com.reprezen.swagedit.preferences.SwaggerPreferenceConstants.VALIDATION_REF_SECURITY_REQUIREMENTS_ARRAY;
 import static com.reprezen.swagedit.preferences.SwaggerPreferenceConstants.VALIDATION_REF_SECURITY_REQUIREMENT_OBJECT;
@@ -20,6 +19,8 @@ import org.eclipse.jface.preference.IPreferenceStore;
 
 import com.reprezen.swagedit.Activator;
 import com.reprezen.swagedit.core.preferences.JsonPreferenceInitializer;
+import com.reprezen.swagedit.core.utils.ExtensionUtils;
+import com.reprezen.swagedit.core.validation.Validator;
 
 /*
  * SwagEdit default preference values.
@@ -31,12 +32,15 @@ public class SwaggerPreferenceInitializer extends JsonPreferenceInitializer {
     public void initializeDefaultPreferences() {
         IPreferenceStore store = Activator.getDefault().getPreferenceStore();
         setColorPreferences(store);
-        
+
         store.setDefault(VALIDATION_REF_SECURITY_DEFINITIONS_OBJECT, false);
         store.setDefault(VALIDATION_REF_SECURITY_SCHEME_OBJECT, false);
         store.setDefault(VALIDATION_REF_SECURITY_REQUIREMENTS_ARRAY, false);
         store.setDefault(VALIDATION_REF_SECURITY_REQUIREMENT_OBJECT, false);
-        store.setDefault(EXAMPLE_VALIDATION, false);
+
+        ExtensionUtils.resolveProviders(Validator.VALIDATION_PROVIDERS_ID).forEach(provider -> {
+            provider.initializeDefaultPreferences(false, store);
+        });
     }
 
 }

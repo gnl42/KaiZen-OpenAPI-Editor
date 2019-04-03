@@ -20,9 +20,7 @@ import java.util.Set;
 
 import org.apache.commons.lang3.tuple.Pair;
 import org.eclipse.core.resources.IMarker;
-import org.eclipse.core.runtime.CoreException;
-import org.eclipse.core.runtime.IConfigurationElement;
-import org.eclipse.core.runtime.Platform;
+import org.eclipse.jface.preference.IPreferenceStore;
 import org.eclipse.ui.IFileEditorInput;
 import org.yaml.snakeyaml.nodes.MappingNode;
 import org.yaml.snakeyaml.nodes.Node;
@@ -44,6 +42,7 @@ import com.reprezen.swagedit.core.model.Model;
 import com.reprezen.swagedit.core.model.ObjectNode;
 import com.reprezen.swagedit.core.model.ValueNode;
 import com.reprezen.swagedit.core.providers.ValidationProvider;
+import com.reprezen.swagedit.core.utils.ExtensionUtils;
 
 /**
  * This class contains methods for validating a Swagger YAML document.
@@ -54,17 +53,25 @@ import com.reprezen.swagedit.core.providers.ValidationProvider;
  */
 public abstract class Validator {
 
+    public static final String VALIDATION_PROVIDERS_ID = "com.reprezen.swagedit.validator";
+
     private final JsonNode schemaRefTemplate = new ObjectMapper().createObjectNode() //
             .put("$ref", "#/definitions/schema");
 
-    private boolean exampleValidation = false;
+    private final Set<ValidationProvider> providers;
+    private final IPreferenceStore preferenceStore;
+
+    public Validator(IPreferenceStore preferenceStore) {
+        this.preferenceStore = preferenceStore;
+        this.providers = ExtensionUtils.resolveProviders(VALIDATION_PROVIDERS_ID);
+    }
 
     public abstract JsonSchemaValidator getSchemaValidator();
 
     public abstract JsonReferenceValidator getReferenceValidator();
 
-    public void setExampleValidation(boolean enable) {
-        this.exampleValidation = enable;
+    protected IPreferenceStore getPreferenceStore() {
+        return preferenceStore;
     }
 
     /**
@@ -117,41 +124,23 @@ public abstract class Validator {
      */
     protected Set<SwaggerError> validateDocument(URI baseURI, JsonDocument document) {
         final Set<SwaggerError> errors = new HashSet<>();
-        // final ExampleValidator exampleValidator = new ExampleValidator(baseURI, document);
         final Model model = document.getModel();
 
         if (model != null && model.getRoot() != null) {
             for (AbstractNode node : model.allNodes()) {
                 executeModelValidation(model, node, errors);
-                executeValidationExtensions(document, baseURI, node, errors);
-                // if (exampleValidation) {
-                // errors.addAll(exampleValidator.validate(node));
-                // }
+                // execute validation from each providers
+                providers.forEach(provider -> {
+                    if (provider.isActive(document, getPreferenceStore())) {
+                        Set<SwaggerError> result = provider.validate(document, baseURI, node);
+                        if (result != null) {
+                            errors.addAll(result);
+                        }
+                    }
+                });
             }
         }
         return errors;
-    }
-
-    private void executeValidationExtensions(JsonDocument document, URI baseURI, AbstractNode node,
-            Set<SwaggerError> errors) {
-
-        IConfigurationElement[] elements = Platform.getExtensionRegistry()
-                .getConfigurationElementsFor("com.reprezen.swagedit.validator");
-        try {
-            for (IConfigurationElement e : elements) {
-                final Object o = e.createExecutableExtension("class");
-                System.out.println("Evaluating extension " + o);
-                if (o instanceof ValidationProvider) {
-                    Set<SwaggerError> result = ((ValidationProvider) o).validate(document, baseURI, node);
-                    if (result != null) {
-                        errors.addAll(result);
-                    }
-                }
-            }
-        } catch (CoreException ex) {
-            System.out.println(ex.getMessage());
-        }
-
     }
 
     protected void executeModelValidation(Model model, AbstractNode node, Set<SwaggerError> errors) {
@@ -237,7 +226,8 @@ public abstract class Validator {
     }
 
     private boolean isSchemaDefinition(AbstractNode node) {
-        // need to use getContent() because asJson() returns resolvedValue is some subclasses
+        // need to use getContent() because asJson() returns resolvedValue is some
+        // subclasses
         return schemaRefTemplate.equals(node.getType().getContent()) //
                 && node.get(JsonReference.PROPERTY) == null //
                 && node.get("allOf") == null;

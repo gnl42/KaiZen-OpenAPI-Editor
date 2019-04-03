@@ -10,7 +10,6 @@
  *******************************************************************************/
 package com.reprezen.swagedit.preferences;
 
-import static com.reprezen.swagedit.preferences.SwaggerPreferenceConstants.EXAMPLE_VALIDATION;
 import static com.reprezen.swagedit.preferences.SwaggerPreferenceConstants.VALIDATION_REF_SECURITY_DEFINITIONS_OBJECT;
 import static com.reprezen.swagedit.preferences.SwaggerPreferenceConstants.VALIDATION_REF_SECURITY_REQUIREMENTS_ARRAY;
 import static com.reprezen.swagedit.preferences.SwaggerPreferenceConstants.VALIDATION_REF_SECURITY_REQUIREMENT_OBJECT;
@@ -19,6 +18,7 @@ import static com.reprezen.swagedit.preferences.SwaggerPreferenceConstants.VALID
 import org.eclipse.jface.layout.GridDataFactory;
 import org.eclipse.jface.layout.GridLayoutFactory;
 import org.eclipse.jface.preference.BooleanFieldEditor;
+import org.eclipse.jface.preference.FieldEditor;
 import org.eclipse.jface.preference.FieldEditorPreferencePage;
 import org.eclipse.jface.util.IPropertyChangeListener;
 import org.eclipse.swt.SWT;
@@ -28,12 +28,15 @@ import org.eclipse.ui.IWorkbench;
 import org.eclipse.ui.IWorkbenchPreferencePage;
 
 import com.reprezen.swagedit.Activator;
+import com.reprezen.swagedit.core.utils.ExtensionUtils;
+import com.reprezen.swagedit.core.validation.Validator;
 
 public class SwaggerValidationPreferences extends FieldEditorPreferencePage
         implements IWorkbenchPreferencePage, IPropertyChangeListener {
 
     public SwaggerValidationPreferences() {
-        // GRID is needed because we are not attaching the editor fields directly to FieldEditorParent, but to its child
+        // GRID is needed because we are not attaching the editor fields directly to
+        // FieldEditorParent, but to its child
         super(FieldEditorPreferencePage.GRID);
         setPreferenceStore(Activator.getDefault().getPreferenceStore());
         setDescription("Swagger preferences for validation");
@@ -49,12 +52,19 @@ public class SwaggerValidationPreferences extends FieldEditorPreferencePage
         GridLayoutFactory.fillDefaults().applyTo(composite);
         GridDataFactory.fillDefaults().grab(true, false).indent(0, 10).applyTo(composite);
 
-        // Example validation
+        // Validation
 
-        addField(new BooleanFieldEditor(EXAMPLE_VALIDATION, "Enable examples validation", composite));
+        ExtensionUtils.resolveProviders(Validator.VALIDATION_PROVIDERS_ID).forEach(provider -> {
+            for (FieldEditor field : provider.getPreferenceFields(false, composite)) {
+                addField(field);
+            }
+        });
 
-        // IMPORTANT: FieldEditorPreferencePage does not work very well with complex layouts and nested widgets.
-        // Consider switching to com.modelsolv.reprezen.generators.ui.preferences.GroupedFieldEditorPreferencePage from
+        // IMPORTANT: FieldEditorPreferencePage does not work very well with complex
+        // layouts and nested widgets.
+        // Consider switching to
+        // com.modelsolv.reprezen.generators.ui.preferences.GroupedFieldEditorPreferencePage
+        // from
         // the RepreZen repo before modifying it
         Composite refValidationComposite = new Composite(composite, SWT.BORDER);
         GridLayoutFactory.fillDefaults().margins(5, 5).applyTo(refValidationComposite);
@@ -67,13 +77,14 @@ public class SwaggerValidationPreferences extends FieldEditorPreferencePage
         GridLayoutFactory.fillDefaults().margins(8, 8).applyTo(fieldComposite);
         GridDataFactory.fillDefaults().grab(true, false).applyTo(fieldComposite);
 
-        addField(
-                new BooleanFieldEditor(VALIDATION_REF_SECURITY_DEFINITIONS_OBJECT, "Security Definitions Object", fieldComposite));
-        addField(new BooleanFieldEditor(VALIDATION_REF_SECURITY_SCHEME_OBJECT, "Security Scheme Object", fieldComposite));
-        addField(
-                new BooleanFieldEditor(VALIDATION_REF_SECURITY_REQUIREMENTS_ARRAY, "Security Requirements Array", fieldComposite));
-        addField(
-                new BooleanFieldEditor(VALIDATION_REF_SECURITY_REQUIREMENT_OBJECT, "Security Requirement Object", fieldComposite));
+        addField(new BooleanFieldEditor(VALIDATION_REF_SECURITY_DEFINITIONS_OBJECT, "Security Definitions Object",
+                fieldComposite));
+        addField(new BooleanFieldEditor(VALIDATION_REF_SECURITY_SCHEME_OBJECT, "Security Scheme Object",
+                fieldComposite));
+        addField(new BooleanFieldEditor(VALIDATION_REF_SECURITY_REQUIREMENTS_ARRAY, "Security Requirements Array",
+                fieldComposite));
+        addField(new BooleanFieldEditor(VALIDATION_REF_SECURITY_REQUIREMENT_OBJECT, "Security Requirement Object",
+                fieldComposite));
     }
 
 }

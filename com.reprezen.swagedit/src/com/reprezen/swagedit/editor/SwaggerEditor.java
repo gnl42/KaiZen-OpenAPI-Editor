@@ -11,7 +11,6 @@
 package com.reprezen.swagedit.editor;
 
 import static com.reprezen.swagedit.preferences.SwaggerPreferenceConstants.ALL_VALIDATION_PREFS;
-import static com.reprezen.swagedit.preferences.SwaggerPreferenceConstants.EXAMPLE_VALIDATION;
 
 import org.dadacoalition.yedit.YEditLog;
 import org.dadacoalition.yedit.editor.YEditSourceViewerConfiguration;
@@ -38,26 +37,27 @@ public class SwaggerEditor extends JsonEditor {
     private final IPropertyChangeListener validationChangeListener = event -> {
 
         if (ALL_VALIDATION_PREFS.contains(event.getProperty())) {
+            boolean newValue = getPreferenceStore().getBoolean(event.getProperty());
+            Activator.getDefault().getSchema().allowJsonRefInContext(event.getProperty(), newValue);
+        }
 
-            if (!event.getProperty().equals(EXAMPLE_VALIDATION)) {
-                boolean newValue = getPreferenceStore().getBoolean(event.getProperty());
-                Activator.getDefault().getSchema().allowJsonRefInContext(event.getProperty(), newValue);
-            }
-
-            try {
-                createValidationOperation(false).run(new NullProgressMonitor());
-            } catch (CoreException e) {
-                YEditLog.logException(e);
-            }
+        try {
+            createValidationOperation(false).run(new NullProgressMonitor());
+        } catch (CoreException e) {
+            YEditLog.logException(e);
         }
     };
 
+    private SwaggerValidator validator;
+
     public SwaggerEditor() {
         super(new SwaggerDocumentProvider(), //
-                // ZEN-4361 Missing marker location indicators (Overview Ruler) next to editor scrollbar in KZOE
+                // ZEN-4361 Missing marker location indicators (Overview Ruler) next to editor
+                // scrollbar in KZOE
                 new ChainedPreferenceStore(new IPreferenceStore[] { //
                         Activator.getDefault().getPreferenceStore(), //
-                        // Preferences store for EditorsPlugin has settings to show/hide the rules and markers
+                        // Preferences store for EditorsPlugin has settings to show/hide the rules and
+                        // markers
                         EditorsPlugin.getDefault().getPreferenceStore() }));
 
         getPreferenceStore().addPropertyChangeListener(validationChangeListener);
@@ -78,8 +78,9 @@ public class SwaggerEditor extends JsonEditor {
 
     @Override
     protected Validator createValidator() {
-        Validator validator = new SwaggerValidator();
-        validator.setExampleValidation(getPreferenceStore().getBoolean(EXAMPLE_VALIDATION));
+        if (validator == null) {
+            validator = new SwaggerValidator(getPreferenceStore());
+        }
 
         return validator;
     }

@@ -10,9 +10,6 @@
  *******************************************************************************/
 package com.reprezen.swagedit.openapi3.editor;
 
-import static com.reprezen.swagedit.openapi3.preferences.OpenApi3PreferenceConstants.ADVANCED_VALIDATION;
-import static com.reprezen.swagedit.openapi3.preferences.OpenApi3PreferenceConstants.EXAMPLE_VALIDATION;
-
 import java.util.HashMap;
 import java.util.Map;
 
@@ -55,13 +52,6 @@ public class OpenApi3Editor extends JsonEditor {
 
     private final IPropertyChangeListener validationChangeListener = event -> {
         if (validator != null) {
-            if (ADVANCED_VALIDATION.equals(event.getProperty())) {
-                validator.setAdvancedValidation(getPreferenceStore().getBoolean(ADVANCED_VALIDATION));
-            }
-            if (EXAMPLE_VALIDATION.equals(event.getProperty())) {
-                validator.setExampleValidation(getPreferenceStore().getBoolean(EXAMPLE_VALIDATION));
-            }
-
             try {
                 createValidationOperation(false).run(new NullProgressMonitor());
             } catch (CoreException e) {
@@ -72,10 +62,12 @@ public class OpenApi3Editor extends JsonEditor {
 
     public OpenApi3Editor() {
         super(new OpenApi3DocumentProvider(), //
-                // ZEN-4361 Missing marker location indicators (Overview Ruler) next to editor scrollbar in KZOE
+                // ZEN-4361 Missing marker location indicators (Overview Ruler) next to editor
+                // scrollbar in KZOE
                 new ChainedPreferenceStore(new IPreferenceStore[] { //
                         Activator.getDefault().getPreferenceStore(), //
-                        // Preferences store for EditorsPlugin has settings to show/hide the rules and markers
+                        // Preferences store for EditorsPlugin has settings to show/hide the rules and
+                        // markers
                         EditorsPlugin.getDefault().getPreferenceStore() }));
 
         getPreferenceStore().addPropertyChangeListener(validationChangeListener);
@@ -136,9 +128,7 @@ public class OpenApi3Editor extends JsonEditor {
             JsonNode schema = Activator.getDefault().getSchema().getRootType().asJson();
             preloadedSchemas.put(OpenApi3Schema.URL, schema);
 
-            validator = new OpenApi3Validator(preloadedSchemas);
-            validator.setAdvancedValidation(getPreferenceStore().getBoolean(ADVANCED_VALIDATION));
-            validator.setExampleValidation(getPreferenceStore().getBoolean(EXAMPLE_VALIDATION));
+            validator = new OpenApi3Validator(preloadedSchemas, getPreferenceStore());
         }
 
         return validator;
