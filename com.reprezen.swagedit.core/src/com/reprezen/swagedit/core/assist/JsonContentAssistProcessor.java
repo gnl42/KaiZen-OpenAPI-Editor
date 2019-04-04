@@ -67,7 +67,7 @@ public abstract class JsonContentAssistProcessor extends TemplateCompletionProce
 
    private final JsonProposalProvider proposalProvider;
    private final JsonReferenceProposalProvider referenceProposalProvider;
-   private final JsonReferenceProposalProvider exampleProposalProvider;
+   private final JsonExampleProposalProvider exampleProposalProvider;
    private final ContentAssistant contentAssistant;
    
     /**
@@ -95,12 +95,12 @@ public abstract class JsonContentAssistProcessor extends TemplateCompletionProce
 	public JsonContentAssistProcessor(ContentAssistant ca, String fileContentType) {
 		this(ca, new JsonProposalProvider(),
 				new JsonReferenceProposalProvider(ContextType.emptyContentTypeCollection(), fileContentType),
-				new JsonReferenceProposalProvider(ContextType.emptyContentTypeCollection(), fileContentType));
+				new JsonExampleProposalProvider(ContextType.emptyContentTypeCollection()));
 	}
 
 	public JsonContentAssistProcessor(ContentAssistant ca, JsonProposalProvider proposalProvider,
 			JsonReferenceProposalProvider referenceProposalProvider,
-			JsonReferenceProposalProvider exampleProposalProvider) {
+			JsonExampleProposalProvider exampleProposalProvider) {
 		this.contentAssistant = ca;
 		this.proposalProvider = proposalProvider;
 		this.referenceProposalProvider = referenceProposalProvider;

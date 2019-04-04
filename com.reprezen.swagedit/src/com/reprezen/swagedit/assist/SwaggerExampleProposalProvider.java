@@ -1,5 +1,5 @@
 /*******************************************************************************
- * Copyright (c) 2019 ModelSolv, Inc. and others.
+ * Copyright (c) 2016 ModelSolv, Inc. and others.
  * All rights reserved. This program and the accompanying materials
  * are made available under the terms of the Eclipse Public License v1.0
  * which accompanies this distribution, and is available at
@@ -8,7 +8,7 @@
  * Contributors:
  *    ModelSolv, Inc. - initial API and implementation and/or initial documentation
  *******************************************************************************/
-package com.reprezen.swagedit.openapi3.assist;
+package com.reprezen.swagedit.assist;
 
 import java.util.Arrays;
 import java.util.Collection;
@@ -29,22 +29,15 @@ import com.reprezen.swagedit.core.model.AbstractNode;
 import com.reprezen.swagedit.core.utils.ModelUtils;
 import com.reprezen.swagedit.core.utils.SwaggerFileFinder.Scope;
 
-public class OpenApi3ExampleProposalProvider extends JsonExampleProposalProvider {
+public class SwaggerExampleProposalProvider extends JsonExampleProposalProvider {
 
-	private static final JsonPointer COMPONENTS_NODE_POINTER = JsonPointer.compile("/definitions/components");
+	private static final JsonPointer DEFINITIONS_NODE_POINTER = JsonPointer.compile("/definitions/definitions");
 
 	private static enum PoiterRegEx {
 
-		REQUEST_BODY_EXAMPLE_POINTER_REGEX(".*/content/\\S+/example$"),
-		REQUEST_BODY_EXAMPLES_EXAMPLE_VALUE_FIELD_POINTER_REGEX(".*/content/\\S+/examples/\\S+/value$"),
-		RESPONSE_BODY_EXAMPLE_POINTER_REGEX(".*/content(/\\S+)/example$"),
-		RESPONSE_BODY_EXAMPLES_EXAMPLE_VALUE_FIELD_POINTER_REGEX(".*/content/\\S+/examples/\\S+/value$"),
-		PARAMETER_EXAMPLE_POINTER_REGEX(".*/parameters/\\S+/example$"),
-		PARAMETER_EXAMPLES_EXAMPLE_VALUE_FIELD_POINTER_REGEX(".*/parameters/\\S+/examples/\\S+/value$"),
-		MODEL_EXAMPLE_POINTER_REGEX("/content/\\S+/schema/example$"),
-		HEADERS_EXAMPLE_POINTER_REGEX(".*/headers/\\S+/example$"),
-		HEADERS_EXAMPLES_POINTER_REGEX(".*/headers/\\S+/examples(/\\S+)/value$"),
-		COMPONENTS_SCHEMA_EXAMPLE_POINTER_REGEX(".*/components/schemas/\\S+/example$");
+		RESPONSE_BODY_EXAMPLES_REGEX(".*/responses/\\S+/examples/.*$"),
+		DEFINITIONS_MODEL_EXAMPLE_REGEX(".*/definitions/\\S+/example$"),
+		PARAMETERS_SCHEMA_EXAMPLE_REGEX(".*/parameters/\\S+/schema/example$");
 
 		private final String regEx;
 
@@ -67,12 +60,12 @@ public class OpenApi3ExampleProposalProvider extends JsonExampleProposalProvider
 		EXAMPLE_CONTEXT_TYPES = ContextType.newContentTypeCollection(contextTypes);
 	}
 
-	public OpenApi3ExampleProposalProvider(ContextTypeCollection contextTypes) {
+	public SwaggerExampleProposalProvider(ContextTypeCollection contextTypes) {
 		super(EXAMPLE_CONTEXT_TYPES);
 	}
 
-	public OpenApi3ExampleProposalProvider() {
-		this(EXAMPLE_CONTEXT_TYPES);
+	public SwaggerExampleProposalProvider() {
+		super(EXAMPLE_CONTEXT_TYPES);
 	}
 
 	@Override
@@ -80,7 +73,7 @@ public class OpenApi3ExampleProposalProvider extends JsonExampleProposalProvider
 		final AbstractNode nodeAtPointer = document.getModel().find(pointer);
 
 		JsonNode normalized = null;
-		if (insideComponentsNode(nodeAtPointer)) {
+		if (insideDefinitionsNode(nodeAtPointer)) {
 			final AbstractNode schemaNode = nodeAtPointer.getParent();
 			normalized = normalize(schemaNode, document);
 		} else {
@@ -98,8 +91,7 @@ public class OpenApi3ExampleProposalProvider extends JsonExampleProposalProvider
 		return Arrays.asList(new ProposalDescriptor("Generate Example:").replacementString(exampleData).type("string"));
 	}
 
-	private boolean insideComponentsNode(AbstractNode node) {
-		return ModelUtils.findParent(node, COMPONENTS_NODE_POINTER).isPresent();
+	private boolean insideDefinitionsNode(AbstractNode node) {
+		return ModelUtils.findParent(node, DEFINITIONS_NODE_POINTER).isPresent();
 	}
-
 }
