@@ -10,10 +10,13 @@
  *******************************************************************************/
 package com.reprezen.swagedit.preferences;
 
+import static com.reprezen.swagedit.core.preferences.KaizenPreferencePage.VALIDATION_PREFERENCE_PAGE;
 import static com.reprezen.swagedit.preferences.SwaggerPreferenceConstants.VALIDATION_REF_SECURITY_DEFINITIONS_OBJECT;
 import static com.reprezen.swagedit.preferences.SwaggerPreferenceConstants.VALIDATION_REF_SECURITY_REQUIREMENTS_ARRAY;
 import static com.reprezen.swagedit.preferences.SwaggerPreferenceConstants.VALIDATION_REF_SECURITY_REQUIREMENT_OBJECT;
 import static com.reprezen.swagedit.preferences.SwaggerPreferenceConstants.VALIDATION_REF_SECURITY_SCHEME_OBJECT;
+
+import java.util.Set;
 
 import org.eclipse.jface.layout.GridDataFactory;
 import org.eclipse.jface.layout.GridLayoutFactory;
@@ -28,8 +31,9 @@ import org.eclipse.ui.IWorkbench;
 import org.eclipse.ui.IWorkbenchPreferencePage;
 
 import com.reprezen.swagedit.Activator;
+import com.reprezen.swagedit.core.editor.JsonDocument.Version;
+import com.reprezen.swagedit.core.providers.PreferenceProvider;
 import com.reprezen.swagedit.core.utils.ExtensionUtils;
-import com.reprezen.swagedit.core.validation.Validator;
 
 public class SwaggerValidationPreferences extends FieldEditorPreferencePage
         implements IWorkbenchPreferencePage, IPropertyChangeListener {
@@ -54,8 +58,9 @@ public class SwaggerValidationPreferences extends FieldEditorPreferencePage
 
         // Validation
 
-        ExtensionUtils.resolveProviders(Validator.VALIDATION_PROVIDERS_ID).forEach(provider -> {
-            for (FieldEditor field : provider.getPreferenceFields(false, composite)) {
+        Set<PreferenceProvider> providers = ExtensionUtils.getPreferenceProviders(VALIDATION_PREFERENCE_PAGE);
+        providers.forEach(provider -> {
+            for (FieldEditor field : provider.createFields(Version.SWAGGER, composite)) {
                 addField(field);
             }
         });

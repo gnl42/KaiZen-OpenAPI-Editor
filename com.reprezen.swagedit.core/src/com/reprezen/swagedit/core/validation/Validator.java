@@ -53,8 +53,6 @@ import com.reprezen.swagedit.core.utils.ExtensionUtils;
  */
 public abstract class Validator {
 
-    public static final String VALIDATION_PROVIDERS_ID = "com.reprezen.swagedit.validator";
-
     private final JsonNode schemaRefTemplate = new ObjectMapper().createObjectNode() //
             .put("$ref", "#/definitions/schema");
 
@@ -63,7 +61,7 @@ public abstract class Validator {
 
     public Validator(IPreferenceStore preferenceStore) {
         this.preferenceStore = preferenceStore;
-        this.providers = ExtensionUtils.resolveProviders(VALIDATION_PROVIDERS_ID);
+        this.providers = ExtensionUtils.getValidationProviders();
     }
 
     public abstract JsonSchemaValidator getSchemaValidator();

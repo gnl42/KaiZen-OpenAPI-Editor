@@ -34,11 +34,14 @@ import com.reprezen.swagedit.core.schema.CompositeSchema;
  * SwaggerDocument
  * 
  */
-public class JsonDocument extends Document {
-    
+public abstract class JsonDocument extends Document {
+
     private final ObjectMapper mapper;
     private CompositeSchema schema;
 
+    public enum Version {
+        SWAGGER, OPENAPI;
+    }
 
     private final Yaml yaml = new Yaml();
 
@@ -50,6 +53,8 @@ public class JsonDocument extends Document {
         this.mapper = mapper;
         this.schema = schema;
     }
+
+    public abstract Version getVersion();
 
     public Exception getYamlError() {
         return yamlContent.get().getError();
@@ -86,7 +91,7 @@ public class JsonDocument extends Document {
         }
         return jsonContent.get().getResult();
     }
-    
+
     public CompositeSchema getSchema() {
         return schema;
     }
@@ -151,7 +156,7 @@ public class JsonDocument extends Document {
     private void updateJson(String content) {
         jsonContent.getAndSet(parseJson(content));
     }
-    
+
     private Result<JsonNode> parseJson(String content) {
         try {
             Object expandedYamlObject = new Yaml().load(content);
@@ -164,7 +169,7 @@ public class JsonDocument extends Document {
     private void updateModel() {
         model.getAndSet(parseModel());
     }
-    
+
     private Model parseModel() {
         try {
             return Model.parseYaml(schema, get());
@@ -245,7 +250,7 @@ public class JsonDocument extends Document {
 
         return new Region(position.getOffset(), position.getLength());
     }
-    
+
     public interface Result<T> {
         boolean isSuccess();
 
@@ -253,7 +258,7 @@ public class JsonDocument extends Document {
 
         Exception getError();
     }
-    
+
     public final class Success<T> implements Result<T> {
         private final T result;
 

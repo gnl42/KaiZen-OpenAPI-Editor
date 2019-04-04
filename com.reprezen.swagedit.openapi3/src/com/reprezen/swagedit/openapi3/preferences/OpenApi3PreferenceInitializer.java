@@ -12,11 +12,14 @@ package com.reprezen.swagedit.openapi3.preferences;
 
 import static com.reprezen.swagedit.openapi3.preferences.OpenApi3PreferenceConstants.ADVANCED_VALIDATION;
 
+import java.util.Set;
+
 import org.eclipse.jface.preference.IPreferenceStore;
 
+import com.reprezen.swagedit.core.editor.JsonDocument.Version;
 import com.reprezen.swagedit.core.preferences.JsonPreferenceInitializer;
+import com.reprezen.swagedit.core.providers.PreferenceProvider;
 import com.reprezen.swagedit.core.utils.ExtensionUtils;
-import com.reprezen.swagedit.core.validation.Validator;
 import com.reprezen.swagedit.openapi3.Activator;
 
 public class OpenApi3PreferenceInitializer extends JsonPreferenceInitializer {
@@ -25,10 +28,11 @@ public class OpenApi3PreferenceInitializer extends JsonPreferenceInitializer {
     public void initializeDefaultPreferences() {
         IPreferenceStore store = Activator.getDefault().getPreferenceStore();
         setColorPreferences(store);
-
         store.setDefault(ADVANCED_VALIDATION, true);
-        ExtensionUtils.resolveProviders(Validator.VALIDATION_PROVIDERS_ID).forEach(provider -> {
-            provider.initializeDefaultPreferences(true, store);
+
+        Set<PreferenceProvider> providers = ExtensionUtils.getPreferenceProviders();
+        providers.forEach(provider -> {
+            provider.initializeDefaultPreferences(Version.OPENAPI, store);
         });
     }
 

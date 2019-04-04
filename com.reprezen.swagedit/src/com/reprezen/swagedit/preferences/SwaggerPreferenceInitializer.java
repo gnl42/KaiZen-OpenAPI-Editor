@@ -15,12 +15,15 @@ import static com.reprezen.swagedit.preferences.SwaggerPreferenceConstants.VALID
 import static com.reprezen.swagedit.preferences.SwaggerPreferenceConstants.VALIDATION_REF_SECURITY_REQUIREMENT_OBJECT;
 import static com.reprezen.swagedit.preferences.SwaggerPreferenceConstants.VALIDATION_REF_SECURITY_SCHEME_OBJECT;
 
+import java.util.Set;
+
 import org.eclipse.jface.preference.IPreferenceStore;
 
 import com.reprezen.swagedit.Activator;
+import com.reprezen.swagedit.core.editor.JsonDocument.Version;
 import com.reprezen.swagedit.core.preferences.JsonPreferenceInitializer;
+import com.reprezen.swagedit.core.providers.PreferenceProvider;
 import com.reprezen.swagedit.core.utils.ExtensionUtils;
-import com.reprezen.swagedit.core.validation.Validator;
 
 /*
  * SwagEdit default preference values.
@@ -38,8 +41,9 @@ public class SwaggerPreferenceInitializer extends JsonPreferenceInitializer {
         store.setDefault(VALIDATION_REF_SECURITY_REQUIREMENTS_ARRAY, false);
         store.setDefault(VALIDATION_REF_SECURITY_REQUIREMENT_OBJECT, false);
 
-        ExtensionUtils.resolveProviders(Validator.VALIDATION_PROVIDERS_ID).forEach(provider -> {
-            provider.initializeDefaultPreferences(false, store);
+        Set<PreferenceProvider> providers = ExtensionUtils.getPreferenceProviders();
+        providers.forEach(provider -> {
+            provider.initializeDefaultPreferences(Version.SWAGGER, store);
         });
     }
 

@@ -18,9 +18,9 @@ import com.reprezen.swagedit.openapi3.schema.OpenApi3Schema;
 
 public class OpenApi3Document extends JsonDocument {
 
-	public OpenApi3Document() {
+    public OpenApi3Document() {
         this(Activator.getDefault().getSchema());
-	}
+    }
 
     public OpenApi3Document(OpenApi3Schema schema) {
         // `new YAMLMapper()` was replaced by `new ObjectMapper(new YAMLFactory())`.
@@ -28,6 +28,11 @@ public class OpenApi3Document extends JsonDocument {
         // Jackson Dataformat library does not declare an OSGi dependency on Jackson Databind which is needed to
         // initialize YAMLMapper (it extends ObjectMapper from Jackson Databind).
         super(new ObjectMapper(new YAMLFactory()), schema);
+    }
+
+    @Override
+    public Version getVersion() {
+        return Version.OPENAPI;
     }
 
 }
