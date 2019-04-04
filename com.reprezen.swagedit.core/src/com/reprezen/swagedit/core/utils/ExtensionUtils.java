@@ -55,11 +55,11 @@ public class ExtensionUtils {
     }
 
     public static Set<PreferenceProvider> getPreferenceProviders() {
-        return resolveProviders(ValidationProvider.ID, (e) -> true);
+        return resolveProviders(PreferenceProvider.ID, (e) -> true);
     }
 
     public static Set<PreferenceProvider> getPreferenceProviders(String preferencePage) {
-        return resolveProviders(ValidationProvider.ID,
+        return resolveProviders(PreferenceProvider.ID,
                 (e) -> preferencePage.equalsIgnoreCase(e.getAttribute("preferencePage")));
     }
 }
