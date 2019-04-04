@@ -1,13 +1,14 @@
 package com.reprezen.swagedit.validation
 
 import com.fasterxml.jackson.databind.JsonNode
+import com.fasterxml.jackson.databind.ObjectMapper
+import com.fasterxml.jackson.dataformat.yaml.YAMLFactory
 import com.reprezen.swagedit.core.json.references.JsonReferenceValidator
 import com.reprezen.swagedit.core.validation.Messages
 import com.reprezen.swagedit.core.validation.SwaggerError
 import com.reprezen.swagedit.editor.SwaggerDocument
 import com.reprezen.swagedit.mocks.Mocks
 import com.reprezen.swagedit.validation.SwaggerValidator.SwaggerSchemaValidator
-import io.swagger.util.Yaml
 import java.net.URI
 import java.util.Map
 import org.eclipse.core.resources.IMarker
@@ -417,7 +418,7 @@ class ReferenceValidatorTest {
 	}
 
 	def asJson(String string) {
-		Yaml.mapper().readTree(string)
+		new ObjectMapper(new YAMLFactory).readTree(string)
 	}
 
 }

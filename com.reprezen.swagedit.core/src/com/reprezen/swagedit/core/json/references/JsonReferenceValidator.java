@@ -27,7 +27,6 @@ import java.util.Map;
 import java.util.Set;
 
 import com.fasterxml.jackson.databind.JsonNode;
-import com.github.fge.jsonschema.core.report.ProcessingReport;
 import com.reprezen.swagedit.core.editor.JsonDocument;
 import com.reprezen.swagedit.core.model.AbstractNode;
 import com.reprezen.swagedit.core.model.Location;
@@ -126,8 +125,8 @@ public class JsonReferenceValidator {
         Map<String, List<AbstractNode>> sourceTypes = groupSourcesByType(sources);
 
         for (String type : sourceTypes.keySet()) {
-            ProcessingReport report = schemaValidator.validateSubSchema(target, type);
-            if (!report.isSuccess()) {
+            Set<JsonNode> report = schemaValidator.validate(target, type);
+            if (!report.isEmpty()) {
                 errors.addAll(createReferenceError(SEVERITY_WARNING, error_invalid_reference_type, sources));
             }
         }
