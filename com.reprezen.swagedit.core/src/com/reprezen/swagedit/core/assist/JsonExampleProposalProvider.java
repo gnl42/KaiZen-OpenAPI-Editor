@@ -95,7 +95,7 @@ public class JsonExampleProposalProvider {
 	
 		try {
 			final ExampleProvider exampleDataProvider = (ExampleProvider) ExtensionUtils
-					.createExecutableExtension(EXTENSION_POINT_NAME, EXTENSION_PROPERTY_NAME);
+					.getExtension(EXTENSION_POINT_NAME, EXTENSION_PROPERTY_NAME);
 			return exampleDataProvider != null ? exampleDataProvider : defaultDataProvider;
 		} catch (CoreException e) {
 			return defaultDataProvider;
