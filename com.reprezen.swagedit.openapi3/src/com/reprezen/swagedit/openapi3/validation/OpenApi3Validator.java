@@ -172,10 +172,6 @@ public class OpenApi3Validator extends Validator {
                 String message = String.format(Messages.error_scope_should_be_empty, name, type, name);
 
                 errors.add(error(node.get(name), IMarker.SEVERITY_ERROR, message));
-            } else if (scopeValues.size() == 0 && shouldHaveScopes) {
-                String message = String.format(Messages.error_scope_should_not_be_empty, name, type);
-
-                errors.add(error(node.get(name), IMarker.SEVERITY_ERROR, message));
             } else {
                 for (AbstractNode scope : scopeValues.elements()) {
                     try {
