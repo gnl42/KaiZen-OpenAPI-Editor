@@ -58,7 +58,7 @@ public class JsonExampleProposalProvider {
 	}
 
 	private boolean isSchemaReference(JsonNode jsonNode) {
-		return jsonNode.get(REFERENCE_KEY) != null;
+		return jsonNode.has(REFERENCE_KEY);
 	}
 
 	protected JsonNode normalize(AbstractNode node, JsonDocument document) {

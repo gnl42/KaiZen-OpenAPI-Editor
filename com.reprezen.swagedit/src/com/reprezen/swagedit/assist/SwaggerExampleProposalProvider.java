@@ -33,31 +33,14 @@ public class SwaggerExampleProposalProvider extends JsonExampleProposalProvider 
 
 	private static final JsonPointer DEFINITIONS_NODE_POINTER = JsonPointer.compile("/definitions/definitions");
 
-	private static enum PoiterRegEx {
-
-		RESPONSE_BODY_EXAMPLES_REGEX(".*/responses/\\S+/examples/.*$"),
-		DEFINITIONS_MODEL_EXAMPLE_REGEX(".*/definitions/\\S+/example$"),
-		PARAMETERS_SCHEMA_EXAMPLE_REGEX(".*/parameters/\\S+/schema/example$");
-
-		private final String regEx;
-
-		private PoiterRegEx(String regEx) {
-			this.regEx = regEx;
-		}
-
-		public String getRegEx() {
-			return regEx;
-		}
-
-	}
-
 	private static final ContextTypeCollection EXAMPLE_CONTEXT_TYPES;
 
 	static {
-		final List<ContextType> contextTypes = Arrays.asList(PoiterRegEx.values()).stream().map(//
-				poiterRegEx -> new RegexContextType("Generate Example", "Example", poiterRegEx.getRegEx())//
-		).collect(Collectors.toList());
-		EXAMPLE_CONTEXT_TYPES = ContextType.newContentTypeCollection(contextTypes);
+		final List<ContextType> contentTypes = Arrays.asList(//
+				new RegexContextType("Generate Example", "Example", ".*/example$"),
+				new RegexContextType("Generate Example", "Example", ".*/examples/.*$")//
+		);
+		EXAMPLE_CONTEXT_TYPES = ContextType.newContentTypeCollection(contentTypes);
 	}
 
 	public SwaggerExampleProposalProvider(ContextTypeCollection contextTypes) {

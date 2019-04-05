@@ -14,7 +14,6 @@ import java.util.Arrays;
 import java.util.Collection;
 import java.util.List;
 import java.util.Optional;
-import java.util.stream.Collectors;
 
 import com.fasterxml.jackson.core.JsonPointer;
 import com.fasterxml.jackson.databind.JsonNode;
@@ -33,38 +32,14 @@ public class OpenApi3ExampleProposalProvider extends JsonExampleProposalProvider
 
 	private static final JsonPointer COMPONENTS_NODE_POINTER = JsonPointer.compile("/definitions/components");
 
-	private static enum PoiterRegEx {
-
-		REQUEST_BODY_EXAMPLE_POINTER_REGEX(".*/content/\\S+/example$"),
-		REQUEST_BODY_EXAMPLES_EXAMPLE_VALUE_FIELD_POINTER_REGEX(".*/content/\\S+/examples/\\S+/value$"),
-		RESPONSE_BODY_EXAMPLE_POINTER_REGEX(".*/content(/\\S+)/example$"),
-		RESPONSE_BODY_EXAMPLES_EXAMPLE_VALUE_FIELD_POINTER_REGEX(".*/content/\\S+/examples/\\S+/value$"),
-		PARAMETER_EXAMPLE_POINTER_REGEX(".*/parameters/\\S+/example$"),
-		PARAMETER_EXAMPLES_EXAMPLE_VALUE_FIELD_POINTER_REGEX(".*/parameters/\\S+/examples/\\S+/value$"),
-		MODEL_EXAMPLE_POINTER_REGEX("/content/\\S+/schema/example$"),
-		HEADERS_EXAMPLE_POINTER_REGEX(".*/headers/\\S+/example$"),
-		HEADERS_EXAMPLES_POINTER_REGEX(".*/headers/\\S+/examples(/\\S+)/value$"),
-		COMPONENTS_SCHEMA_EXAMPLE_POINTER_REGEX(".*/components/schemas/\\S+/example$");
-
-		private final String regEx;
-
-		private PoiterRegEx(String regEx) {
-			this.regEx = regEx;
-		}
-
-		public String getRegEx() {
-			return regEx;
-		}
-
-	}
-
 	private static final ContextTypeCollection EXAMPLE_CONTEXT_TYPES;
 
 	static {
-		final List<ContextType> contextTypes = Arrays.asList(PoiterRegEx.values()).stream().map(//
-				poiterRegEx -> new RegexContextType("Generate Example", "Example", poiterRegEx.getRegEx())//
-		).collect(Collectors.toList());
-		EXAMPLE_CONTEXT_TYPES = ContextType.newContentTypeCollection(contextTypes);
+		final List<ContextType> contentTypes = Arrays.asList(//
+				new RegexContextType("Generate Example", "Example", ".*/example$"),
+				new RegexContextType("Generate Example", "Example", ".*/examples/\\S+/value$")//
+		);
+		EXAMPLE_CONTEXT_TYPES = ContextType.newContentTypeCollection(contentTypes);
 	}
 
 	public OpenApi3ExampleProposalProvider(ContextTypeCollection contextTypes) {
