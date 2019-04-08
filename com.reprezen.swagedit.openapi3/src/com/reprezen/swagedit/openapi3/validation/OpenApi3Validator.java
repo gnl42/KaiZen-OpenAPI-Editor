@@ -167,26 +167,29 @@ public class OpenApi3Validator extends Validator {
         AbstractNode values = node.get(name);
         if (values.isArray()) {
             ArrayNode scopeValues = values.asArray();
-
+            
+            // The scope names MUST be empty for Security Scheme types other than 'oauth2' and 'openIdConnect'
             if (scopeValues.size() > 0 && !shouldHaveScopes) {
                 String message = String.format(Messages.error_scope_should_be_empty, name, type, name);
 
                 errors.add(error(node.get(name), IMarker.SEVERITY_ERROR, message));
-            } else {
-                for (AbstractNode scope : scopeValues.elements()) {
-                    try {
-                        String scopeName = (String) scope.asValue().getValue();
-                        if (!scopes.contains(scopeName)) {
-                            String message = String.format(Messages.error_invalid_scope_reference, scopeName, name);
+			} else {
+				if (type.equals("oauth2")) {
+					for (AbstractNode scope : scopeValues.elements()) {
+						try {
+							String scopeName = (String) scope.asValue().getValue();
+							if (!scopes.contains(scopeName)) {
+								String message = String.format(Messages.error_invalid_scope_reference, scopeName, name);
 
-                            errors.add(error(scope, IMarker.SEVERITY_ERROR, message));
-                        }
-                    } catch (Exception e) {
-                        // Invalid scope name type.
-                        // No need to create an error, it will be handle by the schema validation.
-                    }
-                }
-            }
+								errors.add(error(scope, IMarker.SEVERITY_ERROR, message));
+							}
+						} catch (Exception e) {
+							// Invalid scope name type.
+							// No need to create an error, it will be handle by the schema validation.
+						}
+					}
+				}
+			}
         }
     }
 
