@@ -78,8 +78,11 @@ class ValidationHelper {
 			override getSchemaValidator() {
 				schemaVal
 			}
+
+			override isAdvancedValidation() {
+				advanced
+			}
 		}
-		validator.advancedValidation = advanced
 		validator
 	}
 

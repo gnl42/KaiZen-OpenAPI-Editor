@@ -10,11 +10,15 @@
  *******************************************************************************/
 package com.reprezen.swagedit.openapi3.preferences;
 
+import static com.reprezen.swagedit.core.preferences.KaizenPreferencePage.VALIDATION_PREFERENCE_PAGE;
 import static com.reprezen.swagedit.openapi3.preferences.OpenApi3PreferenceConstants.ADVANCED_VALIDATION;
+
+import java.util.Set;
 
 import org.eclipse.jface.layout.GridDataFactory;
 import org.eclipse.jface.layout.GridLayoutFactory;
 import org.eclipse.jface.preference.BooleanFieldEditor;
+import org.eclipse.jface.preference.FieldEditor;
 import org.eclipse.jface.preference.FieldEditorPreferencePage;
 import org.eclipse.jface.util.IPropertyChangeListener;
 import org.eclipse.swt.SWT;
@@ -22,6 +26,9 @@ import org.eclipse.swt.widgets.Composite;
 import org.eclipse.ui.IWorkbench;
 import org.eclipse.ui.IWorkbenchPreferencePage;
 
+import com.reprezen.swagedit.core.editor.JsonDocument.Version;
+import com.reprezen.swagedit.core.providers.PreferenceProvider;
+import com.reprezen.swagedit.core.utils.ExtensionUtils;
 import com.reprezen.swagedit.openapi3.Activator;
 
 public class OpenApi3ValidationPreferences extends FieldEditorPreferencePage
@@ -44,7 +51,13 @@ public class OpenApi3ValidationPreferences extends FieldEditorPreferencePage
         GridLayoutFactory.fillDefaults().applyTo(composite);
         GridDataFactory.fillDefaults().grab(true, false).indent(0, 10).applyTo(composite);
 
-        addField(new BooleanFieldEditor(ADVANCED_VALIDATION, "Enable advanced validation",
-                composite));
+        addField(new BooleanFieldEditor(ADVANCED_VALIDATION, "Enable advanced validation", composite));
+
+        Set<PreferenceProvider> providers = ExtensionUtils.getPreferenceProviders(VALIDATION_PREFERENCE_PAGE);
+        providers.forEach(provider -> {
+            for (FieldEditor field : provider.createFields(Version.OPENAPI, composite)) {
+                addField(field);
+            }
+        });
     }
 }

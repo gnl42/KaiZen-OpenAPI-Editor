@@ -23,7 +23,7 @@ import static org.junit.Assert.*
 
 class ValidatorTest {
 
-	val validator = new SwaggerValidator
+	val validator = new SwaggerValidator(null)
 	val document = new SwaggerDocument
 
 	@Test

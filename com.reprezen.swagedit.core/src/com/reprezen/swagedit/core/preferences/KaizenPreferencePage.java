@@ -16,6 +16,8 @@ import org.eclipse.ui.IWorkbenchPreferencePage;
 
 public class KaizenPreferencePage extends FieldEditorPreferencePage implements IWorkbenchPreferencePage {
 
+    public static final String VALIDATION_PREFERENCE_PAGE = "com.reprezen.swagedit.preferences.validation";
+
     public KaizenPreferencePage() {
         super(GRID);
         setDescription("KaiZen OpenAPI Editor Preferences");

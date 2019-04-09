@@ -10,12 +10,13 @@
  *******************************************************************************/
 package com.reprezen.swagedit.openapi3.editor;
 
-import static com.reprezen.swagedit.openapi3.preferences.OpenApi3PreferenceConstants.ADVANCED_VALIDATION;
-
 import java.util.HashMap;
 import java.util.Map;
 
+import org.dadacoalition.yedit.YEditLog;
 import org.dadacoalition.yedit.editor.YEditSourceViewerConfiguration;
+import org.eclipse.core.runtime.CoreException;
+import org.eclipse.core.runtime.NullProgressMonitor;
 import org.eclipse.jface.preference.IPreferenceStore;
 import org.eclipse.jface.text.IInformationControlCreator;
 import org.eclipse.jface.text.contentassist.ContentAssistant;
@@ -49,21 +50,27 @@ public class OpenApi3Editor extends JsonEditor {
 
     private OpenApi3Validator validator;
 
-    private final IPropertyChangeListener advancedValidationListener = event -> {
+    private final IPropertyChangeListener validationChangeListener = event -> {
         if (validator != null) {
-            if (ADVANCED_VALIDATION.equals(event.getProperty())) {
-                validator.setAdvancedValidation(getPreferenceStore().getBoolean(ADVANCED_VALIDATION));
+            try {
+                createValidationOperation(false).run(new NullProgressMonitor());
+            } catch (CoreException e) {
+                YEditLog.logException(e);
             }
         }
     };
 
     public OpenApi3Editor() {
         super(new OpenApi3DocumentProvider(), //
-                // ZEN-4361 Missing marker location indicators (Overview Ruler) next to editor scrollbar in KZOE
+                // ZEN-4361 Missing marker location indicators (Overview Ruler) next to editor
+                // scrollbar in KZOE
                 new ChainedPreferenceStore(new IPreferenceStore[] { //
                         Activator.getDefault().getPreferenceStore(), //
-                        // Preferences store for EditorsPlugin has settings to show/hide the rules and markers
+                        // Preferences store for EditorsPlugin has settings to show/hide the rules and
+                        // markers
                         EditorsPlugin.getDefault().getPreferenceStore() }));
+
+        getPreferenceStore().addPropertyChangeListener(validationChangeListener);
     }
 
     @Override
@@ -76,7 +83,7 @@ public class OpenApi3Editor extends JsonEditor {
     @Override
     public void dispose() {
         // preference store is removed in AbstractTextEditor.dispose()
-        getPreferenceStore().removePropertyChangeListener(advancedValidationListener);
+        getPreferenceStore().removePropertyChangeListener(validationChangeListener);
         super.dispose();
     }
 
@@ -121,10 +128,7 @@ public class OpenApi3Editor extends JsonEditor {
             JsonNode schema = Activator.getDefault().getSchema().getRootType().asJson();
             preloadedSchemas.put(OpenApi3Schema.URL, schema);
 
-            validator = new OpenApi3Validator(preloadedSchemas);
-            validator.setAdvancedValidation(getPreferenceStore().getBoolean(ADVANCED_VALIDATION));
-
-            getPreferenceStore().addPropertyChangeListener(advancedValidationListener);
+            validator = new OpenApi3Validator(preloadedSchemas, getPreferenceStore());
         }
 
         return validator;

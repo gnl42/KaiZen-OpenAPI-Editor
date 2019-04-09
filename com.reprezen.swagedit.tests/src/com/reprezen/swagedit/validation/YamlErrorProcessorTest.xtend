@@ -1,11 +1,12 @@
 package com.reprezen.swagedit.validation
 
+import com.fasterxml.jackson.databind.ObjectMapper
+import com.fasterxml.jackson.dataformat.yaml.YAMLFactory
+import com.reprezen.swagedit.core.validation.Messages
 import com.reprezen.swagedit.core.validation.YamlErrorProcessor
-import io.swagger.util.Yaml
 import org.junit.Test
 
 import static org.junit.Assert.*
-import com.reprezen.swagedit.core.validation.Messages
 
 class YamlErrorProcessorTest {
 
@@ -32,7 +33,7 @@ class YamlErrorProcessorTest {
 			         type: string
 		'''
 
-		var mapper = Yaml.mapper
+		var mapper = new ObjectMapper(new YAMLFactory)
 		try {
 			mapper.readTree(content)
 			fail()

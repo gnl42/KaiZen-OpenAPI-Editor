@@ -22,7 +22,6 @@ import java.util.Map;
 import java.util.Set;
 
 import com.fasterxml.jackson.databind.JsonNode;
-import com.github.fge.jsonschema.core.report.ProcessingReport;
 import com.reprezen.swagedit.core.editor.JsonDocument;
 import com.reprezen.swagedit.core.json.references.JsonReference;
 import com.reprezen.swagedit.core.json.references.JsonReferenceFactory;
@@ -59,8 +58,8 @@ public class OpenApi3ReferenceValidator extends JsonReferenceValidator {
             String ptr = isOperationValidation ? operationTypePointer.toString() : type;
             String message = isOperationValidation ? error_invalid_operation_ref : error_invalid_reference_type;
 
-            ProcessingReport report = getSchemaValidator().validateSubSchema(target, ptr);
-            if (!report.isSuccess()) {
+            Set<JsonNode> report = getSchemaValidator().validate(target, ptr);
+            if (!report.isEmpty()) {
                 errors.addAll(createReferenceError(SEVERITY_WARNING, message, sources));
             }
         }

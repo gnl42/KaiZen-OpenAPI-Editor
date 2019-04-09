@@ -548,7 +548,7 @@ public abstract class JsonEditor extends YEdit implements IShowInSource, IShowIn
 
     protected abstract Validator createValidator();
 
-    public class JsonPreferenceChangeListener implements IPropertyChangeListener {
+    private class JsonPreferenceChangeListener implements IPropertyChangeListener {
 
         private final List<String> colorPreferenceKeys = new ArrayList<>();
         {

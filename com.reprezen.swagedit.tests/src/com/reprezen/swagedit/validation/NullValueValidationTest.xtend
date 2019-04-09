@@ -19,7 +19,7 @@ import static org.junit.Assert.*
 
 class NullValueValidationTest {
 
-	val validator = new SwaggerValidator
+	val validator = new SwaggerValidator(null)
 	val SwaggerDocument document = new SwaggerDocument
 
 	@Test
