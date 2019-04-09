@@ -153,7 +153,7 @@ public abstract class JsonContentAssistProcessor extends TemplateCompletionProce
         	final boolean isExampleCompletion = exampleProposalProvider.canProvideProposal(currentModel, currentPath);
         	if (isExampleCompletion) {
         		//TODO: Update or clear status ???????
-        		kaizenProposals = exampleProposalProvider.getProposals(currentPath, document, currentScope);
+        		kaizenProposals = exampleProposalProvider.getProposals(currentPath, document);
         	} else {
         		clearStatus();
         		kaizenProposals = proposalProvider.getProposals(currentPath, currentModel, prefix);

@@ -26,6 +26,7 @@ import com.reprezen.swagedit.core.assist.contexts.ContextTypeCollection;
 import com.reprezen.swagedit.core.assist.contexts.RegexContextType;
 import com.reprezen.swagedit.core.editor.JsonDocument;
 import com.reprezen.swagedit.core.model.AbstractNode;
+import com.reprezen.swagedit.core.utils.DocumentUtils;
 import com.reprezen.swagedit.core.utils.ModelUtils;
 import com.reprezen.swagedit.core.utils.SwaggerFileFinder.Scope;
 
@@ -52,25 +53,26 @@ public class SwaggerExampleProposalProvider extends JsonExampleProposalProvider 
 	}
 
 	@Override
-	public Collection<ProposalDescriptor> getProposals(JsonPointer pointer, JsonDocument document, Scope scope) {
+	public Collection<ProposalDescriptor> getProposals(JsonPointer pointer, JsonDocument document) {
 		final AbstractNode nodeAtPointer = document.getModel().find(pointer);
 
-		JsonNode normalized = null;
+		JsonPointer jsonPointer = null;
 		if (insideDefinitionsNode(nodeAtPointer)) {
 			final AbstractNode schemaNode = nodeAtPointer.getParent();
-			normalized = normalize(schemaNode, document);
+			jsonPointer = schemaNode.getPointer();
 		} else {
 			final Optional<AbstractNode> parentNode = ModelUtils.findParentContainingField(//
 					nodeAtPointer, SCHEMA_FIELD_NAME);
 			if (parentNode.isPresent()) {
 				final AbstractNode schemaNode = parentNode.get().get(SCHEMA_FIELD_NAME);
-				normalized = normalize(schemaNode, document);
+				jsonPointer = schemaNode.getPointer();
 			} else {
-				normalized = NullNode.instance; // schema filed not found in parent
+				//TODO: Add code to handle this case
+				jsonPointer = null; // schema filed not found in parent
 			}
 		}
 
-		final String exampleData = getProposal(normalized);
+		final String exampleData = getExampleDataProvider().getData(jsonPointer, document, DocumentUtils.getActiveEditorInputURI());
 		return Arrays.asList(new ProposalDescriptor("Generate Example:").replacementString(exampleData).type("string"));
 	}
 

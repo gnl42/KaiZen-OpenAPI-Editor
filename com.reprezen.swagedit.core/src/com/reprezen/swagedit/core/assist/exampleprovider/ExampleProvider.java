@@ -10,9 +10,12 @@
  *******************************************************************************/
 package com.reprezen.swagedit.core.assist.exampleprovider;
 
-import com.fasterxml.jackson.databind.JsonNode;
+import java.net.URI;
+
+import com.fasterxml.jackson.core.JsonPointer;
+import com.reprezen.swagedit.core.editor.JsonDocument;
 
 public interface ExampleProvider {
 	
-	String getData(JsonNode node);
+	String getData(JsonPointer jsonPointer, JsonDocument document, URI baseURI);
 }

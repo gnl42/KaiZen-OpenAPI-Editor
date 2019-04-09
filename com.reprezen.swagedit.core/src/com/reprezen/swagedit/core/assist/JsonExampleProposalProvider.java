@@ -10,38 +10,26 @@
  *******************************************************************************/
 package com.reprezen.swagedit.core.assist;
 
-import static com.reprezen.swagedit.core.json.references.JsonReference.isReference;
-
 import java.net.URI;
 import java.util.Collection;
 import java.util.Collections;
 import java.util.Set;
 
-import org.eclipse.core.runtime.CoreException;
-
 import com.fasterxml.jackson.core.JsonPointer;
-import com.fasterxml.jackson.databind.JsonNode;
 import com.reprezen.swagedit.core.assist.contexts.ContextType;
 import com.reprezen.swagedit.core.assist.contexts.ContextTypeCollection;
 import com.reprezen.swagedit.core.assist.exampleprovider.ExampleProvider;
 import com.reprezen.swagedit.core.editor.JsonDocument;
-import com.reprezen.swagedit.core.json.references.JsonReference;
-import com.reprezen.swagedit.core.json.references.JsonReferenceFactory;
-import com.reprezen.swagedit.core.model.AbstractNode;
 import com.reprezen.swagedit.core.model.Model;
-import com.reprezen.swagedit.core.utils.DocumentUtils;
 import com.reprezen.swagedit.core.utils.ExtensionUtils;
-import com.reprezen.swagedit.core.utils.SwaggerFileFinder.Scope;
 
 /**
  * Completion proposal provider for JSON examples.
  */
 public class JsonExampleProposalProvider {
 
-	private static final JsonReferenceFactory REFERENCE_FACTORY = new JsonReferenceFactory();
-	public static final String ID = "com.reprezen.swagedit.core.exampleprovider";
+	public static final String ID = "com.reprezen.swagedit.exampleprovider";
 	protected static final String SCHEMA_FIELD_NAME = "schema";
-	private static final String REFERENCE_KEY = "$ref";
 	private final ContextTypeCollection contextTypes;
 
 	public JsonExampleProposalProvider(ContextTypeCollection contextTypes) {
@@ -52,59 +40,20 @@ public class JsonExampleProposalProvider {
 		return pointer != null && contextTypes.get(model, pointer) != ContextType.UNKNOWN;
 	}
 
-	public Collection<ProposalDescriptor> getProposals(JsonPointer pointer, JsonDocument document,
-			Scope scope) {
+	public Collection<ProposalDescriptor> getProposals(JsonPointer pointer, JsonDocument document) {
 		return Collections.emptyList();
 	}
 
-	private boolean isSchemaReference(JsonNode jsonNode) {
-		return jsonNode.has(REFERENCE_KEY);
-	}
-
-	protected JsonNode normalize(AbstractNode node, JsonDocument document) {
-		final URI filePath = DocumentUtils.getActiveEditorInputURI();
-		final JsonNode schemaNode = document.asJson().at(node.getPointer());
-		if (isSchemaReference(schemaNode)) {
-			final JsonReference schemaReference = REFERENCE_FACTORY.create(schemaNode);
-			final JsonNode resolve = schemaReference.resolve(document, filePath);
-			normalize(resolve, document, filePath);
-			return resolve;
-		} else {
-			normalize(schemaNode, document, filePath);
-			return schemaNode;
-		}
-	}
-
-	private void normalize(JsonNode node, JsonDocument document, URI baseURI) {
-		node.fields().forEachRemaining(entry -> {
-			JsonNode value = entry.getValue();
-			if (isReference(value)) {
-				final JsonReference reference = REFERENCE_FACTORY.create(value);
-				value = reference.resolve(document, baseURI);
-	
-				if (value != null && !value.isMissingNode()) {
-					((com.fasterxml.jackson.databind.node.ObjectNode) node).set(entry.getKey(), value);
-				}
-			}
-			normalize(value, document, baseURI);
-		});
-	}
-
 	protected ExampleProvider getExampleDataProvider() {
-		final ExampleProvider defaultExampleProvider = (JsonNode jsonNode) -> "example:";
-		
+		final ExampleProvider defaultExampleProvider = (JsonPointer jsonPointer, JsonDocument document,
+				URI uri) -> "example:";
+
 		final Set<ExampleProvider> exampleProviders = ExtensionUtils.getExampleProviders();
 		if (exampleProviders != null && !exampleProviders.isEmpty()) {
 			return exampleProviders.iterator().next();
 		} else {
 			return defaultExampleProvider;
 		}
-	}
-
-	protected String getProposal(JsonNode normalized) {
-		final ExampleProvider exampleDataProvider = (ExampleProvider) getExampleDataProvider();
-		final String exampleData = exampleDataProvider.getData(normalized);
-		return exampleData;
 	}
 
 }
