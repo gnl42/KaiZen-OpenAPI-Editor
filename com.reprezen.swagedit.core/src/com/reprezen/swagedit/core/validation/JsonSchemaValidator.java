@@ -15,18 +15,18 @@ import java.util.Map;
 import java.util.Set;
 
 import org.dadacoalition.yedit.YEditLog;
+import org.eclipse.core.resources.IMarker;
 
 import com.fasterxml.jackson.databind.JsonNode;
 import com.github.fge.jsonschema.core.exceptions.ProcessingException;
 import com.github.fge.jsonschema.core.load.configuration.LoadingConfiguration;
 import com.github.fge.jsonschema.core.load.configuration.LoadingConfigurationBuilder;
-import com.github.fge.jsonschema.core.report.ProcessingReport;
 import com.github.fge.jsonschema.main.JsonSchema;
 import com.github.fge.jsonschema.main.JsonSchemaFactory;
 import com.reprezen.swagedit.core.Activator;
 import com.reprezen.swagedit.core.editor.JsonDocument;
 
-public abstract class JsonSchemaValidator {
+public class JsonSchemaValidator {
 
     private final LoadingConfiguration loadingConfiguration;
     private final JsonSchemaFactory factory;
@@ -69,7 +69,19 @@ public abstract class JsonSchemaValidator {
         return errors;
     }
 
-    public ProcessingReport validateSubSchema(JsonNode document, String schemaPointer) {
+    public Set<JsonNode> validate(JsonNode instance) {
+        JsonSchema jsonSchema = null;
+        try {
+            jsonSchema = factory.getJsonSchema(schema);
+        } catch (ProcessingException e) {
+            Activator.getDefault().logError(e.getLocalizedMessage(), e);
+            return null;
+        }
+
+        return doValidate(jsonSchema, instance);
+    }
+
+    public Set<JsonNode> validate(JsonNode instance, String schemaPointer) {
         JsonSchema jsonSchema = null;
         try {
             jsonSchema = factory.getJsonSchema(schema, schemaPointer);
@@ -78,11 +90,34 @@ public abstract class JsonSchemaValidator {
             return null;
         }
 
+        return doValidate(jsonSchema, instance);
+    }
+
+    private Set<JsonNode> doValidate(JsonSchema schema, JsonNode instance) {
+        Set<JsonNode> errors = new HashSet<>();
         try {
-            return jsonSchema.validate(document, true);
+            schema.validate(instance, true).forEach(message -> {
+                errors.add(message.asJson());
+            });
         } catch (ProcessingException e) {
-            Activator.getDefault().logError(e.getLocalizedMessage(), e);
-            return null;
+            Activator.getDefault().logError(e.getMessage(), e);
+        }
+        return errors;
+    }
+
+    public static int getLevel(JsonNode message) {
+        if (message == null || !message.has("level")) {
+            return IMarker.SEVERITY_INFO;
+        }
+
+        switch (message.get("level").asText()) {
+        case "error":
+        case "fatal":
+            return IMarker.SEVERITY_ERROR;
+        case "warning":
+            return IMarker.SEVERITY_WARNING;
+        default:
+            return IMarker.SEVERITY_INFO;
         }
     }
 }

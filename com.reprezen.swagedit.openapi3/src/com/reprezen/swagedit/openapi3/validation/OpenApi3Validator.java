@@ -10,6 +10,7 @@
  *******************************************************************************/
 package com.reprezen.swagedit.openapi3.validation;
 
+import static com.reprezen.swagedit.openapi3.preferences.OpenApi3PreferenceConstants.ADVANCED_VALIDATION;
 import static org.eclipse.core.resources.IMarker.SEVERITY_ERROR;
 
 import java.net.URI;
@@ -23,6 +24,7 @@ import java.util.Set;
 
 import org.eclipse.core.resources.IMarker;
 import org.eclipse.core.runtime.Status;
+import org.eclipse.jface.preference.IPreferenceStore;
 
 import com.fasterxml.jackson.core.JsonPointer;
 import com.fasterxml.jackson.databind.JsonNode;
@@ -57,18 +59,23 @@ public class OpenApi3Validator extends Validator {
 
     private final JsonNode schema;
     private final Map<String, JsonNode> preloadedSchemas;
-    private boolean advancedValidation = false;
 
     private JsonSchemaValidator schemaValidator;
     private JsonReferenceValidator referenceValidator;
 
     public OpenApi3Validator(Map<String, JsonNode> preloadedSchemas) {
+        this(preloadedSchemas, null);
+    }
+
+    public OpenApi3Validator(Map<String, JsonNode> preloadedSchemas, IPreferenceStore preferenceStore) {
+        super(preferenceStore);
+
         this.preloadedSchemas = preloadedSchemas;
         this.schema = preloadedSchemas.get(OpenApi3Schema.URL);
     }
 
-    public void setAdvancedValidation(boolean advancedValidation) {
-        this.advancedValidation = advancedValidation;
+    protected boolean isAdvancedValidation() {
+        return getPreferenceStore() != null && getPreferenceStore().getBoolean(ADVANCED_VALIDATION);
     }
 
     @Override
@@ -92,9 +99,10 @@ public class OpenApi3Validator extends Validator {
         final Set<SwaggerError> errors = super.validate(document, baseURI);
         final long nbOfErrors = errors.stream().filter(e -> e.getLevel() == SEVERITY_ERROR).count();
 
-        // Advanced validation is enable if no errors are detected (does not include warnings and infos),
+        // Advanced validation is enable if no errors are detected (does not include
+        // warnings and infos),
         // and option in UI is enable.
-        if (advancedValidation && nbOfErrors == 0) {
+        if (isAdvancedValidation() && nbOfErrors == 0) {
             try {
                 OpenApi3 result = new OpenApi3Parser().parse(document.get(), baseURI.toURL(), true);
 
