@@ -15,6 +15,7 @@ import static com.reprezen.swagedit.core.json.references.JsonReference.isReferen
 import java.net.URI;
 import java.util.Collection;
 import java.util.Collections;
+import java.util.Set;
 
 import org.eclipse.core.runtime.CoreException;
 
@@ -38,8 +39,7 @@ import com.reprezen.swagedit.core.utils.SwaggerFileFinder.Scope;
 public class JsonExampleProposalProvider {
 
 	private static final JsonReferenceFactory REFERENCE_FACTORY = new JsonReferenceFactory();
-	protected static final String EXTENSION_POINT_NAME = "com.reprezen.swagedit.core.exampleprovider";
-	protected static final String EXTENSION_PROPERTY_NAME = "class";
+	public static final String ID = "com.reprezen.swagedit.core.exampleprovider";
 	protected static final String SCHEMA_FIELD_NAME = "schema";
 	private static final String REFERENCE_KEY = "$ref";
 	private final ContextTypeCollection contextTypes;
@@ -91,14 +91,13 @@ public class JsonExampleProposalProvider {
 	}
 
 	protected ExampleProvider getExampleDataProvider() {
-		final ExampleProvider defaultDataProvider = (JsonNode jsonNode) -> "example:";
-	
-		try {
-			final ExampleProvider exampleDataProvider = (ExampleProvider) ExtensionUtils
-					.getExtension(EXTENSION_POINT_NAME, EXTENSION_PROPERTY_NAME);
-			return exampleDataProvider != null ? exampleDataProvider : defaultDataProvider;
-		} catch (CoreException e) {
-			return defaultDataProvider;
+		final ExampleProvider defaultExampleProvider = (JsonNode jsonNode) -> "example:";
+		
+		final Set<ExampleProvider> exampleProviders = ExtensionUtils.getExampleProviders();
+		if (exampleProviders != null && !exampleProviders.isEmpty()) {
+			return exampleProviders.iterator().next();
+		} else {
+			return defaultExampleProvider;
 		}
 	}
 

@@ -12,6 +12,8 @@ package com.reprezen.swagedit.validation;
 
 import java.util.HashMap;
 
+import org.eclipse.jface.preference.IPreferenceStore;
+
 import com.reprezen.swagedit.Activator;
 import com.reprezen.swagedit.core.json.references.JsonReferenceFactory;
 import com.reprezen.swagedit.core.json.references.JsonReferenceValidator;
@@ -20,6 +22,10 @@ import com.reprezen.swagedit.core.validation.Validator;
 import com.reprezen.swagedit.schema.SwaggerSchema;
 
 public class SwaggerValidator extends Validator {
+
+    public SwaggerValidator(IPreferenceStore preferenceStore) {
+        super(preferenceStore);
+    }
 
     private JsonReferenceValidator referenceValidator;
     private JsonSchemaValidator schemaValidator;

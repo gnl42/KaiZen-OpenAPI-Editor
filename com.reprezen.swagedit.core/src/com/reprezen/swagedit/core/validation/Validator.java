@@ -20,6 +20,7 @@ import java.util.Set;
 
 import org.apache.commons.lang3.tuple.Pair;
 import org.eclipse.core.resources.IMarker;
+import org.eclipse.jface.preference.IPreferenceStore;
 import org.eclipse.ui.IFileEditorInput;
 import org.yaml.snakeyaml.nodes.MappingNode;
 import org.yaml.snakeyaml.nodes.Node;
@@ -40,6 +41,8 @@ import com.reprezen.swagedit.core.model.ArrayNode;
 import com.reprezen.swagedit.core.model.Model;
 import com.reprezen.swagedit.core.model.ObjectNode;
 import com.reprezen.swagedit.core.model.ValueNode;
+import com.reprezen.swagedit.core.providers.ValidationProvider;
+import com.reprezen.swagedit.core.utils.ExtensionUtils;
 
 /**
  * This class contains methods for validating a Swagger YAML document.
@@ -53,9 +56,21 @@ public abstract class Validator {
     private final JsonNode schemaRefTemplate = new ObjectMapper().createObjectNode() //
             .put("$ref", "#/definitions/schema");
 
+    private final Set<ValidationProvider> providers;
+    private final IPreferenceStore preferenceStore;
+
+    public Validator(IPreferenceStore preferenceStore) {
+        this.preferenceStore = preferenceStore;
+        this.providers = ExtensionUtils.getValidationProviders();
+    }
+
     public abstract JsonSchemaValidator getSchemaValidator();
 
     public abstract JsonReferenceValidator getReferenceValidator();
+
+    protected IPreferenceStore getPreferenceStore() {
+        return preferenceStore;
+    }
 
     /**
      * Returns a list or errors if validation fails.
@@ -89,7 +104,7 @@ public abstract class Validator {
             Model model = document.getModel();
             if (yaml != null && model != null) {
                 errors.addAll(getSchemaValidator().validate(document));
-                errors.addAll(validateModel(document.getModel()));
+                errors.addAll(validateDocument(baseURI, document));
                 errors.addAll(checkDuplicateKeys(yaml));
                 errors.addAll(getReferenceValidator().validate(baseURI, document, model));
             }
@@ -101,15 +116,26 @@ public abstract class Validator {
     /**
      * Validates the model against with different rules that cannot be verified only by JSON schema validation.
      * 
+     * @param baseURI
      * @param model
      * @return errors
      */
-    protected Set<SwaggerError> validateModel(Model model) {
+    protected Set<SwaggerError> validateDocument(URI baseURI, JsonDocument document) {
         final Set<SwaggerError> errors = new HashSet<>();
+        final Model model = document.getModel();
 
         if (model != null && model.getRoot() != null) {
             for (AbstractNode node : model.allNodes()) {
                 executeModelValidation(model, node, errors);
+                // execute validation from each providers
+                providers.forEach(provider -> {
+                    if (provider.isActive(document, getPreferenceStore())) {
+                        Set<SwaggerError> result = provider.validate(document, baseURI, node);
+                        if (result != null) {
+                            errors.addAll(result);
+                        }
+                    }
+                });
             }
         }
         return errors;
@@ -198,7 +224,8 @@ public abstract class Validator {
     }
 
     private boolean isSchemaDefinition(AbstractNode node) {
-        // need to use getContent() because asJson() returns resolvedValue is some subclasses
+        // need to use getContent() because asJson() returns resolvedValue is some
+        // subclasses
         return schemaRefTemplate.equals(node.getType().getContent()) //
                 && node.get(JsonReference.PROPERTY) == null //
                 && node.get("allOf") == null;

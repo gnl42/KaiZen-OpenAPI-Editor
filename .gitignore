@@ -16,3 +16,8 @@ target/
 
 # Xtend Gen folder
 xtend-gen/
+
+# Eclipse
+.classpath
+.project
+.settings
