@@ -46,7 +46,7 @@ public class JsonExampleProposalProvider {
 
 	protected ExampleProvider getExampleDataProvider() {
 		final ExampleProvider defaultExampleProvider = (JsonPointer jsonPointer, JsonDocument document,
-				URI uri) -> "example:";
+				URI uri) -> "example:"; 
 
 		final Set<ExampleProvider> exampleProviders = ExtensionUtils.getExampleProviders();
 		if (exampleProviders != null && !exampleProviders.isEmpty()) {
