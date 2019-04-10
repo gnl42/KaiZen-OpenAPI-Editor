@@ -260,7 +260,8 @@ public abstract class AbstractNode {
         if (getClass() != obj.getClass())
             return false;
         AbstractNode other = (AbstractNode) obj;
-        return Objects.equals(getPointer(), other.getPointer());
+
+        return Objects.equals(getModel(), other.getModel()) && Objects.equals(getPointer(), other.getPointer());
     }
 
 }
