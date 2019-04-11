@@ -50,10 +50,9 @@ paths:
             # Example message, keyed by media type
             application/json :
               {
-                filingID : 1234,
+                filingID : "1234",
                 jurisdiction : Federal,
-                year : 2015,
-                period : CALENDAR_YEAR,
+                year : "2015-10-02",
                 currency : EUR,
                 grossIncome : 74832,
                 taxLiability : 15640
@@ -74,6 +73,7 @@ definitions:
         type: string
       year:
         type: string
+        format: date
       period:
         type: integer
       currency:
