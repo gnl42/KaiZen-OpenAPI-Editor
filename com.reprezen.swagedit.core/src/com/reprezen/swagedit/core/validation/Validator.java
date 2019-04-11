@@ -129,7 +129,8 @@ public abstract class Validator {
                 executeModelValidation(model, node, errors);
                 // execute validation from each providers
                 providers.forEach(provider -> {
-                    if (provider.isActive(document, getPreferenceStore())) {
+
+                    if (provider.isActive(document)) {
                         Set<SwaggerError> result = provider.validate(document, baseURI, node);
                         if (result != null) {
                             errors.addAll(result);
