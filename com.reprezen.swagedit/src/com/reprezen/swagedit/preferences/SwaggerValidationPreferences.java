@@ -76,7 +76,9 @@ public class SwaggerValidationPreferences extends FieldEditorPreferencePage
 
         // FieldEditor set parent layout to GridLayout with margin = 0
         ((GridLayout) group.getLayout()).marginTop = 8;
+        ((GridLayout) group.getLayout()).marginBottom = 8;
         ((GridLayout) group.getLayout()).marginLeft = 8;
+        ((GridLayout) group.getLayout()).marginRight = 8;
 
         // Validation
 
