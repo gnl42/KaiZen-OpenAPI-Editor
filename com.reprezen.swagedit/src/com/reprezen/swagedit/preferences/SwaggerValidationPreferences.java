@@ -25,6 +25,7 @@ import org.eclipse.jface.preference.FieldEditor;
 import org.eclipse.jface.preference.FieldEditorPreferencePage;
 import org.eclipse.jface.util.IPropertyChangeListener;
 import org.eclipse.swt.SWT;
+import org.eclipse.swt.layout.GridLayout;
 import org.eclipse.swt.widgets.Composite;
 import org.eclipse.swt.widgets.Group;
 import org.eclipse.ui.IWorkbench;
@@ -62,6 +63,7 @@ public class SwaggerValidationPreferences extends FieldEditorPreferencePage
 
         Group group = new Group(composite, SWT.SHADOW_ETCHED_IN);
         GridDataFactory.fillDefaults().span(2, 1).applyTo(group);
+
         group.setText("Allow JSON references in additional contexts");
 
         addField(new BooleanFieldEditor(VALIDATION_REF_SECURITY_DEFINITIONS_OBJECT, "Security Definitions Object",
@@ -71,6 +73,10 @@ public class SwaggerValidationPreferences extends FieldEditorPreferencePage
                 group));
         addField(new BooleanFieldEditor(VALIDATION_REF_SECURITY_REQUIREMENT_OBJECT, "Security Requirement Object",
                 group));
+
+        // FieldEditor set parent layout to GridLayout with margin = 0
+        ((GridLayout) group.getLayout()).marginTop = 8;
+        ((GridLayout) group.getLayout()).marginLeft = 8;
 
         // Validation
 
