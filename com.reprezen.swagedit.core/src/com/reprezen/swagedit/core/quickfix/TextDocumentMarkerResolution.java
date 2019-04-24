@@ -9,7 +9,7 @@ import org.eclipse.core.runtime.Status;
 import org.eclipse.jface.text.IDocument;
 import org.eclipse.jface.text.IRegion;
 import org.eclipse.ui.IEditorPart;
-import org.eclipse.ui.IMarkerResolution;
+import org.eclipse.ui.IMarkerResolution2;
 import org.eclipse.ui.IWorkbenchPage;
 import org.eclipse.ui.PartInitException;
 import org.eclipse.ui.PlatformUI;
@@ -19,7 +19,7 @@ import org.eclipse.ui.texteditor.ITextEditor;
 
 import com.reprezen.swagedit.core.Activator;
 
-public abstract class TextDocumentMarkerResolution implements IMarkerResolution {
+public abstract class TextDocumentMarkerResolution implements IMarkerResolution2 {
 
     /**
      * @return IRegion to be selected in the editor, can be null

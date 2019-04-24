@@ -33,7 +33,6 @@ Export-Package: com.reprezen.swagedit.openapi3,
  com.reprezen.swagedit.openapi3.editor.wizard,
  com.reprezen.swagedit.openapi3.hyperlinks,
  com.reprezen.swagedit.openapi3.preferences,
- com.reprezen.swagedit.openapi3.quickfix,
  com.reprezen.swagedit.openapi3.schema,
  com.reprezen.swagedit.openapi3.templates,
  com.reprezen.swagedit.openapi3.validation

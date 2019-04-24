@@ -13,6 +13,9 @@ package com.reprezen.swagedit.core.assist;
 import java.util.ArrayList;
 import java.util.Iterator;
 import java.util.List;
+import java.util.Set;
+import java.util.stream.Collectors;
+import java.util.stream.Stream;
 
 import org.eclipse.core.resources.IMarker;
 import org.eclipse.core.runtime.CoreException;
@@ -20,6 +23,7 @@ import org.eclipse.jface.text.BadLocationException;
 import org.eclipse.jface.text.IDocument;
 import org.eclipse.jface.text.IRegion;
 import org.eclipse.jface.text.Position;
+import org.eclipse.jface.text.contentassist.ContextInformation;
 import org.eclipse.jface.text.contentassist.ICompletionProposal;
 import org.eclipse.jface.text.contentassist.IContextInformation;
 import org.eclipse.jface.text.quickassist.IQuickAssistInvocationContext;
@@ -30,23 +34,26 @@ import org.eclipse.jface.text.source.ISourceViewer;
 import org.eclipse.swt.graphics.Image;
 import org.eclipse.swt.graphics.Point;
 import org.eclipse.ui.IMarkerResolution;
+import org.eclipse.ui.IMarkerResolution2;
 import org.eclipse.ui.IMarkerResolutionGenerator2;
 import org.eclipse.ui.texteditor.MarkerAnnotation;
 
 import com.reprezen.swagedit.core.Activator;
 import com.reprezen.swagedit.core.quickfix.TextDocumentMarkerResolution;
+import com.reprezen.swagedit.core.utils.ExtensionUtils;
 
 public class JsonQuickAssistProcessor implements IQuickAssistProcessor {
-    private final IMarkerResolutionGenerator2 quickFixer;
-    private String errorMessage;
 
-    public JsonQuickAssistProcessor(IMarkerResolutionGenerator2 quickFixer) {
-        this.quickFixer = quickFixer;
+    private String errorMessage;
+    private Set<IMarkerResolutionGenerator2> generators;
+
+    public JsonQuickAssistProcessor() {
+        this.generators = ExtensionUtils.getMarkerResolutionGenerators();
     }
 
     @Override
     public boolean canAssist(IQuickAssistInvocationContext invocationContext) {
-        return false;
+        return true;
     }
 
     @Override
@@ -62,7 +69,8 @@ public class JsonQuickAssistProcessor implements IQuickAssistProcessor {
         if (annotation instanceof MarkerAnnotation) {
             MarkerAnnotation markerAnnotation = (MarkerAnnotation) annotation;
             if (!markerAnnotation.isQuickFixableStateSet()) {
-                markerAnnotation.setQuickFixable(quickFixer.hasResolutions(markerAnnotation.getMarker()));
+                markerAnnotation.setQuickFixable(
+                        generators.stream().anyMatch(e -> e.hasResolutions(markerAnnotation.getMarker())));
             }
             return markerAnnotation.isQuickFixable();
         }
@@ -78,13 +86,14 @@ public class JsonQuickAssistProcessor implements IQuickAssistProcessor {
             errorMessage = e.getMessage();
             return new ICompletionProposal[0];
         }
-        List<ICompletionProposal> result = new ArrayList<>();
-        for (IMarker marker : markers) {
-            for (IMarkerResolution markerResolution : quickFixer.getResolutions(marker)) {
-                result.add(new MarkerResolutionProposal(marker, markerResolution, invocationContext.getSourceViewer()));
-            }
-        }
-        return result.toArray(new ICompletionProposal[0]);
+
+        List<MarkerResolutionProposal> result = markers.stream() //
+                .flatMap(e -> generators.stream()
+                        .flatMap(generator -> Stream.of(generator.getResolutions(e))
+                                .map(m -> new MarkerResolutionProposal(e, m, invocationContext.getSourceViewer()))))
+                .collect(Collectors.toList());
+
+        return result.toArray(new ICompletionProposal[result.size()]);
     }
 
     protected List<IMarker> getMarkersFor(ISourceViewer sourceViewer, int offset) throws BadLocationException {
@@ -103,9 +112,11 @@ public class JsonQuickAssistProcessor implements IQuickAssistProcessor {
     protected List<IMarker> getMarkersFor(ISourceViewer sourceViewer, int lineOffset, int lineLength) {
         List<IMarker> result = new ArrayList<>();
         IAnnotationModel annotationModel = sourceViewer.getAnnotationModel();
-        Iterator annotationIter = annotationModel.getAnnotationIterator();
+        Iterator<?> annotationIter = annotationModel.getAnnotationIterator();
+
         while (annotationIter.hasNext()) {
             Object annotation = annotationIter.next();
+
             if (annotation instanceof MarkerAnnotation) {
                 MarkerAnnotation markerAnnotation = (MarkerAnnotation) annotation;
                 IMarker marker = markerAnnotation.getMarker();
@@ -154,6 +165,9 @@ public class JsonQuickAssistProcessor implements IQuickAssistProcessor {
 
         @Override
         public String getAdditionalProposalInfo() {
+            if (markerResolution instanceof IMarkerResolution2) {
+                return ((IMarkerResolution2) markerResolution).getDescription();
+            }
             return null;
         }
 
@@ -164,11 +178,20 @@ public class JsonQuickAssistProcessor implements IQuickAssistProcessor {
 
         @Override
         public Image getImage() {
+            if (markerResolution instanceof IMarkerResolution2) {
+                return ((IMarkerResolution2) markerResolution).getImage();
+            }
             return null;
         }
 
         @Override
         public IContextInformation getContextInformation() {
+            if (markerResolution instanceof IMarkerResolution2) {
+                IMarkerResolution2 mr2 = (IMarkerResolution2) markerResolution;
+                String displayString = mr2.getDescription() == null ? mr2.getLabel() : mr2.getDescription();
+
+                return new ContextInformation(mr2.getImage(), mr2.getLabel(), displayString);
+            }
             return null;
         }
 

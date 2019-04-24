@@ -192,11 +192,5 @@
          </description>
         </fontDefinition>
    </extension>
-   
-   <extension point="org.eclipse.ui.ide.markerResolution">
-      <markerResolutionGenerator
-         markerType="org.eclipse.core.resources.problemmarker"
-         class="com.reprezen.swagedit.quickfix.SwaggerQuickFixer"/>
-   </extension>
-   
+
 </plugin>
