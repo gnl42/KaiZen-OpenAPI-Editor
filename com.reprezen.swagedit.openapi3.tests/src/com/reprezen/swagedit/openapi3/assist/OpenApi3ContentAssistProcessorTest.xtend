@@ -527,4 +527,21 @@ components:
 		)
 	}
 
+	@Test
+	def void testSchema_ShouldHaveDefaultProperty() {
+		val document = new OpenApi3Document(new OpenApi3Schema)
+		val test = setUpContentAssistTest('''
+			components:
+			  schemas:
+			    Pet:
+			      <1>
+		''', document)
+
+		val proposals = test.apply(processor, "1")
+
+		assertThat(
+			proposals.map[(it as StyledCompletionProposal).replacementString],
+			hasItem("default:")
+		)
+	}
 }

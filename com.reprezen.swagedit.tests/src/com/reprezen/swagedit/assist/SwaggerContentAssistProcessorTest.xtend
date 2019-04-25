@@ -185,7 +185,7 @@ class SwaggerContentAssistProcessorTest {
 
 		var proposals = test.apply(processor, "1")
 		var values = proposals.map[(it as StyledCompletionProposal).replacementString]
-		assertEquals(30, values.size)
+		assertEquals(31, values.size)
 		assertThat(values, hasItems(
 			"$ref:", 
 			"format:", 
@@ -216,12 +216,13 @@ class SwaggerContentAssistProcessorTest {
 			"xml:", 
 			"externalDocs:", 
 			"example:", 
+			"default:",
 			"x-:"))
 
 		proposals = test.apply(processor, "2")
 		values = proposals.map[(it as StyledCompletionProposal).replacementString]
 		// same without required and properties
-		assertEquals(28, values.size)
+		assertEquals(29, values.size)
 		assertThat(values, hasItems(
 			"$ref:", 
 			"format:", 
@@ -250,6 +251,7 @@ class SwaggerContentAssistProcessorTest {
 			"xml:", 
 			"externalDocs:", 
 			"example:", 
+			"default:",
 			"x-:"))
 		
 		proposals = test.apply(processor, "3")
