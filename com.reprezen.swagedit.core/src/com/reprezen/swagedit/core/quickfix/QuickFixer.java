@@ -55,7 +55,7 @@ public class QuickFixer implements IMarkerResolutionGenerator2 {
         private static final Pattern WHITESPACE_PATTERN = Pattern.compile("(\\s+)\\S.*", Pattern.DOTALL);
 
         public String getLabel() {
-            return "Set object type to schema definition";
+            return "Set schema definition to object type";
         }
 
         @Override
