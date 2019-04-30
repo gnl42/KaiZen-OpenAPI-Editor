@@ -149,7 +149,7 @@ public class JsonProposalProvider {
     }
 
     protected ProposalDescriptor createPropertyProposal(String key, TypeDefinition type) {
-        if (type == null || "default".equals(key)) {
+        if (type == null) {
             return null;
         }
 
