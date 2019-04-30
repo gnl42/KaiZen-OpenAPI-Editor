@@ -10,6 +10,8 @@
  *******************************************************************************/
 package com.reprezen.swagedit.core.validation;
 
+import java.util.Collections;
+import java.util.HashMap;
 import java.util.Map;
 import java.util.Set;
 import java.util.stream.IntStream;
@@ -21,12 +23,13 @@ import org.yaml.snakeyaml.error.YAMLException;
 import com.fasterxml.jackson.core.JsonProcessingException;
 
 public class SwaggerError {
-    
+
     private static YamlErrorProcessor processor = new YamlErrorProcessor();
 
     public static SwaggerError newYamlError(YAMLException exception) {
         int line = (exception instanceof MarkedYAMLException)
-                ? ((MarkedYAMLException) exception).getProblemMark().getLine() + 1 : 1;
+                ? ((MarkedYAMLException) exception).getProblemMark().getLine() + 1
+                : 1;
         return new SwaggerError(line, IMarker.SEVERITY_ERROR, 0, processor.rewriteMessage(exception));
     }
 
@@ -40,12 +43,18 @@ public class SwaggerError {
     private final int level;
     private final int line;
     private final int indent;
+    private final Map<String, Object> markerAttributes = new HashMap<>();
 
-    public SwaggerError(int line, int level, int indent, String message) {
+    public SwaggerError(int line, int level, int indent, String message, Map<String, Object> markerAttributes) {
         this.line = line;
         this.level = level;
         this.indent = indent;
         this.message = message;
+        this.markerAttributes.putAll(markerAttributes != null ? markerAttributes : Collections.emptyMap());
+    }
+
+    public SwaggerError(int line, int level, int indent, String message) {
+        this(line, level, indent, message, null);
     }
 
     public SwaggerError(int line, int level, String message) {
@@ -63,22 +72,26 @@ public class SwaggerError {
     public int getLine() {
         return line;
     }
-    
+
+    public Map<String, Object> getMarkerAttributes() {
+        return markerAttributes;
+    }
+
     @Override
-    public java.lang.String toString() {
+    public String toString() {
         return getMessage();
     }
 
     String getIndentedMessage() {
         final StringBuilder builder = new StringBuilder();
-        IntStream.range(0, indent).forEach(i->builder.append("\t"));
+        IntStream.range(0, indent).forEach(i -> builder.append("\t"));
         builder.append(" - ");
         builder.append(message);
         builder.append("\n");
 
         return builder.toString();
     }
-    
+
     protected int getIndent() {
         return indent;
     }
@@ -118,7 +131,8 @@ public class SwaggerError {
 
         private final Map<String, Set<SwaggerError>> errors;
 
-        public MultipleSwaggerError(int line, int level, int indent, String message, Map<String, Set<SwaggerError>> errors) {
+        public MultipleSwaggerError(int line, int level, int indent, String message,
+                Map<String, Set<SwaggerError>> errors) {
             super(line, level, indent, message);
             this.errors = errors;
         }

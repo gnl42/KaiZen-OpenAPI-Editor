@@ -77,7 +77,6 @@ import org.eclipse.ui.views.contentoutline.IContentOutlinePage;
 import com.reprezen.swagedit.core.editor.outline.JsonContentOutlinePage;
 import com.reprezen.swagedit.core.handlers.OpenQuickOutlineHandler;
 import com.reprezen.swagedit.core.model.AbstractNode;
-import com.reprezen.swagedit.core.validation.SwaggerError;
 import com.reprezen.swagedit.core.validation.Validator;
 
 /**
@@ -418,7 +417,7 @@ public abstract class JsonEditor extends YEdit implements IShowInSource, IShowIn
     }
 
     protected ValidationOperation createValidationOperation(boolean parseFileContents) {
-        return new ValidationOperation(createValidator(), getEditorInput(), getDocumentProvider(), parseFileContents);
+        return new ValidationOperation(createValidator(), this, parseFileContents);
     }
 
     protected void runValidate(final boolean onOpen) {
@@ -450,21 +449,6 @@ public abstract class JsonEditor extends YEdit implements IShowInSource, IShowIn
             YEditLog.logException(e);
             YEditLog.logger.warning("Failed to delete markers:\n" + e.toString());
         }
-    }
-
-    static IMarker addMarker(SwaggerError error, IFile target, IDocument document) {
-        IMarker marker = null;
-        try {
-            marker = target.createMarker(IMarker.PROBLEM);
-            marker.setAttribute(IMarker.SEVERITY, error.getLevel());
-            marker.setAttribute(IMarker.MESSAGE, error.getMessage());
-            marker.setAttribute(IMarker.LINE_NUMBER, error.getLine());
-        } catch (CoreException e) {
-            YEditLog.logException(e);
-            YEditLog.logger.warning("Failed to create marker for syntax error: \n" + e.toString());
-        }
-
-        return marker;
     }
 
     public void redrawViewer() {

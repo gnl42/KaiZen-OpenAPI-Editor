@@ -19,6 +19,7 @@ import java.util.stream.Stream;
 import org.eclipse.core.runtime.CoreException;
 import org.eclipse.core.runtime.IConfigurationElement;
 import org.eclipse.core.runtime.Platform;
+import org.eclipse.ui.IMarkerResolutionGenerator2;
 
 import com.reprezen.swagedit.core.Activator;
 import com.reprezen.swagedit.core.providers.PreferenceProvider;
@@ -62,4 +63,9 @@ public class ExtensionUtils {
         return resolveProviders(PreferenceProvider.ID,
                 (e) -> preferencePage.equalsIgnoreCase(e.getAttribute("preferencePage")));
     }
+
+    public static Set<IMarkerResolutionGenerator2> getMarkerResolutionGenerators() {
+        return resolveProviders("com.reprezen.swagedit.quickfix", (e) -> true);
+    }
+
 }
