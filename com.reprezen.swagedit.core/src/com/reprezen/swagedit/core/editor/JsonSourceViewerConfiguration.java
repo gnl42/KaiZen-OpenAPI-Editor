@@ -33,15 +33,11 @@ import org.eclipse.jface.text.quickassist.QuickAssistAssistant;
 import org.eclipse.jface.text.reconciler.IReconciler;
 import org.eclipse.jface.text.reconciler.MonoReconciler;
 import org.eclipse.jface.text.source.ISourceViewer;
-import org.eclipse.jface.text.templates.ContextTypeRegistry;
-import org.eclipse.jface.text.templates.persistence.TemplateStore;
 import org.eclipse.swt.widgets.Shell;
 
 import com.reprezen.swagedit.core.assist.JsonContentAssistProcessor;
 import com.reprezen.swagedit.core.assist.JsonQuickAssistProcessor;
 import com.reprezen.swagedit.core.editor.outline.QuickOutline;
-import com.reprezen.swagedit.core.model.Model;
-import com.reprezen.swagedit.core.quickfix.QuickFixer;
 import com.reprezen.swagedit.core.schema.CompositeSchema;
 
 public abstract class JsonSourceViewerConfiguration extends YEditSourceViewerConfiguration {
@@ -49,13 +45,13 @@ public abstract class JsonSourceViewerConfiguration extends YEditSourceViewerCon
     private JsonEditor editor;
     private YAMLScanner scanner;
     private InformationPresenter informationPresenter;
-	private final IPreferenceStore store;
+    private final IPreferenceStore store;
 
     public JsonSourceViewerConfiguration(IPreferenceStore store) {
         super();
-		this.store = store;
+        this.store = store;
     }
-    
+
     abstract protected CompositeSchema getSchema();
 
     @Override
@@ -78,25 +74,8 @@ public abstract class JsonSourceViewerConfiguration extends YEditSourceViewerCon
 
         return ca;
     }
-    
-    protected JsonContentAssistProcessor createContentAssistProcessor(ContentAssistant ca) {
-    	return new JsonContentAssistProcessor(ca, null){
 
-			@Override
-			protected TemplateStore getTemplateStore() {
-				return null;
-			}
-
-			@Override
-			protected ContextTypeRegistry getContextTypeRegistry() {
-				return null;
-			}
-
-			@Override
-			protected String getContextTypeId(Model model, String path) {
-				return null;
-			}};
-    }
+    protected abstract JsonContentAssistProcessor createContentAssistProcessor(ContentAssistant ca);
 
     @Override
     protected YAMLScanner getScanner() {
@@ -121,7 +100,7 @@ public abstract class JsonSourceViewerConfiguration extends YEditSourceViewerCon
 
     @Override
     public IHyperlinkDetector[] getHyperlinkDetectors(ISourceViewer sourceViewer) {
-        return new IHyperlinkDetector[] { new URLHyperlinkDetector()};
+        return new IHyperlinkDetector[] { new URLHyperlinkDetector() };
     }
 
     @Override
@@ -154,27 +133,27 @@ public abstract class JsonSourceViewerConfiguration extends YEditSourceViewerCon
         }
         return informationPresenter;
     }
-    
+
     @Override
     public IQuickAssistAssistant getQuickAssistAssistant(ISourceViewer sourceViewer) {
         QuickAssistAssistant assistant = new QuickAssistAssistant();
-        assistant.setQuickAssistProcessor(new JsonQuickAssistProcessor(new QuickFixer()));
+        assistant.setQuickAssistProcessor(new JsonQuickAssistProcessor());
         assistant.setInformationControlCreator(getInformationControlCreator(sourceViewer));
         return assistant;
     }
 
     abstract protected IInformationControlCreator getOutlineInformationControlCreator();
-   
+
     protected IInformationControlCreator getOutlineInformationControlCreator(final String fileContentType) {
         return new IInformationControlCreator() {
             public IInformationControl createInformationControl(Shell parent) {
                 QuickOutline dialog = new QuickOutline(parent, getEditor(), fileContentType) {
 
-					@Override
-					protected CompositeSchema getSchema() {
-						return JsonSourceViewerConfiguration.this.getSchema();
-					}
-                	
+                    @Override
+                    protected CompositeSchema getSchema() {
+                        return JsonSourceViewerConfiguration.this.getSchema();
+                    }
+
                 };
                 return dialog;
             }

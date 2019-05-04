@@ -12,19 +12,26 @@ package com.reprezen.swagedit.core.quickfix;
 
 import static com.reprezen.swagedit.core.preferences.KaiZenPreferencesUtils.getTabWidth;
 
+import java.net.URL;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
 import java.util.stream.IntStream;
 
 import org.eclipse.core.resources.IMarker;
 import org.eclipse.core.runtime.CoreException;
+import org.eclipse.core.runtime.FileLocator;
+import org.eclipse.core.runtime.Path;
+import org.eclipse.core.runtime.Platform;
+import org.eclipse.jface.resource.ImageDescriptor;
 import org.eclipse.jface.text.BadLocationException;
 import org.eclipse.jface.text.IDocument;
 import org.eclipse.jface.text.IRegion;
 import org.eclipse.jface.text.Region;
 import org.eclipse.jface.text.TextUtilities;
+import org.eclipse.swt.graphics.Image;
 import org.eclipse.ui.IMarkerResolution;
 import org.eclipse.ui.IMarkerResolutionGenerator2;
+import org.osgi.framework.Bundle;
 
 import com.reprezen.swagedit.core.validation.Messages;
 
@@ -59,6 +66,20 @@ public class QuickFixer implements IMarkerResolutionGenerator2 {
         }
 
         @Override
+        public String getDescription() {
+            return null;
+        }
+
+        @Override
+        public Image getImage() {
+            Bundle bundle = Platform.getBundle("org.eclipse.ui.editors");
+            URL url = FileLocator.find(bundle, new Path("icons/full/obj16/quick_fix_warning_obj.png"), null);
+            ImageDescriptor imageDesc = ImageDescriptor.createFromURL(url);
+            Image image = imageDesc.createImage();
+            return image;
+        }
+
+        @Override
         public IRegion processFix(IDocument document, IMarker marker) throws CoreException {
             int line = (int) marker.getAttribute(IMarker.LINE_NUMBER);
             try {
@@ -82,7 +103,7 @@ public class QuickFixer implements IMarkerResolutionGenerator2 {
             final String definitionIndent = m.matches() ? m.group(1) : "";
             StringBuilder indent = new StringBuilder();
             indent.append(definitionIndent);
-            IntStream.range(0, getTabWidth()).forEach(el->indent.append(" "));
+            IntStream.range(0, getTabWidth()).forEach(el -> indent.append(" "));
             return indent.toString();
         }
 

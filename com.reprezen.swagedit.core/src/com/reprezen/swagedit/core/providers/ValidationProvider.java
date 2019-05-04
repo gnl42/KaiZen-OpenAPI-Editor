@@ -13,8 +13,6 @@ package com.reprezen.swagedit.core.providers;
 import java.net.URI;
 import java.util.Set;
 
-import org.eclipse.jface.preference.IPreferenceStore;
-
 import com.reprezen.swagedit.core.editor.JsonDocument;
 import com.reprezen.swagedit.core.model.AbstractNode;
 import com.reprezen.swagedit.core.validation.SwaggerError;
@@ -46,10 +44,8 @@ public interface ValidationProvider {
      * 
      * @param document
      *            being validated.
-     * @param preferenceStore
-     *            holding all preferences.
      * @return true if validator is active.
      */
-    boolean isActive(JsonDocument document, IPreferenceStore preferenceStore);
+    boolean isActive(JsonDocument document);
 
 }

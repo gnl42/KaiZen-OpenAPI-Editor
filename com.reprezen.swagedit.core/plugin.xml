@@ -3,6 +3,7 @@
 <plugin>
    <extension-point id="com.reprezen.swagedit.validator" name="com.reprezen.swagedit.validator" schema="schema/com.reprezen.swagedit.validator.exsd"/>
    <extension-point id="com.reprezen.swagedit.preferences" name="com.reprezen.swagedit.preferences" schema="schema/com.reprezen.swagedit.preferences.exsd"/>
+   <extension-point id="com.reprezen.swagedit.quickfix" name="com.reprezen.swagedit.quickfix" schema="schema/com.reprezen.swagedit.quickfix.exsd"/>
    <extension
          point="org.eclipse.ui.handlers">
       <handler
@@ -40,4 +41,16 @@
       </context>
    </extension>
    
+   <extension point="org.eclipse.ui.ide.markerResolution">
+      <markerResolutionGenerator
+         markerType="org.eclipse.core.resources.problemmarker"
+         class="com.reprezen.swagedit.core.quickfix.QuickFixer"/>
+   </extension>
+   <extension
+         point="com.reprezen.swagedit.quickfix">
+      <generator
+            class="com.reprezen.swagedit.core.quickfix.QuickFixer">
+      </generator>
+   </extension>
+
 </plugin>

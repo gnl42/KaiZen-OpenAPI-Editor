@@ -47,15 +47,24 @@ public class OpenApi3ValidationPreferences extends FieldEditorPreferencePage
 
     @Override
     protected void createFieldEditors() {
-        Composite composite = new Composite(getFieldEditorParent(), SWT.NONE);
-        GridLayoutFactory.fillDefaults().applyTo(composite);
-        GridDataFactory.fillDefaults().grab(true, false).indent(0, 10).applyTo(composite);
+        Composite parent = new Composite(getFieldEditorParent(), SWT.NONE);
 
-        addField(new BooleanFieldEditor(ADVANCED_VALIDATION, "Enable advanced validation", composite));
+        GridLayoutFactory.fillDefaults() //
+                .numColumns(2) //
+                .margins(5, 8) //
+                .spacing(5, 20) //
+                .applyTo(parent);
+
+        // Should wrap the fields in a composite to allow use of spacing.
+        {
+            Composite composite = new Composite(parent, SWT.NONE);
+            GridDataFactory.fillDefaults().span(2, 1).applyTo(composite);
+            addField(new BooleanFieldEditor(ADVANCED_VALIDATION, "Enable advanced validation", composite));
+        }
 
         Set<PreferenceProvider> providers = ExtensionUtils.getPreferenceProviders(VALIDATION_PREFERENCE_PAGE);
         providers.forEach(provider -> {
-            for (FieldEditor field : provider.createFields(Version.OPENAPI, composite)) {
+            for (FieldEditor field : provider.createFields(Version.OPENAPI, parent)) {
                 addField(field);
             }
         });

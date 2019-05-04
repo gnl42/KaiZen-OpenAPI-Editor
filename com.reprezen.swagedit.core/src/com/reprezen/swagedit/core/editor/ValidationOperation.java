@@ -26,6 +26,7 @@ import org.eclipse.ui.texteditor.IDocumentProvider;
 import org.yaml.snakeyaml.error.YAMLException;
 
 import com.fasterxml.jackson.core.JsonProcessingException;
+import com.reprezen.swagedit.core.validation.Markers;
 import com.reprezen.swagedit.core.validation.SwaggerError;
 import com.reprezen.swagedit.core.validation.Validator;
 
@@ -36,12 +37,13 @@ public class ValidationOperation implements IWorkspaceRunnable {
     private final IEditorInput editorInput;
     private final IDocumentProvider documentProvider;
     private final boolean parseFileContents;
+    private final JsonEditor editor;
 
-    public ValidationOperation(Validator validator, IEditorInput editorInput, IDocumentProvider documentProvider,
-            boolean parseFileContents) {
+    public ValidationOperation(Validator validator, JsonEditor editor, boolean parseFileContents) {
+        this.editor = editor;
         this.validator = validator;
-        this.editorInput = editorInput;
-        this.documentProvider = documentProvider;
+        this.editorInput = editor.getEditorInput();
+        this.documentProvider = editor.getDocumentProvider();
         this.parseFileContents = parseFileContents;
     }
 
@@ -74,7 +76,7 @@ public class ValidationOperation implements IWorkspaceRunnable {
                 throw new OperationCanceledException();
             }
             subMonitor.newChild(20);
-            
+
             JsonEditor.clearMarkers(file);
             if (subMonitor.isCanceled()) {
                 throw new OperationCanceledException();
@@ -97,11 +99,12 @@ public class ValidationOperation implements IWorkspaceRunnable {
 
     protected void validateYaml(IFile file, JsonDocument document) {
         if (document.getYamlError() instanceof YAMLException) {
-            JsonEditor.addMarker(SwaggerError.newYamlError((YAMLException) document.getYamlError()), file, document);
+            Markers.addMarker(editor, file, //
+                    SwaggerError.newYamlError((YAMLException) document.getYamlError()));
         }
         if (document.getJsonError() instanceof JsonProcessingException) {
-            JsonEditor.addMarker(SwaggerError.newJsonError((JsonProcessingException) document.getJsonError()), file,
-                    document);
+            Markers.addMarker(editor, file, //
+                    SwaggerError.newJsonError((JsonProcessingException) document.getJsonError()));
         }
     }
 
@@ -109,7 +112,7 @@ public class ValidationOperation implements IWorkspaceRunnable {
         final Set<SwaggerError> errors = validator.validate(document, editorInput);
 
         for (SwaggerError error : errors) {
-            JsonEditor.addMarker(error, file, document);
+            Markers.addMarker(editor, file, error);
         }
     }
 
