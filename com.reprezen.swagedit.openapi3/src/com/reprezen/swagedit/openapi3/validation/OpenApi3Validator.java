@@ -109,8 +109,8 @@ public class OpenApi3Validator extends Validator {
                 for (ValidationItem item : result.getValidationResults().getItems()) {
                     PositionInfo pos = item.getPositionInfo();
                     int line = pos != null ? pos.getLine() : 1;
-
-                    errors.add(new SwaggerError(line, getSeverity(item.getSeverity()), item.getMsg()));
+                    // TODO
+                    // errors.add(new SwaggerError(line, getSeverity(item.getSeverity()), item.getMsg()));
                 }
             } catch (Exception e) {
                 Activator.getDefault().getLog()
@@ -133,14 +133,19 @@ public class OpenApi3Validator extends Validator {
     }
 
     @Override
-    protected void executeModelValidation(Model model, AbstractNode node, Set<SwaggerError> errors) {
-        super.executeModelValidation(model, node, errors);
-        validateOperationIdReferences(model, node, errors);
-        validateSecuritySchemeReferences(model, node, errors);
-        validateParameters(model, node, errors);
+    protected Set<SwaggerError> executeModelValidation(JsonDocument document, AbstractNode node) {
+        Set<SwaggerError> errors = super.executeModelValidation(document, node);
+
+        validateOperationIdReferences(document, node, errors);
+        validateSecuritySchemeReferences(document, node, errors);
+        validateParameters(document, node, errors);
+
+        return errors;
     }
 
-    private void validateSecuritySchemeReferences(Model model, AbstractNode node, Set<SwaggerError> errors) {
+    private void validateSecuritySchemeReferences(JsonDocument doc, AbstractNode node, Set<SwaggerError> errors) {
+        Model model = doc.getModel();
+
         if (node.getPointerString().matches(".*/security/\\d+")) {
             AbstractNode securitySchemes = model.find(securityPointer);
 
@@ -151,9 +156,9 @@ public class OpenApi3Validator extends Validator {
                     if (securityScheme == null) {
                         String message = Messages.error_invalid_security_scheme;
 
-                        errors.add(error(node.get(field), IMarker.SEVERITY_ERROR, message));
+                        errors.add(error(doc, node.get(field), IMarker.SEVERITY_ERROR, message));
                     } else {
-                        validateSecuritySchemeScopes(node, field, securityScheme, errors);
+                        validateSecuritySchemeScopes(doc, node, field, securityScheme, errors);
                     }
                 }
             }
@@ -162,8 +167,8 @@ public class OpenApi3Validator extends Validator {
 
     private List<String> oauthScopes = Arrays.asList("oauth2", "openIdConnect");
 
-    private void validateSecuritySchemeScopes(AbstractNode node, String name, AbstractNode securityScheme,
-            Set<SwaggerError> errors) {
+    private void validateSecuritySchemeScopes(JsonDocument document, AbstractNode node, String name,
+            AbstractNode securityScheme, Set<SwaggerError> errors) {
         String type = getType(securityScheme);
         if (type == null) {
             return;
@@ -175,29 +180,29 @@ public class OpenApi3Validator extends Validator {
         AbstractNode values = node.get(name);
         if (values.isArray()) {
             ArrayNode scopeValues = values.asArray();
-            
+
             // The scope names MUST be empty for Security Scheme types other than 'oauth2' and 'openIdConnect'
             if (scopeValues.size() > 0 && !shouldHaveScopes) {
                 String message = String.format(Messages.error_scope_should_be_empty, name, type, name);
 
-                errors.add(error(node.get(name), IMarker.SEVERITY_ERROR, message));
-			} else {
-				if (type.equals("oauth2")) {
-					for (AbstractNode scope : scopeValues.elements()) {
-						try {
-							String scopeName = (String) scope.asValue().getValue();
-							if (!scopes.contains(scopeName)) {
-								String message = String.format(Messages.error_invalid_scope_reference, scopeName, name);
+                errors.add(error(document, node.get(name), IMarker.SEVERITY_ERROR, message));
+            } else {
+                if (type.equals("oauth2")) {
+                    for (AbstractNode scope : scopeValues.elements()) {
+                        try {
+                            String scopeName = (String) scope.asValue().getValue();
+                            if (!scopes.contains(scopeName)) {
+                                String message = String.format(Messages.error_invalid_scope_reference, scopeName, name);
 
-								errors.add(error(scope, IMarker.SEVERITY_ERROR, message));
-							}
-						} catch (Exception e) {
-							// Invalid scope name type.
-							// No need to create an error, it will be handle by the schema validation.
-						}
-					}
-				}
-			}
+                                errors.add(error(document, scope, IMarker.SEVERITY_ERROR, message));
+                            }
+                        } catch (Exception e) {
+                            // Invalid scope name type.
+                            // No need to create an error, it will be handle by the schema validation.
+                        }
+                    }
+                }
+            }
         }
     }
 
@@ -227,7 +232,8 @@ public class OpenApi3Validator extends Validator {
         return scopes;
     }
 
-    protected void validateOperationIdReferences(Model model, AbstractNode node, Set<SwaggerError> errors) {
+    protected void validateOperationIdReferences(JsonDocument document, AbstractNode node, Set<SwaggerError> errors) {
+        Model model = document.getModel();
         JsonPointer schemaPointer = JsonPointer.compile("/definitions/link/properties/operationId");
 
         if (node != null && node.getType() != null && schemaPointer.equals(node.getType().getPointer())) {
@@ -243,12 +249,13 @@ public class OpenApi3Validator extends Validator {
             }
 
             if (!found) {
-                errors.add(error(node, IMarker.SEVERITY_ERROR, Messages.error_invalid_operation_id));
+                errors.add(error(document, node, IMarker.SEVERITY_ERROR, Messages.error_invalid_operation_id));
             }
         }
     }
 
-    protected void validateParameters(Model model, AbstractNode node, Set<SwaggerError> errors) {
+    protected void validateParameters(JsonDocument document, AbstractNode node, Set<SwaggerError> errors) {
+        Model model = document.getModel();
         final JsonPointer pointer = JsonPointer.compile("/definitions/parameterOrReference");
 
         if (node != null && node.getType() != null && pointer.equals(node.getType().getPointer())) {
@@ -259,10 +266,12 @@ public class OpenApi3Validator extends Validator {
                     Object value = valueNode.asValue().getValue();
 
                     if (!Arrays.asList("query", "header", "path", "cookie").contains(value)) {
-                        errors.add(error(valueNode, IMarker.SEVERITY_ERROR, Messages.error_invalid_parameter_location));
+                        errors.add(error(document, valueNode, IMarker.SEVERITY_ERROR,
+                                Messages.error_invalid_parameter_location));
                     }
                 } catch (Exception e) {
-                    errors.add(error(valueNode, IMarker.SEVERITY_ERROR, Messages.error_invalid_parameter_location));
+                    errors.add(error(document, valueNode, IMarker.SEVERITY_ERROR,
+                            Messages.error_invalid_parameter_location));
                 }
             }
         }

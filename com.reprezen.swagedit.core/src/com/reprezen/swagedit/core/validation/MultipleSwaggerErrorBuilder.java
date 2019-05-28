@@ -19,7 +19,6 @@ import java.util.stream.IntStream;
 
 import com.fasterxml.jackson.databind.JsonNode;
 import com.reprezen.swagedit.core.schema.JsonSchemaUtils;
-import com.reprezen.swagedit.core.validation.SwaggerError.MultipleSwaggerError;
 
 public class MultipleSwaggerErrorBuilder {
 
@@ -54,8 +53,9 @@ public class MultipleSwaggerErrorBuilder {
         return this;
     }
 
-    public MultipleSwaggerError build() {
-        return new MultipleSwaggerError(line, severity, indent, getMessage(), errors);
+    public SwaggerError build() {
+        // return new MultipleSwaggerError(line, severity, indent, getMessage(), errors);
+        return null;
     }
 
     protected String getMessage() {
@@ -71,10 +71,9 @@ public class MultipleSwaggerErrorBuilder {
         orderedErrorLocations.addAll(errors.keySet());
 
         final StringBuilder builder = new StringBuilder();
-        
+
         final StringBuilder tabs = new StringBuilder();
-        IntStream.range(0, indent).forEach(i->tabs.append("\t"));
-        
+        IntStream.range(0, indent).forEach(i -> tabs.append("\t"));
 
         builder.append(tabs);
         builder.append("Failed to match exactly one schema:");
@@ -88,7 +87,7 @@ public class MultipleSwaggerErrorBuilder {
             builder.append("\n");
 
             for (SwaggerError e : errors.get(location)) {
-                builder.append(e.getIndentedMessage());
+                // builder.append(e.getIndentedMessage());
             }
         }
 

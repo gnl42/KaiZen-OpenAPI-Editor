@@ -26,6 +26,7 @@ import org.yaml.snakeyaml.parser.ParserException;
 import com.fasterxml.jackson.core.JsonPointer;
 import com.fasterxml.jackson.databind.JsonNode;
 import com.fasterxml.jackson.databind.ObjectMapper;
+import com.fasterxml.jackson.dataformat.yaml.YAMLFactory;
 import com.reprezen.swagedit.core.model.AbstractNode;
 import com.reprezen.swagedit.core.model.Model;
 import com.reprezen.swagedit.core.schema.CompositeSchema;
@@ -49,8 +50,8 @@ public abstract class JsonDocument extends Document {
     private AtomicReference<Result<Node>> yamlContent = new AtomicReference<>(new Failure<>(null));
     private AtomicReference<Model> model = new AtomicReference<>();
 
-    public JsonDocument(ObjectMapper mapper, CompositeSchema schema) {
-        this.mapper = mapper;
+    public JsonDocument(CompositeSchema schema) {
+        this.mapper = new ObjectMapper(new YAMLFactory());
         this.schema = schema;
     }
 

@@ -5,6 +5,7 @@ import java.lang.reflect.Method;
 
 import org.yaml.snakeyaml.error.YAMLException;
 import org.yaml.snakeyaml.parser.ParserException;
+import org.yaml.snakeyaml.scanner.ScannerException;
 
 //import com.fasterxml.jackson.dataformat.yaml.JacksonYAMLParseException;
 //import com.fasterxml.jackson.dataformat.yaml.snakeyaml.error.MarkedYAMLException;
@@ -57,6 +58,9 @@ public class YamlErrorProcessor {
             if ("while parsing a block mapping".equals(((ParserException) exception).getContext())) {
                 return Messages.error_yaml_parser_indentation;
             }
+        }
+        if (exception instanceof ScannerException) {
+            return ((ScannerException) exception).getProblem();
         }
         return exception != null ? exception.getLocalizedMessage() : null;
     }

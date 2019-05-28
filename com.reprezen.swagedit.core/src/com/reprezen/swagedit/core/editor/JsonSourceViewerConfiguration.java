@@ -17,6 +17,7 @@ import org.eclipse.jface.text.IDocument;
 import org.eclipse.jface.text.IInformationControl;
 import org.eclipse.jface.text.IInformationControlCreator;
 import org.eclipse.jface.text.IRegion;
+import org.eclipse.jface.text.ITextHover;
 import org.eclipse.jface.text.ITextViewer;
 import org.eclipse.jface.text.Region;
 import org.eclipse.jface.text.contentassist.ContentAssistant;
@@ -32,12 +33,16 @@ import org.eclipse.jface.text.quickassist.IQuickAssistAssistant;
 import org.eclipse.jface.text.quickassist.QuickAssistAssistant;
 import org.eclipse.jface.text.reconciler.IReconciler;
 import org.eclipse.jface.text.reconciler.MonoReconciler;
+import org.eclipse.jface.text.source.IAnnotationHover;
 import org.eclipse.jface.text.source.ISourceViewer;
 import org.eclipse.swt.widgets.Shell;
 
 import com.reprezen.swagedit.core.assist.JsonContentAssistProcessor;
 import com.reprezen.swagedit.core.assist.JsonQuickAssistProcessor;
 import com.reprezen.swagedit.core.editor.outline.QuickOutline;
+import com.reprezen.swagedit.core.hover.ProblemAnnotationHover;
+import com.reprezen.swagedit.core.hover.ProblemTextHover;
+import com.reprezen.swagedit.core.hover.QuickFixInformationControl;
 import com.reprezen.swagedit.core.schema.CompositeSchema;
 
 public abstract class JsonSourceViewerConfiguration extends YEditSourceViewerConfiguration {
@@ -75,6 +80,22 @@ public abstract class JsonSourceViewerConfiguration extends YEditSourceViewerCon
         return ca;
     }
 
+    @Override
+    public IInformationControlCreator getInformationControlCreator(ISourceViewer sourceViewer) {
+        return parent -> new QuickFixInformationControl(parent, true);
+    }
+
+    @Override
+    public IAnnotationHover getAnnotationHover(ISourceViewer sourceViewer) {
+        return new ProblemAnnotationHover(sourceViewer);
+        // return new DefaultAnnotationHover();
+    }
+
+    @Override
+    public ITextHover getTextHover(ISourceViewer sourceViewer, String contentType) {
+        return new ProblemTextHover(sourceViewer);
+    }
+
     protected abstract JsonContentAssistProcessor createContentAssistProcessor(ContentAssistant ca);
 
     @Override
@@ -105,7 +126,12 @@ public abstract class JsonSourceViewerConfiguration extends YEditSourceViewerCon
 
     @Override
     public IInformationPresenter getInformationPresenter(ISourceViewer sourceViewer) {
-        return super.getInformationPresenter(sourceViewer);
+        return new InformationPresenter(new IInformationControlCreator() {
+            @Override
+            public IInformationControl createInformationControl(Shell parent) {
+                return new QuickFixInformationControl(parent, true);
+            }
+        });
     }
 
     public void setEditor(JsonEditor editor) {

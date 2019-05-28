@@ -61,6 +61,11 @@ public class JsonQuickAssistProcessor implements IQuickAssistProcessor {
         return errorMessage;
     }
 
+    public List<IMarkerResolution> getMarkerResolution(IMarker marker) {
+        return generators.stream() //
+                .flatMap(e -> Stream.of(e.getResolutions(marker))).collect(Collectors.toList());
+    }
+
     @Override
     public boolean canFix(Annotation annotation) {
         if (annotation.isMarkedDeleted()) {

@@ -27,9 +27,14 @@ public class Markers {
             JsonDocument document = (JsonDocument) provider.getDocument(editor.getEditorInput());
 
             IMarker marker = target.createMarker(IMarker.PROBLEM);
-            marker.setAttribute(IMarker.SEVERITY, error.getLevel());
-            marker.setAttribute(IMarker.MESSAGE, error.getMessage());
-            marker.setAttribute(IMarker.LINE_NUMBER, error.getLine());
+            error.asMarker(marker);
+            // if (error instanceof SchemaValidationError) {
+            // ((SchemaValidationError) error).asMarker(marker);
+            // } else {
+            // marker.setAttribute(IMarker.SEVERITY, error.getLevel());
+            // marker.setAttribute(IMarker.MESSAGE, error.getMessage());
+            // marker.setAttribute(IMarker.LINE_NUMBER, error.getLine());
+            // }
 
             if (!error.getMarkerAttributes().isEmpty()) {
                 marker.setAttribute(DOCUMENT_VERSION_MARKER, document.getVersion().name());
