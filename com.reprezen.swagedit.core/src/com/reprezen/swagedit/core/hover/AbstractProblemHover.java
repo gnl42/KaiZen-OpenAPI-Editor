@@ -1,5 +1,6 @@
 package com.reprezen.swagedit.core.hover;
 
+import java.util.ArrayList;
 import java.util.Collections;
 import java.util.Iterator;
 import java.util.List;
@@ -16,8 +17,6 @@ import org.eclipse.jface.text.source.ILineDiffInfo;
 import org.eclipse.jface.text.source.ISourceViewer;
 import org.eclipse.swt.widgets.Shell;
 import org.eclipse.ui.editors.text.EditorsUI;
-
-import com.google.common.collect.Lists;
 
 public class AbstractProblemHover {
 
@@ -108,7 +107,7 @@ public class AbstractProblemHover {
         }
         System.out.println("annoattion " + lineNumber + " " + offset);
         final Iterator<?> iterator = getAnnotationModel().getAnnotationIterator();
-        List<Annotation> result = Lists.newArrayList();
+        List<Annotation> result = new ArrayList<>();
         while (iterator.hasNext()) {
             final Annotation annotation = (Annotation) iterator.next();
             if (isHandled(annotation)) {

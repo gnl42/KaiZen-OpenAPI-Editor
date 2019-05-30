@@ -92,17 +92,12 @@ public class JsonSchemaValidator {
         try {
             SwaggerErrorFactory f = new SwaggerErrorFactory();
             ProcessingReport report = jsonSchema.validate(document.asJson(), true);
-            System.out.println(report);
+
             errors.addAll(asReportStream(report.iterator()) //
-                    .peek(System.out::println) //
                     .flatMap(flattenReports()) //
                     .map(m -> f.fromSchemaReport(document, m)) //
                     .collect(Collectors.toList()));
 
-            // report.forEach(mes -> {
-            // errors.add();
-            // });
-            // errors.addAll(processor.processReport(report));
         } catch (ProcessingException e) {
             errors.addAll(processor.processMessage(e.getProcessingMessage()));
         }
