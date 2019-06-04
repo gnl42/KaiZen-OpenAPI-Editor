@@ -7,18 +7,9 @@ import org.yaml.snakeyaml.error.YAMLException;
 import org.yaml.snakeyaml.parser.ParserException;
 import org.yaml.snakeyaml.scanner.ScannerException;
 
-//import com.fasterxml.jackson.dataformat.yaml.JacksonYAMLParseException;
-//import com.fasterxml.jackson.dataformat.yaml.snakeyaml.error.MarkedYAMLException;
-
 public class YamlErrorProcessor {
 
     public String rewriteMessage(Exception exception) {
-        // JacksonYAMLParseException is not visible in OSGi, see
-        // https://github.com/fasterxml/jackson-dataformat-yaml/issues/31
-        // TODO remove it when we (Orbit) switch to a newer version of Jackson where this problem is fixed
-        // if (exception instanceof JacksonYAMLParseException) {
-        // return rewriteMessage((JacksonYAMLParseException) exception);
-        // }
         if (exception instanceof YAMLException) {
             return rewriteMessage((YAMLException) exception);
         }
@@ -43,15 +34,6 @@ public class YamlErrorProcessor {
         }
         return null;
     }
-
-    // public String rewriteMessage(JacksonYAMLParseException exception) {
-    // if (exception instanceof MarkedYAMLException) {
-    // if ("while parsing a block mapping".equals(((MarkedYAMLException) exception).getContext())) {
-    // return Messages.error_yaml_parser_indentation;
-    // }
-    // }
-    // return exception != null ? exception.getLocalizedMessage() : null;
-    // }
 
     public String rewriteMessage(YAMLException exception) {
         if (exception instanceof ParserException) {

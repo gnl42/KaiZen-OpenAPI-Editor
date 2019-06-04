@@ -162,17 +162,7 @@ public class QuickFixInformationControl extends AbstractInformationControl imple
 
         List<Link> list = new ArrayList<Link>();
         for (int i = 0; i < proposals.length; i++) {
-            list.add(createCompletionProposalLink(composite, proposals[i], 1));// Original link for single fix, hence
-                                                                               // pass 1 for count
-
-            // DIFF: outcommented, no support of FixCorrectionProposal and ICleanUp (5)
-            // if (proposals[i] instanceof FixCorrectionProposal) {
-            // FixCorrectionProposal proposal= (FixCorrectionProposal)proposals[i];
-            // int count= proposal.computeNumberOfFixesForCleanUp(proposal.getCleanUp());
-            // if (count > 1) {
-            // list.add(createCompletionProposalLink(composite, proposals[i], count));
-            // }
-            // }
+            list.add(createCompletionProposalLink(composite, proposals[i], 1));
         }
         final Link[] links = list.toArray(new Link[list.size()]);
 
@@ -262,13 +252,11 @@ public class QuickFixInformationControl extends AbstractInformationControl imple
 
         Label proposalImage = new Label(parent, SWT.NONE);
         proposalImage.setLayoutData(new GridData(SWT.BEGINNING, SWT.CENTER, false, false));
-        Image image = /* isMultiFix ? JavaPluginImages.get(JavaPluginImages.IMG_CORRECTION_MULTI_FIX) : */proposal
-                .getImage();
+        Image image = proposal.getImage();
+
         if (image != null) {
             proposalImage.setImage(image);
-
             proposalImage.addMouseListener(new MouseListener() {
-
                 @Override
                 public void mouseDoubleClick(MouseEvent e) {
                 }
@@ -295,7 +283,7 @@ public class QuickFixInformationControl extends AbstractInformationControl imple
         } else {
             linkText = proposal.getDisplayString();
         }
-        proposalLink.setText("<a>" + linkText + "</a>"); //$NON-NLS-1$ //$NON-NLS-2$
+        proposalLink.setText("<a>" + linkText + "</a>");
         proposalLink.setLayoutData(layoutData);
         proposalLink.addSelectionListener(new SelectionAdapter() {
 

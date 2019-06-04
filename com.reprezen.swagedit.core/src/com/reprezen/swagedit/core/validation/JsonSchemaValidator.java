@@ -41,6 +41,7 @@ public class JsonSchemaValidator {
 
     private final LoadingConfiguration loadingConfiguration;
     private final JsonSchemaFactory factory;
+    private final SwaggerErrorFactory errorFactory = new SwaggerErrorFactory();
     private final JsonNode schema;
 
     public JsonSchemaValidator(JsonNode schema, Map<String, JsonNode> preloadSchemas) {
@@ -78,7 +79,6 @@ public class JsonSchemaValidator {
     }
 
     public Set<SwaggerError> validate(JsonDocument document) {
-        final ErrorProcessor processor = new ErrorProcessor(document, schema);
         final Set<SwaggerError> errors = new HashSet<>();
 
         JsonSchema jsonSchema = null;
@@ -90,16 +90,16 @@ public class JsonSchemaValidator {
         }
 
         try {
-            SwaggerErrorFactory f = new SwaggerErrorFactory();
             ProcessingReport report = jsonSchema.validate(document.asJson(), true);
 
             errors.addAll(asReportStream(report.iterator()) //
                     .flatMap(flattenReports()) //
-                    .map(m -> f.fromSchemaReport(document, m)) //
+                    .map(m -> errorFactory.fromSchemaReport(document, m)) //
                     .collect(Collectors.toList()));
 
         } catch (ProcessingException e) {
-            errors.addAll(processor.processMessage(e.getProcessingMessage()));
+            errors.add(new SwaggerError(IMarker.SEVERITY_ERROR, 0, 0,
+                    errorFactory.getMessageProcessor().rewriteMessage(e.getProcessingMessage().asJson())));
         }
 
         return errors;

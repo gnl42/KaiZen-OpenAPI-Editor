@@ -15,6 +15,7 @@ import com.reprezen.swagedit.core.Activator;
 import com.reprezen.swagedit.core.editor.JsonDocument;
 import com.reprezen.swagedit.core.model.AbstractNode;
 import com.reprezen.swagedit.core.model.Location;
+import com.reprezen.swagedit.core.model.ValueNode;
 
 public class SwaggerErrorFactory {
 
@@ -22,39 +23,108 @@ public class SwaggerErrorFactory {
         unwanted, expected;
     }
 
-    private final ErrorMessageProcessor processor = new ErrorMessageProcessor();
+    private static final ErrorMessageProcessor processor = new ErrorMessageProcessor();
+    private static final YamlErrorProcessor yamlProcessor = new YamlErrorProcessor();
 
-    private int[] computeOffsetAndLength(JsonDocument doc, AbstractNode node) {
-        int[] values = new int[] { 0, 0 };
-        if (node != null) {
-            try {
-                Location start = node.getStart();
-                Location end = node.getEnd();
-
-                values[0] = doc.getLineOffset(start.getLine()) + start.getColumn();
-                values[1] = (doc.getLineOffset(end.getLine()) + end.getColumn()) - values[0];
-            } catch (BadLocationException ee) {
-                Activator.getDefault().logError(ee.getMessage(), ee);
-            }
-        }
-        return values;
+    public ErrorMessageProcessor getMessageProcessor() {
+        return processor;
     }
 
-    private int[] computeOffsetAndLength(JsonDocument doc, AbstractNode node, String value) {
-        int[] values = new int[] { 0, 0 };
-        if (node != null) {
-            try {
-                Location start = node.getStart();
+    /**
+     * Returns an error coming from a YAML syntax exception.
+     * 
+     * 
+     * @param doc
+     * @param exception
+     *            YAML syntax exception
+     * @return error
+     */
+    public SwaggerError newYamlError(JsonDocument doc, YAMLException exception) {
+        int line = 1;
+        int column = 1;
 
-                values[0] = doc.getLineOffset(start.getLine()) + (start.getColumn());
-                values[1] = value.length();
-            } catch (BadLocationException ee) {
-                Activator.getDefault().logError(ee.getMessage(), ee);
+        if (exception instanceof MarkedYAMLException) {
+            line = ((MarkedYAMLException) exception).getProblemMark().getLine();
+            column = ((MarkedYAMLException) exception).getProblemMark().getColumn();
+        }
+
+        int offset = 1;
+        if (line > 1) {
+            try {
+                offset = doc.getLineOffset(line - 1);
+            } catch (BadLocationException e) {
+                // ignore
             }
         }
-        return values;
+
+        return new SwaggerError(IMarker.SEVERITY_ERROR, offset, column, yamlProcessor.rewriteMessage(exception));
     }
 
+    /**
+     * Returns an error coming from a JSON syntax exception.
+     * 
+     * @param exception
+     *            JSON syntax exception
+     * @return error
+     */
+    public SwaggerError newJsonError(JsonProcessingException exception) {
+        int line = (exception.getLocation() != null) ? exception.getLocation().getLineNr() : 1;
+        return new SwaggerError(line, IMarker.SEVERITY_ERROR, 0, exception.getMessage());
+    }
+
+    /**
+     * Returns an error located at the current node.
+     * 
+     * @param document
+     * @param node
+     *            location of error
+     * @param level
+     *            of error
+     * @param message
+     *            describing the error
+     * @return error
+     */
+    public SwaggerError fromMessage(JsonDocument document, AbstractNode node, int level, String message) {
+        int[] offsetAndLength = computeOffsetAndLength(document, node);
+
+        return new SwaggerError(level, offsetAndLength[0], offsetAndLength[1], message);
+    }
+
+    /**
+     * Returns an error located at the current YAML node.
+     * 
+     * @param document
+     * @param node
+     *            location of error
+     * @param level
+     *            of error
+     * @param message
+     *            describing the error
+     * @return error
+     */
+    public SwaggerError fromNode(JsonDocument document, Node node, int level, String message) {
+        int line = node.getStartMark().getLine() + 1;
+        int column = node.getStartMark().getColumn() + 1;
+        int offset = 1;
+        if (line > 1) {
+            try {
+                offset = document.getLineOffset(line - 1);
+            } catch (BadLocationException e) {
+                // ignore
+            }
+        }
+
+        return new SwaggerError(level, offset, column, message);
+    }
+
+    /**
+     * Returns an error from a JSON schema validation error.
+     * 
+     * @param doc
+     * @param error
+     *            validation error
+     * @return error
+     */
     public SwaggerError fromSchemaReport(JsonDocument doc, JsonNode error) {
         String ptr = null;
 
@@ -79,6 +149,16 @@ public class SwaggerErrorFactory {
         return null;
     }
 
+    /**
+     * Returns an error from a JSON schema validation error happening inside an example node.
+     * 
+     * @param doc
+     * @param error
+     *            validation error
+     * @param example
+     *            location of error
+     * @return error
+     */
     public SwaggerError fromExampleError(JsonDocument doc, JsonNode error, AbstractNode example) {
         AbstractNode errorNode = null;
         if (error.has("instance")) {
@@ -92,6 +172,53 @@ public class SwaggerErrorFactory {
         return new SwaggerError(SEVERITY_ERROR, pos[0], pos[1], processor.rewriteMessage(error));
     }
 
+    private int[] computeOffsetAndLength(JsonDocument doc, AbstractNode node) {
+        int offset = 0;
+        int length = 0;
+
+        if (node != null) {
+            try {
+                Location start = node.getStart();
+
+                if (node instanceof ValueNode) {
+                    // We want here to underline the value of the node not the key
+                    offset = doc.getLineOffset(start.getLine()) + start.getColumn();
+                    // Only if the value is not null we can get it's length
+                    if (node.asValue().getValue() != null) {
+                        if (node.getProperty() != null) {
+                            offset += node.getProperty().length() + 2;
+                            length = node.asValue().getValue().toString().length();
+                        }
+                    } else {
+                        length = node.getProperty() != null ? node.getProperty().length() + 1 : 0;
+                    }
+                } else {
+                    offset = doc.getLineOffset(start.getLine()) + start.getColumn();
+                    length = node.getProperty() != null ? node.getProperty().length() + 1 : 0;
+                }
+            } catch (BadLocationException ee) {
+                Activator.getDefault().logError(ee.getMessage(), ee);
+            }
+        }
+
+        return new int[] { offset, length };
+    }
+
+    private int[] computeOffsetAndLength(JsonDocument doc, AbstractNode node, String value) {
+        int[] values = new int[] { 0, 0 };
+        if (node != null) {
+            try {
+                Location start = node.getStart();
+
+                values[0] = doc.getLineOffset(start.getLine()) + (start.getColumn());
+                values[1] = value != null ? value.length() : 0;
+            } catch (BadLocationException ee) {
+                Activator.getDefault().logError(ee.getMessage(), ee);
+            }
+        }
+        return values;
+    }
+
     private SwaggerError createUnwantedError(JsonDocument doc, JsonNode error, AbstractNode node) {
         String unwanted = error.get("unwanted").get(0).asText();
 
@@ -101,52 +228,4 @@ public class SwaggerErrorFactory {
         return new SwaggerError(SEVERITY_ERROR, pos[0], pos[1], processor.rewriteMessage(error));
     }
 
-    private static YamlErrorProcessor yamlProcessor = new YamlErrorProcessor();
-
-    public SwaggerError newYamlError(JsonDocument doc, YAMLException exception) {
-        int line = 1;
-        int column = 1;
-
-        if (exception instanceof MarkedYAMLException) {
-            line = ((MarkedYAMLException) exception).getProblemMark().getLine();
-            column = ((MarkedYAMLException) exception).getProblemMark().getColumn();
-        }
-
-        int offset = 1;
-        if (line > 1) {
-            try {
-                offset = doc.getLineOffset(line - 1);
-            } catch (BadLocationException e) {
-                // ignore
-            }
-        }
-
-        return new SwaggerError(IMarker.SEVERITY_ERROR, offset, column, yamlProcessor.rewriteMessage(exception));
-    }
-
-    public SwaggerError newJsonError(JsonProcessingException exception) {
-        int line = (exception.getLocation() != null) ? exception.getLocation().getLineNr() : 1;
-        return new SwaggerError(line, IMarker.SEVERITY_ERROR, 0, exception.getMessage());
-    }
-
-    public SwaggerError fromMessage(JsonDocument document, AbstractNode node, int level, String message) {
-        int[] offsetAndLength = computeOffsetAndLength(document, node);
-
-        return new SwaggerError(level, offsetAndLength[0], offsetAndLength[1], message);
-    }
-
-    public SwaggerError fromNode(JsonDocument document, Node node, int level, String message) {
-        int line = node.getStartMark().getLine() + 1;
-        int column = node.getStartMark().getColumn() + 1;
-        int offset = 1;
-        if (line > 1) {
-            try {
-                offset = document.getLineOffset(line - 1);
-            } catch (BadLocationException e) {
-                // ignore
-            }
-        }
-
-        return new SwaggerError(level, offset, column, message);
-    }
 }

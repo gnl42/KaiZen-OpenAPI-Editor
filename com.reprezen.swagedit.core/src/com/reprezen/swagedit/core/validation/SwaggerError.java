@@ -17,8 +17,10 @@ import java.util.Objects;
 
 import org.eclipse.core.resources.IMarker;
 import org.eclipse.core.runtime.CoreException;
+import org.eclipse.jface.text.BadLocationException;
 
 import com.reprezen.swagedit.core.Activator;
+import com.reprezen.swagedit.core.editor.JsonDocument;
 
 public class SwaggerError {
 
@@ -26,9 +28,6 @@ public class SwaggerError {
     private final Map<String, Object> markerAttributes = new HashMap<>();
 
     private int level = IMarker.SEVERITY_WARNING;
-    // private final int line;
-    // private final int indent;
-
     private int offset = 0;
     private int length = 0;
 
@@ -44,10 +43,6 @@ public class SwaggerError {
         this(level, offset, length, message, Collections.emptyMap());
     }
 
-    // public SwaggerError(int line, int level, String message) {
-    // this(line, level, 0, message);
-    // }
-
     public String getMessage() {
         return message;
     }
@@ -55,10 +50,6 @@ public class SwaggerError {
     public int getLevel() {
         return level;
     }
-
-    // public int getLine() {
-    // return line;
-    // }
 
     public int getOffset() {
         return offset;
@@ -77,32 +68,19 @@ public class SwaggerError {
         return getMessage();
     }
 
-    public IMarker asMarker(IMarker marker) {
+    public IMarker asMarker(JsonDocument document, IMarker marker) {
         try {
             marker.setAttribute(IMarker.SEVERITY, getLevel());
             marker.setAttribute(IMarker.MESSAGE, getMessage());
             marker.setAttribute(IMarker.CHAR_START, getOffset());
             marker.setAttribute(IMarker.CHAR_END, getOffset() + getLength());
-        } catch (CoreException e) {
+            marker.setAttribute(IMarker.LINE_NUMBER, document.getLineOfOffset(getOffset()));
+        } catch (CoreException | BadLocationException e) {
             Activator.getDefault().logError(e.getMessage(), e);
         }
 
         return marker;
     }
-
-    // String getIndentedMessage() {
-    // final StringBuilder builder = new StringBuilder();
-    // IntStream.range(0, indent).forEach(i -> builder.append("\t"));
-    // builder.append(" - ");
-    // builder.append(message);
-    // builder.append("\n");
-    //
-    // return builder.toString();
-    // }
-    //
-    // protected int getIndent() {
-    // return indent;
-    // }
 
     @Override
     public int hashCode() {
@@ -121,48 +99,6 @@ public class SwaggerError {
         return level == other.level && offset == other.offset && length == other.length
                 && Objects.equals(message, other.message);
     }
-
-    // public static class MultipleSwaggerError extends SwaggerError {
-    //
-    // private final Map<String, Set<SwaggerError>> errors;
-    //
-    // public MultipleSwaggerError(int line, int level, int indent, String message,
-    // Map<String, Set<SwaggerError>> errors) {
-    // super(line, level, indent, message);
-    // this.errors = errors;
-    // }
-    //
-    // @Override
-    // String getIndentedMessage() {
-    // return getMessage();
-    // }
-    //
-    // @Override
-    // public int hashCode() {
-    // final int prime = 31;
-    // int result = super.hashCode();
-    // result = prime * result + ((errors == null) ? 0 : errors.hashCode());
-    // return result;
-    // }
-    //
-    // @Override
-    // public boolean equals(Object obj) {
-    // if (this == obj)
-    // return true;
-    // if (!super.equals(obj))
-    // return false;
-    // if (getClass() != obj.getClass())
-    // return false;
-    // MultipleSwaggerError other = (MultipleSwaggerError) obj;
-    // if (errors == null) {
-    // if (other.errors != null)
-    // return false;
-    // } else if (!errors.equals(other.errors))
-    // return false;
-    // return true;
-    // }
-    //
-    // }
 
     public void setLevel(int level) {
         this.level = level;

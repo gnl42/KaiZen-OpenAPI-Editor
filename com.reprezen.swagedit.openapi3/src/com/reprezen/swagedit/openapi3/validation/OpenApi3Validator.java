@@ -29,6 +29,7 @@ import org.eclipse.jface.preference.IPreferenceStore;
 import com.fasterxml.jackson.core.JsonPointer;
 import com.fasterxml.jackson.databind.JsonNode;
 import com.reprezen.jsonoverlay.PositionInfo;
+import com.reprezen.jsonoverlay.PositionInfo.PositionEndpoint;
 import com.reprezen.kaizen.oasparser.OpenApi3Parser;
 import com.reprezen.kaizen.oasparser.model3.OpenApi3;
 import com.reprezen.kaizen.oasparser.val.ValidationResults.Severity;
@@ -108,9 +109,17 @@ public class OpenApi3Validator extends Validator {
 
                 for (ValidationItem item : result.getValidationResults().getItems()) {
                     PositionInfo pos = item.getPositionInfo();
-                    int line = pos != null ? pos.getLine() : 1;
-                    // TODO
-                    // errors.add(new SwaggerError(line, getSeverity(item.getSeverity()), item.getMsg()));
+                    if (pos != null) {
+                        PositionEndpoint start = pos.getStart();
+                        PositionEndpoint end = pos.getEnd();
+
+                        int offset = document.getLineOffset(start.getLine() - 1) + (start.getColumn() - 1);
+                        int length = (document.getLineOffset(end.getLine() - 1) + end.getColumn() - 1) - offset;
+
+                        errors.add(new SwaggerError(getSeverity(item.getSeverity()), offset, length, item.getMsg()));
+                    } else {
+                        errors.add(new SwaggerError(getSeverity(item.getSeverity()), 0, 0, item.getMsg()));
+                    }
                 }
             } catch (Exception e) {
                 Activator.getDefault().getLog()
@@ -255,7 +264,6 @@ public class OpenApi3Validator extends Validator {
     }
 
     protected void validateParameters(JsonDocument document, AbstractNode node, Set<SwaggerError> errors) {
-        Model model = document.getModel();
         final JsonPointer pointer = JsonPointer.compile("/definitions/parameterOrReference");
 
         if (node != null && node.getType() != null && pointer.equals(node.getType().getPointer())) {

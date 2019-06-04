@@ -61,7 +61,7 @@ public abstract class Validator {
 
     private final Set<ValidationProvider> providers;
     private final IPreferenceStore preferenceStore;
-    private final SwaggerErrorFactory factory = new SwaggerErrorFactory();
+    private final SwaggerErrorFactory errorFactory = new SwaggerErrorFactory();
 
     public Validator(IPreferenceStore preferenceStore) {
         this.preferenceStore = preferenceStore;
@@ -74,6 +74,10 @@ public abstract class Validator {
 
     protected IPreferenceStore getPreferenceStore() {
         return preferenceStore;
+    }
+
+    protected SwaggerErrorFactory getErrorFactory() {
+        return errorFactory;
     }
 
     /**
@@ -284,7 +288,7 @@ public abstract class Validator {
 
     protected SwaggerError error(JsonDocument document, AbstractNode node, int level, String message) {
         // return new SwaggerError(node.getStart().getLine() + 1, level, message);
-        return factory.fromMessage(document, node, level, message);
+        return errorFactory.fromMessage(document, node, level, message);
     }
 
     /*
@@ -344,9 +348,8 @@ public abstract class Validator {
     }
 
     protected SwaggerError createDuplicateError(JsonDocument document, String key, Node node) {
-        return factory.fromNode(document, node, SEVERITY_WARNING, String.format(Messages.error_duplicate_keys, key));
-        // return new SwaggerError(node.getStartMark().getLine() + 1, ,
-        // String.format(Messages.error_duplicate_keys, key));
+        return errorFactory.fromNode(document, node, SEVERITY_WARNING,
+                String.format(Messages.error_duplicate_keys, key));
     }
 
 }

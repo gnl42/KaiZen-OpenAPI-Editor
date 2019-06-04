@@ -59,6 +59,8 @@ public class ProblemTextHover extends AbstractProblemHover
                             });
                     return new AnnotationInfo(ann, position, textViewer, proposals);
                 }) //
+                   // We return only 1 error to avoid UI complexities
+                   // Once user fixes this error, the others will be displayed
                 .findFirst() //
                 .orElse(null);
 

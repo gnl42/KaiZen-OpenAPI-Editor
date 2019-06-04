@@ -105,14 +105,13 @@ public class AbstractProblemHover {
         if (getAnnotationModel() == null) {
             return Collections.emptyList();
         }
-        System.out.println("annoattion " + lineNumber + " " + offset);
+
         final Iterator<?> iterator = getAnnotationModel().getAnnotationIterator();
         List<Annotation> result = new ArrayList<>();
         while (iterator.hasNext()) {
             final Annotation annotation = (Annotation) iterator.next();
             if (isHandled(annotation)) {
                 Position position = getAnnotationModel().getPosition(annotation);
-                System.out.println("position " + position);
                 if (position != null) {
                     final int start = position.getOffset();
                     final int end = start + position.getLength();
@@ -122,11 +121,6 @@ public class AbstractProblemHover {
                     }
                     try {
                         int startLine = getDocument().getLineOfOffset(start);
-                        int endLine = getDocument().getLineOfOffset(end);
-                        System.out.println("start line " + getDocument().getLineOfOffset(start));
-                        // if (startLine > lineNumber || endLine < lineNumber) {
-                        // continue;
-                        // }
                         if (lineNumber != startLine) {
                             continue;
                         }

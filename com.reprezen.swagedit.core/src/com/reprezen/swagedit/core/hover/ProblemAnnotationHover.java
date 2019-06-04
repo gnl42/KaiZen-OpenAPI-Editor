@@ -37,31 +37,14 @@ public class ProblemAnnotationHover extends AbstractProblemHover
     @Override
     public Object getHoverInfo(ISourceViewer sourceViewer, ILineRange lineRange, int visibleNumberOfLines) {
         List<Annotation> annotations = getAnnotations(lineRange.getStartLine(), -1);
-        // JsonQuickAssistProcessor processor = new JsonQuickAssistProcessor();
 
         AnnotationInfo result = annotations.stream() //
                 .filter(ann -> ann.getText() != null) //
                 .map(ann -> {
                     Position position = getAnnotationModel().getPosition(ann);
-                    // ICompletionProposal[] proposals = processor
-                    // .computeQuickAssistProposals(new IQuickAssistInvocationContext() {
-                    // @Override
-                    // public ISourceViewer getSourceViewer() {
-                    // return sourceViewer;
-                    // }
-                    //
-                    // @Override
-                    // public int getOffset() {
-                    // return lineRange.;
-                    // }
-                    //
-                    // @Override
-                    // public int getLength() {
-                    // return hoverRegion.getLength();
-                    // }
-                    // });
                     return new AnnotationInfo(ann, position, sourceViewer, new ICompletionProposal[] {});
                 }) //
+                   // We return only one marker to avoid UI complexities
                 .findFirst() //
                 .orElse(null);
 
