@@ -42,7 +42,6 @@ import com.reprezen.swagedit.core.assist.JsonQuickAssistProcessor;
 import com.reprezen.swagedit.core.editor.outline.QuickOutline;
 import com.reprezen.swagedit.core.hover.ProblemAnnotationHover;
 import com.reprezen.swagedit.core.hover.ProblemTextHover;
-import com.reprezen.swagedit.core.hover.QuickFixInformationControl;
 import com.reprezen.swagedit.core.schema.CompositeSchema;
 
 public abstract class JsonSourceViewerConfiguration extends YEditSourceViewerConfiguration {
@@ -81,14 +80,8 @@ public abstract class JsonSourceViewerConfiguration extends YEditSourceViewerCon
     }
 
     @Override
-    public IInformationControlCreator getInformationControlCreator(ISourceViewer sourceViewer) {
-        return parent -> new QuickFixInformationControl(parent, true);
-    }
-
-    @Override
     public IAnnotationHover getAnnotationHover(ISourceViewer sourceViewer) {
         return new ProblemAnnotationHover(sourceViewer);
-        // return new DefaultAnnotationHover();
     }
 
     @Override
@@ -122,16 +115,6 @@ public abstract class JsonSourceViewerConfiguration extends YEditSourceViewerCon
     @Override
     public IHyperlinkDetector[] getHyperlinkDetectors(ISourceViewer sourceViewer) {
         return new IHyperlinkDetector[] { new URLHyperlinkDetector() };
-    }
-
-    @Override
-    public IInformationPresenter getInformationPresenter(ISourceViewer sourceViewer) {
-        return new InformationPresenter(new IInformationControlCreator() {
-            @Override
-            public IInformationControl createInformationControl(Shell parent) {
-                return new QuickFixInformationControl(parent, true);
-            }
-        });
     }
 
     public void setEditor(JsonEditor editor) {
