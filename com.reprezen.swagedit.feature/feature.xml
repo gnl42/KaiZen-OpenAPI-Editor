@@ -101,11 +101,11 @@ This Agreement is governed by the laws of the State of New York and the intellec
       <import plugin="org.eclipse.core.runtime"/>
       <import plugin="org.eclipse.ui.editors"/>
       <import plugin="org.eclipse.jface.text"/>
-      <import plugin="org.eclipse.ui.views"/>
+      <import plugin="org.dadacoalition.yedit" version="1.0.15" match="greaterOrEqual"/>
       <import plugin="org.eclipse.core.resources"/>
       <import plugin="org.eclipse.ui.ide"/>
       <import plugin="org.eclipse.ui.workbench.texteditor"/>
-      <import plugin="org.dadacoalition.yedit" version="1.0.15" match="greaterOrEqual"/>
+      <import plugin="org.eclipse.ui.views"/>
    </requires>
 
    <plugin

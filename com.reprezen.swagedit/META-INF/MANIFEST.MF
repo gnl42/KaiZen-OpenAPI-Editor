@@ -21,9 +21,7 @@ Require-Bundle: org.eclipse.ui,
  com.fasterxml.jackson.dataformat.jackson-dataformat-yaml;bundle-version="2.5.0"
 Bundle-ActivationPolicy: lazy
 Bundle-RequiredExecutionEnvironment: JavaSE-1.8
-Bundle-ClassPath: .,
- lib/swagger-core-1.5.14.jar,
- lib/swagger-models-1.5.14.jar
+Bundle-ClassPath: .
 Bundle-Activator: com.reprezen.swagedit.Activator
 Export-Package: com.reprezen.swagedit,
  com.reprezen.swagedit.assist,
