@@ -21,10 +21,6 @@ public class OpenApi3Document extends JsonDocument {
     }
 
     public OpenApi3Document(OpenApi3Schema schema) {
-        // `new YAMLMapper()` was replaced by `new ObjectMapper(new YAMLFactory())`.
-        // It's done to eliminate an initialization exception here -
-        // Jackson Dataformat library does not declare an OSGi dependency on Jackson Databind which is needed to
-        // initialize YAMLMapper (it extends ObjectMapper from Jackson Databind).
         super(schema);
     }
 
