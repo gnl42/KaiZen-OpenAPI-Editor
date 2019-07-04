@@ -27,11 +27,9 @@
       <unit id="com.fasterxml.jackson.dataformat.jackson-dataformat-yaml" version="2.9.8"/>
       <unit id="com.reprezen.jsonoverlay" version="0.0.0"/>
       <unit id="com.reprezen.kaizen.openapi-parser" version="0.0.0"/>
-      <unit id="com.github.javaparser.javaparser-core" version="3.5.7"/>
       <unit id="com.sun.mail.javax.mail" version="1.6.1"/>
       <unit id="javax.activation" version="1.1.0"/>
       <unit id="javax.mail-api" version="1.6.1"/>
-      <unit id="org.apache.commons.cli" version="1.4.0"/>
       <repository location="http://products-internal.reprezen.com/kaizen/openapi-parser/snapshots/4.0.4.20190704164910"/>
     </location>
   </locations>
