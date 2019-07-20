@@ -64,7 +64,7 @@ The [Eclipse Marketplace solution](https://marketplace.eclipse.org/content/kaize
 [![Drag to your running Eclipse workspace.](./etc/img/btn-install.png)](http://marketplace.eclipse.org/marketplace-client-intro?mpc_install=3429028 "Drag to your running Eclipse workspace.")
 
 ### Installing from the Update Site 
-You can install KaiZen OpenAPI Editor into your Eclipse IDE by clicking on `Help > Install New Software... > Add...`
+You can install KaiZen OpenAPI Editor into your Eclipse IDE by clicking `Help > Install New Software... > Add...`
 This will show a dialog box where you can select the location of the update site.
 Use the update site http://products.reprezen.com/swagedit/latest/ as the URL.
 
