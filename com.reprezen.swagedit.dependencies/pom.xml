@@ -15,20 +15,20 @@
 	<packaging>eclipse-plugin</packaging>
 
 	<properties>
-		<kzop.version>4.0.4</kzop.version>
-		<schema.validator.version>2.2.10</schema.validator.version>
+		<kaizen-parser-version>4.0.4</kaizen-parser-version>
+		<schema-validator-version>2.2.10</schema-validator-version>
 	</properties>
 
 	<dependencies>
 		<dependency>
 			<groupId>com.reprezen.kaizen</groupId>
 			<artifactId>openapi-parser</artifactId>
-			<version>${kzop.version}</version>
+			<version>${kaizen-parser-version}</version>
 		</dependency>
 		<dependency>
 			<groupId>com.github.java-json-tools</groupId>
 			<artifactId>json-schema-validator</artifactId>
-			<version>${schema.validator.version}</version>
+			<version>${schema-validator-version}</version>
 		</dependency>
 	</dependencies>
 
