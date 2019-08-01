@@ -4,31 +4,27 @@ Bundle-Name: com.reprezen.swagedit.dependencies
 Bundle-SymbolicName: com.reprezen.swagedit.dependencies;singleton:=true
 Bundle-ActivationPolicy: lazy
 Bundle-Version: 0.8.0.qualifier
-Bundle-Vendor: ModelSolv, Inc.
+Bundle-Vendor: ModelSolv, Inc. d.b.a. RepreZen
 Bundle-RequiredExecutionEnvironment: JavaSE-1.8
 Automatic-Module-Name: com.reprezen.swagedit.dependencies
-Bundle-ClassPath: lib/activation-1.1.jar,
- lib/jackson-annotations-2.9.0.jar,
- lib/jackson-core-2.9.8.jar,
- lib/jackson-databind-2.9.8.jar,
- lib/jackson-dataformat-yaml-2.9.8.jar,
- lib/javax.mail-1.6.1.jar,
- lib/javax.mail-api-1.6.1.jar,
- lib/jsonoverlay-4.0.4.jar,
- lib/openapi-parser-4.0.4.jar,
- lib/snakeyaml-1.23.jar,
- lib/btf-1.2.jar,
- lib/jackson-coreutils-1.9.jar,
- lib/joda-time-2.9.7.jar,
- lib/jopt-simple-5.0.3.jar,
- lib/json-schema-core-1.2.10.jar,
- lib/json-schema-validator-2.2.10.jar,
- lib/jsr305-3.0.1.jar,
- lib/libphonenumber-8.0.0.jar,
- lib/mailapi-1.4.3.jar,
- lib/msg-simple-1.1.jar,
- lib/rhino-1.7.7.1.jar,
- lib/uri-template-0.9.jar
+Bundle-ClassPath: lib/com.fasterxml.jackson.core.jackson-annotations-2.9.0.jar,
+ lib/com.fasterxml.jackson.core.jackson-core-2.9.8.jar,
+ lib/com.fasterxml.jackson.core.jackson-databind-2.9.8.jar,
+ lib/com.fasterxml.jackson.dataformat.jackson-dataformat-yaml-2.9.8.jar,
+ lib/com.github.fge.btf-1.2.jar,
+ lib/com.github.fge.msg-simple-1.1.jar,
+ lib/com.github.fge.uri-template-0.9.jar,
+ lib/com.github.java-json-tools.jackson-coreutils-1.9.jar,
+ lib/com.github.java-json-tools.json-schema-core-1.2.10.jar,
+ lib/com.github.java-json-tools.json-schema-validator-2.2.10.jar,
+ lib/com.google.code.findbugs.jsr305-3.0.1.jar,
+ lib/com.googlecode.libphonenumber.libphonenumber-8.0.0.jar,
+ lib/com.reprezen.jsonoverlay.jsonoverlay-4.0.4.jar,
+ lib/com.reprezen.kaizen.openapi-parser-4.0.4.jar,
+ lib/joda-time.joda-time-2.9.7.jar,
+ lib/net.sf.jopt-simple.jopt-simple-5.0.3.jar,
+ lib/org.mozilla.rhino-1.7.7.1.jar,
+ lib/org.yaml.snakeyaml-1.23.jar
 Export-Package: com.fasterxml.jackson.annotation,
  com.fasterxml.jackson.core,
  com.fasterxml.jackson.core.async,
@@ -99,4 +95,6 @@ Export-Package: com.fasterxml.jackson.annotation,
  org.yaml.snakeyaml.serializer,
  org.yaml.snakeyaml.tokens,
  org.yaml.snakeyaml.util
-Require-Bundle: com.google.guava;bundle-version="21.0.0"
+Require-Bundle: com.google.guava;bundle-version="21.0.0",
+ javax.activation;bundle-version="1.1.0",
+ javax.mail;bundle-version="1.4.0"

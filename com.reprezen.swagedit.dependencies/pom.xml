@@ -59,6 +59,14 @@
 					<outputDirectory>${project.basedir}/lib</outputDirectory>
 					<overWriteReleases>false</overWriteReleases>
 					<overWriteSnapshots>true</overWriteSnapshots>
+					<includeTypes>jar</includeTypes>
+					<prependGroupId>true</prependGroupId>
+					<excludeGroupIds>
+						com.google.guava,
+						javax.mail,
+						javax.activation,
+						com.sun.mail
+					</excludeGroupIds>
 				</configuration>
 			</plugin>
 		</plugins>
