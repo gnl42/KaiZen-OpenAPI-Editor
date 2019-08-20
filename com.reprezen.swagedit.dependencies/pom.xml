@@ -102,9 +102,12 @@
 							<goal>build-classpath</goal>
 						</goals>
 						<configuration>
-							<prefix>dependency</prefix>
+							<prefix>lib</prefix>
 							<prependGroupId>true</prependGroupId>
 							<outputFile>${project.basedir}/lib/classPath.txt</outputFile>
+							<excludeArtifactIds>com.reprezen.swagedit.dependencies</excludeArtifactIds>
+							<excludeScope>system</excludeScope>
+							<includeScope>runtime</includeScope>
 						</configuration>
 					</execution>
 				</executions>
