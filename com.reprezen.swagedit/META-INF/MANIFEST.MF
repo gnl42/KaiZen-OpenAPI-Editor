@@ -15,10 +15,7 @@ Require-Bundle: org.eclipse.ui,
  org.dadacoalition.yedit,
  com.github.eclipsecolortheme;resolution:=optional,
  com.reprezen.swagedit.core,
- com.fasterxml.jackson.core.jackson-annotations;bundle-version="2.5.0",
- com.fasterxml.jackson.core.jackson-core;bundle-version="2.5.0",
- com.fasterxml.jackson.core.jackson-databind;bundle-version="2.5.0",
- com.fasterxml.jackson.dataformat.jackson-dataformat-yaml;bundle-version="2.5.0"
+ com.reprezen.swagedit.dependencies;bundle-version="0.8.0"
 Bundle-ActivationPolicy: lazy
 Bundle-RequiredExecutionEnvironment: JavaSE-1.8
 Bundle-ClassPath: .
@@ -33,3 +30,4 @@ Export-Package: com.reprezen.swagedit,
  com.reprezen.swagedit.validation,
  com.reprezen.swagedit.wizards
 Bundle-Vendor: ModelSolv, Inc. d.b.a. RepreZen
+Automatic-Module-Name: com.reprezen.swagedit

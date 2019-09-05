@@ -64,7 +64,7 @@ The [Eclipse Marketplace solution](https://marketplace.eclipse.org/content/kaize
 [![Drag to your running Eclipse workspace.](./etc/img/btn-install.png)](http://marketplace.eclipse.org/marketplace-client-intro?mpc_install=3429028 "Drag to your running Eclipse workspace.")
 
 ### Installing from the Update Site 
-You can install KaiZen OpenAPI Editor into your Eclipse IDE by clicking on `Help > Install New Software... > Add...`
+You can install KaiZen OpenAPI Editor into your Eclipse IDE by clicking `Help > Install New Software... > Add...`
 This will show a dialog box where you can select the location of the update site.
 Use the update site http://products.reprezen.com/swagedit/latest/ as the URL.
 
@@ -95,5 +95,4 @@ KaiZen OpenAPI Editor is provided under the [Eclipse Public License v1.0](https:
 
 _**Note:** KaiZen Editor includes code assist, real-time validation, syntax highlighting, and outline view.<br/>
 [Eclipse Color Theme](https://marketplace.eclipse.org/content/eclipse-color-theme) and [EditBox](http://marketplace.eclipse.org/content/nodeclipse-editbox-background-colors-themes-highlight-code-blocks-c-java-javascript-python) are available as separate plugins.<br/>
-[RepreZen API Studio](http://reprezen.com/swagger-tools) includes the mock service, live Swagger-UI, code generation, and other features that are not part of KaiZen Editor._
-
+[RepreZen API Studio](http://reprezen.com/swagger-tools) includes the mock service, live Swagger-UI, advanced code generation, and other features that are not part of KaiZen Editor._
