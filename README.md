@@ -95,4 +95,4 @@ KaiZen OpenAPI Editor is provided under the [Eclipse Public License v1.0](https:
 
 _**Note:** KaiZen Editor includes code assist, real-time validation, syntax highlighting, and outline view.<br/>
 [Eclipse Color Theme](https://marketplace.eclipse.org/content/eclipse-color-theme) and [EditBox](http://marketplace.eclipse.org/content/nodeclipse-editbox-background-colors-themes-highlight-code-blocks-c-java-javascript-python) are available as separate plugins.<br/>
-[RepreZen API Studio](http://reprezen.com/swagger-tools) includes the mock service, live Swagger-UI, advanced code generation, and other features that are not part of KaiZen Editor._
+[RepreZen API Studio](http://reprezen.com/swagger-tools) includes the mock service, live Swagger-UI, advanced code generation, and other features that are not part of KaiZen Editor. See the [feature comparison here](https://support.reprezen.com/support/solutions/articles/24000046272-what-s-the-difference-between-kaizen-openapi-editor-and-reprezen-api-studio-)._
