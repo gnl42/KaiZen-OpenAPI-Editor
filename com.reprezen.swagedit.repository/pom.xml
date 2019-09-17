@@ -20,6 +20,7 @@
 					<includeAllDependencies>true</includeAllDependencies>
 					<createArtifactRepository>true</createArtifactRepository>
 					<compress>true</compress>
+					<xzCompress>false</xzCompress>
 				</configuration>
 			</plugin>
 
