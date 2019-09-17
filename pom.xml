@@ -21,7 +21,7 @@
 	</modules>
 
 	<properties>
-		<tycho.version>1.4.0</tycho.version>
+		<tycho.version>0.23.1</tycho.version>
 		<xtend-maven-plugin.version>2.17.0</xtend-maven-plugin.version>
 		<target-platform-artifact-id>com.reprezen.swagedit.target</target-platform-artifact-id>
 		<project.build.sourceEncoding>UTF-8</project.build.sourceEncoding>
