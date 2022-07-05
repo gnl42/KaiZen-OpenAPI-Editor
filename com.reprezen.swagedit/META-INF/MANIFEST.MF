@@ -3,7 +3,7 @@ Bundle-ManifestVersion: 2
 Bundle-Name: %Bundle-Name
 Bundle-Localization: OSGI-INF/l10n/bundle
 Bundle-SymbolicName: com.reprezen.swagedit;singleton:=true
-Bundle-Version: 0.8.0.qualifier
+Bundle-Version: 0.8.1.qualifier
 Require-Bundle: org.eclipse.ui,
  org.eclipse.core.runtime,
  org.eclipse.core.filesystem,
@@ -17,7 +17,7 @@ Require-Bundle: org.eclipse.ui,
  com.reprezen.swagedit.core,
  com.reprezen.swagedit.dependencies;bundle-version="0.8.0"
 Bundle-ActivationPolicy: lazy
-Bundle-RequiredExecutionEnvironment: JavaSE-1.8
+Bundle-RequiredExecutionEnvironment: JavaSE-11
 Bundle-ClassPath: .
 Bundle-Activator: com.reprezen.swagedit.Activator
 Export-Package: com.reprezen.swagedit,

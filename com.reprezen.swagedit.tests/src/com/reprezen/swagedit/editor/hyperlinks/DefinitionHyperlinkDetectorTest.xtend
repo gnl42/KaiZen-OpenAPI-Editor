@@ -8,6 +8,7 @@ import org.eclipse.jface.text.ITextViewer
 import org.eclipse.jface.text.Region
 import org.junit.Test
 
+import static org.hamcrest.MatcherAssert.assertThat
 import static org.hamcrest.core.IsCollectionContaining.hasItem
 import static org.junit.Assert.*
 import com.reprezen.swagedit.core.hyperlinks.DefinitionHyperlinkDetector

@@ -2,6 +2,7 @@ package com.reprezen.swagedit.schema
 
 import org.junit.Test
 
+import static org.hamcrest.MatcherAssert.assertThat
 import static org.hamcrest.core.IsCollectionContaining.*
 import static org.junit.Assert.*
 import com.reprezen.swagedit.core.schema.ObjectTypeDefinition

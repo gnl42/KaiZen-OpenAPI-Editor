@@ -8,6 +8,7 @@ import org.hamcrest.Matcher
 import org.junit.Before
 import org.junit.Test
 
+import static org.hamcrest.MatcherAssert.assertThat
 import static org.hamcrest.core.IsCollectionContaining.*
 import static org.junit.Assert.*
 import com.reprezen.swagedit.schema.SwaggerSchema

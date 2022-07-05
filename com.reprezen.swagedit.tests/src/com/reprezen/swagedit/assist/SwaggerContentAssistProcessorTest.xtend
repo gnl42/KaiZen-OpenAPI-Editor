@@ -5,6 +5,7 @@ import java.util.ArrayList
 import org.junit.Test
 
 import static com.reprezen.swagedit.tests.utils.Cursors.*
+import static org.hamcrest.MatcherAssert.assertThat
 import static org.hamcrest.core.IsCollectionContaining.*
 import static org.junit.Assert.*
 import com.reprezen.swagedit.core.assist.StyledCompletionProposal

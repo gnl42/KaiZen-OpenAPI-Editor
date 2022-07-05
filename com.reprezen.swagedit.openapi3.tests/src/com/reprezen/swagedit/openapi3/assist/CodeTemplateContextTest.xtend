@@ -1,7 +1,7 @@
 /*******************************************************************************
  *  Copyright (c) 2016 ModelSolv, Inc. and others.
  *  All rights reserved. This program and the accompanying materials
- *  are made available under the terms of the Eclipse Public License v1.0
+ *  are made available under the terms of the Eclipse License v1.0
  *  which accompanies this distribution, and is available at
  *  http://www.eclipse.org/legal/epl-v10.html
  *  
@@ -28,16 +28,16 @@ class CodeTemplateContextTest {
 	val static KZOEref = "#KZOE-template"
 	
 	@Parameter
-	var public File specFile
+	var File specFile
 
 	@Parameter(1)
-	var public String fileName // for test name only
+	var String fileName // for test name only
 	
 	@Parameter(2)
-	var public int offset // for test name only
+	var int offset // for test name only
 	
 	@Parameter(3)
-	var public String testName // for test name only
+	var String testName // for test name only
 	
 
 	@Parameters(name="{index}: {1} - {3}")

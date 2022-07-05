@@ -30,7 +30,7 @@ class CodeAssistHelper {
 	val static public refValuePattern = Pattern::compile(".*value=\"([\\w\\s./]+)\".*")
 	val static public arrayItemMarker = "kzoe-arrayItem"
 
-	def public List<TestDecriptor> extractTests(File resourcesDir, String contextMarker) {
+	def List<TestDecriptor> extractTests(File resourcesDir, String contextMarker) {
 		val specFiles = resourcesDir.listFiles(new FilenameFilter() {
 
 			override accept(File dir, String name) {
@@ -47,7 +47,7 @@ class CodeAssistHelper {
 		return result
 	}
 
-	public static class TestDecriptor {
+	static class TestDecriptor {
 		val public File file;
 		val public int offset;
 		val public String name
@@ -70,11 +70,11 @@ class CodeAssistHelper {
 		return result
 	}
 
-	def public static String fileContents(File file) {
+	def static String fileContents(File file) {
 		return new String(Files.readAllBytes(Paths.get(file.getPath)), Charsets.UTF_8);
 	}
 
-	def public String getTestName(String spec, int offset) {
+	def String getTestName(String spec, int offset) {
 		val input = spec.substring(offset, spec.indexOf("\n", offset))
 		val matcher = testNamePattern.matcher(input)
 		if (matcher.matches) {

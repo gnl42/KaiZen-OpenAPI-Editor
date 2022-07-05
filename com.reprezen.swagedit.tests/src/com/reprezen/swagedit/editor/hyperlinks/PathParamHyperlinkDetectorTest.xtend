@@ -7,9 +7,9 @@ import java.util.HashSet
 import org.eclipse.jface.text.Region
 import org.junit.Test
 
+import static org.hamcrest.MatcherAssert.assertThat
 import static org.hamcrest.core.IsCollectionContaining.hasItem
 import static org.hamcrest.core.IsCollectionContaining.hasItems
-import static org.junit.Assert.assertThat
 import com.reprezen.swagedit.core.hyperlinks.SwaggerHyperlink
 import com.reprezen.swagedit.core.hyperlinks.PathParamHyperlinkDetector
 

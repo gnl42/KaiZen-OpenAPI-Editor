@@ -7,7 +7,7 @@
 	<parent>
 		<groupId>com.reprezen</groupId>
 		<artifactId>SwagEdit</artifactId>
-		<version>0.8.0-SNAPSHOT</version>
+		<version>0.8.1-SNAPSHOT</version>
 		<relativePath>../pom.xml</relativePath>
 	</parent>
 
@@ -30,6 +30,11 @@
 			<artifactId>json-schema-validator</artifactId>
 			<version>${schema-validator-version}</version>
 		</dependency>
+		<dependency>
+			<groupId>com.google.guava</groupId>
+			<artifactId>guava</artifactId>
+			<version>21.0</version>
+		</dependency>
 	</dependencies>
 
 	<repositories>
@@ -48,46 +53,38 @@
 
 	<build>
 		<plugins>
-			<plugin>
-				<artifactId>maven-clean-plugin</artifactId>
-				<version>2.6</version>
-				<configuration>
-					<filesets>
-						<fileset>
-							<directory>lib</directory>
-						</fileset>
-					</filesets>
-				</configuration>
-			</plugin>
-			<plugin>
-				<groupId>org.eclipse.tycho</groupId>
-				<artifactId>tycho-compiler-plugin</artifactId>
-				<version>${tycho.version}</version>
-				<configuration>
-					<compilerArgument>-err:-forbidden</compilerArgument>
-				</configuration>
-			</plugin>
+<!-- 			<plugin> -->
+<!-- 				<groupId>org.eclipse.tycho</groupId> -->
+<!-- 				<artifactId>tycho-compiler-plugin</artifactId> -->
+<!-- 				<version>${tycho.version}</version> -->
+<!-- 				<configuration> -->
+<!-- 					<compilerArgument>-err:-forbidden</compilerArgument> -->
+<!-- 				</configuration> -->
+<!-- 			</plugin> -->
+            <plugin>
+                <groupId>org.apache.maven.plugins</groupId>
+                <artifactId>maven-clean-plugin</artifactId>
+            </plugin>
 			<plugin>
 				<groupId>org.apache.maven.plugins</groupId>
 				<artifactId>maven-dependency-plugin</artifactId>
-				<version>2.8</version>
+				<version>3.3.0</version>
 				<executions>
-					<execution>
-						<id>copy-dependencies</id>
-						<phase>initialize</phase>
-						<goals>
-							<goal>copy-dependencies</goal>
-						</goals>
+                    <execution>
+                        <id>copy-dependencies</id>
+                        <phase>clean</phase>
+                        <goals>
+                            <goal>copy-dependencies</goal>
+                        </goals>
 						<configuration>
-							<outputDirectory>${project.basedir}/lib</outputDirectory>
+							<outputDirectory>target/lib</outputDirectory>
 							<overWriteReleases>false</overWriteReleases>
 							<overWriteSnapshots>true</overWriteSnapshots>
 							<includeTypes>jar</includeTypes>
-							<prependGroupId>true</prependGroupId>
+							<prependGroupId>false</prependGroupId>
 							<stripVersion>true</stripVersion>
 							<excludeArtifactIds>com.reprezen.swagedit.dependencies</excludeArtifactIds>
 							<excludeGroupIds>
-								com.google.guava,
 								javax.mail,
 								javax.activation,
 								com.sun.mail
@@ -96,53 +93,65 @@
 							<includeScope>runtime</includeScope>
 						</configuration>
 					</execution>
-					<execution>
-						<id>classpath</id>
-						<goals>
-							<goal>build-classpath</goal>
-						</goals>
-						<configuration>
-							<prefix>lib</prefix>
-							<prependGroupId>true</prependGroupId>
-							<outputFile>${project.basedir}/lib/classPath.txt</outputFile>
-							<excludeArtifactIds>com.reprezen.swagedit.dependencies</excludeArtifactIds>
-							<excludeScope>system</excludeScope>
-							<includeScope>runtime</includeScope>
-						</configuration>
-					</execution>
+<!-- 					<execution> -->
+<!-- 						<id>classpath</id> -->
+<!-- 						<goals> -->
+<!-- 							<goal>build-classpath</goal> -->
+<!-- 						</goals> -->
+<!-- 						<configuration> -->
+<!-- 							<prefix>lib</prefix> -->
+<!-- 							<prependGroupId>true</prependGroupId> -->
+<!-- 							<outputFile>target/lib/classPath.txt</outputFile> -->
+<!-- 							<excludeArtifactIds>com.reprezen.swagedit.dependencies</excludeArtifactIds> -->
+<!-- 							<excludeScope>system</excludeScope> -->
+<!-- 							<includeScope>runtime</includeScope> -->
+<!-- 						</configuration> -->
+<!-- 					</execution> -->
 				</executions>
 			</plugin>
+            <plugin>
+                <groupId>org.eclipse.tycho</groupId>
+                <artifactId>tycho-packaging-plugin</artifactId>
+                <configuration>
+                    <archive>
+                        <manifest>
+                            <addDefaultImplementationEntries>true</addDefaultImplementationEntries>
+                            <addDefaultSpecificationEntries></addDefaultSpecificationEntries>
+                        </manifest>
+                    </archive>
+                </configuration>
+            </plugin>
 		</plugins>
 
-		<pluginManagement>
-			<plugins>
-				<plugin>
-					<groupId>org.eclipse.m2e</groupId>
-					<artifactId>lifecycle-mapping</artifactId>
-					<version>1.0.0</version>
-					<configuration>
-						<lifecycleMappingMetadata>
-							<pluginExecutions>
-								<pluginExecution>
-									<pluginExecutionFilter>
-										<groupId>org.apache.maven.plugins</groupId>
-										<artifactId>maven-dependency-plugin</artifactId>
-										<versionRange>[2.8,)</versionRange>
-										<goals>
-											<goal>build-classpath</goal>
-										</goals>
-									</pluginExecutionFilter>
-									<action>
-										<execute>
-											<runOnIncremental>false</runOnIncremental>
-										</execute>
-									</action>
-								</pluginExecution>
-							</pluginExecutions>
-						</lifecycleMappingMetadata>
-					</configuration>
-				</plugin>
-			</plugins>
-		</pluginManagement>
+<!-- 		<pluginManagement> -->
+<!-- 			<plugins> -->
+<!-- 				<plugin> -->
+<!-- 					<groupId>org.eclipse.m2e</groupId> -->
+<!-- 					<artifactId>lifecycle-mapping</artifactId> -->
+<!-- 					<version>1.0.0</version> -->
+<!-- 					<configuration> -->
+<!-- 						<lifecycleMappingMetadata> -->
+<!-- 							<pluginExecutions> -->
+<!-- 								<pluginExecution> -->
+<!-- 									<pluginExecutionFilter> -->
+<!-- 										<groupId>org.apache.maven.plugins</groupId> -->
+<!-- 										<artifactId>maven-dependency-plugin</artifactId> -->
+<!-- 										<versionRange>[3.3,)</versionRange> -->
+<!-- 										<goals> -->
+<!-- 											<goal>build-classpath</goal> -->
+<!-- 										</goals> -->
+<!-- 									</pluginExecutionFilter> -->
+<!-- 									<action> -->
+<!-- 										<execute> -->
+<!-- 											<runOnIncremental>false</runOnIncremental> -->
+<!-- 										</execute> -->
+<!-- 									</action> -->
+<!-- 								</pluginExecution> -->
+<!-- 							</pluginExecutions> -->
+<!-- 						</lifecycleMappingMetadata> -->
+<!-- 					</configuration> -->
+<!-- 				</plugin> -->
+<!-- 			</plugins> -->
+<!-- 		</pluginManagement> -->
 	</build>
 </project>

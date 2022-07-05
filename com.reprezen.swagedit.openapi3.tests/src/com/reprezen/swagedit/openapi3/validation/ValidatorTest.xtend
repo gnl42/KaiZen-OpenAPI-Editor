@@ -1,7 +1,7 @@
 /*******************************************************************************
  * Copyright (c) 2016 ModelSolv, Inc. and others.
  * All rights reserved. This program and the accompanying materials
- * are made available under the terms of the Eclipse Public License v1.0
+ * are made available under the terms of the Eclipse License v1.0
  * which accompanies this distribution, and is available at
  * http://www.eclipse.org/legal/epl-v10.html
  *
@@ -19,6 +19,7 @@ import org.eclipse.core.resources.IMarker
 import org.eclipse.xtext.xbase.lib.Functions.Function1
 import org.junit.Test
 
+import static org.hamcrest.MatcherAssert.assertThat
 import static org.hamcrest.CoreMatchers.*
 import static org.junit.Assert.*
 
