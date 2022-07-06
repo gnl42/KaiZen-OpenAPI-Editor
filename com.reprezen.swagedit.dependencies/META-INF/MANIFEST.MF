@@ -11,7 +11,6 @@ Automatic-Module-Name: com.reprezen.swagedit.dependencies
 Require-Bundle: javax.activation;bundle-version="1.1.0",
  javax.mail;bundle-version="1.4.0"
 Bundle-ClassPath: target/lib/btf.jar,
- target/lib/guava.jar,
  target/lib/jackson-annotations.jar,
  target/lib/jackson-core.jar,
  target/lib/jackson-coreutils.jar,

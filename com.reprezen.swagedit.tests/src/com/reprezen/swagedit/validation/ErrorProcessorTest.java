@@ -10,7 +10,6 @@
  *******************************************************************************/
 package com.reprezen.swagedit.validation;
 
-import static com.google.common.collect.Iterables.getOnlyElement;
 import static org.junit.Assert.assertEquals;
 import static org.junit.Assert.assertTrue;
 
@@ -43,7 +42,7 @@ public class ErrorProcessorTest {
         Set<SwaggerError> errors = processor.processMessageNode(fixture);
 
         assertEquals(1, errors.size());
-        assertTrue(getOnlyElement(errors) instanceof SwaggerError);
+        assertTrue(errors.iterator().next() instanceof SwaggerError);
     }
 
     @Test
@@ -52,7 +51,7 @@ public class ErrorProcessorTest {
         Set<SwaggerError> errors = processor.processMessageNode(fixture);
 
         assertEquals(1, errors.size());
-        assertTrue(getOnlyElement(errors) instanceof SwaggerError.MultipleSwaggerError);
+        assertTrue(errors.iterator().next() instanceof SwaggerError.MultipleSwaggerError);
     }
 
 }
